@@ -10,6 +10,7 @@ export const CommandSystem = ClientSystemBuilder({
   init: (world) => {
 
     const processMessage = (message: string) => {
+      console.log("Processing message:", message)
       values(world.commands).forEach(({ regex, parse }) => {
         const match = message.match(regex)
         if (match) {
@@ -28,7 +29,6 @@ export const CommandSystem = ClientSystemBuilder({
       priority: 6,
       onTick: () => {
         const messagesFromPlayer = world.messages.atTick(world.tick)
-
         if (messagesFromPlayer) {
           values(messagesFromPlayer).forEach((messages) => messages.forEach((message) => {
             processMessage(message)

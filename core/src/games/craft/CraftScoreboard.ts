@@ -3,7 +3,7 @@ import {
   Player, Position, RefreshableDiv, World
 } from "@piggo-gg/core"
 
-export const Scoreboard = (): Entity => {
+export const CraftScoreboard = (): Entity => {
 
   let init = false
 
@@ -37,7 +37,7 @@ export const Scoreboard = (): Entity => {
   })
 
   const scoreboard = Entity({
-    id: "Scoreboard",
+    id: "CraftScoreboard",
     components: {
       position: Position(),
       npc: NPC({

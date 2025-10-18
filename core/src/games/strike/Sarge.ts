@@ -9,7 +9,7 @@ import {
   MeshPhongMaterial, Object3D, SkeletonHelper, Vector3
 } from "three"
 
-const walk = 0.44
+const walk = 0.42
 const run = 1.2
 const hop = 0.16
 const leap = 0.3
@@ -325,7 +325,9 @@ export const Sarge = (player: Player): Character => {
               }
               speed = 2
               animation = "dead"
+              // if (player.id.includes("dummy"))console.log("dead")
             } else {
+              // if (player.id.includes("dummy"))console.log("alive", sarge.components.health?.data.hp)
               if (speed === 0) {
                 if (animation === "run") {
                   runAnimation.crossFadeTo(idleAnimation.reset().play(), 0.10, false)
