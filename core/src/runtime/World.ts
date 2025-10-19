@@ -266,6 +266,10 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
       const { entities, systems } = world.game
 
+      if (world.pixi) {
+        world.pixi.camera.scaleTo(2.5)
+      }
+
       // add new entities
       for (const entity of entities) {
         if (entity.persists && world.entity(entity.id)) continue

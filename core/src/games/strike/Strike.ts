@@ -61,7 +61,6 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       Scoreboard(),
       EscapeMenu(world),
       // UIProfile(),
-      // CraftScoreboard(),
       HtmlChat(),
       HtmlFeed(),
       HealthAmmo(),
@@ -71,7 +70,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       }),
       Sky(),
       DummyPlayer(),
-      // DummyPlayer2(),
+      DummyPlayer2(),
       PhaseBanner()
     ]
   })
