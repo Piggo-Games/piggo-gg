@@ -218,7 +218,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     setGame: (gameTitle: GameTitle) => {
       const game = world.games[gameTitle]
 
-      console.log("SETTING GAME", gameTitle)
+      // console.log("SETTING GAME", gameTitle)
 
       // remove old entities
       values(world.entities).forEach((entity) => {

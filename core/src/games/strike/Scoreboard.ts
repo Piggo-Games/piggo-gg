@@ -25,7 +25,6 @@ export const Scoreboard = () => {
       npc: NPC({
         behavior: (_, world) => {
           if (!init) {
-            console.log("Scoreboard initialized")
             init = true
             document.body.appendChild(wrapper)
           }

@@ -34,7 +34,7 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
       id: mode === "global" ? "PhysicsSystem" : "LocalPhysicsSystem",
       query: ["position", "collider"],
       priority: mode === "global" ? 7 : 9,
-      // onRollback: resetPhysics,
+      onRollback: resetPhysics,
       onTick: (entities: Entity<Collider | Position>[], isRollback: false) => {
 
         // wait until rapier is ready

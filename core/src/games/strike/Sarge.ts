@@ -325,9 +325,7 @@ export const Sarge = (player: Player): Character => {
               }
               speed = 2
               animation = "dead"
-              // if (player.id.includes("dummy"))console.log("dead")
             } else {
-              // if (player.id.includes("dummy"))console.log("alive", sarge.components.health?.data.hp)
               if (speed === 0) {
                 if (animation === "run") {
                   runAnimation.crossFadeTo(idleAnimation.reset().play(), 0.10, false)
