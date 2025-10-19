@@ -62,6 +62,7 @@ export type Client = {
   sound: Sound
   token: string | undefined
   ws: WebSocket
+  isLeader: () => boolean
   playerId: () => string
   playerName: () => string
   character: () => Character | undefined
@@ -165,6 +166,9 @@ export const Client = ({ world }: ClientProps): Client => {
     sound: Sound(world),
     token: undefined,
     ws: new WebSocket(servers[env]),
+    isLeader: () => {
+      return !client.net.lobbyId || client.player.components.pc.data.leader
+    },
     playerId: () => {
       return client.player.id
     },
