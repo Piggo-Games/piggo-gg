@@ -51,7 +51,8 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
       if (!world.entities[msg.playerId]) {
         ws.data.playerId = msg.playerId
 
-        world.addEntity(Player({ id: msg.playerId, name: ws.data.playerName }))
+        const leader = world.players().length === 0
+        world.addEntity(Player({ id: msg.playerId, name: ws.data.playerName, leader }))
 
         clients[msg.playerId] = ws
         latestClientMessages[msg.playerId] = []

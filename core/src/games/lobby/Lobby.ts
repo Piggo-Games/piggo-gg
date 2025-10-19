@@ -2,7 +2,7 @@ import {
   Actions, Background, Entity, GameBuilder, getBrowser, HButton,
   HImg, HText, HtmlDiv, HtmlText, LobbiesMenu, Networked,
   NPC, piggoVersion, pixiGraphics, PixiRenderSystem, pixiText,
-  Position, RefreshableDiv, Renderable, Strike, Volley, World
+  Position, RefreshableDiv, Renderable, Strike, styleButton, Volley, World
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -43,6 +43,8 @@ const GameButton = (game: GameBuilder, world: World) => {
     onClick: (button) => {
       button.style.transform = `translate(0%, 0%) rotateY(${rotation += 360}deg)`
 
+      if (!world.client?.isLeader()) return
+
       world.actions.push(world.tick + 2, "gameLobby", { actionId: "selectGame", params: { gameId: game.id } })
       world.client?.sound.play({ name: "bubble" })
     },
@@ -81,6 +83,8 @@ const PlayButton = (world: World) => {
       backgroundClip: "content-box, border-box"
     },
     onClick: () => {
+      if (!world.client?.isLeader()) return
+
       const state = world.state<LobbyState>()
       if (["craft", "strike"].includes(state.gameId)) world.client?.pointerLock()
 
@@ -88,12 +92,6 @@ const PlayButton = (world: World) => {
       world.actions.push(world.tick + 2, "world", { actionId: "game", params: { game: state.gameId } })
 
       world.client?.sound.play({ name: "bubble" })
-    },
-    onHover: (button) => {
-      button.style.boxShadow = "0 0 6px 2px white"
-    },
-    onHoverOut: (button) => {
-      button.style.boxShadow = "none"
     }
   })
 
@@ -236,6 +234,7 @@ const GameLobby = (): Entity => {
 
   let gameButtons: HTMLButtonElement[] = []
 
+  let playButton: HTMLButtonElement | undefined = undefined
   let lobbiesMenu: RefreshableDiv | undefined = undefined
   let profile: RefreshableDiv | undefined = undefined
   let playersOnline: RefreshableDiv | undefined = undefined
@@ -302,7 +301,7 @@ const GameLobby = (): Entity => {
 
             document.body.appendChild(shell)
 
-            const playButton = PlayButton(world)
+            playButton = PlayButton(world)
             shell.appendChild(playButton)
 
             const lobbiesShell = HtmlDiv({
@@ -325,6 +324,8 @@ const GameLobby = (): Entity => {
             profile?.update()
             playersOnline?.update()
           }
+
+          if (playButton) styleButton(playButton, world.client?.isLeader() ?? false, playButton.matches(":hover"))
 
           // make border green for selected game
           const state = world.game.state as LobbyState

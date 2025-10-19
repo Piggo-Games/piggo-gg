@@ -163,7 +163,7 @@ export const InputSystem = ClientSystemBuilder({
             // push the message to messages
             if (inputBuffer.length > 0) {
               const message = inputBuffer
-              world.messages.push(world.tick, client.playerId() ?? "", message)
+              world.messages.push(world.tick + 1, client.playerId() ?? "", message)
             }
 
             client.chat.inputBuffer = ""

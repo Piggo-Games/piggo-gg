@@ -108,6 +108,7 @@ export const EscapeMenu = (world: World): Entity => {
       fontSize: "18px",
     },
     onClick: () => {
+      if (!world.client?.isLeader()) return
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
     }
   })
@@ -168,7 +169,7 @@ export const EscapeMenu = (world: World): Entity => {
           artImage.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "176px"
 
           // menu buttons
-          styleButton(returnToHomescreen, true, returnToHomescreen.matches(":hover"))
+          styleButton(returnToHomescreen, world.client?.isLeader() ?? false, returnToHomescreen.matches(":hover"))
           styleButton(lobbiesButton, activeMenu !== "lobbies", lobbiesButton.matches(":hover"))
           styleButton(skinsButton, activeMenu !== "skins", skinsButton.matches(":hover"))
           styleButton(settingsButton, activeMenu !== "settings", settingsButton.matches(":hover"))

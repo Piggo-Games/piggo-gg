@@ -156,10 +156,15 @@ export const Sound = (world: World): Sound => {
         const tone = sound.tones[name]
         if (tone && tone.loaded) {
 
-          const gain = new Gain(dbToGain(tone.volume.value) * (volume ?? 1)).toDestination()
-          const player = new Player(tone.buffer).connect(gain)
+          if (volume) {
+            const gain = new Gain(dbToGain(tone.volume.value) * (volume ?? 1)).toDestination()
+            const player = new Player(tone.buffer).connect(gain)
 
-          player.start(fadeIn, start)
+            player.start(fadeIn, start)
+          } else {
+            tone.start(fadeIn, start)
+          }
+
           return true
         }
       } catch (e) {

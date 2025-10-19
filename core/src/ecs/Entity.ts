@@ -1,5 +1,5 @@
 import {
-  Component, ComponentTypes, NetworkedComponentData, deserializeComponent,
+  Component, ComponentTypes, NetworkedComponentData, ValidComponents, deserializeComponent,
   entries, keys, serializeComponent, values
 } from "@piggo-gg/core"
 
@@ -22,7 +22,7 @@ export type ProtoEntity<T extends ComponentTypes = ComponentTypes> = {
 // an Entity is a uniquely identified set of Components
 export type Entity<T extends ComponentTypes = ComponentTypes> = ProtoEntity<T> & {
   serialize: () => SerializedEntity
-  deserialize: (serializedEntity: SerializedEntity) => void
+  deserialize: (serializedEntity: SerializedEntity, component?: ValidComponents) => void
   removed: boolean
 }
 
@@ -44,7 +44,7 @@ export const Entity = <T extends ComponentTypes>(protoEntity: ProtoEntity<T>): E
 
       return serializedEntity
     },
-    deserialize: (serializedEntity: SerializedEntity) => {
+    deserialize: (serializedEntity: SerializedEntity, component?: ValidComponents) => {
 
       // deprecated
       for (const type of keys(serializedEntity)) {
@@ -53,12 +53,14 @@ export const Entity = <T extends ComponentTypes>(protoEntity: ProtoEntity<T>): E
         }
       }
 
-      entries(serializedEntity).forEach(([type, serializedComponent]) => {
+      for (const [type, serializedComponent] of entries(serializedEntity)) {
+        // entries(serializedEntity).forEach(([type, serializedComponent]) => {
         if (type in entity.components) {
+          if (component && type !== component) continue
           // @ts-expect-error
           deserializeComponent(entity.components[type], serializedComponent)
         }
-      })
+      }
     }
   }
 

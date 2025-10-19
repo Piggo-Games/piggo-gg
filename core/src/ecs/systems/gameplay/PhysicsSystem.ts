@@ -19,6 +19,8 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
     RapierInit().then(() => physics = new RapierWorld({ x: 0, y: 0 }))
 
     const resetPhysics = () => {
+      if (physics === undefined) return
+
       for (const id of keys(bodies)) delete bodies[id]
       colliders.clear()
 

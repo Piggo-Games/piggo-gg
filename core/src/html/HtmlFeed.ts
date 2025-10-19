@@ -3,6 +3,8 @@ import { Entity, entries, HButton, HDiv, HImg, HText, NPC, Player, Position, Thr
 export const HtmlFeed = (): Entity => {
   let init = false
 
+  const duration = 120
+
   type FeedKey = `${number}-${string}-${string}-${boolean}`
   let feedRecord: Record<FeedKey, number> = {}
 
@@ -60,18 +62,18 @@ export const HtmlFeed = (): Entity => {
 
             const timer = world.tick + ratio - tick
 
-            if (timer > 340) {
+            if (timer > (duration + 40)) {
               delete feedRecord[key as FeedKey]
               if (wrapper.children.length > 0) {
                 wrapper.removeChild(wrapper.children[0])
               }
-            } else if (timer > 300) {
+            } else if (timer > duration) {
               const index = Object.keys(feedRecord).indexOf(key)
 
               const item = wrapper.children[index] as HTMLElement
               if (item) {
-                item.style.opacity = `${1 - (timer - 300) / 40}`
-                item.style.marginTop = `${6 - (timer - 300) / 40 * 42}px`
+                item.style.opacity = `${1 - (timer - duration) / 40}`
+                item.style.marginTop = `${6 - (timer - duration) / 40 * 42}px`
               }
             }
           }

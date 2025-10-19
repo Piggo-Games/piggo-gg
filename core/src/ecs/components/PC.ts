@@ -2,15 +2,19 @@ import { Component } from "@piggo-gg/core"
 
 export type PC = Component<"pc"> & {
   data: {
+    leader: boolean
     name: string
-    ready: boolean
     points: number
+    ready: boolean
   }
 }
 
-export const PC = ({ name }: { name: string }): PC => ({
+export const PC = ({ name, leader }: { name: string, leader?: boolean }): PC => ({
   type: "pc",
   data: {
-    name, ready: false, points: 0
+    leader: leader ?? false,
+    name,
+    points: 0,
+    ready: false
   }
 })

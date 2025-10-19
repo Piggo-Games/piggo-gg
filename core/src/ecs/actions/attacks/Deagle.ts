@@ -304,7 +304,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             }
           }
 
-          if (hit.player && !offline) {
+          if (hit.player) {
             if (character.id === world.client?.character()?.id) {
               world.client.controls.localHit = { tick: world.tick, headshot: hit.headshot }
             }

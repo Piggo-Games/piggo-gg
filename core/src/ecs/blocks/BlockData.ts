@@ -103,7 +103,7 @@ export const BlockData = (): BlockData => {
     clear: () => {
       for (let i = 0; i < chunks; i++) {
         for (let j = 0; j < chunks; j++) {
-          data[i][j].fill(0)
+          data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
         }
       }
       visibleCache = {}

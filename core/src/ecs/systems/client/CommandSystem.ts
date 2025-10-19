@@ -15,7 +15,8 @@ export const CommandSystem = ClientSystemBuilder({
         if (match) {
           const action = parse({ world, match })
           if (action) {
-            // TODO can this be more first-class
+            if (!world.client?.isLeader()) return
+
             world.actions.push(world.tick + 1, "world", action)
           }
         }
@@ -28,7 +29,6 @@ export const CommandSystem = ClientSystemBuilder({
       priority: 6,
       onTick: () => {
         const messagesFromPlayer = world.messages.atTick(world.tick)
-
         if (messagesFromPlayer) {
           values(messagesFromPlayer).forEach((messages) => messages.forEach((message) => {
             processMessage(message)

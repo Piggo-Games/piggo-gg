@@ -6,7 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Carl } from "./Carl"
 import { MobileUI } from "./MobileUI"
-import { Scoreboard } from "./Scoreboard"
+import { CraftScoreboard } from "./CraftScoreboard"
 
 export type CraftState = {
   applesEaten: Record<string, number>
@@ -68,7 +68,7 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       Crosshair(),
       EscapeMenu(world),
       // UIProfile(),
-      Scoreboard(),
+      CraftScoreboard(),
       HtmlChat(),
       Sun(),
       Sky()

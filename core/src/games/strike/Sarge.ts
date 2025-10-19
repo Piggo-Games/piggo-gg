@@ -9,7 +9,7 @@ import {
   MeshPhongMaterial, Object3D, SkeletonHelper, Vector3
 } from "three"
 
-const walk = 0.44
+const walk = 0.42
 const run = 1.2
 const hop = 0.16
 const leap = 0.3
