@@ -17,8 +17,6 @@ export const CommandSystem = ClientSystemBuilder({
           if (action) {
             if (!world.client?.isLeader()) return
 
-            console.log("COMMAND:", message, "=>", action)
-
             world.actions.push(world.tick + 1, "world", action)
           }
         }
