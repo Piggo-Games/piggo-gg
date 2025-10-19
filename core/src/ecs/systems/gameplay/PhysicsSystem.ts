@@ -19,6 +19,8 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
     RapierInit().then(() => physics = new RapierWorld({ x: 0, y: 0 }))
 
     const resetPhysics = () => {
+      if (physics === undefined) return
+
       for (const id of keys(bodies)) delete bodies[id]
       colliders.clear()
 
@@ -32,7 +34,7 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
       id: mode === "global" ? "PhysicsSystem" : "LocalPhysicsSystem",
       query: ["position", "collider"],
       priority: mode === "global" ? 7 : 9,
-      onRollback: resetPhysics,
+      // onRollback: resetPhysics,
       onTick: (entities: Entity<Collider | Position>[], isRollback: false) => {
 
         // wait until rapier is ready

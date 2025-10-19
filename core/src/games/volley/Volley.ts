@@ -108,9 +108,11 @@ const VolleySystem = SystemBuilder({
       for (const bot of values(bots)) world.addEntity(bot)
     }
 
-    // scale camera to fit the court
-    const desiredScale = screenWH().w / 600 - 0.2
-    world.pixi?.camera.scaleTo(desiredScale)
+    // scale the camera
+    if (world.client) {
+      const desiredScale = screenWH().w / 600 - 0.2
+      world.pixi?.camera.scaleTo(desiredScale)
+    }
 
     return {
       id: "VolleySystem",

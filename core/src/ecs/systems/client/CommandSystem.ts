@@ -10,13 +10,15 @@ export const CommandSystem = ClientSystemBuilder({
   init: (world) => {
 
     const processMessage = (message: string) => {
-      console.log("Processing message:", message)
       values(world.commands).forEach(({ regex, parse }) => {
         const match = message.match(regex)
         if (match) {
           const action = parse({ world, match })
           if (action) {
-            // TODO can this be more first-class
+            if (!world.client?.isLeader()) return
+
+            console.log("COMMAND:", message, "=>", action)
+
             world.actions.push(world.tick + 1, "world", action)
           }
         }
