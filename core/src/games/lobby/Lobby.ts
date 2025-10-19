@@ -43,6 +43,8 @@ const GameButton = (game: GameBuilder, world: World) => {
     onClick: (button) => {
       button.style.transform = `translate(0%, 0%) rotateY(${rotation += 360}deg)`
 
+      if (!world.client?.isLeader()) return
+
       world.actions.push(world.tick + 2, "gameLobby", { actionId: "selectGame", params: { gameId: game.id } })
       world.client?.sound.play({ name: "bubble" })
     },
