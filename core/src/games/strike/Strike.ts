@@ -103,7 +103,7 @@ const StrikeSystem = SystemBuilder({
 
         mobileUI?.update()
 
-        const players = world.players().filter(p => !p.id.includes("dummy"))
+        const players = world.players()
 
         if (world.mode === "server" && state.phaseChange === undefined && state.phase === "warmup" && players.length > 0) {
           const notReady = players.filter(p => !p.components.pc.data.ready)
@@ -130,9 +130,22 @@ const StrikeSystem = SystemBuilder({
             state.jumped = state.jumped.filter(id => id !== character.id)
           }
 
-          // kda state
+          // initialize kda
           if (!state.kda[player.id]) {
             state.kda[player.id] = "0|0|0"
+          }
+
+          // kda update
+          if (health?.dead() && health.data.died === world.tick - 10) {
+            const [kills, deaths, assists] = state.kda[player.id].split("|").map(Number)
+            state.kda[player.id] = `${kills}|${deaths + 1}|${assists}`
+
+            const from = health.data.diedFrom
+
+            if (from && state.kda[from]) {
+              const [kills, deaths, assists] = state.kda[from].split("|").map(Number)
+              state.kda[from] = `${kills + 1}|${deaths}|${assists}`
+            }
           }
 
           // reset rotation
