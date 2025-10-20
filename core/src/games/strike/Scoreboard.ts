@@ -1,4 +1,4 @@
-import { Entity, HDiv, HText, KDA, NPC, Position, StrikeState, TeamNumber } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDA, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
 
 type RowData = {
   row: HTMLDivElement
@@ -100,6 +100,18 @@ export const Scoreboard = () => {
                 team2.appendChild(row)
               }
             }
+          }
+
+          // sort by kills descending
+          const team1Rows = values(playerData).filter(pd => pd.team === 1)
+            .sort((a, b) => {
+              const aKills = parseInt(a.kda.split("|")[0])
+              const bKills = parseInt(b.kda.split("|")[0])
+              return bKills - aKills
+            })
+          team1.innerHTML = ""
+          for (const rowData of team1Rows) {
+            team1.appendChild(rowData.row)
           }
 
           wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
