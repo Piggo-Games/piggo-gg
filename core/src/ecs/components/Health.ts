@@ -1,5 +1,5 @@
 import {
-  Component, Entity, max, SystemBuilder, ValidSounds, World
+  Component, Entity, max, StrikeState, SystemBuilder, ValidSounds, World
 } from "@piggo-gg/core"
 
 export type Health = Component<"health", {
@@ -50,6 +50,16 @@ export const Health = (
         health.data.died = world.tick
         if (from) health.data.diedFrom = from
         if (reason) health.data.diedReason = reason
+
+        if (world.mode === "server" || !world.client?.net.lobbyId) {
+          const state = world.state<StrikeState>()
+          if (!state.kda) return
+
+          if (from && state.kda[from]) {
+            const [kills, deaths, assists] = state.kda[from].split("|").map(Number)
+            state.kda[from] = `${kills + 1}|${deaths}|${assists}`
+          }
+        }
       }
     },
     dead: () => health.data.hp <= 0,

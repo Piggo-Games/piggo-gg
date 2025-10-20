@@ -130,6 +130,11 @@ const StrikeSystem = SystemBuilder({
             state.jumped = state.jumped.filter(id => id !== character.id)
           }
 
+          // kda state
+          if (!state.kda[player.id]) {
+            state.kda[player.id] = "0|0|0"
+          }
+
           // reset rotation
           position.data.rotating = 0
           if (rotation < 0) position.data.rotating = min(0.08, -rotation)
