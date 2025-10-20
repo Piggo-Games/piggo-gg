@@ -11,7 +11,7 @@ export const Scoreboard = () => {
 
   let init = false
 
-  const players: Record<string, RowData> = {}
+  const playerData: Record<string, RowData> = {}
 
   const team1 = HDiv({
     style: {
@@ -54,31 +54,39 @@ export const Scoreboard = () => {
             document.body.appendChild(wrapper)
           }
 
-          const worldPlayers = world.players()
+          const players = world.players()
           const state = world.state<StrikeState>()
 
-          for (const p of worldPlayers) {
+          // clean up removed players
+          for (const pid in playerData) {
+            if (!players.find(p => p.id === pid)) {
+              const rowData = playerData[pid]
+              rowData.row.parentElement?.removeChild(rowData.row)
+              delete playerData[pid]
+            }
+          }
+
+          for (const p of players) {
 
             const playerKDA = state.kda[p.id] || "0|0|0"
 
             // clean up stale rows
-            const rowData = players[p.id]
+            const rowData = playerData[p.id]
             if (rowData) {
 
               if (rowData.kda !== playerKDA || rowData.name !== p.components.pc.data.name) {
-                // rowData.kda = playerKDA
                 rowData.row.parentElement?.removeChild(rowData.row)
-                delete players[p.id]
+                delete playerData[p.id]
               }
             }
 
             // add new row
-            if (!players[p.id]) {
+            if (!playerData[p.id]) {
 
               const { team } = p.components.team.data
               const row = ScoreboardRow(p, team, playerKDA)
 
-              players[p.id] = {
+              playerData[p.id] = {
                 row,
                 name: p.components.pc.data.name,
                 team: p.components.team.data.team,
