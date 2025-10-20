@@ -52,9 +52,7 @@ export const Hitmarker = () => {
 
           const opacity = max(0, 1.2 - (world.tick - localHit.tick + ratio) * fadeRate)
 
-          if (opacity === 0) {
-            localHit.tick = -100
-          }
+          if (opacity === 0) localHit.tick = -100
 
           for (const m of markers) {
             m.style.opacity = String(opacity)

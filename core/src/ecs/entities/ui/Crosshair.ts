@@ -29,7 +29,7 @@ export const Crosshair = () => {
 
           const fpsCamera = world.three?.camera.mode === "first"
 
-          div.style.visibility = (locked && item && settings.showCrosshair && fpsCamera) ? "visible" : "hidden"
+          div.style.visibility = (locked && item && settings.showCrosshair && fpsCamera && !world.client.bufferDown.get("tab")) ? "visible" : "hidden"
 
           if (!init) {
             world.three?.append(div)
