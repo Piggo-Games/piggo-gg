@@ -95,8 +95,8 @@ export const EscapeMenu = (world: World): Entity => {
     border: ""
   })
 
-  const backToHomescreen = HtmlButton({
-    text: "back to homescreen",
+  const returnToHomescreen = HtmlButton({
+    text: "return to homescreen",
     style: {
       position: "relative",
       transform: "translate(-50%)",
@@ -105,7 +105,7 @@ export const EscapeMenu = (world: World): Entity => {
       marginBottom: "10px",
       height: "40px",
       pointerEvents: "auto",
-      fontSize: "20px",
+      fontSize: "18px",
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
@@ -139,7 +139,7 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(settings.div)
 
   wrapper.appendChild(art)
-  if (!world.client?.mobile) wrapper.appendChild(backToHomescreen)
+  if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
   wrapper.appendChild(submenuButtons)
   wrapper.appendChild(shell)
 
@@ -169,7 +169,7 @@ export const EscapeMenu = (world: World): Entity => {
           artImage.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "176px"
 
           // menu buttons
-          styleButton(backToHomescreen, world.client?.isLeader() ?? false, backToHomescreen.matches(":hover"))
+          styleButton(returnToHomescreen, world.client?.isLeader() ?? false, returnToHomescreen.matches(":hover"))
           styleButton(lobbiesButton, activeMenu !== "lobbies", lobbiesButton.matches(":hover"))
           styleButton(skinsButton, activeMenu !== "skins", skinsButton.matches(":hover"))
           styleButton(settingsButton, activeMenu !== "settings", settingsButton.matches(":hover"))
