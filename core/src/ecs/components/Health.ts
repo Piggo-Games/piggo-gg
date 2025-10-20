@@ -1,5 +1,5 @@
 import {
-  Component, Entity, max, StrikeState, SystemBuilder, ValidSounds, World
+  Component, Entity, max, SystemBuilder, ValidSounds, World
 } from "@piggo-gg/core"
 
 export type Health = Component<"health", {
