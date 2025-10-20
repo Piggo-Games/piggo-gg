@@ -32,6 +32,7 @@ export type World = {
   addSystemBuilders: (systemBuilders: SystemBuilder[]) => void
   addSystems: (systems: System[]) => void
   announce: (message: string) => void
+  authoritative: () => boolean
   characters: () => Character[]
   entity: <T extends ComponentTypes>(id: string) => Entity<T> | undefined
   onTick: (_: { isRollback: boolean }) => void
@@ -139,6 +140,9 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     },
     announce: (message: string) => {
       world.messages.set(world.tick + 1, "game", [message])
+    },
+    authoritative: () => {
+      return (world.client && world.client.net.lobbyId === undefined) || world.mode === "server"
     },
     entity: <T extends ComponentTypes>(id: string) => {
       return world.entities[id] as Entity<T>

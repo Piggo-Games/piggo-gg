@@ -1,22 +1,47 @@
-import { Entity, HDiv, NPC, Position } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDA, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
+
+type RowData = {
+  row: HTMLDivElement
+  name: string
+  team: TeamNumber
+  kda: KDA
+}
 
 export const Scoreboard = () => {
 
   let init = false
 
+  const playerData: Record<string, RowData> = {}
+
+  const team1 = HDiv({
+    style: {
+      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%"
+    }
+  })
+
+  const team2 = HDiv({
+    style: {
+      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%", top: "50%"
+    }
+  })
+
   const wrapper = HDiv({
     style: {
       left: "50%",
       top: "50%",
+      width: "520px",
+      height: "400px",
       transform: "translate(-50%, -50%)",
-      // display: "flex",
-      border: "2px solid blue",
-
-      width: "400px",
-      height: "300px",
+      display: "flex",
+      flexDirection: "column",
+      border: "2px solid white",
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
       visibility: "hidden"
     }
-  })
+  },
+    team1,
+    team2
+  )
 
   const scoreboard = Entity({
     id: "scoreboard",
@@ -29,6 +54,66 @@ export const Scoreboard = () => {
             document.body.appendChild(wrapper)
           }
 
+          const players = world.players()
+          const state = world.state<StrikeState>()
+
+          // clean up removed players
+          for (const pid in playerData) {
+            if (!players.find(p => p.id === pid)) {
+              const rowData = playerData[pid]
+              rowData.row.parentElement?.removeChild(rowData.row)
+              delete playerData[pid]
+            }
+          }
+
+          for (const player of players) {
+
+            const { team, pc } = player.components
+
+            const playerKDA = state.kda[player.id] || "0|0|0"
+
+            // clean up stale rows
+            const rowData = playerData[player.id]
+            if (rowData) {
+
+              if (rowData.kda !== playerKDA || rowData.name !== pc.data.name) {
+                rowData.row.parentElement?.removeChild(rowData.row)
+                delete playerData[player.id]
+              }
+            }
+
+            // add new row
+            if (!playerData[player.id]) {
+
+              const row = ScoreboardRow(pc.data.name, team.data.team, playerKDA, world.client?.player?.id === player.id)
+
+              playerData[player.id] = {
+                row,
+                name: pc.data.name,
+                team: team.data.team,
+                kda: playerKDA
+              }
+
+              if (team.data.team === 1) {
+                team1.appendChild(row)
+              } else {
+                team2.appendChild(row)
+              }
+            }
+          }
+
+          // sort by kills descending
+          const team1Rows = values(playerData).filter(pd => pd.team === 1)
+            .sort((a, b) => {
+              const aKills = parseInt(a.kda.split("|")[0])
+              const bKills = parseInt(b.kda.split("|")[0])
+              return bKills - aKills
+            })
+          team1.innerHTML = ""
+          for (const rowData of team1Rows) {
+            team1.appendChild(rowData.row)
+          }
+
           wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
         }
       })
@@ -37,3 +122,32 @@ export const Scoreboard = () => {
 
   return scoreboard
 }
+
+const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boolean) => HDiv({
+  style: {
+    position: "relative",
+    marginTop: "6px",
+    width: "100%",
+    left: "50%",
+    transform: "translate(-50%)",
+    height: "28px",
+    border: isClient ? "2px solid gold" : "2px solid white",
+    backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
+  }
+}, HText({
+  style: {
+    left: "8px",
+    fontSize: "24px",
+    lineHeight: "28px"
+  },
+  text: name
+}),
+  HText({
+    style: {
+      right: "8px",
+      fontSize: "24px",
+      lineHeight: "28px"
+    },
+    text: kda.replaceAll("|", " / ")
+  })
+)
