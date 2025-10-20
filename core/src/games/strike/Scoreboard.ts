@@ -1,9 +1,32 @@
-import { Entity, HDiv, HText, NPC, Player, Position } from "@piggo-gg/core"
+import { Entity, HDiv, HText, NPC, Player, Position, TeamNumber } from "@piggo-gg/core"
 
 export const Scoreboard = () => {
 
   let init = false
   const players: string[] = []
+
+  const team1 = HDiv({
+    style: {
+      width: "96%",
+      left: "50%",
+      transform: "translate(-50%)",
+      height: "46%",
+
+      // borderBottom: "2px solid yellow",
+    }
+  })
+
+  const team2 = HDiv({
+    style: {
+      width: "96%",
+      left: "50%",
+      transform: "translate(-50%)",
+      height: "46%",
+
+      top: "50%",
+      // borderBottom: "2px solid green",
+    }
+  })
 
   const wrapper = HDiv({
     style: {
@@ -20,7 +43,10 @@ export const Scoreboard = () => {
 
       // visibility: "hidden"
     }
-  })
+  },
+    team1,
+    team2
+  )
 
   const scoreboard = Entity({
     id: "scoreboard",
@@ -37,8 +63,15 @@ export const Scoreboard = () => {
           for (const p of worldPlayers) {
             if (!players.includes(p.id)) {
               players.push(p.id)
-              const row = ScoreboardRow(p)
-              wrapper.appendChild(row)
+
+              const { team } = p.components.team.data
+              const row = ScoreboardRow(p, team)
+
+              if (team === 1) {
+                team1.appendChild(row)
+              } else {
+                team2.appendChild(row)
+              }
             }
           }
 
@@ -51,16 +84,17 @@ export const Scoreboard = () => {
   return scoreboard
 }
 
-const ScoreboardRow = (player: Player) => {
+const ScoreboardRow = (player: Player, team: TeamNumber) => {
   const row = HDiv({
     style: {
       position: "relative",
       marginTop: "6px",
-      width: "96%",
+      width: "100%",
       left: "50%",
       transform: "translate(-50%)",
       height: "28px",
-      border: "1px solid red",
+      border: "2px solid white",
+      backgroundColor: team === 1 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)",
     }
   }, HText({
     text: player.components.pc.data.name
