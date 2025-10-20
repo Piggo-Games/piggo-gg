@@ -85,7 +85,7 @@ export const Scoreboard = () => {
             // add new row
             if (!playerData[player.id]) {
 
-              const row = ScoreboardRow(player, team.data.team, playerKDA)
+              const row = ScoreboardRow(pc.data.name, team.data.team, playerKDA, world.client?.player?.id === player.id)
 
               playerData[player.id] = {
                 row,
@@ -112,7 +112,7 @@ export const Scoreboard = () => {
   return scoreboard
 }
 
-const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
+const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boolean) => HDiv({
   style: {
     position: "relative",
     marginTop: "6px",
@@ -121,7 +121,8 @@ const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
     transform: "translate(-50%)",
     height: "28px",
     // border: "2px solid white",
-    border: team === 1 ? "2px solid rgba(200, 0, 0, 1)" : "2px solid rgba(0, 200, 0, 1)",
+    border: isClient ? "2px solid gold" : "none",
+    // border: isClient ? "2px solid gold" : team === 1 ? "2px solid rgba(200, 0, 0, 1)" : "2px solid rgba(0, 200, 0, 1)",
     backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
   }
 }, HText({
@@ -130,7 +131,7 @@ const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
     fontSize: "24px",
     lineHeight: "28px"
   },
-  text: player.components.pc.data.name
+  text: name
 }),
   HText({
     style: {
