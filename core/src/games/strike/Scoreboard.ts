@@ -15,7 +15,7 @@ export const Scoreboard = () => {
 
   const team1 = HDiv({
     style: {
-      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%",
+      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%"
     }
   })
 
