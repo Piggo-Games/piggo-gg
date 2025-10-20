@@ -11,10 +11,13 @@ import { PhaseBanner } from "./PhaseBanner"
 import { MobileUI } from "../craft/MobileUI"
 import { Scoreboard } from "./Scoreboard"
 
+export type KDA = `${number}|${number}|${number}`
+
 export type StrikeState = {
   jumped: string[]
   phase: "warmup" | "round-spawn" | "round-play" | "round-done" | "game-done"
   phaseChange: number | undefined
+  kda: Record<string, KDA>
 }
 
 export type StrikeSettings = {
@@ -40,7 +43,8 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
     state: {
       jumped: [],
       phase: "warmup",
-      phaseChange: undefined
+      phaseChange: undefined,
+      kda: {}
     },
     systems: [
       SpawnSystem(Sarge),

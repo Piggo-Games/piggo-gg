@@ -1,11 +1,10 @@
-import { Entity, HDiv, HText, NPC, Player, Position, TeamNumber } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDA, NPC, Player, Position, StrikeState, TeamNumber } from "@piggo-gg/core"
 
 type RowData = {
+  row: HTMLDivElement
   name: string
   team: TeamNumber
-  kills: number
-  deaths: number
-  assists: number
+  kda: KDA
 }
 
 export const Scoreboard = () => {
@@ -56,24 +55,45 @@ export const Scoreboard = () => {
           }
 
           const worldPlayers = world.players()
+          const state = world.state<StrikeState>()
+
           for (const p of worldPlayers) {
-            if (!players.includes(p.id)) {
-              players.push(p.id)
 
-              const { team } = p.components.team.data
-              const row = ScoreboardRow(p, team)
+            // clean up row if data changed
+            const rowData = players[p.id]
+            if (rowData) {
+              const playerKDA = state.kda[p.id] || "0|0|0"
 
-              if (team === 1) {
-                team1.appendChild(row)
-              } else {
-                team2.appendChild(row)
+              if (rowData.kda !== playerKDA) {
+                // rowData.kda = playerKDA
+                rowData.row.parentElement?.removeChild(rowData.row)
+              }
+
+              // add new row
+              if (!players[p.id]) {
+
+                const { team } = p.components.team.data
+                const row = ScoreboardRow(p, team)
+
+                players[p.id] = {
+                  row,
+                  name: p.components.pc.data.name,
+                  team: p.components.team.data.team,
+                  kda: playerKDA
+                }
+
+
+                if (team === 1) {
+                  team1.appendChild(row)
+                } else {
+                  team2.appendChild(row)
+                }
               }
             }
-          }
 
-          wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
-        }
-      })
+            wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
+          }
+        })
     }
   })
 
