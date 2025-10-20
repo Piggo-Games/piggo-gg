@@ -7,24 +7,13 @@ export const Scoreboard = () => {
 
   const team1 = HDiv({
     style: {
-      width: "96%",
-      left: "50%",
-      transform: "translate(-50%)",
-      height: "46%",
-
-      // borderBottom: "2px solid yellow",
+      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%",
     }
   })
 
   const team2 = HDiv({
     style: {
-      width: "96%",
-      left: "50%",
-      transform: "translate(-50%)",
-      height: "46%",
-
-      top: "50%",
-      // borderBottom: "2px solid green",
+      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%", top: "50%"
     }
   })
 
@@ -32,16 +21,14 @@ export const Scoreboard = () => {
     style: {
       left: "50%",
       top: "50%",
+      width: "400px",
+      height: "300px",
       transform: "translate(-50%, -50%)",
       display: "flex",
       flexDirection: "column",
       border: "2px solid white",
       backgroundColor: "rgba(0, 0, 0, 0.2)",
-
-      width: "400px",
-      height: "300px",
-
-      // visibility: "hidden"
+      visibility: "hidden"
     }
   },
     team1,
@@ -75,7 +62,7 @@ export const Scoreboard = () => {
             }
           }
 
-          // wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
+          wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
         }
       })
     }
@@ -94,9 +81,14 @@ const ScoreboardRow = (player: Player, team: TeamNumber) => {
       transform: "translate(-50%)",
       height: "28px",
       border: "2px solid white",
-      backgroundColor: team === 1 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)",
+      backgroundColor: team === 1 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)"
     }
   }, HText({
+    style: {
+      left: "4px",
+      fontSize: "18px",
+      lineHeight: "28px"
+    },
     text: player.components.pc.data.name
   }))
 
