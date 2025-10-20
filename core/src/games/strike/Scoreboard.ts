@@ -93,7 +93,8 @@ export const Scoreboard = () => {
 
             wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
           }
-        })
+        }
+      })
     }
   })
 
