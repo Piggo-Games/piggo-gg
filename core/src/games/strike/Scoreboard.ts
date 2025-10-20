@@ -35,7 +35,7 @@ export const Scoreboard = () => {
       display: "flex",
       flexDirection: "column",
       border: "2px solid white",
-      backgroundColor: "rgba(0, 0, 0, 0.2)",
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
       visibility: "hidden"
     }
   },
@@ -131,9 +131,7 @@ const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boole
     left: "50%",
     transform: "translate(-50%)",
     height: "28px",
-    // border: "2px solid white",
-    border: isClient ? "2px solid gold" : "none",
-    // border: isClient ? "2px solid gold" : team === 1 ? "2px solid rgba(200, 0, 0, 1)" : "2px solid rgba(0, 200, 0, 1)",
+    border: isClient ? "2px solid gold" : "2px solid white",
     backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
   }
 }, HText({
@@ -146,8 +144,6 @@ const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boole
 }),
   HText({
     style: {
-      // left: "50%",
-      // transform: "translate(-50%)",
       right: "8px",
       fontSize: "24px",
       lineHeight: "28px"
