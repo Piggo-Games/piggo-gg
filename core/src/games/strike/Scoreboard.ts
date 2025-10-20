@@ -59,40 +59,41 @@ export const Scoreboard = () => {
 
           for (const p of worldPlayers) {
 
-            // clean up row if data changed
+            const playerKDA = state.kda[p.id] || "0|0|0"
+
+            // clean up stale rows
             const rowData = players[p.id]
             if (rowData) {
-              const playerKDA = state.kda[p.id] || "0|0|0"
 
               if (rowData.kda !== playerKDA) {
                 // rowData.kda = playerKDA
-                rowData.row.parentElement?.removeChild(rowData.row)
-              }
-
-              // add new row
-              if (!players[p.id]) {
-
-                const { team } = p.components.team.data
-                const row = ScoreboardRow(p, team, playerKDA)
-
-                players[p.id] = {
-                  row,
-                  name: p.components.pc.data.name,
-                  team: p.components.team.data.team,
-                  kda: playerKDA
-                }
-
-
-                if (team === 1) {
-                  team1.appendChild(row)
-                } else {
-                  team2.appendChild(row)
-                }
+                // rowData.row.parentElement?.removeChild(rowData.row)
               }
             }
 
-            wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
+            // add new row
+            if (!players[p.id]) {
+
+              const { team } = p.components.team.data
+              const row = ScoreboardRow(p, team, playerKDA)
+
+              players[p.id] = {
+                row,
+                name: p.components.pc.data.name,
+                team: p.components.team.data.team,
+                kda: playerKDA
+              }
+
+              if (team === 1) {
+                console.log("adding to team 1")
+                team1.appendChild(row)
+              } else {
+                team2.appendChild(row)
+              }
+            }
           }
+
+          wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
         }
       })
     }
@@ -123,8 +124,8 @@ const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
 }),
   HText({
     style: {
-      position: "absolute",
-      right: "8px",
+      left: "50%",
+      transform: "translate(-50%)",
       fontSize: "24px",
       lineHeight: "28px"
     },
