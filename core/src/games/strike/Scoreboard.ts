@@ -12,7 +12,8 @@ export const Scoreboard = () => {
       transform: "translate(-50%, -50%)",
       display: "flex",
       flexDirection: "column",
-      border: "2px solid blue",
+      border: "2px solid white",
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
 
       width: "400px",
       height: "300px",
