@@ -66,34 +66,35 @@ export const Scoreboard = () => {
             }
           }
 
-          for (const p of players) {
+          for (const player of players) {
 
-            const playerKDA = state.kda[p.id] || "0|0|0"
+            const { team, pc } = player.components
+
+            const playerKDA = state.kda[player.id] || "0|0|0"
 
             // clean up stale rows
-            const rowData = playerData[p.id]
+            const rowData = playerData[player.id]
             if (rowData) {
 
-              if (rowData.kda !== playerKDA || rowData.name !== p.components.pc.data.name) {
+              if (rowData.kda !== playerKDA || rowData.name !== pc.data.name) {
                 rowData.row.parentElement?.removeChild(rowData.row)
-                delete playerData[p.id]
+                delete playerData[player.id]
               }
             }
 
             // add new row
-            if (!playerData[p.id]) {
+            if (!playerData[player.id]) {
 
-              const { team } = p.components.team.data
-              const row = ScoreboardRow(p, team, playerKDA)
+              const row = ScoreboardRow(player, team.data.team, playerKDA)
 
-              playerData[p.id] = {
+              playerData[player.id] = {
                 row,
-                name: p.components.pc.data.name,
-                team: p.components.team.data.team,
+                name: pc.data.name,
+                team: team.data.team,
                 kda: playerKDA
               }
 
-              if (team === 1) {
+              if (team.data.team === 1) {
                 console.log("adding to team 1")
                 team1.appendChild(row)
               } else {
