@@ -1,9 +1,18 @@
 import { Entity, HDiv, HText, NPC, Player, Position, TeamNumber } from "@piggo-gg/core"
 
+type RowData = {
+  name: string
+  team: TeamNumber
+  kills: number
+  deaths: number
+  assists: number
+}
+
 export const Scoreboard = () => {
 
   let init = false
-  const players: string[] = []
+
+  const players: Record<string, RowData> = {}
 
   const team1 = HDiv({
     style: {
