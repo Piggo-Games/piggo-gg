@@ -73,7 +73,7 @@ export const Scoreboard = () => {
               if (!players[p.id]) {
 
                 const { team } = p.components.team.data
-                const row = ScoreboardRow(p, team)
+                const row = ScoreboardRow(p, team, playerKDA)
 
                 players[p.id] = {
                   row,
@@ -101,27 +101,33 @@ export const Scoreboard = () => {
   return scoreboard
 }
 
-const ScoreboardRow = (player: Player, team: TeamNumber) => {
-  const row = HDiv({
+const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
+  style: {
+    position: "relative",
+    marginTop: "6px",
+    width: "100%",
+    left: "50%",
+    transform: "translate(-50%)",
+    height: "28px",
+    // border: "2px solid white",
+    border: team === 1 ? "2px solid rgba(200, 0, 0, 1)" : "2px solid rgba(0, 200, 0, 1)",
+    backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
+  }
+}, HText({
+  style: {
+    left: "4px",
+    fontSize: "24px",
+    lineHeight: "28px"
+  },
+  text: player.components.pc.data.name
+}),
+  HText({
     style: {
-      position: "relative",
-      marginTop: "6px",
-      width: "100%",
-      left: "50%",
-      transform: "translate(-50%)",
-      height: "28px",
-      // border: "2px solid white",
-      border: team === 1 ? "2px solid rgba(200, 0, 0, 1)" : "2px solid rgba(0, 200, 0, 1)",
-      backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
-    }
-  }, HText({
-    style: {
-      left: "4px",
+      position: "absolute",
+      right: "8px",
       fontSize: "24px",
       lineHeight: "28px"
     },
-    text: player.components.pc.data.name
-  }))
-
-  return row
-}
+    text: kda
+  })
+)
