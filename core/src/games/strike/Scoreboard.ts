@@ -116,7 +116,7 @@ const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
   }
 }, HText({
   style: {
-    left: "4px",
+    left: "8px",
     fontSize: "24px",
     lineHeight: "28px"
   },
@@ -124,11 +124,12 @@ const ScoreboardRow = (player: Player, team: TeamNumber, kda: KDA) => HDiv({
 }),
   HText({
     style: {
-      left: "50%",
-      transform: "translate(-50%)",
+      // left: "50%",
+      // transform: "translate(-50%)",
+      right: "8px",
       fontSize: "24px",
       lineHeight: "28px"
     },
-    text: kda
+    text: kda.replaceAll("|", " / ")
   })
 )
