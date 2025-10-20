@@ -1,4 +1,4 @@
-import { Entity, HDiv, HText, KDA, NPC, Player, Position, StrikeState, TeamNumber } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDA, NPC, Position, StrikeState, TeamNumber } from "@piggo-gg/core"
 
 type RowData = {
   row: HTMLDivElement
@@ -95,7 +95,6 @@ export const Scoreboard = () => {
               }
 
               if (team.data.team === 1) {
-                console.log("adding to team 1")
                 team1.appendChild(row)
               } else {
                 team2.appendChild(row)
