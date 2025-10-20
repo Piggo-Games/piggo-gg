@@ -65,9 +65,10 @@ export const Scoreboard = () => {
             const rowData = players[p.id]
             if (rowData) {
 
-              if (rowData.kda !== playerKDA) {
+              if (rowData.kda !== playerKDA || rowData.name !== p.components.pc.data.name) {
                 // rowData.kda = playerKDA
-                // rowData.row.parentElement?.removeChild(rowData.row)
+                rowData.row.parentElement?.removeChild(rowData.row)
+                delete players[p.id]
               }
             }
 
