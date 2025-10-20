@@ -21,8 +21,8 @@ export const Scoreboard = () => {
     style: {
       left: "50%",
       top: "50%",
-      width: "400px",
-      height: "300px",
+      width: "520px",
+      height: "400px",
       transform: "translate(-50%, -50%)",
       display: "flex",
       flexDirection: "column",
@@ -81,12 +81,12 @@ const ScoreboardRow = (player: Player, team: TeamNumber) => {
       transform: "translate(-50%)",
       height: "28px",
       border: "2px solid white",
-      backgroundColor: team === 1 ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 255, 0, 0.2)"
+      backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
     }
   }, HText({
     style: {
       left: "4px",
-      fontSize: "18px",
+      fontSize: "24px",
       lineHeight: "28px"
     },
     text: player.components.pc.data.name
