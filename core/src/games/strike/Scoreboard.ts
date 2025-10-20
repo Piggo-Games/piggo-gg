@@ -54,11 +54,11 @@ const ScoreboardRow = (player: Player) => {
   const row = HDiv({
     style: {
       position: "relative",
-      margin: "4px",
+      marginTop: "6px",
       width: "96%",
       left: "50%",
       transform: "translate(-50%)",
-      height: "24px",
+      height: "28px",
       border: "1px solid red",
     }
   }, HText({
