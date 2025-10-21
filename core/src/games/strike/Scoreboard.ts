@@ -132,7 +132,7 @@ const ScoreboardRow = (name: string, team: TeamNumber, kda: KDAstring, isClient:
     transform: "translate(-50%)",
     height: "28px",
     border: isClient ? "2px solid gold" : "2px solid white",
-    backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
+    backgroundColor: team === 1 ? "rgba(229, 159, 37, 0.4)" : "rgba(70, 95, 144, 0.4)"
   }
 }, HText({
   style: {
