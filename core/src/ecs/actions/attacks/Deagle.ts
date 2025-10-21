@@ -1,9 +1,8 @@
 import {
-  Action, Actions, BlockColor, BlockInLine, blockInLine, Character, cos, Effects, Entity, Gun,
-  hypot, Input, Item, ItemComponents, max, min, Networked, nextColor, NPC, PI,
+  Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
+  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, NPC, PI,
   Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
-  rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance,
-  XYZstring
+  rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
