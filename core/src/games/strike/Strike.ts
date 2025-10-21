@@ -15,7 +15,7 @@ export type KDA = `${number}|${number}|${number}`
 
 export type StrikeState = {
   jumped: string[]
-  phase: "warmup" | "round-spawn" | "round-play" | "round-done" | "game-done"
+  phase: "warmup" | "round-start" | "round-play" | "round-end" | "game-end"
   phaseChange: number | undefined
   kda: Record<string, KDA>
 }
@@ -114,7 +114,9 @@ const StrikeSystem = SystemBuilder({
         }
 
         if (state.phaseChange && world.tick >= state.phaseChange) {
-          state.phase = "round-spawn"
+          if (state.phase === "warmup") {
+            state.phase = "round-start"
+          }
           state.phaseChange = undefined
         }
 
