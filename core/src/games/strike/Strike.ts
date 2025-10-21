@@ -105,7 +105,7 @@ const StrikeSystem = SystemBuilder({
 
         const players = world.players()
 
-        if (world.mode === "server" && state.phaseChange === undefined && state.phase === "warmup" && players.length > 0) {
+        if (world.mode === "server" && state.phaseChange === null && state.phase === "warmup") {
           const pcs = players.filter(p => !p.id.includes("dummy"))
           const ready = players.filter(p => p.components.pc.data.ready)
 
