@@ -1,4 +1,4 @@
-import { Entity, HDiv, HText, KDA, KDAstring, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDAstring, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
 
 type RowData = {
   row: HTMLDivElement
@@ -70,15 +70,12 @@ export const Scoreboard = () => {
 
             const { team, pc } = player.components
 
-            // const playerKDA = state.kda[player.id] || "0|0|0"
             const health = player.components.controlling?.getCharacter(world)?.components.health
-            // const { k, d, a } = health ? health.getKDA() : { k: 0, d: 0, a: 0 }
             const playerKDA: KDAstring = health?.data.kda || "0|0|0"
 
             // clean up stale rows
             const rowData = playerData[player.id]
             if (rowData) {
-
               if (rowData.kda !== playerKDA || rowData.name !== pc.data.name) {
                 rowData.row.parentElement?.removeChild(rowData.row)
                 delete playerData[player.id]
