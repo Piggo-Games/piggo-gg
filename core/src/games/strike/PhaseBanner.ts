@@ -1,4 +1,12 @@
-import { Entity, HDiv, HText, NPC, StrikeState } from "@piggo-gg/core"
+import { ceil, Entity, HDiv, HText, NPC, round, StrikeState, World } from "@piggo-gg/core"
+
+const textMap: Record<StrikeState["phase"], (world: World, state: StrikeState) => string> = {
+  "warmup": (world, { phaseChange }) => phaseChange ? `starting in ${ceil((phaseChange - world.tick) / 40)}` : "warmup",
+  "round-start": ({ }) => "round starting",
+  "round-play": () => "round in play",
+  "round-end": () => "round over",
+  "game-end": () => "game over"
+}
 
 export const PhaseBanner = () => {
 
@@ -27,15 +35,21 @@ export const PhaseBanner = () => {
             document.body.appendChild(wrapper)
           }
 
-          wrapper.style.visibility = world.client?.net.lobbyId ? "visible" : "hidden"
+          const visible = Boolean(world.client?.net.lobbyId)
+
+          wrapper.style.visibility = visible ? "visible" : "hidden"
+
+          if (!visible) return
 
           const state = world.state<StrikeState>()
-          phaseText.textContent = state.phase
+          phaseText.textContent = textMap[state.phase](world, state)
 
           // # of ready players
           const players = world.players().filter(p => !p.id.includes("dummy"))
           const ready = players.filter(p => (p.components.pc.data.ready)).length
+
           readyText.textContent = `ready: ${ready}/${players.length}`
+          readyText.style.visibility = state.phase === "warmup" ? "visible" : "hidden"
         }
       })
     }

@@ -1,10 +1,10 @@
-import { Entity, HDiv, HText, KDA, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
+import { Entity, HDiv, HText, KDAstring, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
 
 type RowData = {
   row: HTMLDivElement
   name: string
   team: TeamNumber
-  kda: KDA
+  kda: KDAstring
 }
 
 export const Scoreboard = () => {
@@ -70,12 +70,12 @@ export const Scoreboard = () => {
 
             const { team, pc } = player.components
 
-            const playerKDA = state.kda[player.id] || "0|0|0"
+            const health = player.components.controlling?.getCharacter(world)?.components.health
+            const playerKDA: KDAstring = health?.data.kda || "0|0|0"
 
             // clean up stale rows
             const rowData = playerData[player.id]
             if (rowData) {
-
               if (rowData.kda !== playerKDA || rowData.name !== pc.data.name) {
                 rowData.row.parentElement?.removeChild(rowData.row)
                 delete playerData[player.id]
@@ -123,7 +123,7 @@ export const Scoreboard = () => {
   return scoreboard
 }
 
-const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boolean) => HDiv({
+const ScoreboardRow = (name: string, team: TeamNumber, kda: KDAstring, isClient: boolean) => HDiv({
   style: {
     position: "relative",
     marginTop: "6px",
@@ -132,7 +132,7 @@ const ScoreboardRow = (name: string, team: TeamNumber, kda: KDA, isClient: boole
     transform: "translate(-50%)",
     height: "28px",
     border: isClient ? "2px solid gold" : "2px solid white",
-    backgroundColor: team === 1 ? "rgba(255, 100, 100, 0.4)" : "rgba(100, 255, 100, 0.4)"
+    backgroundColor: team === 1 ? "rgba(229, 159, 37, 0.4)" : "rgba(70, 95, 144, 0.4)"
   }
 }, HText({
   style: {

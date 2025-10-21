@@ -1,6 +1,6 @@
 import {
-  Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity, Gun,
-  hypot, Input, Item, ItemComponents, max, min, Networked, NPC, PI,
+  Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
+  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, NPC, PI,
   Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
   rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
@@ -322,6 +322,8 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             if (hit.block.inside.type === 6) {
               world.blocks.remove(hit.block.inside)
             }
+
+            // if (!beamResult) return
 
             // if (world.debug) {
             //   if (beamResult.inside.type === 12) {

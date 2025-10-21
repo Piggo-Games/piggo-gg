@@ -9,15 +9,15 @@ import { MobileUI } from "./MobileUI"
 import { CraftScoreboard } from "./CraftScoreboard"
 
 export type CraftState = {
-  applesEaten: Record<string, number>
+  // applesEaten: Record<string, number>
   doubleJumped: string[]
-  hit: Record<string, { tick: number, by: string }>
-  lastShot: Record<string, number>
+  // hit: Record<string, { tick: number, by: string }>
+  // lastShot: Record<string, number>
   nextSeed: number
   phase: "warmup" | "starting" | "play"
   round: number
   startedEagle: string[]
-  willStart: undefined | number
+  willStart: null | number
 }
 
 export type CraftSettings = {
@@ -42,15 +42,15 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       mouseSensitivity: 1
     },
     state: {
-      applesEaten: {},
+      // applesEaten: {},
       doubleJumped: [],
-      hit: {},
-      lastShot: {},
+      // hit: {},
+      // lastShot: {},
       nextSeed: 123456111,
       phase: "warmup",
       round: 0,
       startedEagle: [],
-      willStart: undefined
+      willStart: null
     },
     systems: [
       SpawnSystem(Carl),
@@ -161,7 +161,7 @@ const CraftSystem = SystemBuilder({
           world.announce(`round ${state.round + 1}!`)
 
           // update state
-          state.applesEaten = {}
+          // state.applesEaten = {}
           state.phase = "play"
           state.round += 1
 
@@ -223,10 +223,10 @@ const CraftSystem = SystemBuilder({
             position.setPosition({ x: 20, y: 20, z: 8 })
           }
 
-          if ((world.tick - state.hit[character.id]?.tick) >= 40) {
-            position.setPosition({ x: 20, y: 20, z: 8 })
-            delete state.hit[character.id]
-          }
+          // if ((world.tick - state.hit[character.id]?.tick) >= 40) {
+          //   position.setPosition({ x: 20, y: 20, z: 8 })
+          //   delete state.hit[character.id]
+          // }
 
           // if eagle, check if eaten a duck
           if (world.mode === "server" && position.data.flying) {

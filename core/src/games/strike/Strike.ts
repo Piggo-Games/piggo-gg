@@ -11,13 +11,11 @@ import { PhaseBanner } from "./PhaseBanner"
 import { MobileUI } from "../craft/MobileUI"
 import { Scoreboard } from "./Scoreboard"
 
-export type KDA = `${number}|${number}|${number}`
-
 export type StrikeState = {
   jumped: string[]
-  phase: "warmup" | "round-spawn" | "round-play" | "round-done" | "game-done"
-  phaseChange: number | undefined
-  kda: Record<string, KDA>
+  phase: "warmup" | "round-start" | "round-play" | "round-end" | "game-end"
+  phaseChange: number | null
+  round: number | null
 }
 
 export type StrikeSettings = {
@@ -43,8 +41,8 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
     state: {
       jumped: [],
       phase: "warmup",
-      phaseChange: undefined,
-      kda: {}
+      phaseChange: null,
+      round: null,
     },
     systems: [
       SpawnSystem(Sarge),
@@ -52,7 +50,6 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       StrikeSystem,
-      // HUDSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
@@ -105,16 +102,20 @@ const StrikeSystem = SystemBuilder({
 
         const players = world.players()
 
-        if (world.mode === "server" && state.phaseChange === undefined && state.phase === "warmup" && players.length > 0) {
-          const notReady = players.filter(p => !p.components.pc.data.ready)
-          if (notReady.length === 0) {
+        if (world.mode === "server" && state.phaseChange === null && state.phase === "warmup") {
+          const pcs = players.filter(p => !p.id.includes("dummy"))
+          const ready = players.filter(p => p.components.pc.data.ready)
+
+          if (ready.length && ready.length === pcs.length) {
             state.phaseChange = world.tick + 120
           }
         }
 
         if (state.phaseChange && world.tick >= state.phaseChange) {
-          state.phase = "round-spawn"
-          state.phaseChange = undefined
+          if (state.phase === "warmup") {
+            state.phase = "round-start"
+          }
+          state.phaseChange = null
         }
 
         const t1 = performance.now()
@@ -123,6 +124,7 @@ const StrikeSystem = SystemBuilder({
           if (!character) continue
 
           const { position, health } = character.components
+          if (!health) continue
           const { z, rotation, standing, velocity } = position.data
 
           // jump state cleanup
@@ -130,21 +132,17 @@ const StrikeSystem = SystemBuilder({
             state.jumped = state.jumped.filter(id => id !== character.id)
           }
 
-          // initialize kda
-          if (!state.kda[player.id]) {
-            state.kda[player.id] = "0|0|0"
-          }
-
           // kda update
           if (health?.dead() && health.data.died === world.tick - 10) {
-            const [kills, deaths, assists] = state.kda[player.id].split("|").map(Number)
-            state.kda[player.id] = `${kills}|${deaths + 1}|${assists}`
 
-            const from = health.data.diedFrom
+            const { k, d, a } = health.getKDA()
+            health.setKDA({ k, d: d + 1, a })
 
-            if (from && state.kda[from]) {
-              const [kills, deaths, assists] = state.kda[from].split("|").map(Number)
-              state.kda[from] = `${kills + 1}|${deaths}|${assists}`
+            const fromPlayer = world.entity(health.data.diedFrom || "")
+            const fromCharacter = fromPlayer?.components.controlling?.getCharacter(world)
+            if (fromCharacter && fromCharacter.components.health) {
+              const kda = fromCharacter.components.health.getKDA()
+              fromCharacter.components.health.setKDA({ k: kda.k + 1, d: kda.d, a: kda.a })
             }
           }
 
