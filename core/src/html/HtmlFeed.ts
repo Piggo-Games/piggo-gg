@@ -1,12 +1,12 @@
 import { Entity, entries, HButton, HDiv, HImg, HText, NPC, Player, Position, Three } from "@piggo-gg/core"
 
+type FeedKey = `${number}-${string}-${string}-${boolean}`
+
 export const HtmlFeed = (): Entity => {
   let init = false
 
+  const feedRecord: Record<FeedKey, number> = {}
   const duration = 120
-
-  type FeedKey = `${number}-${string}-${string}-${boolean}`
-  let feedRecord: Record<FeedKey, number> = {}
 
   const wrapper = HDiv({
     style: {
@@ -57,12 +57,11 @@ export const HtmlFeed = (): Entity => {
         onRender: ({ world, delta }) => {
           const ratio = delta / 25
 
-          // Remove old items
           for (const [key, tick] of entries(feedRecord)) {
 
             const timer = world.tick + ratio - tick
 
-            if (timer > (duration + 40)) {
+            if (timer - 40 > duration || tick > world.tick) {
               delete feedRecord[key as FeedKey]
               if (wrapper.children.length > 0) {
                 wrapper.removeChild(wrapper.children[0])
