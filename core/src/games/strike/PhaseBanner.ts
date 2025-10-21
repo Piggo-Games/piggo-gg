@@ -1,6 +1,6 @@
 import { ceil, Entity, HDiv, HText, NPC, round, StrikeState, World } from "@piggo-gg/core"
 
-const PhaseTextMap: Record<StrikeState["phase"], (world: World, state: StrikeState) => string> = {
+const textMap: Record<StrikeState["phase"], (world: World, state: StrikeState) => string> = {
   "warmup": (world, {phaseChange}) => phaseChange ? `starting in ${ceil((phaseChange - world.tick) / 60)}` : "warmup",
   "round-start": ({}) => "round starting",
   "round-play": () => "round in play",
@@ -42,13 +42,7 @@ export const PhaseBanner = () => {
           if (!visible) return
 
           const state = world.state<StrikeState>()
-          phaseText.textContent = PhaseTextMap[state.phase](world, state)
-          // phaseText.textContent = state.phase
-
-          // if (state.phase === "warmup" && state.phaseChange) {
-          //   const secondsLeft = ceil((state.phaseChange - world.tick) / 60)
-          //   phaseText.textContent = `starting in ${secondsLeft}`
-          // }
+          phaseText.textContent = textMap[state.phase](world, state)
 
           // # of ready players
           const players = world.players().filter(p => !p.id.includes("dummy"))
