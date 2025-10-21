@@ -57,12 +57,11 @@ export const HtmlFeed = (): Entity => {
         onRender: ({ world, delta }) => {
           const ratio = delta / 25
 
-          // Remove old items
           for (const [key, tick] of entries(feedRecord)) {
 
             const timer = world.tick + ratio - tick
 
-            if (timer > (duration + 40)) {
+            if (timer - 40 > duration) {
               delete feedRecord[key as FeedKey]
               if (wrapper.children.length > 0) {
                 wrapper.removeChild(wrapper.children[0])
