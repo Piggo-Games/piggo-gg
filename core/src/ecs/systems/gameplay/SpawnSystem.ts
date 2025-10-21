@@ -39,7 +39,7 @@ export const SpawnSystem = (spawner: CharacterSpawner) => SystemBuilder<"SpawnSy
           if (!character.components.health) return
 
           const { died } = character.components.health.data
-          if (died === undefined) return
+          if (died === null) return
 
           if (died + 60 < world.tick) {
 

@@ -9,7 +9,7 @@ export type Position = Component<"position", {
   z: number
   aim: XY
   facing: -1 | 1
-  follows: string | undefined
+  follows: string | null
   friction: boolean
   flying: boolean
   gravity: number
@@ -23,7 +23,7 @@ export type Position = Component<"position", {
   speed: number
   standing: boolean
   stop: number
-  tether: undefined | XYZ & { dist: number }
+  tether: null | XYZ & { dist: number }
   velocity: XYZ
   velocityResets: number
 }> & {
@@ -82,7 +82,7 @@ export const Position = (props: PositionProps = {}): Position => {
     data: {
       x, y, z,
       facing: 1,
-      follows: props.follows ?? undefined,
+      follows: props.follows ?? null,
       friction: props.friction ?? false,
       flying: props.flying ?? false,
       gravity: props.gravity ?? 0,
@@ -97,7 +97,7 @@ export const Position = (props: PositionProps = {}): Position => {
       speed: props.speed ?? 0,
       standing: true,
       stop: props.stop ?? 0,
-      tether: undefined,
+      tether: null,
       velocity: props.velocity ? { ...props.velocity, z: 0 } : { x: 0, y: 0, z: 0 },
       velocityResets: props.velocityResets ?? 0
     },

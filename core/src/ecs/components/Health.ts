@@ -5,9 +5,9 @@ import {
 export type Health = Component<"health", {
   hp: number,
   maxHp: number,
-  died: undefined | number,
-  diedFrom: undefined | string
-  diedReason: undefined | string
+  died: null | number,
+  diedFrom: null | string
+  diedReason: null | string
 }> & {
   showHealthBar: boolean
   deathSounds: ValidSounds[]
@@ -34,9 +34,9 @@ export const Health = (
     data: {
       hp: hp ?? 100,
       maxHp: maxHp ?? hp ?? 100,
-      died: undefined,
-      diedFrom: undefined,
-      diedReason: undefined
+      died: null,
+      diedFrom: null,
+      diedReason: null
     },
     showHealthBar,
     deathSounds: deathSounds ?? [],
@@ -46,7 +46,7 @@ export const Health = (
 
       if (health.onDamage) health.onDamage(damage, world)
 
-      if (health.data.hp <= 0 && health.data.died === undefined) {
+      if (health.data.hp <= 0 && health.data.died === null) {
         health.data.died = world.tick
         if (from) health.data.diedFrom = from
         if (reason) health.data.diedReason = reason
@@ -55,9 +55,9 @@ export const Health = (
     dead: () => health.data.hp <= 0,
     revive: () => {
       health.data.hp = health.data.maxHp
-      health.data.died = undefined
-      health.data.diedFrom = undefined
-      health.data.diedReason = undefined
+      health.data.died = null
+      health.data.diedFrom = null
+      health.data.diedReason = null
     }
   }
   return health
