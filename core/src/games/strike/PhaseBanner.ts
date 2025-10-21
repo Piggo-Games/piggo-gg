@@ -1,7 +1,7 @@
 import { ceil, Entity, HDiv, HText, NPC, round, StrikeState, World } from "@piggo-gg/core"
 
 const textMap: Record<StrikeState["phase"], (world: World, state: StrikeState) => string> = {
-  "warmup": (world, { phaseChange }) => phaseChange ? `starting in ${ceil((phaseChange - world.tick) / 60)}` : "warmup",
+  "warmup": (world, { phaseChange }) => phaseChange ? `starting in ${ceil((phaseChange - world.tick) / 40)}` : "warmup",
   "round-start": ({ }) => "round starting",
   "round-play": () => "round in play",
   "round-end": () => "round over",

@@ -110,7 +110,7 @@ const StrikeSystem = SystemBuilder({
           const ready = players.filter(p => p.components.pc.data.ready)
 
           if (ready.length && ready.length === pcs.length) {
-            state.phaseChange = world.tick + 140
+            state.phaseChange = world.tick + 120
           }
         }
 
