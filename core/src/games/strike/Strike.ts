@@ -106,8 +106,9 @@ const StrikeSystem = SystemBuilder({
         const players = world.players()
 
         if (world.mode === "server" && state.phaseChange === undefined && state.phase === "warmup" && players.length > 0) {
-          const notReady = players.filter(p => !p.components.pc.data.ready)
-          if (notReady.length === 0) {
+          const pcs = players.filter(p => !p.id.includes("dummy"))
+          const ready = players.filter(p => p.components.pc.data.ready)
+          if (ready.length === pcs.length) {
             state.phaseChange = world.tick + 120
           }
         }
