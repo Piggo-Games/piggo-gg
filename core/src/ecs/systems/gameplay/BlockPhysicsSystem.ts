@@ -339,28 +339,28 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           const { tether } = position.data
 
-          if (tether) {
-            const dx = position.data.x - tether.x
-            const dy = position.data.y - tether.y
-            const dz = position.data.z - tether.z
+          // if (tether) {
+          //   const dx = position.data.x - tether.x
+          //   const dy = position.data.y - tether.y
+          //   const dz = position.data.z - tether.z
 
-            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
+          //   const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
-            if (dist < 0.7 || dist > 10) {
-              position.data.tether = undefined
-            } else {
-              if (mode === "local") {
-                position.localVelocity.x -= dx / 200
-                position.localVelocity.y -= dy / 200
-                position.localVelocity.z -= dz / 400
-              }
+          //   if (dist < 0.7 || dist > 10) {
+          //     position.data.tether = null
+          //   } else {
+          //     if (mode === "local") {
+          //       position.localVelocity.x -= dx / 200
+          //       position.localVelocity.y -= dy / 200
+          //       position.localVelocity.z -= dz / 400
+          //     }
 
-              // move player toward tether
-              position.data.velocity.x -= dx / 200
-              position.data.velocity.y -= dy / 200
-              position.data.velocity.z -= dz / 400
-            }
-          }
+          //     // move player toward tether
+          //     position.data.velocity.x -= dx / 200
+          //     position.data.velocity.y -= dy / 200
+          //     position.data.velocity.z -= dz / 400
+          //   }
+          // }
 
           if (mode === "local") continue
 
@@ -378,7 +378,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           position.data.y += position.data.velocity.y / 40
 
           // friction
-          if (position.data.friction && !tether) {
+          if (position.data.friction) {
             const { flying, standing } = position.data
 
             const scale = flying ? 0.98 : (standing ? 0.82 : 0.94)

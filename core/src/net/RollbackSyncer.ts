@@ -248,8 +248,6 @@ export const RollbackSyncer = (world: World): Syncer => {
           }
         }
 
-        if (added || removed) console.log(`tick:${world.tick} ADDED:${added} REMOVED:${removed}`)
-
         // set actions
         if (message.actions[message.tick]) {
           entries(message.actions[message.tick]).forEach(([entityId, actions]) => {
@@ -287,7 +285,7 @@ export const RollbackSyncer = (world: World): Syncer => {
 
         buffer = []
 
-        console.log(`rollback was:${was} msg:${message.tick} forward:${framesForward} end:${world.tick}`)
+        console.log(`rollback was:${was} msg:${message.tick} fwd:${framesForward} end:${world.tick} ADD:${added} RM:${removed}`)
       }
     }
   }

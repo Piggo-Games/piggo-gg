@@ -56,7 +56,10 @@ export const Entity = <T extends ComponentTypes>(protoEntity: ProtoEntity<T>): E
       for (const [type, serializedComponent] of entries(serializedEntity)) {
         // entries(serializedEntity).forEach(([type, serializedComponent]) => {
         if (type in entity.components) {
-          if (component && type !== component) continue
+          // if (component && type !== component) continue
+          if (type === "gun" && entity.id.includes("deagle")) {
+            console.log("DESERIALIZE ENTITY", entity.id, serializedComponent)
+          }
           // @ts-expect-error
           deserializeComponent(entity.components[type], serializedComponent)
         }

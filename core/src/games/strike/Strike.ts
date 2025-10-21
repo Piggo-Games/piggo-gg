@@ -49,7 +49,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
     systems: [
       SpawnSystem(Sarge),
       BlockPhysicsSystem("global"),
-      BlockPhysicsSystem("local"),
+      // BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       StrikeSystem,
       // HUDSystem,
@@ -106,7 +106,7 @@ const StrikeSystem = SystemBuilder({
         const players = world.players()
 
         if (world.mode === "server" && state.phaseChange === undefined && state.phase === "warmup" && players.length > 0) {
-          const notReady = players.filter(p => !p.components.pc.data.ready)
+          const notReady = players.filter(p => !p.id.includes("dummy")).filter(p => !p.components.pc.data.ready)
           if (notReady.length === 0) {
             state.phaseChange = world.tick + 120
           }
