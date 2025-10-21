@@ -2,12 +2,16 @@ import {
   Component, Entity, max, SystemBuilder, ValidSounds, World
 } from "@piggo-gg/core"
 
+export type KDA = { k: number, d: number, a: number }
+export type KDAstring = `${number}|${number}|${number}`
+
 export type Health = Component<"health", {
   hp: number,
   maxHp: number,
   died: null | number,
   diedFrom: null | string
   diedReason: null | string
+  kda: KDAstring
 }> & {
   showHealthBar: boolean
   deathSounds: ValidSounds[]
@@ -15,6 +19,8 @@ export type Health = Component<"health", {
   damage: (damage: number, world: World, from?: string, reason?: string) => void
   dead: () => boolean
   revive: () => void
+  getKDA: () => KDA
+  setKDA: (kda: KDA) => void
 }
 
 export type HealthProps = {
@@ -36,7 +42,8 @@ export const Health = (
       maxHp: maxHp ?? hp ?? 100,
       died: null,
       diedFrom: null,
-      diedReason: null
+      diedReason: null,
+      kda: "0|0|0"
     },
     showHealthBar,
     deathSounds: deathSounds ?? [],
@@ -58,6 +65,13 @@ export const Health = (
       health.data.died = null
       health.data.diedFrom = null
       health.data.diedReason = null
+    },
+    getKDA: () => {
+      const [k, d, a] = health.data.kda.split("|").map(Number)
+      return { k, d, a }
+    },
+    setKDA: (kda: KDA) => {
+      health.data.kda = `${kda.k}|${kda.d}|${kda.a}`
     }
   }
   return health

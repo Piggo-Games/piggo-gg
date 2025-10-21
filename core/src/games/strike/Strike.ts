@@ -11,13 +11,12 @@ import { PhaseBanner } from "./PhaseBanner"
 import { MobileUI } from "../craft/MobileUI"
 import { Scoreboard } from "./Scoreboard"
 
-export type KDA = `${number}|${number}|${number}`
-
 export type StrikeState = {
   jumped: string[]
   phase: "warmup" | "round-start" | "round-play" | "round-end" | "game-end"
-  phaseChange: number | undefined
-  kda: Record<string, KDA>
+  phaseChange: number | null
+  round: number | null
+  // kda: Record<string, KDA>
 }
 
 export type StrikeSettings = {
@@ -43,8 +42,9 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
     state: {
       jumped: [],
       phase: "warmup",
-      phaseChange: undefined,
-      kda: {}
+      phaseChange: null,
+      round: null,
+      // kda: {}
     },
     systems: [
       SpawnSystem(Sarge),
@@ -110,7 +110,7 @@ const StrikeSystem = SystemBuilder({
           const ready = players.filter(p => p.components.pc.data.ready)
 
           if (ready.length && ready.length === pcs.length) {
-            state.phaseChange = world.tick + 120
+            state.phaseChange = world.tick + 140
           }
         }
 
@@ -118,7 +118,7 @@ const StrikeSystem = SystemBuilder({
           if (state.phase === "warmup") {
             state.phase = "round-start"
           }
-          state.phaseChange = undefined
+          state.phaseChange = null
         }
 
         const t1 = performance.now()
@@ -127,6 +127,7 @@ const StrikeSystem = SystemBuilder({
           if (!character) continue
 
           const { position, health } = character.components
+          if (!health) continue
           const { z, rotation, standing, velocity } = position.data
 
           // jump state cleanup
@@ -135,21 +136,28 @@ const StrikeSystem = SystemBuilder({
           }
 
           // initialize kda
-          if (!state.kda[player.id]) {
-            state.kda[player.id] = "0|0|0"
-          }
+          // if (!state.kda[player.id]) {
+          //   state.kda[player.id] = "0|0|0"
+          // }
 
           // kda update
           if (health?.dead() && health.data.died === world.tick - 10) {
-            const [kills, deaths, assists] = state.kda[player.id].split("|").map(Number)
-            state.kda[player.id] = `${kills}|${deaths + 1}|${assists}`
 
-            const from = health.data.diedFrom
+            const { k, d, a } = health.getKDA()
+            health.setKDA({ k, d: d + 1, a })
 
-            if (from && state.kda[from]) {
-              const [kills, deaths, assists] = state.kda[from].split("|").map(Number)
-              state.kda[from] = `${kills + 1}|${deaths}|${assists}`
+            // state.kda[player.id] = `${kills}|${deaths + 1}|${assists}`
+
+            const fromCharacter = world.entity(health.data.diedFrom || "")
+            if (fromCharacter && fromCharacter.components.health) {
+              const kda = fromCharacter.components.health.getKDA()
+              fromCharacter.components.health.setKDA({ k: kda.k + 1, d: kda.d, a: kda.a })
             }
+
+            // if (from && state.kda[from]) {
+            //   const [kills, deaths, assists] = state.kda[from].split("|").map(Number)
+            //   state.kda[from] = `${kills + 1}|${deaths}|${assists}`
+            // }
           }
 
           // reset rotation
