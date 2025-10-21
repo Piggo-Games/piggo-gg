@@ -27,7 +27,11 @@ export const PhaseBanner = () => {
             document.body.appendChild(wrapper)
           }
 
-          wrapper.style.visibility = world.client?.net.lobbyId ? "visible" : "hidden"
+          const visible = Boolean(world.client?.net.lobbyId)
+
+          wrapper.style.visibility = visible ? "visible" : "hidden"
+
+          if (!visible) return
 
           const state = world.state<StrikeState>()
           phaseText.textContent = state.phase
@@ -36,6 +40,8 @@ export const PhaseBanner = () => {
           const players = world.players().filter(p => !p.id.includes("dummy"))
           const ready = players.filter(p => (p.components.pc.data.ready)).length
           readyText.textContent = `ready: ${ready}/${players.length}`
+
+          readyText.style.visibility = state.phase === "warmup" ? "visible" : "hidden"
         }
       })
     }
