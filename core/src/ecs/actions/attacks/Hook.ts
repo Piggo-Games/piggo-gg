@@ -95,8 +95,8 @@ export const Hook = () => Action<HookParams>("hook", ({ world, params, character
   if (!characterPos) return
 
   if (characterPos.tether) {
-    characterPos.tether = null
-    if (character) character.components.position.data.tether = null
+    characterPos.tether = undefined
+    if (character) character.components.position.data.tether = undefined
     return
   }
 

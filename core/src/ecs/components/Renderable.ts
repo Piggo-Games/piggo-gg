@@ -6,7 +6,7 @@ export type Dynamic = ((_: { container: Container, renderable: Renderable, entit
 export type DynamicDelta = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client, delta: number }) => void)
 
 export type Renderable = Component<"renderable", {
-  desiredSkin: PixiSkins | null
+  desiredSkin: PixiSkins | undefined
 }> & {
   activeAnimation: string
   anchor: XY
@@ -18,7 +18,7 @@ export type Renderable = Component<"renderable", {
   c: Container
   children: Renderable[] | undefined
   cullable: boolean
-  currentSkin: PixiSkins | null
+  currentSkin: PixiSkins | undefined
   color: number
   filters: Record<string, Filter>
   interactiveChildren: boolean
@@ -86,7 +86,7 @@ export const Renderable = (props: RenderableProps): Renderable => {
   const renderable: Renderable = {
     type: "renderable",
     data: {
-      desiredSkin: props.skin ?? null
+      desiredSkin: props.skin ?? undefined
     },
     activeAnimation: "",
     anchor: props.anchor ?? { x: 0.5, y: 0.5 },
@@ -100,7 +100,7 @@ export const Renderable = (props: RenderableProps): Renderable => {
     color: props.color ?? 0xffffff,
     children: undefined,
     cullable: props.cullable ?? false,
-    currentSkin: null,
+    currentSkin: undefined,
     filters: {},
     initialized: false,
     interactiveChildren: props.interactiveChildren ?? false,

@@ -144,7 +144,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
           if (world.tick === gun.data.reloading) {
             gun.ammo = 7
-            gun.data.reloading = null
+            gun.data.reloading = undefined
           }
 
           if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {

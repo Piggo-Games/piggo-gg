@@ -13,7 +13,7 @@ export type ComponentTypes =
 export type ValidComponents = ComponentTypes["type"]
 
 export type NetworkedComponentData = Record<string,
-  null | boolean | string | number |
+  undefined | boolean | string | number |
   string[] | number[] |
   (string[] | undefined)[] | XY
 >
@@ -29,9 +29,8 @@ export const serializeComponent = (c: Component<string, NetworkedComponentData>)
   if (!c.data) return data
 
   for (const [key, value] of entries(c.data)) {
-    if (value === null) {
-      data[key] = null
-    } else if (Array.isArray(value)) {
+    if (value === undefined) continue
+    if (Array.isArray(value)) {
       // @ts-expect-error
       c.data[key] = [...value]
     } else if (typeof value === "object") {
@@ -46,9 +45,7 @@ export const serializeComponent = (c: Component<string, NetworkedComponentData>)
 
 export const deserializeComponent = (c: Component<string, NetworkedComponentData>, data: NetworkedComponentData): void => {
   for (const [key, value] of entries(data)) {
-    if (value === null) {
-      c.data[key] = null
-    } else if (Array.isArray(value)) {
+    if (Array.isArray(value)) {
       // @ts-expect-error
       c.data[key] = [...value]
     } else if (typeof value === "object") {

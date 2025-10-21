@@ -17,7 +17,7 @@ export type GunProps = {
 export type Gun = Component<"gun", GunProps & {
   clip: number
   lastShot: number
-  reloading: null | number
+  reloading: undefined | number
   outlineColor: number
 }> & {
   ammo: number
@@ -39,7 +39,7 @@ export const Gun = (props: GunProps): Gun => {
       lastShot: 0,
       outlineColor: 0x000000,
       name: props.name,
-      reloading: null,
+      reloading: undefined,
       reloadTime: props.reloadTime,
       speed: props.speed ?? 1
     },
