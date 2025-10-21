@@ -16,7 +16,6 @@ export type StrikeState = {
   phase: "warmup" | "round-start" | "round-play" | "round-end" | "game-end"
   phaseChange: number | null
   round: number | null
-  // kda: Record<string, KDA>
 }
 
 export type StrikeSettings = {
@@ -44,7 +43,6 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       phase: "warmup",
       phaseChange: null,
       round: null,
-      // kda: {}
     },
     systems: [
       SpawnSystem(Sarge),
@@ -52,7 +50,6 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       StrikeSystem,
-      // HUDSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
