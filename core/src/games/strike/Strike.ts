@@ -128,8 +128,6 @@ const StrikeSystem = SystemBuilder({
 
               const randomPoint = spawnPoints[teamNumber][teamNumber === 1 ? i++ : j++]
 
-              console.log("moving player to", player.id, randomPoint)
-
               position.setPosition(randomPoint)
               position.data.aim.x = randomPoint.r
 
