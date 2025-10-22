@@ -2,7 +2,7 @@ import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
   EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
   logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, floor, XYZR
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -123,7 +123,7 @@ const StrikeSystem = SystemBuilder({
               const { position, health } = character.components
               const teamNumber = player.components.team.data.team
 
-              const randomIndex = floor(world.random.int(spawnPoints[teamNumber].length - 1))
+              const randomIndex = world.random.int(spawnPoints[teamNumber].length - 1)
               const randomPoint = spawnPoints[teamNumber][randomIndex]
 
               console.log("moving player to", player.id, randomPoint, randomIndex)
