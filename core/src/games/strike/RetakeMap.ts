@@ -499,7 +499,21 @@ export const RetakeMapColoring: Record<XYZstring, BlockColor> = {
   "50,23,1": "tan",
   "49,23,2": "tan",
   "49,22,2": "tan",
-  "49,23,1": "tan"
+  "49,23,1": "tan",
+  "50,63,2": "rosybrown",
+  "51,63,1": "rosybrown",
+  "51,63,2": "rosybrown",
+  "52,63,2": "rosybrown",
+  "52,63,1": "rosybrown",
+  "53,63,1": "rosybrown",
+  "53,63,2": "rosybrown",
+  "54,63,2": "rosybrown",
+  "54,63,1": "rosybrown",
+  "55,63,1": "rosybrown",
+  "56,63,1": "rosybrown",
+  "56,63,2": "rosybrown",
+  "55,63,2": "rosybrown",
+  "57,63,2": "rosybrown"
 }
 
 export const RetakeMap: Record<string, string> = {

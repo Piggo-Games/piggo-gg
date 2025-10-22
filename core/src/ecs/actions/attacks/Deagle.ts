@@ -325,6 +325,8 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
             if (!beamResult) return
 
+            item.components.gun!.ammo += 1
+
             if (world.debug) {
               if (beamResult.inside.type === 12) {
                 world.blocks.setType(beamResult.inside, 3)
