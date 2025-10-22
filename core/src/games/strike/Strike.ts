@@ -1,10 +1,8 @@
 import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
-  EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem,
-  InventorySystem, logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2,
-  TeamNumber,
-  XYZ
+  EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
+  logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZ
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -166,9 +164,17 @@ const StrikeSystem = SystemBuilder({
 
 const spawnPoints: Record<TeamNumber, XYZ[]> = {
   1: [
-
+    { x: 8.15, y: 4.6, z: 1.2 },
+    { x: 13.8, y: 6.6, z: 1.2 },
+    { x: 15, y: 3, z: 1.2 },
+    { x: 12, y: 5.6, z: 1.2 },
+    { x: 12.7, y: 2.8, z: 1.2 }
   ],
   2: [
-
+    { x: 7.8, y: 19.5, z: 0.3 },
+    { x: 11, y: 19.5, z: 0.3 },
+    { x: 9.5, y: 17.6, z: 0.3 },
+    { x: 8, y: 17.6, z: 0.3 },
+    { x: 7.5, y: 18, z: 0.3 }
   ]
 }
