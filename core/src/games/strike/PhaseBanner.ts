@@ -49,7 +49,7 @@ export const PhaseBanner = () => {
           const ready = players.filter(p => (p.components.pc.data.ready)).length
 
           readyText.textContent = `ready: ${ready}/${players.length}`
-          readyText.style.visibility = state.phase === "warmup" ? "visible" : "hidden"
+          readyText.style.visibility = state.phase === "warmup" && state.phaseChange === null ? "visible" : "hidden"
         }
       })
     }
