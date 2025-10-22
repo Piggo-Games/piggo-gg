@@ -2,7 +2,9 @@ import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
   EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
   logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZ
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZ,
+  floor,
+  randomInt
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -114,6 +116,19 @@ const StrikeSystem = SystemBuilder({
         if (state.phaseChange && world.tick >= state.phaseChange) {
           if (state.phase === "warmup") {
             state.phase = "round-start"
+
+            // move everyone
+            for (const player of players) {
+              const character = player.components.controlling?.getCharacter(world)
+              if (!character) continue
+
+              const teamNumber = player.components.team.data.team
+
+              const spawnPoint = spawnPoints[teamNumber][floor(randomInt(spawnPoints[teamNumber].length))]
+              const position = character.components.position
+              position.setPosition(spawnPoint)
+              // position.setRotation(0)
+            }
           }
           state.phaseChange = null
         }
