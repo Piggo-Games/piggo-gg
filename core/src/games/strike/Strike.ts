@@ -115,6 +115,9 @@ const StrikeSystem = SystemBuilder({
           if (state.phase === "warmup") {
             state.phase = "round-start"
 
+            let i = 0
+            let j = 0
+
             // move everyone
             for (const player of players) {
               const character = player.components.controlling?.getCharacter(world)
@@ -123,10 +126,9 @@ const StrikeSystem = SystemBuilder({
               const { position, health } = character.components
               const teamNumber = player.components.team.data.team
 
-              const randomIndex = world.random.int(spawnPoints[teamNumber].length - 1)
-              const randomPoint = spawnPoints[teamNumber][randomIndex]
+              const randomPoint = spawnPoints[teamNumber][teamNumber === 1 ? i++ : j++]
 
-              console.log("moving player to", player.id, randomPoint, randomIndex)
+              console.log("moving player to", player.id, randomPoint)
 
               position.setPosition(randomPoint)
               position.data.aim.x = randomPoint.r
@@ -187,17 +189,17 @@ const StrikeSystem = SystemBuilder({
 
 const spawnPoints: Record<TeamNumber, XYZR[]> = {
   1: [
-    { x: 8.15, y: 4.6, z: 1.2, r: 1 },
+    { x: 8.1, y: 4.6, z: 1.2, r: 4.2 },
     { x: 13.8, y: 6.6, z: 1.2, r: 1 },
-    { x: 15, y: 3, z: 1.2, r: 1 },
-    { x: 12, y: 5.6, z: 1.2, r: 1 },
-    { x: 12.7, y: 2.8, z: 1.2, r: 1 }
+    { x: 15, y: 3, z: 1.2, r: 3.14 },
+    { x: 12, y: 5.6, z: 1.2, r: 1.7 },
+    { x: 12.7, y: 2.8, z: 1.2, r: 3.8 }
   ],
   2: [
-    { x: 7.8, y: 19.5, z: 0.3, r: 1 },
-    { x: 11, y: 19.5, z: 0.3, r: 1 },
-    { x: 9.5, y: 17.6, z: 0.3, r: 1 },
-    { x: 8, y: 17.6, z: 0.3, r: 1 },
-    { x: 7.5, y: 18, z: 0.3, r: 1 }
+    { x: 7.8, y: 19.5, z: 0.3, r: -0.5 },
+    { x: 11, y: 19.5, z: 0.3, r: 0.9 },
+    { x: 9.5, y: 17.8, z: 0.3, r: 2 },
+    { x: 8, y: 17.8, z: 0.3, r: 4.3 },
+    { x: 7.5, y: 18, z: 0.3, r: 4.5 }
   ]
 }

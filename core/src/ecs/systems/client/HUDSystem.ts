@@ -119,7 +119,7 @@ export const HUDSystem = ClientSystemBuilder({
           jumpLabel.style.visibility = visibility
 
           if (client.env !== "production" && world.debug) {
-            posText.innerHTML = `<span style='color: #00ffff'>${x.toFixed(2)}</span><span style='color: #ffff00'> ${y.toFixed(2)}</span><span style='color: #ff33cc'> ${z.toFixed(2)}</span>`
+            posText.innerHTML = `<span style='color: #00ffff'>${x.toFixed(2)}</span><span style='color: #ffff00'> ${y.toFixed(2)}</span><span style='color: #ff33cc'> ${z.toFixed(2)}</span><span style='color: #6bc6ffff'> ${client.controls.localAim.x.toFixed(2)}</span>`
             posText.style.visibility = "visible"
           } else {
             posText.style.visibility = "hidden"
