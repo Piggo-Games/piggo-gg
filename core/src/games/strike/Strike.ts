@@ -1,8 +1,8 @@
 import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
-  EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem,
-  InventorySystem, logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2
+  EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
+  logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -114,6 +114,29 @@ const StrikeSystem = SystemBuilder({
         if (state.phaseChange && world.tick >= state.phaseChange) {
           if (state.phase === "warmup") {
             state.phase = "round-start"
+
+            let i = 0
+            let j = 0
+
+            // move everyone
+            for (const player of players) {
+              const character = player.components.controlling?.getCharacter(world)
+              if (!character) continue
+
+              const { position, health } = character.components
+              const teamNumber = player.components.team.data.team
+
+              const randomPoint = spawnPoints[teamNumber][teamNumber === 1 ? i++ : j++]
+
+              position.setPosition(randomPoint)
+              position.data.aim.x = randomPoint.r
+
+              if (health) health.setKDA({ k: 0, d: 0, a: 0 })
+
+              if (world.client?.playerId() === player.id) {
+                world.client.controls.localAim.x = randomPoint.r
+              }
+            }
           }
           state.phaseChange = null
         }
@@ -161,3 +184,20 @@ const StrikeSystem = SystemBuilder({
     }
   }
 })
+
+const spawnPoints: Record<TeamNumber, XYZR[]> = {
+  1: [
+    { x: 8.1, y: 4.6, z: 1.2, r: 4.2 },
+    { x: 13.8, y: 6.6, z: 1.2, r: 1 },
+    { x: 15, y: 3, z: 1.2, r: 3.14 },
+    { x: 12, y: 5.6, z: 1.2, r: 1.7 },
+    { x: 12.7, y: 2.8, z: 1.2, r: 3.8 }
+  ],
+  2: [
+    { x: 7.8, y: 19.5, z: 0.3, r: -0.5 },
+    { x: 11, y: 19.5, z: 0.3, r: 0.9 },
+    { x: 9.5, y: 17.8, z: 0.3, r: 2 },
+    { x: 8, y: 17.8, z: 0.3, r: 4.3 },
+    { x: 7.5, y: 18, z: 0.3, r: 4.5 }
+  ]
+}

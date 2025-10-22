@@ -1,8 +1,8 @@
 import {
   Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
-  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, NPC, PI,
+  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, nextColor, NPC, PI,
   Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
-  rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance
+  rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
 import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
@@ -325,6 +325,8 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
             // if (!beamResult) return
 
+            // item.components.gun!.ammo += 1
+
             // if (world.debug) {
             //   if (beamResult.inside.type === 12) {
             //     world.blocks.setType(beamResult.inside, 3)
@@ -338,7 +340,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             //   world.blocks.setType(beamResult.inside, 12)
             //   const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`
             //   if (world.blocks.coloring[xyzstr]) {
-            //     const color = nextColor(world.blocks.coloring[xyzstr] as BlockColor)
+            //     const color = nextColor(world.blocks.coloring[xyzstr])
             //     world.blocks.coloring[xyzstr] = color
             //   } else {
             //     world.blocks.coloring[xyzstr] = `slategray`

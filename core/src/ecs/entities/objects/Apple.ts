@@ -81,19 +81,19 @@ export const Apple = ({ id }: { id: string }): Entity<Position> => {
               // update state
               const state = world.game.state as CraftState
 
-              if (!state.applesEaten[player.id]) {
-                state.applesEaten[player.id] = 1
-              } else {
-                state.applesEaten[player.id] += 1
-              }
+              // if (!state.applesEaten[player.id]) {
+              //   state.applesEaten[player.id] = 1
+              // } else {
+              //   state.applesEaten[player.id] += 1
+              // }
 
-              if (state.phase === "play") {
-                player.components.pc.data.points += 1
+              // if (state.phase === "play") {
+              //   player.components.pc.data.points += 1
 
-                if (state.applesEaten[player.id] >= 10) {
-                  character.components.position.data.flying = true
-                }
-              }
+              //   if (state.applesEaten[player.id] >= 10) {
+              //     character.components.position.data.flying = true
+              //   }
+              // }
             }
           }
         }
