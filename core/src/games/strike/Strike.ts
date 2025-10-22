@@ -123,20 +123,18 @@ const StrikeSystem = SystemBuilder({
               const character = player.components.controlling?.getCharacter(world)
               if (!character) continue
 
-              const { position } = character.components
+              const { position, health } = character.components
               const teamNumber = player.components.team.data.team
 
               const randomIndex = floor(world.random.int(spawnPoints[teamNumber].length - 1))
               const randomPoint = spawnPoints[teamNumber][randomIndex]
 
-              if (!randomPoint) {
-                console.error(`No spawn point for team ${teamNumber}`, randomPoint, randomIndex)
-              }
-
               console.log("moving player to", player.id, randomPoint, randomIndex)
 
               position.setPosition(randomPoint)
               position.data.aim.x = randomPoint.r
+
+              if (health) health.setKDA({ k: 0, d: 0, a: 0 })
 
               if (world.client?.playerId() === player.id) {
                 world.client.controls.localAim.x = randomPoint.r
