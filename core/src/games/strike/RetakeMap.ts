@@ -1,6 +1,6 @@
-import { XYZstring } from "@piggo-gg/core"
+import { BlockColor, XYZstring } from "@piggo-gg/core"
 
-export const RetakeMapColoring: Record<XYZstring, string> = {
+export const RetakeMapColoring: Record<XYZstring, BlockColor> = {
   "41,19,4": "chocolate",
   "41,20,4": "chocolate",
   "41,20,5": "chocolate",

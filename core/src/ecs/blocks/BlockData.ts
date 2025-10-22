@@ -23,7 +23,7 @@ export const nextColor = (current: BlockColor): BlockColor => {
 }
 
 export type BlockData = {
-  coloring: Record<XYZstring, string>
+  coloring: Record<XYZstring, BlockColor>
   add: (block: Block) => boolean
   addPlan: (plan: BlockPlan) => boolean
   clear: () => void
