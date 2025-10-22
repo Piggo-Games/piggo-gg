@@ -4,7 +4,8 @@ import {
   logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
   ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZ,
   floor,
-  randomInt
+  randomInt,
+  XYZR
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -122,12 +123,24 @@ const StrikeSystem = SystemBuilder({
               const character = player.components.controlling?.getCharacter(world)
               if (!character) continue
 
+              const { position } = character.components
               const teamNumber = player.components.team.data.team
 
-              const spawnPoint = spawnPoints[teamNumber][floor(randomInt(spawnPoints[teamNumber].length))]
-              const position = character.components.position
-              position.setPosition(spawnPoint)
-              // position.setRotation(0)
+              const randomIndex = floor(world.random.int(spawnPoints[teamNumber].length - 1))
+              const randomPoint = spawnPoints[teamNumber][randomIndex]
+
+              if (!randomPoint) {
+                console.error(`No spawn point for team ${teamNumber}`, randomPoint, randomIndex)
+              }
+
+              console.log("moving player to", player.id, randomPoint, randomIndex)
+
+              position.setPosition(randomPoint)
+              position.data.aim.x = randomPoint.r
+
+              if (world.client?.playerId() === player.id) {
+                world.client.controls.localAim.x = randomPoint.r
+              }
             }
           }
           state.phaseChange = null
@@ -177,19 +190,19 @@ const StrikeSystem = SystemBuilder({
   }
 })
 
-const spawnPoints: Record<TeamNumber, XYZ[]> = {
+const spawnPoints: Record<TeamNumber, XYZR[]> = {
   1: [
-    { x: 8.15, y: 4.6, z: 1.2 },
-    { x: 13.8, y: 6.6, z: 1.2 },
-    { x: 15, y: 3, z: 1.2 },
-    { x: 12, y: 5.6, z: 1.2 },
-    { x: 12.7, y: 2.8, z: 1.2 }
+    { x: 8.15, y: 4.6, z: 1.2, r: 1 },
+    { x: 13.8, y: 6.6, z: 1.2, r: 1 },
+    { x: 15, y: 3, z: 1.2, r: 1 },
+    { x: 12, y: 5.6, z: 1.2, r: 1 },
+    { x: 12.7, y: 2.8, z: 1.2, r: 1 }
   ],
   2: [
-    { x: 7.8, y: 19.5, z: 0.3 },
-    { x: 11, y: 19.5, z: 0.3 },
-    { x: 9.5, y: 17.6, z: 0.3 },
-    { x: 8, y: 17.6, z: 0.3 },
-    { x: 7.5, y: 18, z: 0.3 }
+    { x: 7.8, y: 19.5, z: 0.3, r: 1 },
+    { x: 11, y: 19.5, z: 0.3, r: 1 },
+    { x: 9.5, y: 17.6, z: 0.3, r: 1 },
+    { x: 8, y: 17.6, z: 0.3, r: 1 },
+    { x: 7.5, y: 18, z: 0.3, r: 1 }
   ]
 }

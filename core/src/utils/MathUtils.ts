@@ -6,6 +6,7 @@ export type Capsule = { A: XYZ, B: XYZ, radius: number }
 export type XY = { x: number, y: number }
 export type XZ = { x: number, z: number }
 export type XYZ = { x: number, y: number, z: number }
+export type XYZR = { x: number, y: number, z: number, r: number }
 export type XYZstring = `${number},${number},${number}`
 export type Bounds = { left: number, right: number, top: number, bottom: number }
 export type TwoPoints = [number, number, number, number]
