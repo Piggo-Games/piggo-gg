@@ -19,10 +19,12 @@ export const HUDSystem = ClientSystemBuilder({
     const wButton = KeyButton({ text: "W", left, bottom: bottom + 130 })
 
     const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
+    const zButton = KeyButton({ text: "z", left, bottom: bottom + 460 })
 
     const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
     const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160, visible: false })
 
+    const readyLabel = KeyLabel("ready", left, bottom + 430)
     const reloadLabel = KeyLabel("reload", left, bottom + 320)
     const moveLabel = KeyLabel("move", left, bottom + 50)
 
@@ -64,7 +66,10 @@ export const HUDSystem = ClientSystemBuilder({
     controls.appendChild(sButton)
     controls.appendChild(wButton)
     controls.appendChild(rButton)
+    controls.appendChild(zButton)
+
     controls.appendChild(jumpButton)
+    controls.appendChild(readyLabel)
     controls.appendChild(reloadLabel)
     controls.appendChild(moveLabel)
     controls.appendChild(jumpLabel)
@@ -105,6 +110,7 @@ export const HUDSystem = ClientSystemBuilder({
           sButton.style.backgroundColor = down.includes("s") ? active : inactive
           wButton.style.backgroundColor = down.includes("w") ? active : inactive
           rButton.style.backgroundColor = down.includes("r") ? active : inactive
+          zButton.style.backgroundColor = down.includes("z") ? active : inactive
           boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
           jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
@@ -128,19 +134,11 @@ export const HUDSystem = ClientSystemBuilder({
 
         inventory.update()
 
-        // const state = world.game.state as CraftState
-        // const pcApplesEaten = state.applesEaten[client.playerId() || ""] || 0
+        const state = world.state<{ phase: string }>()
 
-        // const isWarmup = state.phase === "warmup"
+        const isWarmup = state.phase === "warmup"
         // rButton.style.visibility = isWarmup ? "visible" : "hidden"
         // reloadLabel.style.visibility = isWarmup ? "visible" : "hidden"
-
-        // if (pcApplesEaten !== currentApplesEaten) {
-        //   currentApplesEaten = pcApplesEaten
-        //   scoreText.innerHTML = `<span>apples: </span><span style='color: #ffc0cb'>${currentApplesEaten}/10</span>`
-        // }
-
-        // scoreText.style.visibility = state.phase === "play" && !pc?.components.position.data.flying ? "visible" : "hidden"
       }
     }
   }
