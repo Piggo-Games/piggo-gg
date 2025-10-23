@@ -13,21 +13,21 @@ export const HUDSystem = ClientSystemBuilder({
     const bottom = 40
     const left = 120
 
-    const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 200 })
-    const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 200 })
-    const sButton = KeyButton({ text: "S", left, bottom: bottom + 200 })
+    const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 80 })
+    const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 80 })
+    const sButton = KeyButton({ text: "S", left, bottom: bottom + 80 })
+    const wButton = KeyButton({ text: "W", left, bottom: bottom + 130 })
 
-    const wButton = KeyButton({ text: "W", left, bottom: bottom + 250 })
-    // const eButton = KeyButton({ text: "E", left, top: top - 150 })
+    const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
 
     const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
-    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 100, width: 160, visible: false })
+    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160, visible: false })
 
-    const transformLabel = KeyLabel("transform", left, bottom - 100)
-    const moveLabel = KeyLabel("move", left, bottom + 170)
+    const reloadLabel = KeyLabel("reload", left, bottom + 320)
+    const moveLabel = KeyLabel("move", left, bottom + 50)
 
     const boostLabel = KeyLabel("boost", left, bottom - 30)
-    const jumpLabel = KeyLabel("jump", left, bottom + 70, false)
+    const jumpLabel = KeyLabel("jump", left, bottom + 210, false)
 
     const scoreText = HtmlText({
       text: "",
@@ -63,9 +63,9 @@ export const HUDSystem = ClientSystemBuilder({
     controls.appendChild(dButton)
     controls.appendChild(sButton)
     controls.appendChild(wButton)
-    // controls.appendChild(eButton)
+    controls.appendChild(rButton)
     controls.appendChild(jumpButton)
-    // controls.appendChild(transformLabel)
+    controls.appendChild(reloadLabel)
     controls.appendChild(moveLabel)
     controls.appendChild(jumpLabel)
 
@@ -104,7 +104,7 @@ export const HUDSystem = ClientSystemBuilder({
           dButton.style.backgroundColor = down.includes("d") ? active : inactive
           sButton.style.backgroundColor = down.includes("s") ? active : inactive
           wButton.style.backgroundColor = down.includes("w") ? active : inactive
-          // eButton.style.backgroundColor = down.includes("e") ? active : inactive
+          rButton.style.backgroundColor = down.includes("r") ? active : inactive
           boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
           jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
@@ -132,8 +132,8 @@ export const HUDSystem = ClientSystemBuilder({
         // const pcApplesEaten = state.applesEaten[client.playerId() || ""] || 0
 
         // const isWarmup = state.phase === "warmup"
-        // eButton.style.visibility = isWarmup ? "visible" : "hidden"
-        // transformLabel.style.visibility = isWarmup ? "visible" : "hidden"
+        // rButton.style.visibility = isWarmup ? "visible" : "hidden"
+        // reloadLabel.style.visibility = isWarmup ? "visible" : "hidden"
 
         // if (pcApplesEaten !== currentApplesEaten) {
         //   currentApplesEaten = pcApplesEaten
