@@ -19,17 +19,17 @@ export const HUDSystem = ClientSystemBuilder({
     const wButton = KeyButton({ text: "W", left, bottom: bottom + 130 })
 
     const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
-    const zButton = KeyButton({ text: "z", left, bottom: bottom + 460 })
+    const zButton = KeyButton({ text: "z", left, bottom: bottom + 460, visible: false })
 
     const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
-    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160, visible: false })
+    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160 })
 
-    const readyLabel = KeyLabel("ready", left, bottom + 430)
+    const readyLabel = KeyLabel("ready", left, bottom + 430, false)
     const reloadLabel = KeyLabel("reload", left, bottom + 320)
     const moveLabel = KeyLabel("move", left, bottom + 50)
 
     const boostLabel = KeyLabel("boost", left, bottom - 30)
-    const jumpLabel = KeyLabel("jump", left, bottom + 210, false)
+    const jumpLabel = KeyLabel("jump", left, bottom + 210)
 
     const scoreText = HtmlText({
       text: "",
@@ -136,9 +136,9 @@ export const HUDSystem = ClientSystemBuilder({
 
         const state = world.state<{ phase: string }>()
 
-        const isWarmup = state.phase === "warmup"
-        // rButton.style.visibility = isWarmup ? "visible" : "hidden"
-        // reloadLabel.style.visibility = isWarmup ? "visible" : "hidden"
+        const isWarmup = state.phase === "warmup" && world.client?.net.lobbyId
+        zButton.style.visibility = isWarmup ? "visible" : "hidden"
+        readyLabel.style.visibility = isWarmup ? "visible" : "hidden"
       }
     }
   }
