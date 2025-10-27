@@ -28,6 +28,7 @@ export const Sarge = (player: Player): Character => {
   let deathAnimation: AnimationAction | undefined
 
   let animation: "idle" | "run" | "dead" = "idle"
+  let lastTeamNumber = player.components.team.data.team
 
   const isDummy = player.id.includes("dummy")
 
@@ -310,6 +311,12 @@ export const Sarge = (player: Player): Character => {
           // rotation
           pig.rotation.y = orientation.x + PI
 
+          // team color
+          if (lastTeamNumber !== player.components.team.data.team) {
+            colorMaterials(pig, SargeColors, player.components.team.data.team)
+            lastTeamNumber = player.components.team.data.team
+          }
+
           // animation
           let speed = hypot(position.data.velocity.x, position.data.velocity.y)
 
@@ -428,5 +435,10 @@ const SargeColors: ColorMapping = {
   "cead86": { 2: "#be9393", 1: "#be9393" },
   "4f535a": { 2: "#4f535a", 1: "#7e4f19" },
   "312e2b": { 2: "#312e2b", 1: "#2b1608" },
-  "161616": { 2: "#453089", 1: "#671029" }
+  "161616": { 2: "#453089", 1: "#671029" },
+
+  "7e4f19": { 2: "#4f535a", 1: "#7e4f19" },
+  "2b1608": { 2: "#312e2b", 1: "#2b1608" },
+  "453089": { 2: "#453089", 1: "#671029" },
+  "671029": { 2: "#453089", 1: "#671029" }
 }
