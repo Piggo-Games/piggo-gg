@@ -112,7 +112,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-
           "r": ({ hold, client, world }) => {
             if (hold) return
 
@@ -125,7 +124,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
             return { actionId: "reload", params: { value: world.tick + 40 } }
           },
-
           "mb1": ({ hold, character, world, aim, client, delta }) => {
             if (hold) return
             if (!character) return
@@ -142,12 +140,13 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             if (cd + 5 > world.tick) return
             cd = world.tick
 
-            const { position } = character.components
+            const { position, team } = character.components
             const pos = position.xyz()
 
             const targets: Target[] = world.characters()
               .filter(c => c.id !== character.id)
               .filter(c => c.components.health && c.components.health.data.hp > 0)
+              .filter(c => c.components.team.data.team !== team.data.team)
               .map(target => ({
                 ...target.components.position.interpolate(world, delta ?? 0),
                 id: target.id

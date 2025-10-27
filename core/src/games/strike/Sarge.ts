@@ -282,7 +282,7 @@ export const Sarge = (player: Player): Character => {
           position.impulse({ x: toward.x * factor, y: toward.z * factor })
         })
       }),
-      team: Team(1),
+      team: Team(player.components.team.data.team),
       three: Three({
         onRender: ({ entity, world, delta, client, three, since }) => {
           const ratio = since / 25
