@@ -112,6 +112,12 @@ export const Sarge = (player: Player): Character => {
             return { actionId: "ready" }
           },
 
+          "c": ({ hold }) => {
+            if (hold) return
+            sarge.components.team.switchTeam()
+            player.components.team.switchTeam()
+          },
+
           // "t": ({ hold }) => {
           //   if (hold) return
           //   sarge.components.position.data.flying = !sarge.components.position.data.flying
