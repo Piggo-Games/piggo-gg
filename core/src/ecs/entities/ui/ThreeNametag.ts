@@ -19,13 +19,7 @@ export const ThreeNametag = (player: Player): ThreeNametag => {
       if (!character) return
 
       const pc = world.client?.character()
-      if (pc) {
-        if (pc.components.position.data.flying && !character.components.position.data.flying) {
-          group.visible = false
-        } else {
-          group.visible = player.components.team.data.team === pc.components.team.data.team
-        }
-      }
+      if (pc) group.visible = player.components.team.data.team === pc.components.team.data.team
 
       const { position, health } = character.components
 
