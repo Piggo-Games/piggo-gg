@@ -8,6 +8,7 @@ export type XZ = { x: number, z: number }
 export type XYZ = { x: number, y: number, z: number }
 export type XYZR = { x: number, y: number, z: number, r: number }
 export type XYZstring = `${number},${number},${number}`
+export type Target = XYZ & { id: string }
 export type Bounds = { left: number, right: number, top: number, bottom: number }
 export type TwoPoints = [number, number, number, number]
 export type Oct = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7

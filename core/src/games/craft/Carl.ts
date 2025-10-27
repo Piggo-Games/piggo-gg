@@ -1,6 +1,6 @@
 import {
   abs, Action, Actions, Character, cloneSkeleton, Collider, copyMaterials, cos,
-  HookItem, hypot, Input, Inventory, LaserItem, max, Networked,
+  HookItem, hypot, Input, Inventory, max, Networked,
   PI, Place, Player, Point, Position, Ready, setActiveItemIndex,
   sin, sqrt, Team, Three, upAndDir, XYZ, XZ
 } from "@piggo-gg/core"
@@ -30,7 +30,7 @@ export const Carl = (player: Player): Character => {
     components: {
       position: Position({ friction: true, gravity: 0.003, flying: false, z: 6, x: 25, y: 18 }),
       networked: Networked(),
-      inventory: Inventory([HookItem, LaserItem]),
+      inventory: Inventory([HookItem]),
       collider: Collider({
         shape: "ball",
         radius: 0.1
@@ -345,7 +345,7 @@ export const Carl = (player: Player): Character => {
           if (!position.data.standing && params.hold) return
 
           const state = world.game.state as CraftState
-          if (state.hit[entity.id]) return
+          // if (state.hit[entity.id]) return
           if (!position.data.standing && state.doubleJumped.includes(entity.id)) return
 
           // double jumped
@@ -383,7 +383,7 @@ export const Carl = (player: Player): Character => {
           if (!params.up || !params.dir) return
 
           const state = world.state<CraftState>()
-          if (state.hit[entity?.id ?? ""]) return
+          // if (state.hit[entity?.id ?? ""]) return
 
           const up = new Vector3(params.up.x, params.up.y, params.up.z)
           const dir = new Vector3(params.dir.x, 0, params.dir.z)
