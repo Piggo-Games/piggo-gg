@@ -25,8 +25,8 @@ export const HUDSystem = ClientSystemBuilder({
     const cButton = KeyButton({ text: "c", left, bottom: bottom + 460, visible: false })
     const teamLabel = KeyLabel("switch team", left, bottom + 430, false)
 
-    // const zButton = KeyButton({ text: "z", left, bottom: bottom + 460, visible: false })
-    // const readyLabel = KeyLabel("ready", left, bottom + 430, false)
+    const zButton = KeyButton({ text: "z", left, bottom: bottom + 570, visible: true })
+    const readyLabel = KeyLabel("ready", left, bottom + 540, true)
 
     const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
     const boostLabel = KeyLabel("boost", left, bottom - 30)
@@ -70,12 +70,14 @@ export const HUDSystem = ClientSystemBuilder({
     controls.appendChild(wButton)
     controls.appendChild(rButton)
     controls.appendChild(cButton)
+    controls.appendChild(zButton)
 
     controls.appendChild(jumpButton)
     controls.appendChild(teamLabel)
     controls.appendChild(reloadLabel)
     controls.appendChild(moveLabel)
     controls.appendChild(jumpLabel)
+    controls.appendChild(readyLabel)
 
     if (world.game.id === "craft") {
       controls.appendChild(boostButton)
@@ -114,6 +116,7 @@ export const HUDSystem = ClientSystemBuilder({
           wButton.style.backgroundColor = down.includes("w") ? active : inactive
           rButton.style.backgroundColor = down.includes("r") ? active : inactive
           cButton.style.backgroundColor = down.includes("c") ? active : inactive
+          zButton.style.backgroundColor = down.includes("z") ? active : inactive
           boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
           jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
@@ -139,11 +142,14 @@ export const HUDSystem = ClientSystemBuilder({
 
         const state = world.state<{ phase: string }>()
 
-        // const isConnected = !!world.client?.net.lobbyId
+        const isConnected = !!world.client?.net.lobbyId
         const isWarmup = state.phase === "warmup"
 
         cButton.style.visibility = isWarmup ? "visible" : "hidden"
         teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
+
+        zButton.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
+        readyLabel.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
       }
     }
   }
