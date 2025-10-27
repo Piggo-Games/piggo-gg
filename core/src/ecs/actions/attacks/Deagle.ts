@@ -70,9 +70,48 @@ export const DeagleItem = ({ character }: { character: Character }) => {
       networked: Networked(),
       item: Item({ name: "deagle", stackable: false }),
       gun: Gun({ name: "deagle", clipSize: 7, automatic: false, reloadTime: 60, damage: 35, fireRate: 5, bulletSize: 0.02, speed: 3 }),
+      npc: NPC({
+        behavior: (_, world) => {
+          const { recoil } = character.components.position.data
+
+          // TODO move to a system
+          if (recoil > 0) {
+            character.components.position.data.recoil = max(0, recoil - recoilRate)
+          }
+
+          const { gun } = item.components
+
+          if (world.tick === gun.data.reloading) {
+            gun.ammo = 7
+            gun.data.reloading = null
+          }
+
+          if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {
+            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
+            world.client.sound.play({ name: "reload" })
+          }
+
+          // dummy auto reload
+          if (character.id.includes("dummy") && world.tick % 120 === 0) {
+            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
+          }
+
+          // particles
+          for (let i = 1; i < particles.length; i++) {
+            const p = particles[i]
+
+            p.pos = {
+              x: p.pos.x + p.velocity.x,
+              y: p.pos.y + p.velocity.y,
+              z: p.pos.z + p.velocity.z
+            }
+
+            p.velocity.z -= p.gravity
+          }
+        }
+      }),
       input: Input({
         press: {
-
           "r": ({ hold, client, world }) => {
             if (hold) return
 
@@ -85,7 +124,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
             return { actionId: "reload", params: { value: world.tick + 40 } }
           },
-
           "mb1": ({ hold, character, world, aim, client, delta }) => {
             if (hold) return
             if (!character) return
@@ -102,12 +140,13 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             if (cd + 5 > world.tick) return
             cd = world.tick
 
-            const { position } = character.components
+            const { position, team } = character.components
             const pos = position.xyz()
 
             const targets: Target[] = world.characters()
               .filter(c => c.id !== character.id)
               .filter(c => c.components.health && c.components.health.data.hp > 0)
+              .filter(c => c.components.team.data.team !== team.data.team)
               .map(target => ({
                 ...target.components.position.interpolate(world, delta ?? 0),
                 id: target.id
@@ -129,57 +168,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
             return { actionId: "shoot", params }
           },
-        }
-      }),
-      npc: NPC({
-        behavior: (_, world) => {
-          const { recoil } = character.components.position.data
-
-          // TODO move this to a system
-          if (recoil > 0) {
-            character.components.position.data.recoil = max(0, recoil - recoilRate)
-          }
-
-          const { gun } = item.components
-
-          if (world.tick === gun.data.reloading) {
-            gun.ammo = 7
-            gun.data.reloading = null
-          }
-
-          if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {
-            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
-            world.client.sound.play({ name: "reload" })
-          }
-
-          // dummy auto reload
-          if (character.id.includes("dummy")) {
-            // if (world.tick % 20 === 0 && gun.data.ammo > 0 && !gun.data.reloading) {
-            //   world.actions.push(world.tick + 1, item.id, {
-            //     actionId: "deagle", params: {
-            //       pos: character.components.position.xyz(),
-            //       aim: character.components.position.data.aim,
-            //       targets: []
-            //     }
-            //   })
-            // }
-            if (world.tick % 120 === 0) {
-              world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
-            }
-          }
-
-          // particles
-          for (let i = 1; i < particles.length; i++) {
-            const p = particles[i]
-
-            p.pos = {
-              x: p.pos.x + p.velocity.x,
-              y: p.pos.y + p.velocity.y,
-              z: p.pos.z + p.velocity.z
-            }
-
-            p.velocity.z -= p.gravity
-          }
         }
       }),
       actions: Actions({

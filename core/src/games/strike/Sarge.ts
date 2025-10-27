@@ -28,6 +28,7 @@ export const Sarge = (player: Player): Character => {
   let deathAnimation: AnimationAction | undefined
 
   let animation: "idle" | "run" | "dead" = "idle"
+  let lastTeamNumber = player.components.team.data.team
 
   const isDummy = player.id.includes("dummy")
 
@@ -110,6 +111,14 @@ export const Sarge = (player: Player): Character => {
           "z": ({ hold }) => {
             if (hold) return
             return { actionId: "ready" }
+          },
+
+          "c": ({ hold, world }) => {
+            if (hold) return
+            const state = world.state<StrikeState>()
+            if (state.phase !== "warmup") return
+
+            world.actions.push(world.tick, player.id, { actionId: "switchTeam" })
           },
 
           // "t": ({ hold }) => {
@@ -282,7 +291,7 @@ export const Sarge = (player: Player): Character => {
           position.impulse({ x: toward.x * factor, y: toward.z * factor })
         })
       }),
-      team: Team(1),
+      team: Team(player.components.team.data.team),
       three: Three({
         onRender: ({ entity, world, delta, client, three, since }) => {
           const ratio = since / 25
@@ -301,6 +310,12 @@ export const Sarge = (player: Player): Character => {
 
           // rotation
           pig.rotation.y = orientation.x + PI
+
+          // team color
+          if (lastTeamNumber !== player.components.team.data.team) {
+            colorMaterials(pig, SargeColors, player.components.team.data.team)
+            lastTeamNumber = player.components.team.data.team
+          }
 
           // animation
           let speed = hypot(position.data.velocity.x, position.data.velocity.y)
@@ -417,8 +432,13 @@ export const Sarge = (player: Player): Character => {
 }
 
 const SargeColors: ColorMapping = {
-  "cead86": { 1: "#be9393", 2: "#be9393" },
-  "4f535a": { 1: "#4f535a", 2: "#7e4f19" },
-  "312e2b": { 1: "#312e2b", 2: "#2b1608" },
-  "161616": { 1: "#453089", 2: "#671029" }
+  "cead86": { 2: "#be9393", 1: "#be9393" },
+  "4f535a": { 2: "#4f535a", 1: "#7e4f19" },
+  "312e2b": { 2: "#312e2b", 1: "#2b1608" },
+  "161616": { 2: "#453089", 1: "#671029" },
+
+  "7e4f19": { 2: "#4f535a", 1: "#7e4f19" },
+  "2b1608": { 2: "#312e2b", 1: "#2b1608" },
+  "453089": { 2: "#453089", 1: "#671029" },
+  "671029": { 2: "#453089", 1: "#671029" }
 }
