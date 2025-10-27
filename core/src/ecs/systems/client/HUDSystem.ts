@@ -17,18 +17,21 @@ export const HUDSystem = ClientSystemBuilder({
     const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 80 })
     const sButton = KeyButton({ text: "S", left, bottom: bottom + 80 })
     const wButton = KeyButton({ text: "W", left, bottom: bottom + 130 })
-
-    const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
-    const zButton = KeyButton({ text: "z", left, bottom: bottom + 460, visible: false })
-
-    const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
-    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160 })
-
-    const readyLabel = KeyLabel("ready", left, bottom + 430, false)
-    const reloadLabel = KeyLabel("reload", left, bottom + 320)
     const moveLabel = KeyLabel("move", left, bottom + 50)
 
+    const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
+    const reloadLabel = KeyLabel("reload", left, bottom + 320)
+
+    const cButton = KeyButton({ text: "c", left, bottom: bottom + 460, visible: false })
+    const teamLabel = KeyLabel("switch team", left, bottom + 430, false)
+
+    // const zButton = KeyButton({ text: "z", left, bottom: bottom + 460, visible: false })
+    // const readyLabel = KeyLabel("ready", left, bottom + 430, false)
+
+    const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
     const boostLabel = KeyLabel("boost", left, bottom - 30)
+
+    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160 })
     const jumpLabel = KeyLabel("jump", left, bottom + 210)
 
     const scoreText = HtmlText({
@@ -66,10 +69,10 @@ export const HUDSystem = ClientSystemBuilder({
     controls.appendChild(sButton)
     controls.appendChild(wButton)
     controls.appendChild(rButton)
-    controls.appendChild(zButton)
+    controls.appendChild(cButton)
 
     controls.appendChild(jumpButton)
-    controls.appendChild(readyLabel)
+    controls.appendChild(teamLabel)
     controls.appendChild(reloadLabel)
     controls.appendChild(moveLabel)
     controls.appendChild(jumpLabel)
@@ -110,7 +113,7 @@ export const HUDSystem = ClientSystemBuilder({
           sButton.style.backgroundColor = down.includes("s") ? active : inactive
           wButton.style.backgroundColor = down.includes("w") ? active : inactive
           rButton.style.backgroundColor = down.includes("r") ? active : inactive
-          zButton.style.backgroundColor = down.includes("z") ? active : inactive
+          cButton.style.backgroundColor = down.includes("c") ? active : inactive
           boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
           jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
@@ -136,9 +139,11 @@ export const HUDSystem = ClientSystemBuilder({
 
         const state = world.state<{ phase: string }>()
 
-        const isWarmup = state.phase === "warmup" && world.client?.net.lobbyId
-        zButton.style.visibility = isWarmup ? "visible" : "hidden"
-        readyLabel.style.visibility = isWarmup ? "visible" : "hidden"
+        // const isConnected = !!world.client?.net.lobbyId
+        const isWarmup = state.phase === "warmup"
+
+        cButton.style.visibility = isWarmup ? "visible" : "hidden"
+        teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
       }
     }
   }
@@ -171,6 +176,8 @@ const KeyLabel = (text: string, left: number, bottom: number, visible = true) =>
   style: {
     left: `${left}px`,
     bottom: `${bottom}px`,
+    width: "200px",
+    textAlign: "center",
     visibility: visible ? "visible" : "hidden",
     transform: "translate(-50%)"
   }
