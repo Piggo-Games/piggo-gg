@@ -76,7 +76,7 @@ export const Scoreboard = () => {
             // clean up stale rows
             const rowData = playerData[player.id]
             if (rowData) {
-              if (rowData.kda !== playerKDA || rowData.name !== pc.data.name) {
+              if (rowData.kda !== playerKDA || rowData.name !== pc.data.name || rowData.team !== team.data.team) {
                 rowData.row.parentElement?.removeChild(rowData.row)
                 delete playerData[player.id]
               }
@@ -84,34 +84,26 @@ export const Scoreboard = () => {
 
             // add new row
             if (!playerData[player.id]) {
-
               const row = ScoreboardRow(pc.data.name, team.data.team, playerKDA, world.client?.player?.id === player.id)
 
               playerData[player.id] = {
-                row,
-                name: pc.data.name,
-                team: team.data.team,
-                kda: playerKDA
-              }
-
-              if (team.data.team === 1) {
-                team1.appendChild(row)
-              } else {
-                team2.appendChild(row)
+                row, name: pc.data.name, team: team.data.team, kda: playerKDA
               }
             }
           }
 
-          // sort by kills descending
-          const team1Rows = values(playerData).filter(pd => pd.team === 1)
-            .sort((a, b) => {
-              const aKills = parseInt(a.kda.split("|")[0])
-              const bKills = parseInt(b.kda.split("|")[0])
-              return bKills - aKills
-            })
+          // sort team1
           team1.innerHTML = ""
+          const team1Rows = sortByFrags(playerData, 1)
           for (const rowData of team1Rows) {
             team1.appendChild(rowData.row)
+          }
+
+          // sort team2
+          team2.innerHTML = ""
+          const team2Rows = sortByFrags(playerData, 2)
+          for (const rowData of team2Rows) {
+            team2.appendChild(rowData.row)
           }
 
           wrapper.style.visibility = world.client?.bufferDown.get("tab") ? "visible" : "hidden"
@@ -121,6 +113,14 @@ export const Scoreboard = () => {
   })
 
   return scoreboard
+}
+
+const sortByFrags = (data: Record<string, RowData>, teamNumber: TeamNumber) => {
+  return values(data).filter(pd => pd.team === teamNumber).sort((a, b) => {
+    const aKills = parseInt(a.kda.split("|")[0])
+    const bKills = parseInt(b.kda.split("|")[0])
+    return bKills - aKills
+  })
 }
 
 const ScoreboardRow = (name: string, team: TeamNumber, kda: KDAstring, isClient: boolean) => HDiv({
