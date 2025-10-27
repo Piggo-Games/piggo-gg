@@ -23,7 +23,7 @@ export const ThreeNametag = (player: Player): ThreeNametag => {
         if (pc.components.position.data.flying && !character.components.position.data.flying) {
           group.visible = false
         } else {
-          group.visible = true
+          group.visible = player.components.team.data.team === pc.components.team.data.team
         }
       }
 
