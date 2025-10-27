@@ -356,10 +356,14 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             mesh = gltf.scene
             mesh.scale.set(0.025, 0.025, 0.025)
 
-            mesh.receiveShadow = true
-            mesh.castShadow = true
-
             mesh.rotation.order = "YXZ"
+
+            mesh.traverse((child) => {
+              if (child instanceof Mesh) {
+                child.castShadow = true
+                child.receiveShadow = true
+              }
+            })
 
             item.components.three?.o.push(mesh)
           })
@@ -424,11 +428,11 @@ export const DeagleItem = ({ character }: { character: Character }) => {
           }
 
           // gun
-          mesh.position.copy({
-            x: pos.x + offset.x,
-            y: pos.z + 0.45 + offset.y,
-            z: pos.y + offset.z
-          })
+          mesh.position.set(
+            pos.x + offset.x,
+            pos.z + 0.45 + offset.y,
+            pos.y + offset.z
+          )
 
           const { recoil } = character.components.position.data
           const localRecoil = recoil ? recoil - recoilRate * ratio : 0
