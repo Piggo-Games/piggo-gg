@@ -7,10 +7,13 @@ import {
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
-const servers = {
+type env = "local" | "dev" | "production" | "discord"
+
+const servers: Record<env, string> = {
   local: "ws://localhost:3000",
   dev: "wss://piggo-api-staging.up.railway.app",
-  production: "wss://api.piggo.gg"
+  production: "wss://api.piggo.gg",
+  discord: `wss://${window.location.host}/.proxy/api/ws`
 } as const
 
 export const hosts = {
@@ -46,7 +49,7 @@ export type Client = {
     moveLocal: (xy: XY, flying?: boolean) => void
   }
   discord: Discord | undefined
-  env: "local" | "dev" | "production"
+  env: "local" | "dev" | "production" | "discord"
   lastMessageTick: number
   lobbyId: string | undefined
   net: {
@@ -104,7 +107,9 @@ export const Client = ({ world }: ClientProps): Client => {
     // TODO handle timeout
   }
 
-  const env = location?.hostname === "piggo.gg" ? "production" : location?.hostname === "dev.piggo.gg" ? "dev" : "local"
+  const env = location?.hostname === "piggo.gg" ? "production" :
+    location?.hostname === "dev.piggo.gg" ? "dev" :
+    location?.hostname.includes("discordsays") ? "discord" : "local"
 
   const client: Client = {
     bufferDown: KeyBuffer(),
