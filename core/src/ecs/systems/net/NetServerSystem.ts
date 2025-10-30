@@ -94,6 +94,24 @@ export const NetServerSystem = ({
         }
       }
 
+      // missing a message. if they moved last tick, re-apply that movement
+      if (lastMessageTick[clientId] === world.tick - 1) {
+        console.log(`client:${clientId} missed tick:${world.tick} --- re-applying last move action`)
+
+        // actions last tick
+        const lastActions = world.actions.atTick(world.tick - 1)
+        if (!lastActions) continue
+
+        const playerActions = lastActions[clientId]
+        if (!playerActions) continue
+
+        const moveAction = playerActions.find(a => a.actionId === "move")
+        if (!moveAction) continue
+
+        world.actions.push(world.tick, clientId, { ...moveAction })
+        console.log(`re-applying move action for client:${clientId} at tick:${world.tick}`)
+      }
+
       latestClientMessages[clientId] = []
     }
   }
