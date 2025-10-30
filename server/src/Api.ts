@@ -347,7 +347,7 @@ export const Api = (): Api => {
         return
       }
 
-      if (ws.readyState !== 1) console.warn("ws not open")
+      if (ws.readyState !== 1) console.error("WS NOT OPEN")
 
       const world = api.worlds[ws.data.worldId]
       if (world) world.handleMessage(ws, wsData)
