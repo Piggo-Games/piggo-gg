@@ -107,15 +107,15 @@ export const NetServerSystem = ({
         if (!character) continue
 
         // actions last tick
-        const lastActions = world.actions.atTick(lastMessageTick[character.id])
+        const lastActions = world.actions.atTick(lastMessageTick[clientId])
         console.log("early return lastActions")
         if (!lastActions) continue
 
-        const playerActions = lastActions[character.id]
-        console.log("early return playerActions")
-        if (!playerActions) continue
+        const characterActions = lastActions[character.id]
+        console.log("early return characterActions")
+        if (!characterActions) continue
 
-        const moveAction = playerActions.find(a => a.actionId === "move")
+        const moveAction = characterActions.find(a => a.actionId === "move")
         console.log("early return moveAction")
         if (!moveAction) continue
 
