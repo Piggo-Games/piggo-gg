@@ -99,7 +99,7 @@ export const NetServerSystem = ({
         console.log(`MISSED MOVEMENT`)
 
         // actions last tick
-        const lastActions = world.actions.atTick(world.tick - 1)
+        const lastActions = world.actions.atTick(lastMessageTick[clientId])
         console.log("early return lastActions")
         if (!lastActions) continue
 
