@@ -95,7 +95,7 @@ export const NetServerSystem = ({
       }
 
       // missing a message. if they moved last tick, re-apply that movement
-      if (lastMessageTick[clientId] === world.tick - 1) {
+      if (lastMessageTick[clientId] < world.tick) {
         console.log(`client:${clientId} missed tick:${world.tick} --- re-applying last move action`)
 
         // actions last tick
