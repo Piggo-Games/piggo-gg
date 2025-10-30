@@ -35,11 +35,11 @@ export const NetServerSystem = ({
 
     // send tick data to all clients
     for (const [id, client] of entries(clients)) {
-      client.send(encode({
-        ...tickData,
-        latency: latestClientLag[id],
-        diff: latestClientDiff[id]
-      }))
+      const payload = encode({
+        ...tickData, latency: latestClientLag[id], diff: latestClientDiff[id]
+      })
+      client.send(payload)
+
       if (world.tick - 1 !== lastSent) {
         console.error(`sent last:${lastSent} world:${world.tick} to ${id}`)
       }
