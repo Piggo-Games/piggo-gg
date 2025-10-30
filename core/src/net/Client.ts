@@ -150,7 +150,7 @@ export const Client = ({ world }: ClientProps): Client => {
         client.controls.localAim.y = max(lower, min(upper, client.controls.localAim.y))
       }
     },
-    discord: Discord(),
+    discord: undefined, // Discord()
     env,
     lastMessageTick: 0,
     lobbyId: undefined,
