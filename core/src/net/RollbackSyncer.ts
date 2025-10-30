@@ -109,7 +109,6 @@ export const RollbackSyncer = (world: World): Syncer => {
 
       // consume buffer
       if (buffer.length > 1) {
-        console.error("pre-reading messages", buffer.length)
         preRead(message)
         message = buffer.shift() as GameData
       }

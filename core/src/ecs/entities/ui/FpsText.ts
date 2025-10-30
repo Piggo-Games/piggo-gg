@@ -1,4 +1,4 @@
-import { Entity, Position, Renderable, pixiText, round } from "@piggo-gg/core"
+import { Entity, HDiv, HText, NPC, Position, Renderable, pixiText, round } from "@piggo-gg/core"
 import { Text } from "pixi.js"
 
 export type FpsTextProps = {
@@ -27,6 +27,50 @@ export const FpsText = ({ x, y }: FpsTextProps = {}) => Entity<Position | Render
     })
   }
 })
+
+export const HtmlLagText = () => {
+
+  let init = false
+
+  let last = 0
+  let lastTick = 0
+
+  const div = HText({
+    style: {
+      right: "16px",
+      bottom: "16px",
+      color: "#00dd00",
+      textShadow: "none",
+      visibility: "hidden"
+    },
+    text: "ms: 0"
+  })
+
+  return Entity({
+    id: "htmlLagText",
+    components: {
+      position: Position(),
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!init) {
+            document.body.appendChild(div)
+            init = true
+          }
+
+          const lag = round(world.client?.net.ms ?? 0)
+          div.style.visibility = world.client?.net.synced ? "visible" : "hidden"
+
+          if (lag > last || world.tick - lastTick > 60) {
+            last = lag
+            lastTick = world.tick
+
+            div.textContent = `ms: ${lag}`
+          }
+        }
+      })
+    }
+  })
+}
 
 export const LagText = ({ x, y }: FpsTextProps = {}) => {
 

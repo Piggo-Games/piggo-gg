@@ -2,7 +2,7 @@ import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
   EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
   logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -72,7 +72,8 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       Sky(),
       DummyPlayer(),
       DummyPlayer2(),
-      PhaseBanner()
+      PhaseBanner(),
+      HtmlLagText()
     ]
   })
 }

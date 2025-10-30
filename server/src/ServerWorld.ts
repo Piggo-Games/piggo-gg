@@ -63,13 +63,12 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
         console.log(`id:${ws.data.playerId} name:${ws.data.playerName} connected ${ws.remoteAddress}`)
       }
 
-      // store last message for client
+      // store the message
       latestClientMessages[msg.playerId].push(msg)
 
-      // if (latestClientMessages[msg.playerId].length === 1) {
+      // record latency
       if (!lastMessageTick[msg.playerId] || lastMessageTick[msg.playerId] < msg.tick) {
         latestClientLag[msg.playerId] = Date.now() - msg.timestamp
-        // latestClientDiff[msg.playerId] = msg.tick - world.tick
       }
 
       // if (world.tick % 400 === 0) console.log(`player:${ws.data.playerId} name:${ws.data.playerName} diff:${diff}`)
