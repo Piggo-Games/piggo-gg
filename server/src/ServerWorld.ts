@@ -27,8 +27,11 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
   const latestClientMessages: Record<string, GameData[]> = {}
   const latestClientLag: Record<string, number> = {}
   const latestClientDiff: Record<string, number> = {}
+  const lastMessageTick: Record<string, number> = {}
 
-  world.addSystems([NetServerSystem({ world, clients, latestClientMessages, latestClientLag, latestClientDiff })])
+  world.addSystems([NetServerSystem({
+    world, clients, latestClientMessages, latestClientLag, latestClientDiff, lastMessageTick }
+  )])
   world.addSystemBuilders([NoobSystem])
 
   return {
@@ -63,9 +66,10 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
       // store last message for client
       latestClientMessages[msg.playerId].push(msg)
 
-      if (latestClientMessages[msg.playerId].length === 1) {
+      // if (latestClientMessages[msg.playerId].length === 1) {
+      if (!lastMessageTick[msg.playerId] || lastMessageTick[msg.playerId] < msg.tick) {
         latestClientLag[msg.playerId] = Date.now() - msg.timestamp
-        latestClientDiff[msg.playerId] = msg.tick - world.tick
+        // latestClientDiff[msg.playerId] = msg.tick - world.tick
       }
 
       // if (world.tick % 400 === 0) console.log(`player:${ws.data.playerId} name:${ws.data.playerName} diff:${diff}`)

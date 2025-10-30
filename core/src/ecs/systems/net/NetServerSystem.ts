@@ -7,14 +7,17 @@ export type DelayServerSystemProps = {
   latestClientMessages: Record<string, GameData[]>
   latestClientLag: Record<string, number>
   latestClientDiff: Record<string, number>
+  lastMessageTick: Record<string, number>
 }
 
 // delay netcode server
-export const NetServerSystem = ({ world, clients, latestClientMessages, latestClientLag, latestClientDiff }: DelayServerSystemProps): System<"NetServerSystem"> => {
+export const NetServerSystem = ({
+  world, clients, latestClientMessages, latestClientLag, latestClientDiff, lastMessageTick
+}: DelayServerSystemProps): System<"NetServerSystem"> => {
 
   let lastSent = 0
 
-  const lastMessageTick: Record<string, number> = {}
+  // const lastMessageTick: Record<string, number> = {}
 
   const write = () => {
 
@@ -73,7 +76,7 @@ export const NetServerSystem = ({ world, clients, latestClientMessages, latestCl
         lastMessageTick[clientId] = message.tick
 
         // latestClientLag[message.playerId] = Date.now() - message.timestamp
-        // latestClientDiff[message.playerId] = message.tick - world.tick
+        latestClientDiff[message.playerId] = message.tick - world.tick
 
         // process message actions
         if (message.actions[message.tick]) {
