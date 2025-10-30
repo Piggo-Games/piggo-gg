@@ -266,10 +266,10 @@ export const Api = (): Api => {
           return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ? new Response() : new Response("upgrade failed", { status: 500 })
         },
         websocket: {
-          perMessageDeflate: false,
+          perMessageDeflate: true,
           close: api.handleClose,
           open: api.handleOpen,
-          message: api.handleMessage,
+          message: api.handleMessage
         }
       })
 
