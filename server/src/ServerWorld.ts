@@ -63,10 +63,10 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
       // store last message for client
       latestClientMessages[msg.playerId].push(msg)
 
-      // latestClientLag[msg.playerId] = Date.now() - msg.timestamp
-
-      // const diff = msg.tick - world.tick
-      // latestClientDiff[msg.playerId] = diff
+      if (latestClientMessages[msg.playerId].length === 1) {
+        latestClientLag[msg.playerId] = Date.now() - msg.timestamp
+        latestClientDiff[msg.playerId] = msg.tick - world.tick
+      }
 
       // if (world.tick % 400 === 0) console.log(`player:${ws.data.playerId} name:${ws.data.playerName} diff:${diff}`)
     }
