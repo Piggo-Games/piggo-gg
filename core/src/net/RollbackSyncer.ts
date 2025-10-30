@@ -1,5 +1,5 @@
 import {
-  ceil, entityConstructors, entries, GameData, InvokedAction, keys,
+  ceil, Client, entityConstructors, entries, GameData, InvokedAction, keys,
   logDiff, stringify, Syncer, values, World
 } from "@piggo-gg/core"
 
@@ -25,6 +25,8 @@ export const RollbackSyncer = (world: World): Syncer => {
 
   let last = 0
   let rollback = false
+
+  const client = world.client as Client
 
   const mustRollback = (reason: string) => {
     console.log(`MUST ROLLBACK world:${world.tick}`, reason)
@@ -90,7 +92,7 @@ export const RollbackSyncer = (world: World): Syncer => {
       actions: world.actions.fromTick(world.tick, s => s.offline !== true),
       chats: world.messages.atTick(world.tick) ?? {},
       game: world.game.id,
-      playerId: world.client?.playerId() ?? "",
+      playerId: client.playerId(),
       serializedEntities: {},
       tick: world.tick,
       timestamp: Date.now(),
@@ -109,14 +111,18 @@ export const RollbackSyncer = (world: World): Syncer => {
 
       // consume buffer
       if (buffer.length > 1) {
-        preRead(message)
-        message = buffer.shift() as GameData
+        while (buffer.length > 1) {
+          preRead(message)
+          message = buffer.shift() as GameData
+        }
       }
 
-      if ((message.diff ?? 1) > 3) {
+      const target = client.env === "discord" ? 3 : 2
+
+      if ((message.diff ?? 1) > target + 1) {
         console.log("speed up")
         world.tickrate = 30
-      } else if ((message.diff ?? 2) < 2) {
+      } else if ((message.diff ?? 2) < target) {
         console.log("slow down")
         world.tickrate = 20
       } else {
@@ -124,7 +130,7 @@ export const RollbackSyncer = (world: World): Syncer => {
       }
 
       if (message.tick <= last) {
-        console.error(`OUT OF ORDER last:${last} msg:${message.tick} client${world.client?.lastMessageTick}`)
+        console.error(`OUT OF ORDER last:${last} msg:${message.tick} client${client.lastMessageTick}`)
         last = message.tick
         return
       }
@@ -134,9 +140,7 @@ export const RollbackSyncer = (world: World): Syncer => {
       last = message.tick
 
       const gap = world.tick - message.tick
-      const framesForward = (gap >= 2 && gap <= 5) ?
-        gap :
-        ceil(world.client!.net.ms * 2 / world.tickrate) + 2
+      const framesForward = (gap >= 2 && gap <= 5) ? gap : ceil(client.net.ms * 2 / world.tickrate) + target
 
       const localActions = world.actions.atTick(message.tick) ?? {}
 
