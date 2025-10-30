@@ -142,7 +142,7 @@ export const HUDSystem = ClientSystemBuilder({
 
         const state = world.state<{ phase: string }>()
 
-        const isConnected = !!world.client?.net.lobbyId
+        const isConnected = world.client?.net.synced
         const isWarmup = state.phase === "warmup"
 
         cButton.style.visibility = isWarmup ? "visible" : "hidden"
