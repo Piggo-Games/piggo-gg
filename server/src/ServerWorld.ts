@@ -1,5 +1,5 @@
 import {
-  Craft, DefaultWorld, GameData, GameTitle, keys, NetMessageTypes, NetServerSystem, Player, World
+  DefaultWorld, GameData, GameTitle, keys, NetMessageTypes, NetServerSystem, Player, World
 } from "@piggo-gg/core"
 import { PerClientData, NoobSystem } from "@piggo-gg/server"
 import { ServerWebSocket } from "bun"

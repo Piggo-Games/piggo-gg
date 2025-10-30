@@ -1,9 +1,12 @@
 import { mocks } from 'mock-browser'
 
-// for pixi-filters
+// for pixi-filters & discord
 global.window = {
   innerWidth: 1920,
-  innerHeight: 1080
+  innerHeight: 1080,
+  location: {
+    origin: 'http://localhost'
+  }
 }
 
 // for react-hot-toast
