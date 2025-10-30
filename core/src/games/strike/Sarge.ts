@@ -42,7 +42,7 @@ export const Sarge = (player: Player): Character => {
         aim: isDummy ? { x: -3.14, y: 0 } : { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([DeagleItem, HookItem]),
+      inventory: Inventory([DeagleItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
