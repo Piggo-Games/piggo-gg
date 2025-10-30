@@ -72,6 +72,9 @@ export const NetServerSystem = ({ world, clients, latestClientMessages, latestCl
 
         lastMessageTick[clientId] = message.tick
 
+        latestClientLag[message.playerId] = Date.now() - message.timestamp
+        latestClientDiff[message.playerId] = message.tick - world.tick
+
         // process message actions
         if (message.actions[message.tick]) {
 
