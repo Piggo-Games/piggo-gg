@@ -13,7 +13,7 @@ const servers: Record<env, string> = {
   local: "ws://localhost:3000",
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
-  discord: `wss://${window.location.host}/.proxy/api/ws`
+  discord: `wss://${window.location.host}/.proxy/api`
 } as const
 
 export const hosts = {
