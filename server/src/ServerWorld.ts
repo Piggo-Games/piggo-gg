@@ -69,10 +69,14 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
       // record latency
       if (!lastMessageTick[msg.playerId] || lastMessageTick[msg.playerId] < msg.tick) {
         latestClientLag[msg.playerId] = Date.now() - msg.timestamp
-        latestClientDiff[msg.playerId] = msg.tick - world.tick
-      }
 
-      // if (world.tick % 400 === 0) console.log(`player:${ws.data.playerId} name:${ws.data.playerName} diff:${diff}`)
+        const diff = msg.tick - world.tick
+        latestClientDiff[msg.playerId] = diff
+
+        if (diff < 1 || world.tick % 200 === 0) {
+          console.log(`diff:${diff} lag:${latestClientLag[msg.playerId]}ms player:${ws.data.playerId} name:${ws.data.playerName}`)
+        }
+      }
     }
   }
 }
