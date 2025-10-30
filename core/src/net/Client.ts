@@ -3,7 +3,7 @@ import {
   RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
   FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
   ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, round, max, min, GameTitle
+  BadResponse, LobbyExit, XY, round, max, min, GameTitle, Discord
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
@@ -45,6 +45,7 @@ export type Client = {
     localHit: { tick: number, headshot: boolean }
     moveLocal: (xy: XY, flying?: boolean) => void
   }
+  discord: Discord | undefined
   env: "local" | "dev" | "production"
   lastMessageTick: number
   lobbyId: string | undefined
@@ -149,6 +150,7 @@ export const Client = ({ world }: ClientProps): Client => {
         client.controls.localAim.y = max(lower, min(upper, client.controls.localAim.y))
       }
     },
+    discord: Discord(),
     env,
     lastMessageTick: 0,
     lobbyId: undefined,
