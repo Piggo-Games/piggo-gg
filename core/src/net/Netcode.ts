@@ -47,7 +47,7 @@ export type RequestTypes =
   LobbyList | LobbyCreate | LobbyJoin | LobbyExit |
   FriendsList | FriendsAdd | FriendsRemove |
   ProfileCreate | ProfileGet |
-  AuthLogin |
+  AuthLogin | DiscordLogin |
   Pls |
   MetaPlayers
 
@@ -88,6 +88,10 @@ export type ProfileGet = Request<"profile/get", { name: string }> & { token: str
 // auth endpoints
 export type AuthLogin = Request<"auth/login", { token: string, newUser: boolean }> & {
   jwt: string
+}
+
+export type DiscordLogin = Request<"discord/login", { access_token: string }> & {
+  code: string
 }
 
 // ai endpoints

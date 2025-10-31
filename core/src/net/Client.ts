@@ -3,24 +3,20 @@ import {
   RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
   FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
   ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, round, max, min, GameTitle, Discord
+  BadResponse, LobbyExit, XY, round, max, min, GameTitle, Discord,
+  DiscordLogin
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
 type env = "local" | "dev" | "production" | "discord"
 
 const servers: Record<env, string> = {
-  local: "ws://localhost:3000",
+  // local: "ws://localhost:3000",
+  local: `wss://1433003541521236100.discordsays.com/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
-  discord: `wss://${window.location.host}/.proxy/api`
+  discord: `wss://1433003541521236100.discordsays.com/.proxy/api`
 } as const
-
-export const hosts = {
-  local: "http://localhost:8000",
-  dev: "https://dev.piggo.gg",
-  production: "https://piggo.gg"
-}
 
 type APICallback<R extends RequestTypes = RequestTypes> = (response: R["response"] | BadResponse) => void
 type Callback<R extends RequestTypes = RequestTypes> = (response: R["response"]) => void
@@ -75,6 +71,7 @@ export type Client = {
   lobbyLeave: () => void
   lobbyList: (callback: Callback<LobbyList>) => void
   metaPlayers: (callback: Callback<MetaPlayers>) => void
+  discordLogin: (code: string, callback?: Callback<DiscordLogin>) => void
   authLogin: (jwt: string, callback?: Callback<AuthLogin>) => void
   logout: () => void
   aiPls: (prompt: string, callback: Callback<Pls>) => void
@@ -155,8 +152,7 @@ export const Client = ({ world }: ClientProps): Client => {
         client.controls.localAim.y = max(lower, min(upper, client.controls.localAim.y))
       }
     },
-    discord: undefined,
-    // discord: Discord(),
+    discord: Discord(),
     env,
     lastMessageTick: 0,
     lobbyId: undefined,
@@ -251,6 +247,19 @@ export const Client = ({ world }: ClientProps): Client => {
           console.error("failed to get meta players:", response.error)
         } else {
           callback(response)
+        }
+      })
+    },
+    discordLogin: async (code, callback) => {
+      request<DiscordLogin>({ route: "discord/login", type: "request", id: randomHash(), code }, (response) => {
+        if ("error" in response) {
+          console.error("failed to login with discord:", response.error)
+        } else {
+          client.token = response.access_token
+
+          localStorage?.setItem("token", response.access_token)
+          // if (!response.newUser) client.profileGet()
+          if (callback) callback(response)
         }
       })
     },
