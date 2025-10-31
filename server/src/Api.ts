@@ -258,7 +258,8 @@ export const Api = (): Api => {
           const origin = r.headers.get("origin")
 
           const proxied = origin?.includes("discordsays")
-          if ((!origin || !["https://piggo.gg", "https://dev.piggo.gg", "http://localhost:8000"].includes(origin)) && !proxied) {
+          if ((!origin || !["https://piggo.gg", "https://dev.piggo.gg", "http://localhost:8000", "https://localhost:8000"].includes(origin)) && !proxied) {
+            console.log("blocked origin:", origin)
             return new Response("invalid origin", { status: 403 })
           }
 

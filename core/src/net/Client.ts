@@ -10,10 +10,10 @@ import { decode, encode } from "@msgpack/msgpack"
 type env = "local" | "dev" | "production" | "discord"
 
 const servers: Record<env, string> = {
-  local: "ws://localhost:3000",
+  local: `wss://1433003541521236100.discordsays.com/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
-  discord: `wss://${window.location.host}/.proxy/api`
+  discord: `wss://1433003541521236100.discordsays.com/.proxy/api`
 } as const
 
 export const hosts = {
