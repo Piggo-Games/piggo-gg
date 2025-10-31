@@ -7,14 +7,15 @@ export type DelayServerSystemProps = {
   latestClientMessages: Record<string, GameData[]>
   latestClientLag: Record<string, number>
   latestClientDiff: Record<string, number>
+  lastMessageTick: Record<string, number>
 }
 
 // delay netcode server
-export const NetServerSystem = ({ world, clients, latestClientMessages, latestClientLag, latestClientDiff }: DelayServerSystemProps): System<"NetServerSystem"> => {
+export const NetServerSystem = ({
+  world, clients, latestClientMessages, latestClientLag, latestClientDiff, lastMessageTick
+}: DelayServerSystemProps): System<"NetServerSystem"> => {
 
   let lastSent = 0
-
-  const lastMessageTick: Record<string, number> = {}
 
   const write = () => {
 
@@ -32,11 +33,11 @@ export const NetServerSystem = ({ world, clients, latestClientMessages, latestCl
 
     // send tick data to all clients
     for (const [id, client] of entries(clients)) {
-      client.send(encode({
-        ...tickData,
-        latency: latestClientLag[id],
-        diff: latestClientDiff[id]
-      }))
+      const payload = encode({
+        ...tickData, latency: latestClientLag[id], diff: latestClientDiff[id]
+      })
+      client.send(payload)
+
       if (world.tick - 1 !== lastSent) {
         console.error(`sent last:${lastSent} world:${world.tick} to ${id}`)
       }
@@ -57,16 +58,16 @@ export const NetServerSystem = ({ world, clients, latestClientMessages, latestCl
         if (message.type !== "game") continue
 
         if (message.tick < world.tick) {
-          console.error(`OLD MESSAGE client:${clientId} msg:${message.tick} server: ${world.tick}`)
+          console.error(`msg:${message.tick} server:${world.tick} client:${clientId} OLD MESSAGE`)
           continue
         }
 
         if (lastMessageTick[clientId]) {
           if (message.tick <= lastMessageTick[clientId]) {
-            console.error(`OUT OF ORDER    client:${clientId} last:${lastMessageTick[clientId]} msg:${message.tick} server: ${world.tick}`)
+            console.error(`msg:${message.tick} server:${world.tick} last:${lastMessageTick[clientId]} client:${clientId} OUT OF ORDER`)
             continue
           } else if (message.tick > lastMessageTick[clientId] + 1) {
-            console.error(`MISSED MESSAGES client:${clientId} last:${lastMessageTick[clientId]} msg:${message.tick} server: ${world.tick}`)
+            console.error(`msg:${message.tick} server:${world.tick} last:${lastMessageTick[clientId]} client:${clientId} MISSED MESSAGES`)
           }
         }
 
@@ -89,6 +90,24 @@ export const NetServerSystem = ({ world, clients, latestClientMessages, latestCl
         if (message.chats[clientId]) {
           world.messages.set(world.tick, clientId, message.chats[clientId])
         }
+      }
+
+      // missing a message. if they moved last tick, re-apply that movement
+      if (lastMessageTick[clientId] < world.tick) {
+        const player = world.entity(clientId)
+        if (!player) continue
+
+        const character = player.components.controlling?.getCharacter(world)
+        if (!character) continue
+
+        const characterActions = world.actions.atTick(lastMessageTick[clientId])?.[character.id]
+        if (!characterActions) continue
+
+        const moveAction = characterActions.find(a => a.actionId === "move")
+        if (!moveAction) continue
+
+        world.actions.push(world.tick, character.id, { ...moveAction })
+        console.log(`RE-APPLY MISSING MOVEMENT tick:${world.tick}`)
       }
 
       latestClientMessages[clientId] = []

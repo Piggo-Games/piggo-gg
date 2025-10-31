@@ -8,7 +8,7 @@ import { Spike } from "./Spike"
 
 export const Bot = (team: TeamNumber, pos: PositionProps): Entity<Position | Team> => {
   const bot: Entity<Position | Team> = Entity({
-    id: `bot-${team}-${pos.x}-${pos.y}`,
+    id: `bot-${team}|${pos.x}|${pos.y}`,
     components: {
       debug: Debug(),
       position: Position({ velocityResets: 1, speed: 120, gravity: 0.3, ...pos }),

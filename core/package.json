@@ -4,6 +4,7 @@
   "main": "./main.ts",
   "dependencies": {
     "@dimforge/rapier2d-compat": "0.13.1",
+    "@discord/embedded-app-sdk": "^2.4.0",
     "@msgpack/msgpack": "^3.1.1",
     "@pixi/ui": "2.2.1",
     "pixi-filters": "6.0.3",

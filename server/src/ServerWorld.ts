@@ -1,5 +1,5 @@
 import {
-  Craft, DefaultWorld, GameData, GameTitle, keys, NetMessageTypes, NetServerSystem, Player, World
+  DefaultWorld, entries, GameData, GameTitle, keys, NetMessageTypes, NetServerSystem, Player, World
 } from "@piggo-gg/core"
 import { PerClientData, NoobSystem } from "@piggo-gg/server"
 import { ServerWebSocket } from "bun"
@@ -27,9 +27,28 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
   const latestClientMessages: Record<string, GameData[]> = {}
   const latestClientLag: Record<string, number> = {}
   const latestClientDiff: Record<string, number> = {}
+  const lastMessageTick: Record<string, number> = {}
 
-  world.addSystems([NetServerSystem({ world, clients, latestClientMessages, latestClientLag, latestClientDiff })])
+  world.addSystems([NetServerSystem({
+    world, clients, latestClientMessages, latestClientLag, latestClientDiff, lastMessageTick }
+  )])
   world.addSystemBuilders([NoobSystem])
+
+  setInterval(() => {
+
+    // clean up idle players
+    for (const [clientId, ws] of entries(clients)) {
+      const latestTick = lastMessageTick[clientId] || 0
+      if (world.tick - latestTick > 80) {
+        world.removeEntity(clientId)
+
+        delete clients[clientId]
+        delete latestClientMessages[clientId]
+
+        console.log(`id:${clientId} name:${ws.data.playerName} kicked for inactivity`)
+      }
+    }
+  }, 500)
 
   return {
     world,
@@ -60,14 +79,20 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
         console.log(`id:${ws.data.playerId} name:${ws.data.playerName} connected ${ws.remoteAddress}`)
       }
 
-      // store last message for client
+      // store the message
       latestClientMessages[msg.playerId].push(msg)
-      latestClientLag[msg.playerId] = Date.now() - msg.timestamp
 
-      const diff = msg.tick - world.tick
-      latestClientDiff[msg.playerId] = diff
+      // record latency
+      if (!lastMessageTick[msg.playerId] || lastMessageTick[msg.playerId] < msg.tick) {
+        latestClientLag[msg.playerId] = Date.now() - msg.timestamp
 
-      // if (world.tick % 400 === 0) console.log(`player:${ws.data.playerId} name:${ws.data.playerName} diff:${diff}`)
+        const diff = msg.tick - world.tick
+        latestClientDiff[msg.playerId] = diff
+
+        if (diff < 1 || world.tick % 200 === 0) {
+          console.log(`diff:${diff} lag:${latestClientLag[msg.playerId]}ms player:${ws.data.playerId} name:${ws.data.playerName}`)
+        }
+      }
     }
   }
 }

@@ -248,10 +248,9 @@ const GameLobby = (): Entity => {
     }))
   }
 
-  const gameLobby = Entity<Position>({
+  const gameLobby = Entity({
     id: "gameLobby",
     components: {
-      position: Position({ x: 220, y: 10, screenFixed: true }),
       networked: Networked(),
       actions: Actions({
         "selectGame": ({ world, params }) => {

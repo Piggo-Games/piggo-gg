@@ -2,11 +2,17 @@ import {
   Entity, GameData, Hitbox, Player, SerializedEntity,
   Syncer, Apple, entries, keys, stringify, logDiff
 } from "@piggo-gg/core"
+import { Bot } from "../games/volley/Bot"
 
 export const entityConstructors: Record<string, (_: { id?: string }) => Entity> = {
   "player": Player,
   "hitbox": Hitbox,
-  "d3apple": Apple
+  "d3apple": Apple,
+  "bot": ({ id }: { id: string }) => {
+    const x = Number(id.split("|")[1])
+    const y = Number(id.split("|")[2])
+    return Bot(1, { x, y })
+  }
 }
 
 export const DelaySyncer = (): Syncer => ({
