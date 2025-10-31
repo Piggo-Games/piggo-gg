@@ -3,8 +3,10 @@
   "main": "./main.ts",
   "scripts": {
     "dev": "bun dev-compile & bun dev-serve",
+    "dev-https": "bun dev-compile & bun dev-serve-https",
     "dev-compile": "bun build --watch src/index.tsx --outdir res",
-    "dev-serve": "bun x serve -L -p 8000 res"
+    "dev-serve": "bun x serve -L -p 8000 res",
+    "dev-serve-https": "bun x serve -L -p 8000 res --ssl-cert ./localhost+2.pem --ssl-key ./localhost+2-key.pem"
   },
   "dependencies": {
     "react": "^18.2.0",
