@@ -38,6 +38,7 @@ export const Api = (): Api => {
 
   const prisma = new PrismaClient()
   const JWT_SECRET = process.env["JWT_SECRET"] ?? "piggo"
+  const DISCORD_SECRET = process.env["DISCORD_SECRET"] ?? ""
   const google = new OAuth2Client("1064669120093-9727dqiidriqmrn0tlpr5j37oefqdam3.apps.googleusercontent.com")
 
   const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "lobby/list"]
@@ -213,6 +214,25 @@ export const Api = (): Api => {
         })
 
         return { id: data.id, name: newUser.name }
+      },
+      "discord/login": async ({ data }) => {
+
+        const response = await fetch('https://discord.com/api/oauth2/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            code: data.code,
+            client_id: "1433003541521236100",
+            client_secret: DISCORD_SECRET,
+            grant_type: 'authorization_code'
+          }),
+        })
+
+        const { access_token } = await response.json() as { access_token: string }
+
+        return { id: data.id, access_token }
       },
       "auth/login": async ({ ws, data }) => {
 
