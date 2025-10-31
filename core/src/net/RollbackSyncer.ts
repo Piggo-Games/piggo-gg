@@ -4,6 +4,7 @@ import {
 } from "@piggo-gg/core"
 
 const movementActions = ["move", "moveAnalog", "jump", "point", "shoot"]
+const ignoreActions = ["point"]
 
 const otherCharacter = (id: string, world: World) => {
   if (id === world.client?.character()?.id) return false
@@ -117,7 +118,7 @@ export const RollbackSyncer = (world: World): Syncer => {
         }
       }
 
-      const target = client.env === "discord" ? 3 : 2
+      const target = client.env === "discord" ? 2 : 2
 
       if ((message.diff ?? 1) > target + 1) {
         console.log("speed up")
@@ -140,7 +141,7 @@ export const RollbackSyncer = (world: World): Syncer => {
       last = message.tick
 
       const gap = world.tick - message.tick
-      const framesForward = (gap >= 2 && gap <= 5) ? gap : ceil(client.net.ms * 2 / world.tickrate) + target
+      const framesForward = (gap >= 2 && gap <= 9) ? gap : ceil(client.net.ms * 2 / world.tickrate) + target
 
       const localActions = world.actions.atTick(message.tick) ?? {}
 
@@ -169,7 +170,7 @@ export const RollbackSyncer = (world: World): Syncer => {
 
           // check remote has each action
           for (const action of localActions[entityId]) {
-            if (actions.find((a) => a.actionId === action.actionId) === undefined) {
+            if (!ignoreActions.includes(action.actionId) && actions.find((a) => a.actionId === action.actionId) === undefined) {
               mustRollback(`action not found remotely entity:${entityId} action:${action.actionId}`)
               break
             }
