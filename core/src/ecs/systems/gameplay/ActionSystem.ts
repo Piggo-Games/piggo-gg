@@ -37,10 +37,6 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
         for (const invokedAction of actions) {
           const entity = world.entity(entityId)
 
-          // if (entityId === world.client?.character()?.id && invokedAction.actionId === "move") {
-          //   console.log(stringify(invokedAction))
-          // }
-
           // entity not found
           if (!entity) {
             console.log(`entity ${entityId} not found for action ${invokedAction.actionId}`)

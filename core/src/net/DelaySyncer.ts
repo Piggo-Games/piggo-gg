@@ -11,9 +11,6 @@ export const entityConstructors: Record<string, (_: { id?: string }) => Entity> 
   "bot": ({ id }: { id: string }) => {
     const x = Number(id.split("|")[1])
     const y = Number(id.split("|")[2])
-
-    console.log("SPAWN BOT", id, x, y)
-
     return Bot(1, { x, y })
   }
 }

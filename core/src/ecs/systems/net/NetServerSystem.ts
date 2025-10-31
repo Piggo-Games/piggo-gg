@@ -17,8 +17,6 @@ export const NetServerSystem = ({
 
   let lastSent = 0
 
-  // const lastMessageTick: Record<string, number> = {}
-
   const write = () => {
 
     // build tick data
