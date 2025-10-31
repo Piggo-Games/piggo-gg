@@ -10,17 +10,12 @@ import { decode, encode } from "@msgpack/msgpack"
 type env = "local" | "dev" | "production" | "discord"
 
 const servers: Record<env, string> = {
+  // local: "ws://localhost:3000",
   local: `wss://1433003541521236100.discordsays.com/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
   discord: `wss://1433003541521236100.discordsays.com/.proxy/api`
 } as const
-
-export const hosts = {
-  local: "http://localhost:8000",
-  dev: "https://dev.piggo.gg",
-  production: "https://piggo.gg"
-}
 
 type APICallback<R extends RequestTypes = RequestTypes> = (response: R["response"] | BadResponse) => void
 type Callback<R extends RequestTypes = RequestTypes> = (response: R["response"]) => void
