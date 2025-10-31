@@ -233,11 +233,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         el.remove()
       }
 
-      world.client?.discord?.userId().then((username) => {
-        if (username) {
-          world.announce(`Welcome, ${username}!`)
-        }
-      })
+      world.client?.discord?.login(world.client)
 
       // remove dummies
       delete world.entities["player-dummy"]
