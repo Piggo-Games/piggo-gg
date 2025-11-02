@@ -6,6 +6,6 @@ export const CORSHeaders = {
 
 export const CookieHeader = (token: string) => {
   return `access_token=${token}; ` + 
-  `Domain: 1433003541521236100.discordsays.com; ` +
-  `SameSite: None; Partitioned`
+  `Domain=1433003541521236100.discordsays.com; ` +
+  `SameSite=None; Partitioned; Secure; HttpOnly; Path=/;`
 }
