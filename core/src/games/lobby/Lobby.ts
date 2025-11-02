@@ -162,7 +162,7 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "32px", color: "#ffc0cb", left: "50%", top: "120px", transform: "translate(-50%)"
+          fontSize: "28px", color: "#ffc0cb", left: "50%", top: "120px", transform: "translate(-50%)"
         }
       })
     )
@@ -316,6 +316,11 @@ const GameLobby = (): Entity => {
             lobbiesMenu = LobbiesMenu(world)
             lobbiesShell.appendChild(lobbiesMenu.div)
             shell.appendChild(lobbiesShell)
+          }
+
+
+          if (world.client?.discord && lobbiesMenu) {
+            lobbiesMenu.div.style.display = "none"
           }
 
           if (world.client) {
