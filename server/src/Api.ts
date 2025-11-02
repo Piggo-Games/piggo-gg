@@ -1,7 +1,7 @@
 import {
-  ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
-  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
-  CORSHeaders
+  ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes,
+  ResponseData, entries, randomHash, keys, round, stringify,
+  values, BadResponse, GameTitle, CORSHeaders, CookieHeader
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -315,7 +315,8 @@ export const Api = (): Api => {
             return new Response(stringify({ access_token }), {
               headers: {
                 ...CORSHeaders,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Set-Cookie": CookieHeader(access_token)
               }
             })
           }
