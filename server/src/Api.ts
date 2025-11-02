@@ -1,6 +1,7 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
-  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle
+  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
+  CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes, HttpError
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -27,7 +28,7 @@ export type Api = {
   clientIncr: number
   clients: Record<string, ServerWebSocket<PerClientData>>
   worlds: Record<string, ServerWorld>
-  handlers: { [R in RequestTypes["route"]]: Handler<R> }
+  handlers: { [R in WSRequestTypes["route"]]: Handler<R> }
   init: () => Api
   handleClose: (ws: ServerWebSocket<PerClientData>) => void
   handleOpen: (ws: ServerWebSocket<PerClientData>) => void
@@ -38,6 +39,7 @@ export const Api = (): Api => {
 
   const prisma = new PrismaClient()
   const JWT_SECRET = process.env["JWT_SECRET"] ?? "piggo"
+  const DISCORD_SECRET = process.env["DISCORD_SECRET"] ?? ""
   const google = new OAuth2Client("1064669120093-9727dqiidriqmrn0tlpr5j37oefqdam3.apps.googleusercontent.com")
 
   const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "lobby/list"]
@@ -75,6 +77,10 @@ export const Api = (): Api => {
       },
       "lobby/create": async ({ ws, data }) => {
         const lobbyId = randomHash()
+
+        if (data.playerName) {
+          ws.data.playerName = data.playerName
+        }
 
         // create world
         api.worlds[lobbyId] = ServerWorld({ creator: ws, game: data.game })
@@ -254,15 +260,87 @@ export const Api = (): Api => {
       api.bun = Bun.serve({
         hostname: "0.0.0.0",
         port: env.PORT ?? 3000,
-        fetch: (r: Request, server: Server) => {
+        fetch: async (r: Request, server: Server) => {
           const origin = r.headers.get("origin")
 
-          const proxied = origin?.includes("discordsays")
-          if ((!origin || !["https://piggo.gg", "https://dev.piggo.gg", "http://localhost:8000"].includes(origin)) && !proxied) {
+          if (!origin || !ValidOrigins.includes(origin)) {
+            console.log("blocked origin:", origin)
             return new Response("invalid origin", { status: 403 })
           }
 
-          return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ? new Response() : new Response("upgrade failed", { status: 500 })
+          // CORS
+          if (r.method === "OPTIONS") return new Response(null, {
+            headers: CORSHeaders(origin)
+          })
+
+          const cookie = r.headers.get("cookie")
+          console.log("cookie:", cookie)
+
+          const url = new URL(r.url)
+
+          if (url.pathname === "/discord/me") {
+            if (!cookie) return HttpError(400, "missing cookie", origin)
+
+            const match = cookie.match(/access_token=([^;]+)/)
+            if (!match) return HttpError(400, "missing access_token", origin)
+
+            const access_token = match[1]
+
+            const response = await fetch('https://discord.com/api/users/@me', {
+              headers: {
+                ...CORSHeaders(origin),
+                Authorization: `Bearer ${access_token}`
+              }
+            })
+
+            if (response.status !== 200) {
+              return HttpError(401, "failed to fetch discord me", origin)
+            }
+
+            const data = await response.json()
+
+            return new Response(stringify(data), {
+              headers: {
+                ...CORSHeaders(origin),
+                "Content-Type": "application/json"
+              }
+            })
+          }
+
+          if (url.pathname === "/discord/login") {
+            const code = url.searchParams.get("code")
+
+            if (!code) {
+              return HttpError(400, "missing code", origin)
+            }
+
+            const response = await fetch('https://discord.com/api/oauth2/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                code,
+                client_id: "1433003541521236100",
+                client_secret: DISCORD_SECRET,
+                grant_type: 'authorization_code'
+              })
+            })
+
+            const { access_token } = await response.json() as { access_token: string }
+
+            return new Response(stringify({ access_token }), {
+              headers: {
+                ...CORSHeaders(origin),
+                "Content-Type": "application/json",
+                "Set-Cookie": CookieHeader(access_token)
+              }
+            })
+          }
+
+          return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ?
+            new Response() :
+            new Response("upgrade failed", { status: 500 })
         },
         websocket: {
           perMessageDeflate: false,
@@ -334,9 +412,7 @@ export const Api = (): Api => {
 
           const start = performance.now()
 
-          // @ts-expect-error
-          const result = handler({ ws, data: wsData.data }) // TODO fix type casting
-          result.then((data) => {
+          handler({ ws, data: wsData.data }).then((data) => {
             if (!skiplog.includes(wsData.data.route)) {
               console.log(">>", ws.data.playerName, stringify({ route: wsData.data.route, ...data }), `ms:${round(performance.now() - start)}`)
             }

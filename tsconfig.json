@@ -22,5 +22,5 @@
     // "strictFunctionTypes": true,
     "typeRoots": ["core/types", "./node_modules/@types"]
   },
-  "include": ["web/**/*", "server/**/*", "core/**/*", "games/**/*"]
+  "include": ["web/**/*", "server/**/*", "core/**/*"]
 }

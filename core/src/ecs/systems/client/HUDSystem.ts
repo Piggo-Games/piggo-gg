@@ -13,26 +13,26 @@ export const HUDSystem = ClientSystemBuilder({
     const bottom = 40
     const left = 120
 
-    const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 80 })
-    const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 80 })
-    const sButton = KeyButton({ text: "S", left, bottom: bottom + 80 })
-    const wButton = KeyButton({ text: "W", left, bottom: bottom + 130 })
-    const moveLabel = KeyLabel("move", left, bottom + 50)
+    const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 70 })
+    const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 70 })
+    const sButton = KeyButton({ text: "S", left, bottom: bottom + 70 })
+    const wButton = KeyButton({ text: "W", left, bottom: bottom + 120 })
+    const moveLabel = KeyLabel("move", left, bottom + 40)
 
-    const rButton = KeyButton({ text: "r", left, bottom: bottom + 350 })
-    const reloadLabel = KeyLabel("reload", left, bottom + 320)
+    const rButton = KeyButton({ text: "r", left, bottom: bottom + 320 })
+    const reloadLabel = KeyLabel("reload", left, bottom + 290)
 
-    const cButton = KeyButton({ text: "c", left, bottom: bottom + 460, visible: false })
-    const teamLabel = KeyLabel("switch team", left, bottom + 430, false)
+    const cButton = KeyButton({ text: "c", left, bottom: bottom + 430, visible: false })
+    const teamLabel = KeyLabel("switch team", left, bottom + 400, false)
 
-    const zButton = KeyButton({ text: "z", left, bottom: bottom + 570, visible: true })
-    const readyLabel = KeyLabel("ready", left, bottom + 540, true)
+    const zButton = KeyButton({ text: "z", left, bottom: bottom + 540, visible: true })
+    const readyLabel = KeyLabel("ready", left, bottom + 510, true)
 
-    const boostButton = KeyButton({ text: "shift", left, bottom, width: 120 })
-    const boostLabel = KeyLabel("boost", left, bottom - 30)
+    // const boostButton = KeyButton({ text: "shift", left, bottom, width: 100 })
+    // const boostLabel = KeyLabel("boost", left, bottom - 10)
 
-    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 240, width: 160 })
-    const jumpLabel = KeyLabel("jump", left, bottom + 210)
+    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 220, width: 160 })
+    const jumpLabel = KeyLabel("jump", left, bottom + 190)
 
     const scoreText = HtmlText({
       text: "",
@@ -80,8 +80,8 @@ export const HUDSystem = ClientSystemBuilder({
     controls.appendChild(readyLabel)
 
     if (world.game.id === "craft") {
-      controls.appendChild(boostButton)
-      controls.appendChild(boostLabel)
+      // controls.appendChild(boostButton)
+      // controls.appendChild(boostLabel)
     }
 
     three.append(controls)
@@ -117,7 +117,7 @@ export const HUDSystem = ClientSystemBuilder({
           rButton.style.backgroundColor = down.includes("r") ? active : inactive
           cButton.style.backgroundColor = down.includes("c") ? active : inactive
           zButton.style.backgroundColor = down.includes("z") ? active : inactive
-          boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
+          // boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
           jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
 
@@ -168,9 +168,9 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
   style: {
     left: `${props.left}px`,
     bottom: `${props.bottom}px`,
-    width: `${props.width ?? 40}px`,
-    height: "40px",
-    fontSize: "26px",
+    width: `${props.width ?? 36}px`,
+    height: "36px",
+    fontSize: "20px",
     visibility: props.visible === false ? "hidden" : "visible",
     transform: "translate(-50%)",
     ...ogButtonStyle

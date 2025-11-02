@@ -49,7 +49,12 @@ export type RequestTypes =
   ProfileCreate | ProfileGet |
   AuthLogin |
   Pls |
-  MetaPlayers
+  MetaPlayers |
+  HttpRequestTypes
+
+export type HttpRequestTypes = DiscordLogin | DiscordMe
+
+export type WSRequestTypes = Exclude<RequestTypes, HttpRequestTypes>
 
 export type ExtractedRequestTypes<T extends RequestTypes["route"]> = Extract<RequestTypes, { route: T }>
 
@@ -66,7 +71,7 @@ export type ResponseData = {
 // lobby endpoints
 export type LobbyList = Request<"lobby/list", { lobbies: Record<string,
   { id: string, creator: string, players: number, game: GameTitle }> }>
-export type LobbyCreate = Request<"lobby/create", { lobbyId: string }> & { game: GameTitle }
+export type LobbyCreate = Request<"lobby/create", { lobbyId: string }> & { game: GameTitle, playerName?: string }
 export type LobbyJoin = Request<"lobby/join"> & { join: string }
 export type LobbyExit = Request<"lobby/exit">
 
@@ -88,6 +93,12 @@ export type ProfileGet = Request<"profile/get", { name: string }> & { token: str
 // auth endpoints
 export type AuthLogin = Request<"auth/login", { token: string, newUser: boolean }> & {
   jwt: string
+}
+
+export type DiscordMe = Request<"discord/me", { username: string }>
+
+export type DiscordLogin = Request<"discord/login", { access_token: string }> & {
+  code: string
 }
 
 // ai endpoints

@@ -1,8 +1,10 @@
-export const piggoVersion: `0.${number}.${number}` = "0.44.1"
+export const piggoVersion: `0.${number}.${number}` = "0.44.2"
 
 export const isMobile = (): boolean => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
 export const { keys, values, entries } = Object
+
+export type ENV = "production" | "dev" | "discord" | "local"
 
 const textInputSelector =
   'textarea,[contenteditable]:not([contenteditable="false"]),input:not([type]),' +

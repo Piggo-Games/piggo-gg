@@ -1,25 +1,24 @@
 import {
-  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData,
-  RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
-  FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
-  ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, round, max, min, GameTitle, Discord
+  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData, RequestTypes,
+  World, randomPlayerId, Sound, randomHash, AuthLogin, FriendsList, Pls, NetClientReadSystem,
+  NetClientWriteSystem, ProfileGet, ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer,
+  isMobile, LobbyList, BadResponse, LobbyExit, XY, max, min, GameTitle, Discord,
+  DiscordLogin, DiscordDomain, DiscordMe, ENV
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
-type env = "local" | "dev" | "production" | "discord"
-
-const servers: Record<env, string> = {
-  local: "ws://localhost:3000",
+const servers: Record<ENV, string> = {
+  // local: "ws://localhost:3000",
+  local: `wss://${DiscordDomain}/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
-  discord: `wss://${window.location.host}/.proxy/api`
+  discord: `wss://${DiscordDomain}/.proxy/api`
 } as const
 
-export const hosts = {
-  local: "http://localhost:8000",
-  dev: "https://dev.piggo.gg",
-  production: "https://piggo.gg"
+const environments: Record<string, ENV> = {
+  "piggo.gg": "production",
+  "dev.piggo.gg": "dev",
+  [DiscordDomain]: "discord"
 }
 
 type APICallback<R extends RequestTypes = RequestTypes> = (response: R["response"] | BadResponse) => void
@@ -49,7 +48,7 @@ export type Client = {
     moveLocal: (xy: XY, flying?: boolean) => void
   }
   discord: Discord | undefined
-  env: "local" | "dev" | "production" | "discord"
+  env: ENV
   lastMessageTick: number
   lobbyId: string | undefined
   net: {
@@ -75,6 +74,8 @@ export type Client = {
   lobbyLeave: () => void
   lobbyList: (callback: Callback<LobbyList>) => void
   metaPlayers: (callback: Callback<MetaPlayers>) => void
+  discordMe: (callback: Callback<DiscordMe>, errorCallback: () => void) => void
+  discordLogin: (code: string, callback?: Callback<DiscordLogin>) => void
   authLogin: (jwt: string, callback?: Callback<AuthLogin>) => void
   logout: () => void
   aiPls: (prompt: string, callback: Callback<Pls>) => void
@@ -107,9 +108,7 @@ export const Client = ({ world }: ClientProps): Client => {
     // TODO handle timeout
   }
 
-  const env = location?.hostname === "piggo.gg" ? "production" :
-    location?.hostname === "dev.piggo.gg" ? "dev" :
-    location?.hostname.includes("discordsays") ? "discord" : "local"
+  const env = environments[location?.hostname] || "local"
 
   const client: Client = {
     bufferDown: KeyBuffer(),
@@ -155,8 +154,7 @@ export const Client = ({ world }: ClientProps): Client => {
         client.controls.localAim.y = max(lower, min(upper, client.controls.localAim.y))
       }
     },
-    discord: undefined,
-    // discord: Discord(),
+    discord: Discord(),
     env,
     lastMessageTick: 0,
     lobbyId: undefined,
@@ -193,7 +191,7 @@ export const Client = ({ world }: ClientProps): Client => {
       document.exitPointerLock()
     },
     lobbyCreate: (game, callback) => {
-      request<LobbyCreate>({ route: "lobby/create", type: "request", id: randomHash(), game }, (response) => {
+      request<LobbyCreate>({ route: "lobby/create", type: "request", id: randomHash(), game, playerName: client.playerName() }, (response) => {
         if ("error" in response) {
           console.error("failed to create lobby:", response.error)
         } else {
@@ -251,6 +249,35 @@ export const Client = ({ world }: ClientProps): Client => {
           console.error("failed to get meta players:", response.error)
         } else {
           callback(response)
+        }
+      })
+    },
+    discordMe: (callback, errorCallback) => {
+      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/me`, {
+        method: "GET",
+        credentials: "include"
+      }).then(async (res) => {
+        const data = await res.json() as DiscordMe["response"] | BadResponse
+
+        if (res.status !== 200 || "error" in data) {
+          console.error("failed to get discord/me")
+          errorCallback()
+        } else {
+          callback(data)
+        }
+      })
+    },
+    discordLogin: (code, callback) => {
+      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/login?code=${code}`, {
+        method: "GET",
+        credentials: "include"
+      }).then(async (res) => {
+        const data = await res.json() as DiscordLogin["response"] | BadResponse
+
+        if ("error" in data) {
+          console.error("failed to login with discord:", data.error)
+        } else {
+          if (callback) callback(data)
         }
       })
     },
