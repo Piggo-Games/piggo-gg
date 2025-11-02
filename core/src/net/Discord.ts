@@ -8,7 +8,7 @@ export type Discord = {
 
 export const Discord = (): Discord | undefined => {
 
-  let sdk = undefined
+  let sdk: DiscordSDK | undefined = undefined
   let loggedIn = false
 
   try {

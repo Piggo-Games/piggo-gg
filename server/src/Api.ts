@@ -280,29 +280,27 @@ export const Api = (): Api => {
             const match = cookie.match(/access_token=([^;]+)/)
             if (!match) return HttpError(400, "missing access_token", origin)
 
-            if (true) return HttpError(400, "missing access_token", origin)
+            const access_token = match[1]
 
-            // const access_token = match[1]
+            const response = await fetch('https://discord.com/api/users/@me', {
+              headers: {
+                ...CORSHeaders(origin),
+                Authorization: `Bearer ${access_token}`
+              }
+            })
 
-            // const response = await fetch('https://discord.com/api/users/@me', {
-            //   headers: {
-            //     ...CORSHeaders(origin),
-            //     Authorization: `Bearer ${access_token}`
-            //   }
-            // })
+            if (response.status !== 200) {
+              return HttpError(401, "failed to fetch discord me", origin)
+            }
 
-            // if (response.status !== 200) {
-            //   return HttpError(401, "failed to fetch discord me", origin)
-            // }
+            const data = await response.json()
 
-            // const data = await response.json()
-
-            // return new Response(stringify(data), {
-            //   headers: {
-            //     ...CORSHeaders(origin),
-            //     "Content-Type": "application/json"
-            //   }
-            // })
+            return new Response(stringify(data), {
+              headers: {
+                ...CORSHeaders(origin),
+                "Content-Type": "application/json"
+              }
+            })
           }
 
           if (url.pathname === "/discord/login") {

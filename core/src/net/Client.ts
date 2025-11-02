@@ -1,10 +1,9 @@
 import {
-  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData,
-  RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
-  FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
-  ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, max, min, GameTitle, Discord, DiscordLogin, DiscordDomain,
-  DiscordMe
+  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData, RequestTypes,
+  World, randomPlayerId, Sound, randomHash, AuthLogin, FriendsList, Pls, NetClientReadSystem,
+  NetClientWriteSystem, ProfileGet, ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer,
+  isMobile, LobbyList, BadResponse, LobbyExit, XY, max, min, GameTitle, Discord,
+  DiscordLogin, DiscordDomain, DiscordMe
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
@@ -276,10 +275,6 @@ export const Client = ({ world }: ClientProps): Client => {
         if ("error" in data) {
           console.error("failed to login with discord:", data.error)
         } else {
-          client.token = data.access_token
-
-          localStorage?.setItem("token", data.access_token)
-          // if (!data.newUser) client.profileGet()
           if (callback) callback(data)
         }
       })
