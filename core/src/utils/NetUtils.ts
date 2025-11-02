@@ -23,8 +23,8 @@ export const CookieHeader = (token: string) => {
 
 export const HttpError = (status: number, message: string, origin: string) => {
   return new Response(stringify({ error: message }), {
-    status,
-    headers: CORSHeaders(origin)
+    headers: CORSHeaders(origin),
+    status
   })
 }
 

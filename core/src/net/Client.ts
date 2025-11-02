@@ -3,19 +3,23 @@ import {
   World, randomPlayerId, Sound, randomHash, AuthLogin, FriendsList, Pls, NetClientReadSystem,
   NetClientWriteSystem, ProfileGet, ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer,
   isMobile, LobbyList, BadResponse, LobbyExit, XY, max, min, GameTitle, Discord,
-  DiscordLogin, DiscordDomain, DiscordMe
+  DiscordLogin, DiscordDomain, DiscordMe, ENV
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
-type env = "local" | "dev" | "production" | "discord"
-
-const servers: Record<env, string> = {
+const servers: Record<ENV, string> = {
   // local: "ws://localhost:3000",
   local: `wss://${DiscordDomain}/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
   discord: `wss://${DiscordDomain}/.proxy/api`
 } as const
+
+const environments: Record<string, ENV> = {
+  "piggo.gg": "production",
+  "dev.piggo.gg": "dev",
+  [DiscordDomain]: "discord"
+}
 
 type APICallback<R extends RequestTypes = RequestTypes> = (response: R["response"] | BadResponse) => void
 type Callback<R extends RequestTypes = RequestTypes> = (response: R["response"]) => void
@@ -44,7 +48,7 @@ export type Client = {
     moveLocal: (xy: XY, flying?: boolean) => void
   }
   discord: Discord | undefined
-  env: "local" | "dev" | "production" | "discord"
+  env: ENV
   lastMessageTick: number
   lobbyId: string | undefined
   net: {
@@ -104,9 +108,7 @@ export const Client = ({ world }: ClientProps): Client => {
     // TODO handle timeout
   }
 
-  const env = location?.hostname === "piggo.gg" ? "production" :
-    location?.hostname === "dev.piggo.gg" ? "dev" :
-      location?.hostname.includes("discordsays") ? "discord" : "local"
+  const env = environments[location?.hostname] || "local"
 
   const client: Client = {
     bufferDown: KeyBuffer(),

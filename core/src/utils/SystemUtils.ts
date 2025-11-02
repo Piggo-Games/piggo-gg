@@ -4,6 +4,8 @@ export const isMobile = (): boolean => /iPhone|iPad|iPod|Android/i.test(navigato
 
 export const { keys, values, entries } = Object
 
+export type ENV = "production" | "dev" | "discord" | "local"
+
 const textInputSelector =
   'textarea,[contenteditable]:not([contenteditable="false"]),input:not([type]),' +
   'input[type="text"],input[type="search"],input[type="url"],input[type="tel"],' +

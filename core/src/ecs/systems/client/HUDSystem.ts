@@ -173,7 +173,7 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
     fontSize: "20px",
     visibility: props.visible === false ? "hidden" : "visible",
     transform: "translate(-50%)",
-    ...ogButtonStyle,
+    ...ogButtonStyle
   }
 })
 
