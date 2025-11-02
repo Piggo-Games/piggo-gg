@@ -3,8 +3,7 @@ import {
   RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
   FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
   ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, round, max, min, GameTitle, Discord,
-  DiscordLogin
+  BadResponse, LobbyExit, XY, max, min, GameTitle, Discord, DiscordLogin, DiscordDomain
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
@@ -12,10 +11,10 @@ type env = "local" | "dev" | "production" | "discord"
 
 const servers: Record<env, string> = {
   // local: "ws://localhost:3000",
-  local: `wss://1433003541521236100.discordsays.com/.proxy/api-local`,
+  local: `wss://${DiscordDomain}/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
-  discord: `wss://1433003541521236100.discordsays.com/.proxy/api`
+  discord: `wss://${DiscordDomain}/.proxy/api`
 } as const
 
 type APICallback<R extends RequestTypes = RequestTypes> = (response: R["response"] | BadResponse) => void
@@ -251,10 +250,10 @@ export const Client = ({ world }: ClientProps): Client => {
       })
     },
     discordLogin: (code, callback) => {
-      const f = fetch(
-        `https://1433003541521236100.discordsays.com/.proxy/api-local/discord/login?code=${code}`,
-        { method: "GET" }
-      ).then(async (res) => {
+      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/login?code=${code}`, {
+        method: "GET",
+        credentials: "include"
+      }).then(async (res) => {
         const data = await res.json() as DiscordLogin["response"] | BadResponse
 
         if ("error" in data) {

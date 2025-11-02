@@ -9,3 +9,5 @@ export const CookieHeader = (token: string) => {
   `Domain=1433003541521236100.discordsays.com; ` +
   `SameSite=None; Partitioned; Secure; Path=/;`
 }
+
+export const DiscordDomain = "1433003541521236100.discordsays.com"
