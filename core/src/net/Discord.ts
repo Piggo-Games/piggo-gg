@@ -24,26 +24,23 @@ export const Discord = (): Discord | undefined => {
     sdk,
     login: async (client: Client) => {
       if (loggedIn) return
-
-      console.log("DISCORD LOGIN")
-
       loggedIn = true
 
       client.discordMe((response) => {
-        console.log("Discord me response:", response, response.username)
+        client.player.components.pc.data.name = response.username
       })
 
       // console.log("Loggin in", sdk, sdk.commands.get)
 
-    //   const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
+      //   const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
 
-    //   client.discordLogin(authorized.code, (token) => {
-    //     const authenticated = sdk.commands.authenticate({ access_token: token.access_token })
+      //   client.discordLogin(authorized.code, (token) => {
+      //     const authenticated = sdk.commands.authenticate({ access_token: token.access_token })
 
-    //     authenticated.then((auth) => {
-    //       client.player.components.pc.data.name = auth.user.username
-    //     })
-    //   })
+      //     authenticated.then((auth) => {
+      //       client.player.components.pc.data.name = auth.user.username
+      //     })
+      //   })
     }
   }
 }

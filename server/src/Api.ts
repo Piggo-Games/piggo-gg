@@ -311,8 +311,11 @@ export const Api = (): Api => {
               }
             })
 
+            if (response.status !== 200) {
+              return new Response("failed to fetch discord me", { status: 404 })
+            }
+
             const data = await response.json()
-            console.log("discord/me data:", data)
 
             return new Response(stringify(data), {
               headers: {
