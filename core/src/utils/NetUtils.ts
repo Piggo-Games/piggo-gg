@@ -1,3 +1,5 @@
+import { stringify } from "@piggo-gg/core"
+
 export const ValidOrigins = [
   "https://localhost:8000",
   "http://localhost:8000",
@@ -17,6 +19,13 @@ export const CookieHeader = (token: string) => {
   return `access_token=${token}; ` +
     `Domain=1433003541521236100.discordsays.com; ` +
     `SameSite=None; Partitioned; Secure; Path=/;`
+}
+
+export const HttpError = (status: number, message: string, origin: string) => {
+  return new Response(stringify({ error: message }), {
+    status,
+    headers: CORSHeaders(origin)
+  })
 }
 
 export const DiscordDomain = "1433003541521236100.discordsays.com"

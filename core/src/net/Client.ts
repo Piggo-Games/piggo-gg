@@ -71,7 +71,7 @@ export type Client = {
   lobbyLeave: () => void
   lobbyList: (callback: Callback<LobbyList>) => void
   metaPlayers: (callback: Callback<MetaPlayers>) => void
-  discordMe: (callback: Callback<DiscordMe>) => void
+  discordMe: (callback: Callback<DiscordMe>, errorCallback: () => void) => void
   discordLogin: (code: string, callback?: Callback<DiscordLogin>) => void
   authLogin: (jwt: string, callback?: Callback<AuthLogin>) => void
   logout: () => void
@@ -251,15 +251,16 @@ export const Client = ({ world }: ClientProps): Client => {
         }
       })
     },
-    discordMe: (callback) => {
+    discordMe: (callback, errorCallback) => {
       fetch(`https://${DiscordDomain}/.proxy/api-local/discord/me`, {
         method: "GET",
         credentials: "include"
       }).then(async (res) => {
         const data = await res.json() as DiscordMe["response"] | BadResponse
 
-        if ("error" in data) {
-          console.error("failed to get discord me:", data.error)
+        if (res.status !== 200 || "error" in data) {
+          console.error("failed to get discord/me")
+          errorCallback()
         } else {
           callback(data)
         }

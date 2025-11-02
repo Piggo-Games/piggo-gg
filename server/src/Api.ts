@@ -1,7 +1,7 @@
 import {
-  ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes,
-  ResponseData,entries, randomHash, keys, round, stringify, values,
-  BadResponse, GameTitle, CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes
+  ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
+  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
+  CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes, HttpError
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -216,25 +216,6 @@ export const Api = (): Api => {
 
         return { id: data.id, name: newUser.name }
       },
-      // "discord/login": async ({ data }) => {
-
-      //   const response = await fetch('https://discord.com/api/oauth2/token', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/x-www-form-urlencoded',
-      //     },
-      //     body: new URLSearchParams({
-      //       code: data.code,
-      //       client_id: "1433003541521236100",
-      //       client_secret: DISCORD_SECRET,
-      //       grant_type: 'authorization_code'
-      //     }),
-      //   })
-
-      //   const { access_token } = await response.json() as { access_token: string }
-
-      //   return { id: data.id, access_token }
-      // },
       "auth/login": async ({ ws, data }) => {
 
         // 1. verify google jwt
@@ -295,24 +276,25 @@ export const Api = (): Api => {
 
           if (url.pathname === "/discord/me") {
             if (!cookie) {
-              return new Response("missing cookie", { status: 400 })
+              return HttpError(400, "missing cookie", origin)
             }
 
             const match = cookie.match(/access_token=([^;]+)/)
             if (!match) {
-              return new Response("missing access_token", { status: 400 })
+              return HttpError(400, "missing access_token", origin)
             }
 
             const access_token = match[1]
 
             const response = await fetch('https://discord.com/api/users/@me', {
               headers: {
+                ...CORSHeaders(origin),
                 Authorization: `Bearer ${access_token}`
               }
             })
 
             if (response.status !== 200) {
-              return new Response("failed to fetch discord me", { status: 404 })
+              return HttpError(401, "failed to fetch discord me", origin)
             }
 
             const data = await response.json()
@@ -324,12 +306,12 @@ export const Api = (): Api => {
               }
             })
           }
-          
+
           if (url.pathname === "/discord/login") {
             const code = url.searchParams.get("code")
 
             if (!code) {
-              return new Response("missing code", { status: 400 })
+              return HttpError(400, "missing code", origin)
             }
 
             const response = await fetch('https://discord.com/api/oauth2/token', {
@@ -430,8 +412,7 @@ export const Api = (): Api => {
 
           const start = performance.now()
 
-          const result = handler({ ws, data: wsData.data }) // TODO fix type casting
-          result.then((data) => {
+          handler({ ws, data: wsData.data }).then((data) => {
             if (!skiplog.includes(wsData.data.route)) {
               console.log(">>", ws.data.playerName, stringify({ route: wsData.data.route, ...data }), `ms:${round(performance.now() - start)}`)
             }
