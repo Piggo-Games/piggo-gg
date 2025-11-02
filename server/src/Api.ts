@@ -1,8 +1,7 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes,
-  ResponseData, entries, randomHash, keys, round, stringify,
-  values, BadResponse, GameTitle, CORSHeaders, CookieHeader,
-  ValidOrigins
+  ResponseData,entries, randomHash, keys, round, stringify, values,
+  BadResponse, GameTitle, CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -29,7 +28,7 @@ export type Api = {
   clientIncr: number
   clients: Record<string, ServerWebSocket<PerClientData>>
   worlds: Record<string, ServerWorld>
-  handlers: { [R in RequestTypes["route"]]: Handler<R> }
+  handlers: { [R in WSRequestTypes["route"]]: Handler<R> }
   init: () => Api
   handleClose: (ws: ServerWebSocket<PerClientData>) => void
   handleOpen: (ws: ServerWebSocket<PerClientData>) => void
@@ -43,7 +42,7 @@ export const Api = (): Api => {
   const DISCORD_SECRET = process.env["DISCORD_SECRET"] ?? ""
   const google = new OAuth2Client("1064669120093-9727dqiidriqmrn0tlpr5j37oefqdam3.apps.googleusercontent.com")
 
-  const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "discord/login", "lobby/list"]
+  const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "lobby/list"]
 
   const verifyJWT = (data: { token: string }): SessionToken | false => {
     let token: SessionToken | undefined = undefined
@@ -217,25 +216,25 @@ export const Api = (): Api => {
 
         return { id: data.id, name: newUser.name }
       },
-      "discord/login": async ({ data }) => {
+      // "discord/login": async ({ data }) => {
 
-        const response = await fetch('https://discord.com/api/oauth2/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            code: data.code,
-            client_id: "1433003541521236100",
-            client_secret: DISCORD_SECRET,
-            grant_type: 'authorization_code'
-          }),
-        })
+      //   const response = await fetch('https://discord.com/api/oauth2/token', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/x-www-form-urlencoded',
+      //     },
+      //     body: new URLSearchParams({
+      //       code: data.code,
+      //       client_id: "1433003541521236100",
+      //       client_secret: DISCORD_SECRET,
+      //       grant_type: 'authorization_code'
+      //     }),
+      //   })
 
-        const { access_token } = await response.json() as { access_token: string }
+      //   const { access_token } = await response.json() as { access_token: string }
 
-        return { id: data.id, access_token }
-      },
+      //   return { id: data.id, access_token }
+      // },
       "auth/login": async ({ ws, data }) => {
 
         // 1. verify google jwt
@@ -289,10 +288,40 @@ export const Api = (): Api => {
             headers: CORSHeaders(origin)
           })
 
-          const cookies = r.headers.get("cookie")
-          console.log("cookies:", cookies)
+          const cookie = r.headers.get("cookie")
+          console.log("cookie:", cookie)
 
           const url = new URL(r.url)
+
+          if (url.pathname === "/discord/me") {
+            if (!cookie) {
+              return new Response("missing cookie", { status: 400 })
+            }
+
+            const match = cookie.match(/access_token=([^;]+)/)
+            if (!match) {
+              return new Response("missing access_token", { status: 400 })
+            }
+
+            const access_token = match[1]
+
+            const response = await fetch('https://discord.com/api/users/@me', {
+              headers: {
+                Authorization: `Bearer ${access_token}`
+              }
+            })
+
+            const data = await response.json()
+            console.log("discord/me data:", data)
+
+            return new Response(stringify(data), {
+              headers: {
+                ...CORSHeaders(origin),
+                "Content-Type": "application/json"
+              }
+            })
+          }
+          
           if (url.pathname === "/discord/login") {
             const code = url.searchParams.get("code")
 
@@ -398,7 +427,6 @@ export const Api = (): Api => {
 
           const start = performance.now()
 
-          // @ts-expect-error
           const result = handler({ ws, data: wsData.data }) // TODO fix type casting
           result.then((data) => {
             if (!skiplog.includes(wsData.data.route)) {

@@ -173,6 +173,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.tick += 1
       world.time = now
 
+      world.client?.discord?.login(world.client)
+ 
       // store serialized entities
       world.entitiesAtTick[world.tick] = {}
       for (const entityId in world.entities) {
@@ -233,7 +235,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         el.remove()
       }
 
-      world.client?.discord?.login(world.client)
+      // world.client?.discord?.login(world.client)
 
       // remove dummies
       delete world.entities["player-dummy"]

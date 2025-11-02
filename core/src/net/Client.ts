@@ -3,7 +3,8 @@ import {
   RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin,
   FriendsList, Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet,
   ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList,
-  BadResponse, LobbyExit, XY, max, min, GameTitle, Discord, DiscordLogin, DiscordDomain
+  BadResponse, LobbyExit, XY, max, min, GameTitle, Discord, DiscordLogin, DiscordDomain,
+  DiscordMe
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
@@ -70,6 +71,7 @@ export type Client = {
   lobbyLeave: () => void
   lobbyList: (callback: Callback<LobbyList>) => void
   metaPlayers: (callback: Callback<MetaPlayers>) => void
+  discordMe: (callback: Callback<DiscordMe>) => void
   discordLogin: (code: string, callback?: Callback<DiscordLogin>) => void
   authLogin: (jwt: string, callback?: Callback<AuthLogin>) => void
   logout: () => void
@@ -249,6 +251,20 @@ export const Client = ({ world }: ClientProps): Client => {
         }
       })
     },
+    discordMe: (callback) => {
+      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/me`, {
+        method: "GET",
+        credentials: "include"
+      }).then(async (res) => {
+        const data = await res.json() as DiscordMe["response"] | BadResponse
+
+        if ("error" in data) {
+          console.error("failed to get discord me:", data.error)
+        } else {
+          callback(data)
+        }
+      })
+    },
     discordLogin: (code, callback) => {
       fetch(`https://${DiscordDomain}/.proxy/api-local/discord/login?code=${code}`, {
         method: "GET",
@@ -267,19 +283,6 @@ export const Client = ({ world }: ClientProps): Client => {
         }
       })
     },
-    // discordLogin: async (code, callback) => {
-    //   request<DiscordLogin>({ route: "discord/login", type: "request", id: randomHash(), code }, (response) => {
-    //     if ("error" in response) {
-    //       console.error("failed to login with discord:", response.error)
-    //     } else {
-    //       client.token = response.access_token
-
-    //       localStorage?.setItem("token", response.access_token)
-    //       // if (!response.newUser) client.profileGet()
-    //       if (callback) callback(response)
-    //     }
-    //   })
-    // },
     authLogin: async (jwt, callback) => {
       request<AuthLogin>({ route: "auth/login", type: "request", id: randomHash(), jwt }, (response) => {
         if ("error" in response) {
