@@ -106,7 +106,7 @@ export const Client = ({ world }: ClientProps): Client => {
 
   const env = location?.hostname === "piggo.gg" ? "production" :
     location?.hostname === "dev.piggo.gg" ? "dev" :
-    location?.hostname.includes("discordsays") ? "discord" : "local"
+      location?.hostname.includes("discordsays") ? "discord" : "local"
 
   const client: Client = {
     bufferDown: KeyBuffer(),
@@ -250,19 +250,37 @@ export const Client = ({ world }: ClientProps): Client => {
         }
       })
     },
-    discordLogin: async (code, callback) => {
-      request<DiscordLogin>({ route: "discord/login", type: "request", id: randomHash(), code }, (response) => {
-        if ("error" in response) {
-          console.error("failed to login with discord:", response.error)
-        } else {
-          client.token = response.access_token
+    discordLogin: (code, callback) => {
+      const f = fetch(
+        `https://1433003541521236100.discordsays.com/.proxy/api-local/discord/login?code=${code}`,
+        { method: "GET" }
+      ).then(async (res) => {
+        const data = await res.json() as DiscordLogin["response"] | BadResponse
 
-          localStorage?.setItem("token", response.access_token)
-          // if (!response.newUser) client.profileGet()
-          if (callback) callback(response)
+        if ("error" in data) {
+          console.error("failed to login with discord:", data.error)
+        } else {
+          client.token = data.access_token
+
+          localStorage?.setItem("token", data.access_token)
+          // if (!data.newUser) client.profileGet()
+          if (callback) callback(data)
         }
       })
     },
+    // discordLogin: async (code, callback) => {
+    //   request<DiscordLogin>({ route: "discord/login", type: "request", id: randomHash(), code }, (response) => {
+    //     if ("error" in response) {
+    //       console.error("failed to login with discord:", response.error)
+    //     } else {
+    //       client.token = response.access_token
+
+    //       localStorage?.setItem("token", response.access_token)
+    //       // if (!response.newUser) client.profileGet()
+    //       if (callback) callback(response)
+    //     }
+    //   })
+    // },
     authLogin: async (jwt, callback) => {
       request<AuthLogin>({ route: "auth/login", type: "request", id: randomHash(), jwt }, (response) => {
         if ("error" in response) {

@@ -17,9 +17,14 @@ export const Discord = (): Discord | undefined => {
     return undefined
   }
 
+  console.log("Discord SDK initialized", sdk)
+
   return {
     sdk,
     login: async (client: Client) => {
+
+      // console.log("Loggin in", sdk, sdk.commands.get)
+
       const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
 
       client.discordLogin(authorized.code, (token) => {

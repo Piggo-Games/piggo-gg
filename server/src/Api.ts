@@ -1,6 +1,7 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
-  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle
+  entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
+  CORSHeaders
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -41,7 +42,7 @@ export const Api = (): Api => {
   const DISCORD_SECRET = process.env["DISCORD_SECRET"] ?? ""
   const google = new OAuth2Client("1064669120093-9727dqiidriqmrn0tlpr5j37oefqdam3.apps.googleusercontent.com")
 
-  const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "lobby/list"]
+  const skiplog: RequestTypes["route"][] = ["meta/players", "auth/login", "discord/login", "lobby/list"]
 
   const verifyJWT = (data: { token: string }): SessionToken | false => {
     let token: SessionToken | undefined = undefined
@@ -274,7 +275,7 @@ export const Api = (): Api => {
       api.bun = Bun.serve({
         hostname: "0.0.0.0",
         port: env.PORT ?? 3000,
-        fetch: (r: Request, server: Server) => {
+        fetch: async (r: Request, server: Server) => {
           const origin = r.headers.get("origin")
 
           const proxied = origin?.includes("discordsays")
@@ -283,7 +284,45 @@ export const Api = (): Api => {
             return new Response("invalid origin", { status: 403 })
           }
 
-          return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ? new Response() : new Response("upgrade failed", { status: 500 })
+          // CORS
+          if (r.method === "OPTIONS") return new Response(null, {
+            headers: CORSHeaders
+          })
+
+          const url = new URL(r.url)
+          if (url.pathname === "/discord/login") {
+            const code = url.searchParams.get("code")
+            console.log("discord login code:", code)
+            if (!code) {
+              return new Response("missing code", { status: 400 })
+            }
+
+            const response = await fetch('https://discord.com/api/oauth2/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                code,
+                client_id: "1433003541521236100",
+                client_secret: DISCORD_SECRET,
+                grant_type: 'authorization_code'
+              })
+            })
+
+            const { access_token } = await response.json() as { access_token: string }
+
+            return new Response(stringify({ access_token }), {
+              headers: {
+                ...CORSHeaders,
+                "Content-Type": "application/json"
+              }
+            })
+          }
+
+          return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ?
+            new Response() :
+            new Response("upgrade failed", { status: 500 })
         },
         websocket: {
           perMessageDeflate: false,
