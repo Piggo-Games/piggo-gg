@@ -1,7 +1,8 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes,
   ResponseData, entries, randomHash, keys, round, stringify,
-  values, BadResponse, GameTitle, CORSHeaders, CookieHeader
+  values, BadResponse, GameTitle, CORSHeaders, CookieHeader,
+  ValidOrigins
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -278,15 +279,14 @@ export const Api = (): Api => {
         fetch: async (r: Request, server: Server) => {
           const origin = r.headers.get("origin")
 
-          const proxied = origin?.includes("discordsays")
-          if ((!origin || !["https://piggo.gg", "https://dev.piggo.gg", "http://localhost:8000", "https://localhost:8000"].includes(origin)) && !proxied) {
+          if (!origin || !ValidOrigins.includes(origin)) {
             console.log("blocked origin:", origin)
             return new Response("invalid origin", { status: 403 })
           }
 
           // CORS
           if (r.method === "OPTIONS") return new Response(null, {
-            headers: CORSHeaders
+            headers: CORSHeaders(origin)
           })
 
           const cookies = r.headers.get("cookie")
@@ -317,7 +317,7 @@ export const Api = (): Api => {
 
             return new Response(stringify({ access_token }), {
               headers: {
-                ...CORSHeaders,
+                ...CORSHeaders(origin),
                 "Content-Type": "application/json",
                 "Set-Cookie": CookieHeader(access_token)
               }
