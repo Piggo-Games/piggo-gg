@@ -275,36 +275,34 @@ export const Api = (): Api => {
           const url = new URL(r.url)
 
           if (url.pathname === "/discord/me") {
-            if (!cookie) {
-              return HttpError(400, "missing cookie", origin)
-            }
+            if (!cookie) return HttpError(400, "missing cookie", origin)
 
             const match = cookie.match(/access_token=([^;]+)/)
-            if (!match) {
-              return HttpError(400, "missing access_token", origin)
-            }
+            if (!match) return HttpError(400, "missing access_token", origin)
 
-            const access_token = match[1]
+            if (true) return HttpError(400, "missing access_token", origin)
 
-            const response = await fetch('https://discord.com/api/users/@me', {
-              headers: {
-                ...CORSHeaders(origin),
-                Authorization: `Bearer ${access_token}`
-              }
-            })
+            // const access_token = match[1]
 
-            if (response.status !== 200) {
-              return HttpError(401, "failed to fetch discord me", origin)
-            }
+            // const response = await fetch('https://discord.com/api/users/@me', {
+            //   headers: {
+            //     ...CORSHeaders(origin),
+            //     Authorization: `Bearer ${access_token}`
+            //   }
+            // })
 
-            const data = await response.json()
+            // if (response.status !== 200) {
+            //   return HttpError(401, "failed to fetch discord me", origin)
+            // }
 
-            return new Response(stringify(data), {
-              headers: {
-                ...CORSHeaders(origin),
-                "Content-Type": "application/json"
-              }
-            })
+            // const data = await response.json()
+
+            // return new Response(stringify(data), {
+            //   headers: {
+            //     ...CORSHeaders(origin),
+            //     "Content-Type": "application/json"
+            //   }
+            // })
           }
 
           if (url.pathname === "/discord/login") {
