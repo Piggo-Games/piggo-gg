@@ -289,14 +289,12 @@ export const Api = (): Api => {
             headers: CORSHeaders
           })
 
+          const cookies = r.headers.get("cookie")
+          console.log("cookies:", cookies)
+
           const url = new URL(r.url)
           if (url.pathname === "/discord/login") {
             const code = url.searchParams.get("code")
-            // console.log("discord login code:", code)
-
-            const cookies = r.headers.get("cookie")
-            console.log("cookies:", cookies)
-
 
             if (!code) {
               return new Response("missing code", { status: 400 })
