@@ -78,6 +78,10 @@ export const Api = (): Api => {
       "lobby/create": async ({ ws, data }) => {
         const lobbyId = randomHash()
 
+        if (data.playerName) {
+          ws.data.playerName = data.playerName
+        }
+
         // create world
         api.worlds[lobbyId] = ServerWorld({ creator: ws, game: data.game })
 

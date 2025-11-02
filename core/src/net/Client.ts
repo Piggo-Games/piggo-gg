@@ -189,7 +189,7 @@ export const Client = ({ world }: ClientProps): Client => {
       document.exitPointerLock()
     },
     lobbyCreate: (game, callback) => {
-      request<LobbyCreate>({ route: "lobby/create", type: "request", id: randomHash(), game }, (response) => {
+      request<LobbyCreate>({ route: "lobby/create", type: "request", id: randomHash(), game, playerName: client.playerName() }, (response) => {
         if ("error" in response) {
           console.error("failed to create lobby:", response.error)
         } else {
