@@ -1,6 +1,6 @@
 import {
-  Component, ComponentTypes, NetworkedComponentData, ValidComponents, deserializeComponent,
-  entries, keys, serializeComponent, values
+  Component, ComponentTypes, NetworkedComponentData, ValidComponents,
+  deserializeComponent, entries, keys, serializeComponent, values
 } from "@piggo-gg/core"
 
 export type SerializedEntity = Record<string, NetworkedComponentData>

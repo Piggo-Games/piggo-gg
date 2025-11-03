@@ -1,9 +1,9 @@
 import {
-  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData, RequestTypes,
-  World, randomPlayerId, Sound, randomHash, AuthLogin, FriendsList, Pls, NetClientReadSystem,
-  NetClientWriteSystem, ProfileGet, ProfileCreate, MetaPlayers, FriendsAdd, KeyBuffer,
-  isMobile, LobbyList, BadResponse, LobbyExit, XY, max, min, GameTitle, Discord,
-  DiscordLogin, DiscordDomain, DiscordMe, ENV
+  Character, LobbyCreate, LobbyJoin, NetMessageTypes, Player, RequestData,
+  RequestTypes, World, randomPlayerId, Sound, randomHash, AuthLogin, FriendsList,
+  Pls, NetClientReadSystem, NetClientWriteSystem, ProfileGet, ProfileCreate,
+  MetaPlayers, FriendsAdd, KeyBuffer, isMobile, LobbyList, BadResponse, LobbyExit,
+  XY, max, min, GameTitle, Discord, DiscordLogin, DiscordDomain, DiscordMe, ENV
 } from "@piggo-gg/core"
 import { decode, encode } from "@msgpack/msgpack"
 
@@ -191,7 +191,10 @@ export const Client = ({ world }: ClientProps): Client => {
       document.exitPointerLock()
     },
     lobbyCreate: (game, callback) => {
-      request<LobbyCreate>({ route: "lobby/create", type: "request", id: randomHash(), game, playerName: client.playerName() }, (response) => {
+      request<LobbyCreate>({
+        route: "lobby/create", type: "request", id: randomHash(),
+        game, playerName: client.playerName(), lobbyId: client.discord?.sdk.instanceId ?? ""
+      }, (response) => {
         if ("error" in response) {
           console.error("failed to create lobby:", response.error)
         } else {
@@ -257,9 +260,9 @@ export const Client = ({ world }: ClientProps): Client => {
         method: "GET",
         credentials: "include"
       }).then(async (res) => {
-        const data = await res.json() as DiscordMe["response"] | BadResponse
+        const data = await res.json() as DiscordMe["response"]
 
-        if (res.status !== 200 || "error" in data) {
+        if (res.status !== 200) {
           console.error("failed to get discord/me")
           errorCallback()
         } else {
@@ -272,10 +275,10 @@ export const Client = ({ world }: ClientProps): Client => {
         method: "GET",
         credentials: "include"
       }).then(async (res) => {
-        const data = await res.json() as DiscordLogin["response"] | BadResponse
+        const data = await res.json() as DiscordLogin["response"]
 
-        if ("error" in data) {
-          console.error("failed to login with discord:", data.error)
+        if (res.status !== 200) {
+          console.error("failed to login with discord:")
         } else {
           if (callback) callback(data)
         }

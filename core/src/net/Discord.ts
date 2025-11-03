@@ -1,5 +1,5 @@
 import { DiscordSDK } from '@discord/embedded-app-sdk'
-import { Client } from "@piggo-gg/core"
+import { Client, DiscordMe, GoodResponse } from "@piggo-gg/core"
 
 export type Discord = {
   sdk: DiscordSDK
@@ -14,21 +14,25 @@ export const Discord = (): Discord | undefined => {
   try {
     sdk = new DiscordSDK("1433003541521236100")
   } catch (error) {
-    console.error("Discord SDK not available")
     return undefined
   }
-
-  console.log("Discord SDK initialized", sdk)
 
   return {
     sdk,
     login: async (client: Client) => {
       if (loggedIn) return
+
       loggedIn = true
 
-      client.discordMe((response) => {
+      // already authorized
+      const foundCookie = async (response: GoodResponse<DiscordMe["response"]>) => {
         client.player.components.pc.data.name = response.username
-      }, async () => {
+
+        client.lobbyCreate("lobby")
+      }
+
+      // fresh login
+      const noCookie = async () => {
         const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
 
         client.discordLogin(authorized.code, (token) => {
@@ -38,7 +42,11 @@ export const Discord = (): Discord | undefined => {
             client.player.components.pc.data.name = auth.user.username
           })
         })
-      })
+
+        client.lobbyCreate("lobby")
+      }
+
+      client.discordMe(foundCookie, noCookie)
     }
   }
 }

@@ -15,7 +15,7 @@ export const CORSHeaders = (origin: string) => ({
   "Access-Control-Allow-Credentials": "true"
 })
 
-export const CookieHeader = (token: string) => {
+export const DiscordCookie = (token: string) => {
   return `access_token=${token}; ` +
     `Domain=1433003541521236100.discordsays.com; ` +
     `SameSite=None; Partitioned; Secure; Path=/;`
@@ -23,8 +23,22 @@ export const CookieHeader = (token: string) => {
 
 export const HttpError = (status: number, message: string, origin: string) => {
   return new Response(stringify({ error: message }), {
-    headers: CORSHeaders(origin),
+    headers: {
+      "Content-Type": "application/json",
+      ...CORSHeaders(origin)
+    },
     status
+  })
+}
+
+export const HttpOk = (origin: string, data?: any, headers?: Record<string, string>) => {
+  return new Response(data ? stringify(data) : null, {
+    headers: {
+      "Content-Type": "application/json",
+      ...CORSHeaders(origin),
+      ...(headers ? { ...headers } : {})
+    },
+    status: 200
   })
 }
 

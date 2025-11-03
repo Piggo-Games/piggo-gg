@@ -71,7 +71,7 @@ export type ResponseData = {
 // lobby endpoints
 export type LobbyList = Request<"lobby/list", { lobbies: Record<string,
   { id: string, creator: string, players: number, game: GameTitle }> }>
-export type LobbyCreate = Request<"lobby/create", { lobbyId: string }> & { game: GameTitle, playerName?: string }
+export type LobbyCreate = Request<"lobby/create", { lobbyId: string }> & { game: GameTitle, playerName?: string, lobbyId?: string }
 export type LobbyJoin = Request<"lobby/join"> & { join: string }
 export type LobbyExit = Request<"lobby/exit">
 
@@ -95,7 +95,7 @@ export type AuthLogin = Request<"auth/login", { token: string, newUser: boolean 
   jwt: string
 }
 
-export type DiscordMe = Request<"discord/me", { username: string }>
+export type DiscordMe = Request<"discord/me", { username: string, access_token: string }>
 
 export type DiscordLogin = Request<"discord/login", { access_token: string }> & {
   code: string

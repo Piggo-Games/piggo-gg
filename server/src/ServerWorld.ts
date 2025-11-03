@@ -34,21 +34,20 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
   )])
   world.addSystemBuilders([NoobSystem])
 
-  setInterval(() => {
+  // clean up idle players
+  // setInterval(() => {
+  //   for (const [clientId, ws] of entries(clients)) {
+  //     const latestTick = lastMessageTick[clientId] || 0
+  //     if (world.tick - latestTick > 80) {
+  //       world.removeEntity(clientId)
 
-    // clean up idle players
-    for (const [clientId, ws] of entries(clients)) {
-      const latestTick = lastMessageTick[clientId] || 0
-      if (world.tick - latestTick > 80) {
-        world.removeEntity(clientId)
+  //       delete clients[clientId]
+  //       delete latestClientMessages[clientId]
 
-        delete clients[clientId]
-        delete latestClientMessages[clientId]
-
-        console.log(`id:${clientId} name:${ws.data.playerName} kicked for inactivity`)
-      }
-    }
-  }, 500)
+  //       console.log(`id:${clientId} name:${ws.data.playerName} kicked for inactivity`)
+  //     }
+  //   }
+  // }, 500)
 
   return {
     world,
