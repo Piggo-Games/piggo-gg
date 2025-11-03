@@ -82,6 +82,12 @@ export const Api = (): Api => {
           ws.data.playerName = data.playerName
         }
 
+        // join if it already exists
+        if (api.worlds[lobbyId]) {
+          ws.data.worldId = lobbyId
+          return { id: data.id, lobbyId }
+        }
+
         // create world
         api.worlds[lobbyId] = ServerWorld({ creator: ws, game: data.game })
 

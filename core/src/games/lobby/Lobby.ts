@@ -1,6 +1,6 @@
 import {
   Actions, Background, Entity, GameBuilder, getBrowser, HButton,
-  HImg, HText, HtmlDiv, HtmlText, LobbiesMenu, Networked,
+  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
   NPC, piggoVersion, pixiGraphics, PixiRenderSystem, pixiText,
   Position, RefreshableDiv, Renderable, Strike, styleButton, Volley, World
 } from "@piggo-gg/core"
@@ -22,6 +22,7 @@ export const Lobby: GameBuilder = {
     entities: [
       Background({ moving: true, rays: true }),
       GameLobby(),
+      HtmlLagText()
 
       // SignupCTA()
     ],
@@ -205,7 +206,7 @@ const SignupCTA = () => Entity<Position | Renderable>({
 const Version = () => HtmlText({
   text: `v${piggoVersion}`,
   style: {
-    position: "fixed", right: "15px", bottom: "15px", fontSize: "16px", color: "white", opacity: "0.7",
+    position: "fixed", left: "15px", bottom: "15px", fontSize: "16px", color: "white", opacity: "0.7",
     userSelect: "none", pointerEvents: "none"
   }
 })

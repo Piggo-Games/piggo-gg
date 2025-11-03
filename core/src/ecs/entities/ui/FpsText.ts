@@ -41,7 +41,8 @@ export const HtmlLagText = () => {
       bottom: "16px",
       color: "#00dd00",
       textShadow: "none",
-      visibility: "hidden"
+      visibility: "hidden",
+      fontSize: "16px"
     },
     text: "ms: 0"
   })

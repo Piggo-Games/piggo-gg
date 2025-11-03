@@ -27,6 +27,8 @@ export const Discord = (): Discord | undefined => {
       // already authorized
       const foundCookie = async (response: GoodResponse<DiscordMe["response"]>) => {
         client.player.components.pc.data.name = response.username
+
+        client.lobbyCreate("lobby")
       }
 
       // fresh login
@@ -40,9 +42,13 @@ export const Discord = (): Discord | undefined => {
             client.player.components.pc.data.name = auth.user.username
           })
         })
+
+        client.lobbyCreate("lobby")
       }
 
       client.discordMe(foundCookie, noCookie)
+
+      // create lobby
     }
   }
 }
