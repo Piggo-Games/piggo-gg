@@ -95,7 +95,7 @@ export type AuthLogin = Request<"auth/login", { token: string, newUser: boolean 
   jwt: string
 }
 
-export type DiscordMe = Request<"discord/me", { username: string }>
+export type DiscordMe = Request<"discord/me", { username: string, access_token: string }>
 
 export type DiscordLogin = Request<"discord/login", { access_token: string }> & {
   code: string

@@ -297,13 +297,10 @@ export const Api = (): Api => {
               return HttpError(401, "failed to fetch discord me", origin)
             }
 
-            const data = await response.json()
+            const data = await response.json() as { username: string }
 
-            return new Response(stringify(data), {
-              headers: {
-                ...CORSHeaders(origin),
-                "Content-Type": "application/json"
-              }
+            return new Response(stringify({ ...data, access_token }), {
+              headers: { ...CORSHeaders(origin), "Content-Type": "application/json" }
             })
           }
 

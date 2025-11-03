@@ -26,8 +26,16 @@ export const Discord = (): Discord | undefined => {
       if (loggedIn) return
       loggedIn = true
 
-      client.discordMe((response) => {
+      // two paths — authorized (cookie stored) / unauthorized (need to allow)
+      client.discordMe(async (response) => {
         client.player.components.pc.data.name = response.username
+
+        await sdk.commands.authenticate({ access_token: response.access_token })
+        const participants = await sdk.commands.getActivityInstanceConnectedParticipants()
+
+        console.log("PARTICIPANTS", participants)
+
+        console.log("INSTANCE ID", sdk.instanceId)
       }, async () => {
         const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
 
