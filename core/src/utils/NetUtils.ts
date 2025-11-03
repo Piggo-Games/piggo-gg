@@ -24,19 +24,19 @@ export const DiscordCookie = (token: string) => {
 export const HttpError = (status: number, message: string, origin: string) => {
   return new Response(stringify({ error: message }), {
     headers: {
-      ...CORSHeaders(origin),
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...CORSHeaders(origin)
     },
     status
   })
 }
 
-export const HttpOk = (origin: string, data?: any, cookies?: Record<string, string>) => {
+export const HttpOk = (origin: string, data?: any, headers?: Record<string, string>) => {
   return new Response(data ? stringify(data) : null, {
     headers: {
-      ...CORSHeaders(origin),
       "Content-Type": "application/json",
-      ...(cookies ? { ...cookies } : {})
+      ...CORSHeaders(origin),
+      ...(headers ? { ...headers } : {})
     },
     status: 200
   })
