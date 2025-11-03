@@ -1,7 +1,7 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
   entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
-  CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes, HttpError, HttpOk, DiscordDomain
+  CORSHeaders, ValidOrigins, WSRequestTypes, HttpError, HttpOk, DiscordDomain, DiscordCookie
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -304,11 +304,7 @@ export const Api = (): Api => {
 
             const data = await response.json() as { username: string }
 
-            // return 
-            return HttpOk(origin, stringify({ ...data, access_token }))
-            // return new Response(stringify({ ...data, access_token }), {
-            //   headers: { ...CORSHeaders(origin), "Content-Type": "application/json" }
-            // })
+            return HttpOk(origin, { ...data, access_token })
           }
 
           // discord login
@@ -334,13 +330,7 @@ export const Api = (): Api => {
 
             const { access_token } = await response.json() as { access_token: string }
 
-            return new Response(stringify({ access_token }), {
-              headers: {
-                ...CORSHeaders(origin),
-                "Content-Type": "application/json",
-                "Set-Cookie": CookieHeader(access_token)
-              }
-            })
+            return HttpOk(origin, { access_token }, { "Set-Cookie": DiscordCookie(access_token) })
           }
 
           // websocket upgrade
