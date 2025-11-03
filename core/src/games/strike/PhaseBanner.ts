@@ -48,8 +48,10 @@ export const PhaseBanner = () => {
           const players = world.players().filter(p => !p.id.includes("dummy"))
           const ready = players.filter(p => (p.components.pc.data.ready)).length
 
+          const connected = world.client?.net.synced
+
           readyText.textContent = `ready: ${ready}/${players.length}`
-          readyText.style.visibility = state.phase === "warmup" && state.phaseChange === null ? "visible" : "hidden"
+          readyText.style.visibility = state.phase === "warmup" && state.phaseChange === null && connected ? "visible" : "hidden"
         }
       })
     }
