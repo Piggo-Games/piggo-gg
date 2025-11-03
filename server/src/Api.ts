@@ -76,7 +76,7 @@ export const Api = (): Api => {
         return { id: data.id, lobbies }
       },
       "lobby/create": async ({ ws, data }) => {
-        const lobbyId = randomHash()
+        const lobbyId = data.lobbyId || randomHash()
 
         if (data.playerName) {
           ws.data.playerName = data.playerName
@@ -274,7 +274,6 @@ export const Api = (): Api => {
           })
 
           const cookie = r.headers.get("cookie")
-          console.log("cookie:", cookie)
 
           const url = new URL(r.url)
 
