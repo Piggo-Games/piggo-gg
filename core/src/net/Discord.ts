@@ -21,15 +21,16 @@ export const Discord = (): Discord | undefined => {
     sdk,
     login: async (client: Client) => {
       if (loggedIn) return
+
       loggedIn = true
 
-      // cookie already has token
-      const signedInFlow = async (response: GoodResponse<DiscordMe["response"]>) => {
+      // already authorized
+      const foundCookie = async (response: GoodResponse<DiscordMe["response"]>) => {
         client.player.components.pc.data.name = response.username
       }
 
       // fresh login
-      const unsignedInFlow = async () => {
+      const noCookie = async () => {
         const authorized = await sdk.commands.authorize({ client_id: "1433003541521236100", scope: ["identify"] })
 
         client.discordLogin(authorized.code, (token) => {
@@ -41,7 +42,7 @@ export const Discord = (): Discord | undefined => {
         })
       }
 
-      client.discordMe(signedInFlow, unsignedInFlow)
+      client.discordMe(foundCookie, noCookie)
     }
   }
 }

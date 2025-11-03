@@ -1,7 +1,7 @@
 import {
   ExtractedRequestTypes, Friend, NetMessageTypes, RequestTypes, ResponseData,
   entries, randomHash, keys, round, stringify, values, BadResponse, GameTitle,
-  CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes, HttpError
+  CORSHeaders, CookieHeader, ValidOrigins, WSRequestTypes, HttpError, HttpOk, DiscordDomain
 } from "@piggo-gg/core"
 import { ServerWorld, PrismaClient } from "@piggo-gg/server"
 import { Server, ServerWebSocket, env } from "bun"
@@ -261,22 +261,28 @@ export const Api = (): Api => {
         hostname: "0.0.0.0",
         port: env.PORT ?? 3000,
         fetch: async (r: Request, server: Server) => {
-          const origin = r.headers.get("origin")
+          let origin = r.headers.get("origin")
 
+          // sometimes origin is null from discord
+          const referer = r.headers.get("referer")
+          if (origin === null && referer?.includes(DiscordDomain)) {
+            origin = `https://${DiscordDomain}`
+          }
+
+          // check valid origin
           if (!origin || !ValidOrigins.includes(origin)) {
             console.log("blocked origin:", origin)
-            return new Response("invalid origin", { status: 403 })
+            return HttpError(403, "invalid origin", origin ?? "")
           }
 
           // CORS
-          if (r.method === "OPTIONS") return new Response(null, {
-            headers: CORSHeaders(origin)
-          })
+          if (r.method === "OPTIONS") return HttpOk(origin)
 
           const cookie = r.headers.get("cookie")
 
           const url = new URL(r.url)
 
+          // discord cookie
           if (url.pathname === "/discord/me") {
             if (!cookie) return HttpError(400, "missing cookie", origin)
 
@@ -298,11 +304,14 @@ export const Api = (): Api => {
 
             const data = await response.json() as { username: string }
 
-            return new Response(stringify({ ...data, access_token }), {
-              headers: { ...CORSHeaders(origin), "Content-Type": "application/json" }
-            })
+            // return 
+            return HttpOk(origin, stringify({ ...data, access_token }))
+            // return new Response(stringify({ ...data, access_token }), {
+            //   headers: { ...CORSHeaders(origin), "Content-Type": "application/json" }
+            // })
           }
 
+          // discord login
           if (url.pathname === "/discord/login") {
             const code = url.searchParams.get("code")
 
@@ -334,6 +343,7 @@ export const Api = (): Api => {
             })
           }
 
+          // websocket upgrade
           return server.upgrade(r, { data: { ip: r.headers.get("x-forwarded-for") } }) ?
             new Response() :
             new Response("upgrade failed", { status: 500 })

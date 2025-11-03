@@ -23,8 +23,21 @@ export const CookieHeader = (token: string) => {
 
 export const HttpError = (status: number, message: string, origin: string) => {
   return new Response(stringify({ error: message }), {
-    headers: CORSHeaders(origin),
+    headers: {
+      ...CORSHeaders(origin),
+      "Content-Type": "application/json"
+    },
     status
+  })
+}
+
+export const HttpOk = (origin: string, data?: any) => {
+  return new Response(data ? stringify(data) : null, {
+    headers: {
+      ...CORSHeaders(origin),
+      "Content-Type": "application/json"
+    },
+    status: 200
   })
 }
 
