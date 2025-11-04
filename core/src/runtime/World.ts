@@ -158,6 +158,11 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         return
       }
 
+      const diff = now - world.lastTick
+      if (diff > 30 && world.mode === "server") {
+        console.error("late tick on server")
+      }
+
       // update lastTick
       if (!isRollback) {
         if ((now - world.tickrate - world.tickrate) > world.lastTick) {
