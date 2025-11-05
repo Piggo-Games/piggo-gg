@@ -253,15 +253,11 @@ const controls: HUDSystemProps = {
     },
     {
       label: "jump",
-      buttons: [
-        ["spacebar"]
-      ]
+      buttons: [["spacebar"]]
     },
     {
       label: "hit",
-      buttons: [
-        ["mb1"]
-      ]
+      buttons: [["mb1"]]
     }
   ]
 }
