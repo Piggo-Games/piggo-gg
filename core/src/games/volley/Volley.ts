@@ -243,12 +243,25 @@ const VolleySystem = SystemBuilder({
 })
 
 const controls: HUDSystemProps = {
+  direction: "row",
   clusters: [
     {
       label: "move",
       buttons: [
         ["A", "S", "D"],
         ["W"]
+      ]
+    },
+    {
+      label: "jump",
+      buttons: [
+        ["spacebar"]
+      ]
+    },
+    {
+      label: "hit",
+      buttons: [
+        ["mb1"]
       ]
     }
   ]

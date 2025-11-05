@@ -21,12 +21,14 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     const wrapper = HDiv({
       style: {
         bottom: "20px",
-        left: "20px",
+        left: props.direction === "row" ? "50%" : "120px",
         display: "flex",
         flexDirection: props.direction || "column",
         // border: "1px solid red", 
         width: "fit-content",
-        height: "fit-content"
+        height: "fit-content",
+        alignItems: "flex-end",
+        transform: "translate(-50%)",
       }
     })
 
