@@ -33,13 +33,13 @@ export const Vince = (player: Player) => Character({
           if (hold) return
           return { actionId: "jump" }
         },
-        "mb1": ({ hold, mouse, world, entity, client }) => {
+        "mb1": ({ hold, mouse, world, entity }) => {
           if (hold) return
           const { position } = entity.components
           if (!position) return
 
           const from = position.xyz()
-          const target = { ...client.controls.mouseScreen }
+          const target = { x: mouse.x, y: mouse.y }
           world.actions.push(world.tick + 3, entity.id, { actionId: "spike", params: { from, target } })
 
           return
