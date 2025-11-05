@@ -52,13 +52,19 @@ export const InputSystem = ClientSystemBuilder({
         }
       } else {
         client.controls.mouseScreen = {
-          x: event.offsetX,
-          y: event.offsetY
+          x: event.clientX,
+          y: event.clientY
         }
+
+        // client.controls.mouseScreen = {
+        //   x: event.offsetX,
+        //   y: event.offsetY
+        // }
       }
 
       // mouse
       if (pixi) client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+      // if (pixi) client.controls.mouse = client.controls.mouseScreen
     })
 
     document.addEventListener("pointerdown", (event) => {
