@@ -56,7 +56,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         }
       })
 
-      const label = KeyLabel(cluster.label, 0, 0)
+      const label = KeyLabel(cluster.label)
 
       const keyWrapper = HDiv({
         style: {
@@ -68,7 +68,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           border: "1px solid blue",
           marginBottom: "6px",
           justifyContent: "center",
-          alignItems: "center",,
+          alignItems: "center"
         }
       })
 
@@ -262,15 +262,11 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
   }
 })
 
-const KeyLabel = (text: string, left: number, bottom: number, visible = true) => HtmlText({
+const KeyLabel = (text: string) => HtmlText({
   text,
   style: {
     position: "relative",
-    // left: `${left}px`,
-    // bottom: `${bottom}px`,
     width: "200px",
-    textAlign: "center",
-    visibility: visible ? "visible" : "hidden",
-    // transform: "translate(-50%)"
+    textAlign: "center"
   }
 })
