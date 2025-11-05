@@ -24,11 +24,12 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         left: props.direction === "row" ? "50%" : "120px",
         display: "flex",
         flexDirection: props.direction || "column",
-        // border: "1px solid red", 
         width: "fit-content",
         height: "fit-content",
-        alignItems: "flex-end",
+        alignItems: props.direction === "row" ? "flex-end" : "center",
         transform: "translate(-50%)",
+        gap: "30px",
+        // border: "1px solid red"
       }
     })
 
@@ -45,8 +46,8 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           position: "relative",
           width: "fit-content",
           height: "fit-content",
-          marginBottom: "30px",
           justifyContent: "center",
+          border: "1px solid green"
         }
       })
       wrapper.appendChild(clusterDiv)
@@ -151,7 +152,6 @@ const KeyLabel = (text: string) => HtmlText({
   text,
   style: {
     position: "relative",
-    width: "200px",
     textAlign: "center",
     marginTop: "6px"
   }
