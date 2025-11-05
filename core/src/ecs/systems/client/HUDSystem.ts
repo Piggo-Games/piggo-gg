@@ -11,7 +11,7 @@ type Cluster = {
   label: string
 }
 
-type HUDSystemProps = {
+export type HUDSystemProps = {
   clusters: Cluster[]
 }
 
@@ -26,14 +26,12 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     const wrapper = HDiv({
       style: {
         bottom: "20px",
-        left: "80px",
-        pointerEvents: "none",
-        border: "1px solid red",
+        left: "40px",
+        // border: "1px solid red",
         display: "flex",
-        flexDirection: "column-reverse",
-        width: "fit-content",
-        height: "fit-content",
-        // alignItems: "center",
+        // flexDirection: "column",
+        // width: "fit-content",
+        // height: "fit-content"
       }
     })
 
@@ -51,12 +49,11 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           width: "fit-content",
           height: "fit-content",
           marginBottom: "30px",
-          border: "1px solid green",
+          // border: "1px solid green",
           justifyContent: "center",
         }
       })
-
-      const label = KeyLabel(cluster.label)
+      wrapper.appendChild(clusterDiv)
 
       const keyWrapper = HDiv({
         style: {
@@ -65,29 +62,29 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           width: "fit-content",
           display: "flex",
           flexDirection: "column-reverse",
-          border: "1px solid blue",
-          marginBottom: "6px",
+          // border: "1px solid blue",
+          gap: "8px",
           justifyContent: "center",
           alignItems: "center"
         }
       })
+      clusterDiv.appendChild(keyWrapper)
 
       for (const row of cluster.buttons) {
 
         const rowDiv = HDiv({
           style: {
             position: "relative",
+            gap: "8px",
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            border: "1px solid yellow",
-            marginBottom: "4px",
+            // border: "1px solid yellow",
             width: "fit-content",
             height: "fit-content"
           }
         })
-        
         keyWrapper.appendChild(rowDiv)
 
         // for (const button of cluster.buttons) {
@@ -103,10 +100,8 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         }
       }
 
-      clusterDiv.appendChild(keyWrapper)
+      const label = KeyLabel(cluster.label)
       clusterDiv.appendChild(label)
-
-      wrapper.appendChild(clusterDiv)
     }
 
     // const bottom = 40
@@ -201,7 +196,8 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
           for (const btn of buttonElements) {
-            btn.element.style.backgroundColor = down.includes(btn.key) ? active : inactive
+            const check = btn.key === "spacebar" ? " " : btn.key
+            btn.element.style.backgroundColor = down.includes(check) ? active : inactive
           }
         }
 
@@ -256,7 +252,6 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
     paddingLeft: "12px",
     height: "36px",
     fontSize: "20px",
-    // marginLeft: "8px",
     visibility: props.visible === false ? "hidden" : "visible",
     ...ogButtonStyle
   }
@@ -267,6 +262,7 @@ const KeyLabel = (text: string) => HtmlText({
   style: {
     position: "relative",
     width: "200px",
-    textAlign: "center"
+    textAlign: "center",
+    marginTop: "6px"
   }
 })

@@ -2,7 +2,8 @@ import {
   BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
   EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
   logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText
+  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText,
+  HUDSystemProps
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -54,26 +55,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       ThreeSystem,
       InventorySystem,
       BlockMeshSysten,
-      HUDSystem({
-        clusters: [
-          {
-            label: "move", buttons: [
-              [
-                { text: "A", hori: -50, vert: 0 },
-                { text: "S", hori: 0, vert: 0 },
-                { text: "D", hori: 50, vert: 0 }
-              ], [
-                { text: "W", hori: 0, vert: 50 },
-              ]
-            ]
-          },
-          {
-            label: "jump", buttons: [[
-              { text: "space", hori: 10, vert: 10 }
-            ]]
-          }
-        ]
-      })
+      HUDSystem(controls)
     ],
     entities: [
       Crosshair(),
@@ -219,5 +201,34 @@ const spawnPoints: Record<TeamNumber, XYZR[]> = {
     { x: 9.5, y: 17.8, z: 0.3, r: 2 },
     { x: 8, y: 17.8, z: 0.3, r: 4.3 },
     { x: 7.5, y: 18, z: 0.3, r: 4.5 }
+  ]
+}
+
+const controls: HUDSystemProps = {
+  clusters: [
+    {
+      label: "reload",
+      buttons: [[
+        { text: "r" }
+      ]]
+    },
+    {
+      label: "move",
+      buttons: [
+        [
+          { text: "A", hori: -50, vert: 0 },
+          { text: "S", hori: 0, vert: 0 },
+          { text: "D", hori: 50, vert: 0 }
+        ], [
+          { text: "W", hori: 0, vert: 50 },
+        ]
+      ]
+    },
+    {
+      label: "jump",
+      buttons: [[
+        { text: "spacebar", hori: 10, vert: 10 }
+      ]]
+    }
   ]
 }
