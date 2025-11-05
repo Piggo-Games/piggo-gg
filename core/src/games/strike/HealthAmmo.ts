@@ -4,11 +4,11 @@ export const HealthAmmo = (): Entity => {
   let init = false
 
   const ammoText = HText({
-    style: { fontSize: "38px", position: "relative", marginLeft: "6px", textAlign: "center" }
+    style: { fontSize: "34px", position: "relative", marginLeft: "6px", textAlign: "center" }
   })
 
   const healthText = HText({
-    style: { fontSize: "38px", position: "relative", marginLeft: "6px", textAlign: "center", marginRight: "12px" }
+    style: { fontSize: "34px", position: "relative", marginLeft: "6px", textAlign: "center", marginRight: "12px" }
   })
 
   const wrapper = HDiv({
@@ -16,12 +16,12 @@ export const HealthAmmo = (): Entity => {
   },
     HImg({
       src: "health.svg",
-      style: { height: "36px", position: "relative", transform: "translate(0%, 0%)" }
+      style: { height: "32px", position: "relative", transform: "translate(0%, 0%)" }
     }),
     healthText,
     HImg({
       src: "bullet.svg",
-      style: { height: "36px", position: "relative", transform: "translate(0%, 0%)" }
+      style: { height: "32px", position: "relative", transform: "translate(0%, 0%)" }
     }),
     ammoText
   )

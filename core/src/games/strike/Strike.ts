@@ -1,8 +1,8 @@
 import {
-  BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem,
-  EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem,
-  logPerf, min, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ThreeSystem, DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText
+  BlockMeshSysten, BlockPhysicsSystem, Crosshair, ThreeNametagSystem, EscapeMenu,
+  GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem, logPerf, min,
+  Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeSystem,
+  DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText, HUDSystemProps
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -54,7 +54,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       ThreeSystem,
       InventorySystem,
       BlockMeshSysten,
-      HUDSystem
+      HUDSystem(controls)
     ],
     entities: [
       Crosshair(),
@@ -200,5 +200,29 @@ const spawnPoints: Record<TeamNumber, XYZR[]> = {
     { x: 9.5, y: 17.8, z: 0.3, r: 2 },
     { x: 8, y: 17.8, z: 0.3, r: 4.3 },
     { x: 7.5, y: 18, z: 0.3, r: 4.5 }
+  ]
+}
+
+const controls: HUDSystemProps = {
+  clusters: [
+    {
+      label: "switch team",
+      buttons: [["t"]]
+    },
+    {
+      label: "reload",
+      buttons: [["r"]]
+    },
+    {
+      label: "move",
+      buttons: [
+        ["A", "S", "D"],
+        ["W"]
+      ]
+    },
+    {
+      label: "jump",
+      buttons: [["spacebar"]]
+    }
   ]
 }

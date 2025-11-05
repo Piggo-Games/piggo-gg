@@ -113,7 +113,7 @@ export const Sarge = (player: Player): Character => {
             return { actionId: "ready" }
           },
 
-          "c": ({ hold, world }) => {
+          "t": ({ hold, world }) => {
             if (hold) return
             const state = world.state<StrikeState>()
             if (state.phase !== "warmup") return

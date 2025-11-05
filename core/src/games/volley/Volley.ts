@@ -1,5 +1,5 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HtmlChat, HtmlLagText, LagText, NametagSystem, PhysicsSystem,
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat, HtmlLagText, LagText, NametagSystem, PhysicsSystem,
   PixiCameraSystem, PixiRenderSystem, Position, Renderable, ScorePanel, ShadowSystem,
   SpawnSystem, SystemBuilder, Team, Tooltip, screenWH, switchTeamButton, values
 } from "@piggo-gg/core"
@@ -53,6 +53,7 @@ export const Volley: GameBuilder<VolleyState> = {
       TargetSystem,
       PixiRenderSystem,
       NametagSystem,
+      HUDSystem(controls),
       PixiCameraSystem(() => ({ x: 225, y: 0, z: 0 }))
     ],
     entities: [
@@ -70,8 +71,7 @@ export const Volley: GameBuilder<VolleyState> = {
       Bounds("3"),
       ScorePanel(),
       HtmlLagText(),
-      switchTeamButton(),
-      Tooltip("controls", " move: WASD\n jump: SPACE\n  aim: MOUSE\n  hit: LEFT CLICK "),
+      switchTeamButton()
     ]
   })
 }
@@ -240,3 +240,24 @@ const VolleySystem = SystemBuilder({
     }
   }
 })
+
+const controls: HUDSystemProps = {
+  direction: "row",
+  clusters: [
+    {
+      label: "move",
+      buttons: [
+        ["A", "S", "D"],
+        ["W"]
+      ]
+    },
+    {
+      label: "jump",
+      buttons: [["spacebar"]]
+    },
+    {
+      label: "hit",
+      buttons: [["mb1"]]
+    }
+  ]
+}
