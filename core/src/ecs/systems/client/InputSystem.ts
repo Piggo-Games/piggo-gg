@@ -52,8 +52,8 @@ export const InputSystem = ClientSystemBuilder({
         }
       } else {
         client.controls.mouseScreen = {
-          x: event.offsetX,
-          y: event.offsetY
+          x: event.clientX,
+          y: event.clientY
         }
       }
 
