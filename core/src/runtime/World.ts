@@ -184,7 +184,6 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       }
 
       // run system onTick (sorted by priority)
-      const allSystemsTime = performance.now()
       values(world.systems).sort((a, b) => a.priority - b.priority).forEach((system) => {
         if (!isRollback || (isRollback && !system.skipOnRollback)) {
           if (!world.systems[system.id]) return
@@ -194,7 +193,6 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
           logPerf(system.id, now)
         }
       })
-      logPerf("allSystems", allSystemsTime)
 
       // schedule onTick
       if (!isRollback) scheduleOnTick()

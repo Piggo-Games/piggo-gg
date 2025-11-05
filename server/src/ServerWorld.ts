@@ -65,9 +65,6 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
     handleMessage: (ws: WS, msg: NetMessageTypes) => {
       if (msg.type !== "game") return
 
-      const diff = msg.tick - world.tick
-      if (diff > 40) console.log(`diff: ${diff}`)
-
       // add player entity if it doesn't exist
       if (!world.entities[msg.playerId]) {
         ws.data.playerId = msg.playerId
@@ -88,7 +85,7 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
       if (!lastMessageTick[msg.playerId] || lastMessageTick[msg.playerId] < msg.tick) {
         latestClientLag[msg.playerId] = Date.now() - msg.timestamp
 
-        // const diff = msg.tick - world.tick
+        const diff = msg.tick - world.tick
         latestClientDiff[msg.playerId] = diff
 
         if (diff < 1 || world.tick % 200 === 0) {
