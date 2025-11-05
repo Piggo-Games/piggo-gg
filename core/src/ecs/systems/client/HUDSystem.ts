@@ -47,7 +47,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           width: "fit-content",
           height: "fit-content",
           justifyContent: "center",
-          border: "1px solid green"
+          // border: "1px solid green"
         }
       })
       wrapper.appendChild(clusterDiv)
