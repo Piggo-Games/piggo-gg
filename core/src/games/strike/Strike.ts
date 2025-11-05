@@ -56,12 +56,22 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       BlockMeshSysten,
       HUDSystem({
         clusters: [
-          { label: "move", buttons: [
-            { text: "W", hori: 60, vert: 130 },
-            { text: "A", hori: 10, vert: 80 },
-            { text: "S", hori: 60, vert: 80 },
-            { text: "D", hori: 110, vert: 80 }
-          ] }
+          {
+            label: "move", buttons: [
+              [
+                { text: "A", hori: -50, vert: 0 },
+                { text: "S", hori: 0, vert: 0 },
+                { text: "D", hori: 50, vert: 0 }
+              ], [
+                { text: "W", hori: 0, vert: 50 },
+              ]
+            ]
+          },
+          {
+            label: "jump", buttons: [[
+              { text: "space", hori: 10, vert: 10 }
+            ]]
+          }
         ]
       })
     ],

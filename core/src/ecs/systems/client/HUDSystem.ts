@@ -1,6 +1,5 @@
 import {
-  HtmlButton, HtmlText, ClientSystemBuilder, HtmlDiv, HtmlInventory, ogButtonStyle,
-  HDiv
+  HtmlButton, HtmlText, ClientSystemBuilder, HtmlInventory, ogButtonStyle, HDiv
 } from "@piggo-gg/core"
 
 type Cluster = {
@@ -8,7 +7,7 @@ type Cluster = {
     text: string
     hori?: number
     vert?: number
-  }[]
+  }[][]
   label: string
 }
 
@@ -25,22 +24,87 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     if (client.mobile) return
 
     const wrapper = HDiv({
-      style: { bottom: "0px", left: "0px", pointerEvents: "none", border: "" }
+      style: {
+        bottom: "20px",
+        left: "80px",
+        pointerEvents: "none",
+        border: "1px solid red",
+        display: "flex",
+        flexDirection: "column-reverse",
+        width: "fit-content",
+        height: "fit-content",
+        // alignItems: "center",
+      }
     })
+
+    three.append(wrapper)
+
+    let buttonElements: { element: HTMLButtonElement, key: string }[] = []
 
     for (const cluster of props.clusters) {
       const clusterDiv = HDiv({
-        
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          position: "relative",
+          width: "fit-content",
+          height: "fit-content",
+          marginBottom: "30px",
+          border: "1px solid green",
+          justifyContent: "center",
+        }
       })
 
-      for (const button of cluster.buttons) {
-        const btn = KeyButton({
-          text: button.text,
-          left: button.hori ? button.hori : 0,
-          bottom: button.vert ? button.vert : 0
+      const label = KeyLabel(cluster.label, 0, 0)
+
+      const keyWrapper = HDiv({
+        style: {
+          position: "relative",
+          height: "fit-content",
+          width: "fit-content",
+          display: "flex",
+          flexDirection: "column-reverse",
+          border: "1px solid blue",
+          marginBottom: "6px",
+          justifyContent: "center",
+          alignItems: "center",,
+        }
+      })
+
+      for (const row of cluster.buttons) {
+
+        const rowDiv = HDiv({
+          style: {
+            position: "relative",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            border: "1px solid yellow",
+            marginBottom: "4px",
+            width: "fit-content",
+            height: "fit-content"
+          }
         })
-        clusterDiv.appendChild(btn)
+        
+        keyWrapper.appendChild(rowDiv)
+
+        // for (const button of cluster.buttons) {
+        for (const button of row) {
+          const btn = KeyButton({
+            text: button.text,
+            left: button.hori ? button.hori : 0,
+            bottom: button.vert ? button.vert : 0
+          })
+          // keyWrapper.appendChild(btn)
+          rowDiv.appendChild(btn)
+          buttonElements.push({ element: btn, key: button.text.toLowerCase() })
+        }
       }
+
+      clusterDiv.appendChild(keyWrapper)
+      clusterDiv.appendChild(label)
 
       wrapper.appendChild(clusterDiv)
     }
@@ -107,12 +171,10 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     // controls.appendChild(jumpLabel)
     // controls.appendChild(readyLabel)
 
-    if (world.game.id === "craft") {
-      // controls.appendChild(boostButton)
-      // controls.appendChild(boostLabel)
-    }
-
-    three.append(wrapper)
+    // if (world.game.id === "craft") {
+    // controls.appendChild(boostButton)
+    // controls.appendChild(boostLabel)
+    // }
     // three.append(scoreText)
     // three.append(posText)
 
@@ -134,19 +196,13 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       priority: 10,
       onTick: () => {
         const settings = world.settings<{ showControls: boolean }>()
-        // controls.style.display = settings.showControls ? "block" : "none"
+        wrapper.style.display = settings.showControls ? "block" : "none"
 
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
-          // aButton.style.backgroundColor = down.includes("a") ? active : inactive
-          // dButton.style.backgroundColor = down.includes("d") ? active : inactive
-          // sButton.style.backgroundColor = down.includes("s") ? active : inactive
-          // wButton.style.backgroundColor = down.includes("w") ? active : inactive
-          // rButton.style.backgroundColor = down.includes("r") ? active : inactive
-          // cButton.style.backgroundColor = down.includes("c") ? active : inactive
-          // zButton.style.backgroundColor = down.includes("z") ? active : inactive
-          // // boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
-          // jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
+          for (const btn of buttonElements) {
+            btn.element.style.backgroundColor = down.includes(btn.key) ? active : inactive
+          }
         }
 
         const pc = client.character()
@@ -194,13 +250,14 @@ type KeyButtonProps = {
 const KeyButton = (props: KeyButtonProps) => HtmlButton({
   text: props.text,
   style: {
-    left: `${props.left}px`,
-    bottom: `${props.bottom}px`,
-    width: `${props.width ?? 36}px`,
+    position: "relative",
+    width: "fit-content",
+    paddingRight: "12px",
+    paddingLeft: "12px",
     height: "36px",
     fontSize: "20px",
+    // marginLeft: "8px",
     visibility: props.visible === false ? "hidden" : "visible",
-    transform: "translate(-50%)",
     ...ogButtonStyle
   }
 })
@@ -208,11 +265,12 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
 const KeyLabel = (text: string, left: number, bottom: number, visible = true) => HtmlText({
   text,
   style: {
-    left: `${left}px`,
-    bottom: `${bottom}px`,
+    position: "relative",
+    // left: `${left}px`,
+    // bottom: `${bottom}px`,
     width: "200px",
     textAlign: "center",
     visibility: visible ? "visible" : "hidden",
-    transform: "translate(-50%)"
+    // transform: "translate(-50%)"
   }
 })

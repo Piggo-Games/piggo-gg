@@ -27,7 +27,7 @@ export type CSS = Partial<{
   fontSize: `${number}px`
   fontWeight: "normal" | "bold" | "bolder" | "lighter" | number
   gap: `${number}px` | `${number}%`
-  height: "inherit" | `${number}px` | `${number}%` | "auto" | `${number}vh` | `${number}dvh`
+  height: "inherit" | `${number}px` | `${number}%` | "auto" | `${number}vh` | `${number}dvh` | "fit-content"
   imageRendering: "auto" | "crisp-edges" | "pixelated"
   justifyContent: "center" | "flex-start" | "flex-end" | "space-between" | "space-around"
   left: `${number}%` | `${number}px` | `${number}dvh` | `calc(${string})`
