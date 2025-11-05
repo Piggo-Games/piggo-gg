@@ -1,8 +1,22 @@
 import {
-  HtmlButton, HtmlText, ClientSystemBuilder, HtmlDiv, HtmlInventory, ogButtonStyle
+  HtmlButton, HtmlText, ClientSystemBuilder, HtmlDiv, HtmlInventory, ogButtonStyle,
+  HDiv
 } from "@piggo-gg/core"
 
-export const HUDSystem = ClientSystemBuilder({
+type Cluster = {
+  buttons: {
+    text: string
+    hori?: number
+    vert?: number
+  }[]
+  label: string
+}
+
+type HUDSystemProps = {
+  clusters: Cluster[]
+}
+
+export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
   id: "HUDSystem",
   init: (world) => {
     const { three, client } = world
@@ -10,83 +24,97 @@ export const HUDSystem = ClientSystemBuilder({
 
     if (client.mobile) return
 
-    const bottom = 40
-    const left = 120
+    const wrapper = HDiv({
+      style: { bottom: "0px", left: "0px", pointerEvents: "none", border: "" }
+    })
 
-    const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 70 })
-    const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 70 })
-    const sButton = KeyButton({ text: "S", left, bottom: bottom + 70 })
-    const wButton = KeyButton({ text: "W", left, bottom: bottom + 120 })
-    const moveLabel = KeyLabel("move", left, bottom + 40)
+    for (const cluster of props.clusters) {
+      const clusterDiv = HDiv({
+        
+      })
 
-    const rButton = KeyButton({ text: "r", left, bottom: bottom + 320 })
-    const reloadLabel = KeyLabel("reload", left, bottom + 290)
-
-    const cButton = KeyButton({ text: "c", left, bottom: bottom + 430, visible: false })
-    const teamLabel = KeyLabel("switch team", left, bottom + 400, false)
-
-    const zButton = KeyButton({ text: "z", left, bottom: bottom + 540, visible: true })
-    const readyLabel = KeyLabel("ready", left, bottom + 510, true)
-
-    // const boostButton = KeyButton({ text: "shift", left, bottom, width: 100 })
-    // const boostLabel = KeyLabel("boost", left, bottom - 10)
-
-    const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 220, width: 160 })
-    const jumpLabel = KeyLabel("jump", left, bottom + 190)
-
-    const scoreText = HtmlText({
-      text: "",
-      style: {
-        left: `50%`,
-        bottom: "50px",
-        fontSize: "28px",
-        color: "#ffffff",
-        transform: "translate(-50%)",
+      for (const button of cluster.buttons) {
+        const btn = KeyButton({
+          text: button.text,
+          left: button.hori ? button.hori : 0,
+          bottom: button.vert ? button.vert : 0
+        })
+        clusterDiv.appendChild(btn)
       }
-    })
 
-    const posText = HtmlText({
-      text: "0|0|0",
-      style: {
-        left: `25%`,
-        bottom: `20px`,
-        fontSize: "22px",
-        color: "#00ffff",
-        transform: "translate(-50%)",
-        visibility: "hidden"
-      }
-    })
+      wrapper.appendChild(clusterDiv)
+    }
 
-    const controls = HtmlDiv({
-      bottom: "0px",
-      left: "0px",
-      pointerEvents: "none",
-      border: ""
-    })
+    // const bottom = 40
+    // const left = 120
 
-    controls.appendChild(aButton)
-    controls.appendChild(dButton)
-    controls.appendChild(sButton)
-    controls.appendChild(wButton)
-    controls.appendChild(rButton)
-    controls.appendChild(cButton)
-    controls.appendChild(zButton)
+    // const aButton = KeyButton({ text: "A", left: left - 50, bottom: bottom + 70 })
+    // const dButton = KeyButton({ text: "D", left: left + 50, bottom: bottom + 70 })
+    // const sButton = KeyButton({ text: "S", left, bottom: bottom + 70 })
+    // const wButton = KeyButton({ text: "W", left, bottom: bottom + 120 })
+    // const moveLabel = KeyLabel("move", left, bottom + 40)
 
-    controls.appendChild(jumpButton)
-    controls.appendChild(teamLabel)
-    controls.appendChild(reloadLabel)
-    controls.appendChild(moveLabel)
-    controls.appendChild(jumpLabel)
-    controls.appendChild(readyLabel)
+    // const rButton = KeyButton({ text: "r", left, bottom: bottom + 320 })
+    // const reloadLabel = KeyLabel("reload", left, bottom + 290)
+
+    // const cButton = KeyButton({ text: "c", left, bottom: bottom + 430, visible: false })
+    // const teamLabel = KeyLabel("switch team", left, bottom + 400, false)
+
+    // const zButton = KeyButton({ text: "z", left, bottom: bottom + 540, visible: true })
+    // const readyLabel = KeyLabel("ready", left, bottom + 510, true)
+
+    // // const boostButton = KeyButton({ text: "shift", left, bottom, width: 100 })
+    // // const boostLabel = KeyLabel("boost", left, bottom - 10)
+
+    // const jumpButton = KeyButton({ text: "spacebar", left, bottom: bottom + 220, width: 160 })
+    // const jumpLabel = KeyLabel("jump", left, bottom + 190)
+
+    // const scoreText = HtmlText({
+    //   text: "",
+    //   style: {
+    //     left: `50%`,
+    //     bottom: "50px",
+    //     fontSize: "28px",
+    //     color: "#ffffff",
+    //     transform: "translate(-50%)",
+    //   }
+    // })
+
+    // const posText = HtmlText({
+    //   text: "0|0|0",
+    //   style: {
+    //     left: `25%`,
+    //     bottom: `20px`,
+    //     fontSize: "22px",
+    //     color: "#00ffff",
+    //     transform: "translate(-50%)",
+    //     visibility: "hidden"
+    //   }
+    // })
+
+    // controls.appendChild(aButton)
+    // controls.appendChild(dButton)
+    // controls.appendChild(sButton)
+    // controls.appendChild(wButton)
+    // controls.appendChild(rButton)
+    // controls.appendChild(cButton)
+    // controls.appendChild(zButton)
+
+    // controls.appendChild(jumpButton)
+    // controls.appendChild(teamLabel)
+    // controls.appendChild(reloadLabel)
+    // controls.appendChild(moveLabel)
+    // controls.appendChild(jumpLabel)
+    // controls.appendChild(readyLabel)
 
     if (world.game.id === "craft") {
       // controls.appendChild(boostButton)
       // controls.appendChild(boostLabel)
     }
 
-    three.append(controls)
-    three.append(scoreText)
-    three.append(posText)
+    three.append(wrapper)
+    // three.append(scoreText)
+    // three.append(posText)
 
     const inventory = HtmlInventory(client)
 
@@ -106,19 +134,19 @@ export const HUDSystem = ClientSystemBuilder({
       priority: 10,
       onTick: () => {
         const settings = world.settings<{ showControls: boolean }>()
-        controls.style.display = settings.showControls ? "block" : "none"
+        // controls.style.display = settings.showControls ? "block" : "none"
 
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
-          aButton.style.backgroundColor = down.includes("a") ? active : inactive
-          dButton.style.backgroundColor = down.includes("d") ? active : inactive
-          sButton.style.backgroundColor = down.includes("s") ? active : inactive
-          wButton.style.backgroundColor = down.includes("w") ? active : inactive
-          rButton.style.backgroundColor = down.includes("r") ? active : inactive
-          cButton.style.backgroundColor = down.includes("c") ? active : inactive
-          zButton.style.backgroundColor = down.includes("z") ? active : inactive
-          // boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
-          jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
+          // aButton.style.backgroundColor = down.includes("a") ? active : inactive
+          // dButton.style.backgroundColor = down.includes("d") ? active : inactive
+          // sButton.style.backgroundColor = down.includes("s") ? active : inactive
+          // wButton.style.backgroundColor = down.includes("w") ? active : inactive
+          // rButton.style.backgroundColor = down.includes("r") ? active : inactive
+          // cButton.style.backgroundColor = down.includes("c") ? active : inactive
+          // zButton.style.backgroundColor = down.includes("z") ? active : inactive
+          // // boostButton.style.backgroundColor = down.includes("shift") ? active : inactive
+          // jumpButton.style.backgroundColor = down.includes(" ") ? active : inactive
         }
 
         const pc = client.character()
@@ -127,15 +155,15 @@ export const HUDSystem = ClientSystemBuilder({
 
           const visibility = flying ? "hidden" : "visible"
 
-          jumpButton.style.visibility = visibility
-          jumpLabel.style.visibility = visibility
+          // jumpButton.style.visibility = visibility
+          // jumpLabel.style.visibility = visibility
 
-          if (client.env !== "production" && world.debug) {
-            posText.innerHTML = `<span style='color: #00ffff'>${x.toFixed(2)}</span><span style='color: #ffff00'> ${y.toFixed(2)}</span><span style='color: #ff33cc'> ${z.toFixed(2)}</span><span style='color: #6bc6ffff'> ${client.controls.localAim.x.toFixed(2)}</span>`
-            posText.style.visibility = "visible"
-          } else {
-            posText.style.visibility = "hidden"
-          }
+          // if (client.env !== "production" && world.debug) {
+          //   posText.innerHTML = `<span style='color: #00ffff'>${x.toFixed(2)}</span><span style='color: #ffff00'> ${y.toFixed(2)}</span><span style='color: #ff33cc'> ${z.toFixed(2)}</span><span style='color: #6bc6ffff'> ${client.controls.localAim.x.toFixed(2)}</span>`
+          //   posText.style.visibility = "visible"
+          // } else {
+          //   posText.style.visibility = "hidden"
+          // }
         }
 
         inventory.update()
@@ -145,11 +173,11 @@ export const HUDSystem = ClientSystemBuilder({
         const isConnected = world.client?.net.synced
         const isWarmup = state.phase === "warmup"
 
-        cButton.style.visibility = isWarmup ? "visible" : "hidden"
-        teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
+        // cButton.style.visibility = isWarmup ? "visible" : "hidden"
+        // teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
 
-        zButton.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
-        readyLabel.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
+        // zButton.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
+        // readyLabel.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
       }
     }
   }
