@@ -3,9 +3,7 @@ import {
 } from "@piggo-gg/core"
 
 type Cluster = {
-  buttons: {
-    text: string
-  }[][]
+  buttons: string[][]
   label: string
 }
 
@@ -76,10 +74,10 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
 
         for (const button of row) {
           const btn = KeyButton({
-            text: button.text
+            text: button
           })
           rowDiv.appendChild(btn)
-          buttonElements.push({ element: btn, key: button.text.toLowerCase() })
+          buttonElements.push({ element: btn, key: button.toLowerCase() })
         }
       }
 

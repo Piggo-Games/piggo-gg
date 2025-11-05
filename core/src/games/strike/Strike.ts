@@ -208,33 +208,22 @@ const controls: HUDSystemProps = {
   clusters: [
     {
       label: "switch team",
-      buttons: [[
-        { text: "t" }
-      ]]
+      buttons: [["t"]]
     },
     {
       label: "reload",
-      buttons: [[
-        { text: "r" }
-      ]]
+      buttons: [["r"]]
     },
     {
       label: "move",
       buttons: [
-        [
-          { text: "A" },
-          { text: "S" },
-          { text: "D" },
-        ], [
-          { text: "W" },
-        ]
+        ["A", "S", "D"],
+        ["W"]
       ]
     },
     {
       label: "jump",
-      buttons: [[
-        { text: "spacebar" }
-      ]]
+      buttons: [["spacebar"]]
     }
   ]
 }
