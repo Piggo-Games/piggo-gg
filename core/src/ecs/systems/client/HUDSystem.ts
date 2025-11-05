@@ -8,22 +8,29 @@ type Cluster = {
 }
 
 export type HUDSystemProps = {
+  direction?: "column" | "row"
   clusters: Cluster[]
 }
 
 export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
   id: "HUDSystem",
   init: (world) => {
-    const { three, client } = world
-    if (!three || !client) return
-
-    if (client.mobile) return
+    const { client } = world
+    if (!client || client.mobile) return
 
     const wrapper = HDiv({
-      style: { bottom: "20px", left: "20px", display: "flex" }
+      style: {
+        bottom: "20px",
+        left: "20px",
+        display: "flex",
+        flexDirection: props.direction || "column",
+        // border: "1px solid red", 
+        width: "fit-content",
+        height: "fit-content"
+      }
     })
 
-    three.append(wrapper)
+    document.body.append(wrapper)
 
     let buttonElements: { element: HTMLButtonElement, key: string }[] = []
 
@@ -94,7 +101,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       priority: 10,
       onTick: () => {
         const settings = world.settings<{ showControls: boolean }>()
-        wrapper.style.display = settings.showControls ? "block" : "none"
+        // wrapper.style.visibility = settings.showControls ? "visible" : "hidden"
 
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
