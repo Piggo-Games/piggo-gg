@@ -35,6 +35,7 @@ export const Vince = (player: Player) => Character({
         },
         "mb1": ({ hold, mouse, world, entity }) => {
           if (hold) return
+
           const { position } = entity.components
           if (!position) return
 
