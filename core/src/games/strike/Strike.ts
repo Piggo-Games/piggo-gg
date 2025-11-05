@@ -207,6 +207,12 @@ const spawnPoints: Record<TeamNumber, XYZR[]> = {
 const controls: HUDSystemProps = {
   clusters: [
     {
+      label: "switch team",
+      buttons: [[
+        { text: "t" }
+      ]]
+    },
+    {
       label: "reload",
       buttons: [[
         { text: "r" }
@@ -216,18 +222,18 @@ const controls: HUDSystemProps = {
       label: "move",
       buttons: [
         [
-          { text: "A", hori: -50, vert: 0 },
-          { text: "S", hori: 0, vert: 0 },
-          { text: "D", hori: 50, vert: 0 }
+          { text: "A" },
+          { text: "S" },
+          { text: "D" },
         ], [
-          { text: "W", hori: 0, vert: 50 },
+          { text: "W" },
         ]
       ]
     },
     {
       label: "jump",
       buttons: [[
-        { text: "spacebar", hori: 10, vert: 10 }
+        { text: "spacebar" }
       ]]
     }
   ]

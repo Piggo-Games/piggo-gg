@@ -5,8 +5,6 @@ import {
 type Cluster = {
   buttons: {
     text: string
-    hori?: number
-    vert?: number
   }[][]
   label: string
 }
@@ -24,15 +22,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     if (client.mobile) return
 
     const wrapper = HDiv({
-      style: {
-        bottom: "20px",
-        left: "40px",
-        // border: "1px solid red",
-        display: "flex",
-        // flexDirection: "column",
-        // width: "fit-content",
-        // height: "fit-content"
-      }
+      style: { bottom: "20px", left: "20px", display: "flex" }
     })
 
     three.append(wrapper)
@@ -49,7 +39,6 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           width: "fit-content",
           height: "fit-content",
           marginBottom: "30px",
-          // border: "1px solid green",
           justifyContent: "center",
         }
       })
@@ -62,7 +51,6 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           width: "fit-content",
           display: "flex",
           flexDirection: "column-reverse",
-          // border: "1px solid blue",
           gap: "8px",
           justifyContent: "center",
           alignItems: "center"
@@ -80,21 +68,16 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            // border: "1px solid yellow",
             width: "fit-content",
             height: "fit-content"
           }
         })
         keyWrapper.appendChild(rowDiv)
 
-        // for (const button of cluster.buttons) {
         for (const button of row) {
           const btn = KeyButton({
-            text: button.text,
-            left: button.hori ? button.hori : 0,
-            bottom: button.vert ? button.vert : 0
+            text: button.text
           })
-          // keyWrapper.appendChild(btn)
           rowDiv.appendChild(btn)
           buttonElements.push({ element: btn, key: button.text.toLowerCase() })
         }
@@ -183,8 +166,6 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     const active = "rgba(0, 160, 200, 0.6)"
     const inactive = "rgba(0, 0, 0, 0.3)"
 
-    let currentApplesEaten = -1
-
     return {
       id: "HUDSystem",
       query: [],
@@ -237,10 +218,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
 
 type KeyButtonProps = {
   text: string
-  left: number
-  bottom: number
   visible?: boolean
-  width?: number
 }
 
 const KeyButton = (props: KeyButtonProps) => HtmlButton({
