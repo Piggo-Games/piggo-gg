@@ -21,8 +21,7 @@ export const EscapeMenu = (world: World): Entity => {
     display: "flex",
     flexDirection: "column",
     touchAction: "pan-y",
-    visibility: "hidden",
-    // gap: "12px"
+    visibility: "hidden"
   })
 
   let rotation = 0
@@ -104,12 +103,8 @@ export const EscapeMenu = (world: World): Entity => {
       marginTop: "16px",
       width: "200px",
       left: "50%",
-      // marginBottom: "10px",
       height: "40px",
-      pointerEvents: "auto",
-      // paddingLeft: "12px",
-      // paddingRight: "12px",
-      // fontSize: "18px",
+      pointerEvents: "auto"
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
