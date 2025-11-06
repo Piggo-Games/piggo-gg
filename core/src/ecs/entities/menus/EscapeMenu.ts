@@ -14,14 +14,15 @@ export const EscapeMenu = (world: World): Entity => {
     transform: "translate(-50%, -50%)",
     width: "404px",
     maxWidth: "94%",
-    height: "80%",
-    maxHeight: "540px",
+    height: "70%",
+    maxHeight: "400px",
     pointerEvents: "auto",
     border: "",
     display: "flex",
     flexDirection: "column",
     touchAction: "pan-y",
-    visibility: "hidden"
+    visibility: "hidden",
+    // gap: "12px"
   })
 
   let rotation = 0
@@ -46,7 +47,7 @@ export const EscapeMenu = (world: World): Entity => {
     style: {
       left: "50%",
       transform: "translate(-50%)",
-      marginBottom: "12px",
+      // marginBottom: "12px",
       width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
       transition: "transform 0.8s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
@@ -96,16 +97,19 @@ export const EscapeMenu = (world: World): Entity => {
   })
 
   const returnToHomescreen = HtmlButton({
-    text: "return to homescreen",
+    text: "return home",
     style: {
       position: "relative",
       transform: "translate(-50%)",
-      width: "260px",
+      marginTop: "16px",
+      width: "200px",
       left: "50%",
-      marginBottom: "10px",
+      // marginBottom: "10px",
       height: "40px",
       pointerEvents: "auto",
-      fontSize: "18px",
+      // paddingLeft: "12px",
+      // paddingRight: "12px",
+      // fontSize: "18px",
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
@@ -122,14 +126,14 @@ export const EscapeMenu = (world: World): Entity => {
   const settings = SettingsMenu(world)
 
   const shell = HtmlDiv({
+    position: "relative",
     width: "100%",
     top: "10px",
     flex: "1 1 auto",
+    // minHeight: "200px",
     maxHeight: "300px",
-    minHeight: 0,
     display: "flex",
     border: "none",
-    position: "relative",
     flexDirection: "column",
     touchAction: "pan-y"
   })
@@ -138,10 +142,10 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(skins.div)
   shell.appendChild(settings.div)
 
-  wrapper.appendChild(art)
-  if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
+  // wrapper.appendChild(art)
   wrapper.appendChild(submenuButtons)
   wrapper.appendChild(shell)
+  if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
 
   const menu = Entity({
     id: "EscapeMenu",
