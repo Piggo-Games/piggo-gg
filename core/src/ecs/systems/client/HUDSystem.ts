@@ -1,5 +1,5 @@
 import {
-  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv
+  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv, HImg
 } from "@piggo-gg/core"
 
 type Cluster = {
@@ -35,7 +35,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
 
     document.body.append(wrapper)
 
-    let buttonElements: { element: HTMLButtonElement, key: string }[] = []
+    let buttonElements: { element: HTMLElement, key: string }[] = []
 
     for (const cluster of props.clusters) {
       const clusterDiv = HDiv({
@@ -83,9 +83,8 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         keyWrapper.appendChild(rowDiv)
 
         for (const button of row) {
-          const btn = KeyButton({
-            text: button
-          })
+          const btn = button === "mb1" ? KeyImg("mb1.svg") : KeyButton({ text: button })
+
           rowDiv.appendChild(btn)
           buttonElements.push({ element: btn, key: button.toLowerCase() })
         }
@@ -110,7 +109,12 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         if (down) {
           for (const btn of buttonElements) {
             const check = btn.key === "spacebar" ? " " : btn.key
-            btn.element.style.backgroundColor = down.includes(check) ? active : inactive
+
+            if (check === "mb1") {
+              btn.element.style.filter = down.includes(check) ? "sepia(83%) saturate(8000%) hue-rotate(170deg)" : ""
+            } else {
+              btn.element.style.backgroundColor = down.includes(check) ? active : inactive
+            }
           }
         }
 
@@ -145,6 +149,15 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
     fontSize: "20px",
     visibility: props.visible === false ? "hidden" : "visible",
     ...ogButtonStyle
+  }
+})
+
+const KeyImg = (src: string) => HImg({
+  src,
+  style: {
+    width: "36px",
+    position: "relative",
+    transform: "translate(0%)"
   }
 })
 

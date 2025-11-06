@@ -20,7 +20,7 @@ export const Ball = () => Entity({
         const { x, y } = position.data.velocity
         position.data.rotation += 0.001 * sqrt((x * x + y * y)) * sign(x)
 
-        if (position.data.z < 25) {
+        if (position.data.z < 22) {
           collider.setGroup("2")
         } else {
           collider.setGroup("3")

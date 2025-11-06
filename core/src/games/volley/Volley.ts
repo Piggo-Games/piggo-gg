@@ -1,7 +1,7 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat, HtmlLagText, LagText, NametagSystem, PhysicsSystem,
-  PixiCameraSystem, PixiRenderSystem, Position, Renderable, ScorePanel, ShadowSystem,
-  SpawnSystem, SystemBuilder, Team, Tooltip, screenWH, switchTeamButton, values
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
+  HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
+  Renderable, ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, screenWH, values
 } from "@piggo-gg/core"
 import { Bot } from "./Bot"
 import { Ball, Bounds, Centerline, Court, Net, PostBottom, PostTop } from "./entities"
@@ -58,8 +58,7 @@ export const Volley: GameBuilder<VolleyState> = {
     ],
     entities: [
       Background({ rays: true }),
-      HtmlChat(),
-      EscapeMenu(world),
+
       Cursor(),
       Ball(),
       Court(),
@@ -69,9 +68,11 @@ export const Volley: GameBuilder<VolleyState> = {
       Net(),
       Bounds("2"),
       Bounds("3"),
+
       ScorePanel(),
-      HtmlLagText(),
-      switchTeamButton()
+      HtmlChat(),
+      EscapeMenu(world),
+      HtmlLagText()
     ]
   })
 }
@@ -167,7 +168,7 @@ const VolleySystem = SystemBuilder({
           })
         }
 
-        if (state.phase === "serve") {
+        if (state.phase === "serve" && state.hit === 0) {
           let team1 = 0
           let team2 = 0
 
@@ -258,6 +259,10 @@ const controls: HUDSystemProps = {
     {
       label: "hit",
       buttons: [["mb1"]]
+    },
+    {
+      label: "switch team",
+      buttons: [["t"]]
     }
   ]
 }

@@ -1,7 +1,7 @@
 import {
-  Action, Actions, ChangeSkin, Character, Collider, Debug, Input,
-  Move, Networked, PixiSkins, Player, Position, Renderable, Shadow,
-  Team, VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
+  Action, Actions, ChangeSkin, Character, Collider, Debug, Input, Move,
+  Networked, PixiSkins, Player, Position, Renderable, Shadow, Team,
+  VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
 } from "@piggo-gg/core"
 import { Spike } from "./Spike"
 
@@ -44,6 +44,10 @@ export const Vince = (player: Player) => Character({
           world.actions.push(world.tick + 3, entity.id, { actionId: "spike", params: { from, target } })
 
           return
+        },
+        "t": ({ hold, world }) => {
+          if (hold) return
+          world.actions.push(world.tick + 2, player.id, { actionId: "SwitchTeam" })
         }
       }
     }),
