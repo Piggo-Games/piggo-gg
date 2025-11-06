@@ -1,59 +1,53 @@
-import { Entity, Position, Renderable, TeamColors, pixiText } from "@piggo-gg/core"
-import { Graphics } from "pixi.js"
+import { Entity, HDiv, HText, NPC } from "@piggo-gg/core"
 
-export const ScorePanel = (): Entity => {
+export const ScorePanel = () => {
 
-  let left = 0
-  let right = 0
+  let init = false
 
-  const textLeft = pixiText({
-    text: "0",
-    pos: { x: -30, y: 30 },
-    anchor: { x: 0.5, y: 0.5 },
-    style: { fill: 0xffffff, fontSize: 32, dropShadow: true }
+  const div = HDiv({
+    style: {
+      display: "flex", left: "50%", top: "6px", transform: "translate(-50%)", gap: "8px"
+    }
   })
 
-  const textRight = pixiText({
+  const ScoreBlock = (color: `#${string}`) => HText({
     text: "0",
-    pos: { x: 30, y: 30 },
-    anchor: { x: 0.5, y: 0.5 },
-    style: { fill: 0xffffff, fontSize: 32, dropShadow: true }
+    style: {
+      position: "relative",
+      backgroundColor: color,
+      color: "white",
+      fontSize: "36px",
+      width: "46px",
+      height: "46px",
+      lineHeight: "46px",
+      textAlign: "center",
+      border: "2px solid white"
+    }
   })
 
-  const scorePanel = Entity<Position>({
+  const left = ScoreBlock("#ffaacccc")
+  const right = ScoreBlock("#00ccffcc")
+
+  div.append(left, right)
+
+  return Entity({
     id: "scorepanel",
     components: {
-      position: Position({ screenFixed: true }),
-      renderable: Renderable({
-        zIndex: 10,
-        anchor: { x: 0.5, y: 0 },
-        onTick: ({ world }) => {
-          const state = world.game.state as { scoreLeft: number, scoreRight: number }
-          if (left !== state.scoreLeft || right !== state.scoreRight) {
-            left = state.scoreLeft
-            right = state.scoreRight
-
-            textLeft.text = left.toString()
-            textRight.text = right.toString()
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!init) {
+            init = true
+            document.body.appendChild(div)
           }
-        },
-        setup: async (r, renderer) => {
-          const g = new Graphics()
-          g.roundRect(-55, 5, 50, 50, 10)
-            .fill({ color: TeamColors[1], alpha: 0.7 })
-            .stroke({ color: 0xffffff, width: 2, alpha: 0.9 })
-            .roundRect(5, 5, 50, 50, 10)
-            .fill({ color: TeamColors[2], alpha: 0.7 })
-            .stroke({ color: 0xffffff, width: 2, alpha: 0.9 })
 
-          r.c.addChild(g, textLeft, textRight)
+          const { scoreLeft, scoreRight } = world.game.state as { scoreLeft: number, scoreRight: number }
 
-          const { width } = renderer.wh()
-          scorePanel.components.position.setPosition({ x: width / 2, y: 0 })
+          if (Number(left.textContent) !== scoreLeft || Number(right.textContent) !== scoreRight) {
+            left.textContent = scoreLeft.toString()
+            right.textContent = scoreRight.toString()
+          }
         }
       })
     }
   })
-
-  return scorePanel
 }
