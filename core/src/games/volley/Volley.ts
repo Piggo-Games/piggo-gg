@@ -58,8 +58,7 @@ export const Volley: GameBuilder<VolleyState> = {
     ],
     entities: [
       Background({ rays: true }),
-      HtmlChat(),
-      EscapeMenu(world),
+
       Cursor(),
       Ball(),
       Court(),
@@ -69,7 +68,10 @@ export const Volley: GameBuilder<VolleyState> = {
       Net(),
       Bounds("2"),
       Bounds("3"),
+
       ScorePanel(),
+      HtmlChat(),
+      EscapeMenu(world),
       HtmlLagText(),
       switchTeamButton()
     ]

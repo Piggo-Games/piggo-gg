@@ -6,7 +6,7 @@ export const controlEntity: Action = Action("controlEntity", ({ entity, player }
   player.components.controlling = Controlling({ entityId: entity.id })
 })
 
-export const switchTeam = Action("switchTeam", ({ entity, world }) => {
+export const SwitchTeam = Action("switchTeam", ({ entity, world }) => {
   if (!entity) return
 
   const { team, controlling } = entity.components
