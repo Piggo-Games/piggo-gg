@@ -1,5 +1,52 @@
-import { Entity, Position, Renderable, TeamColors, pixiText } from "@piggo-gg/core"
+import { Entity, HDiv, HText, NPC, Position, Renderable, TeamColors, pixiText } from "@piggo-gg/core"
 import { Graphics } from "pixi.js"
+
+export const ScorePanelHtml = () => {
+
+  let init = false
+
+  const div = HDiv({
+    style: {
+      display: "flex",
+      left: "50%",
+      top: "6px",
+      transform: "translate(-50%)",
+      border: "1px solid blue",
+      width: "fit-content",
+      height: "fit-content"
+    }
+  })
+
+  const left = HText({
+    text: "0",
+    style: {
+      backgroundColor: "#ffaacc",
+      color: "white",
+      fontSize: "36px",
+      width: "46px",
+      height: "46px",
+      lineHeight: "46px",
+      textAlign: "center",
+      border: "2px solid white"
+    }
+  })
+
+  div.appendChild(left)
+
+  return Entity({
+    id: "scorepanelhtml",
+    components: {
+      npc: NPC({
+        behavior: () => {
+          if (!init) {
+            init = true
+            document.body.appendChild(div)
+          }
+        }
+      })
+    }
+  })
+}
 
 export const ScorePanel = (): Entity => {
 
