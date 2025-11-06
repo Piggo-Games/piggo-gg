@@ -28,16 +28,18 @@ export const ScorePanel = () => {
   const left = ScoreBlock("#ffaacccc")
   const right = ScoreBlock("#00ccffcc")
 
-  div.append(left, right)
-
   return Entity({
     id: "scorepanel",
     components: {
       npc: NPC({
         behavior: (_, world) => {
+          if (!world.client) return
+
           if (!init) {
-            init = true
+            div.append(left, right)
             document.body.appendChild(div)
+
+            init = true
           }
 
           const { scoreLeft, scoreRight } = world.game.state as { scoreLeft: number, scoreRight: number }
