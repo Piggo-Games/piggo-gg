@@ -8,6 +8,10 @@ export const EscapeMenu = (world: World): Entity => {
   let init = false
   let activeMenu: "lobbies" | "skins" | "settings" = "lobbies"
 
+  const bg = HtmlDiv({
+    width: "100%", height: "100%", left: "0px", top: "0px", backgroundColor: "rgba(0, 0, 0, 0.2)"
+  })
+
   const wrapper = HtmlDiv({
     top: "50%",
     left: "50%",
@@ -151,13 +155,14 @@ export const EscapeMenu = (world: World): Entity => {
           if (world.mode === "server") return
 
           if (!init) {
-            world.three?.append(wrapper)
+            world.three?.append(bg, wrapper)
             init = true
           }
 
           // overall visibility
           if (world.client) {
             const visible = world.client.menu
+            bg.style.visibility = visible ? "visible" : "hidden"
             wrapper.style.visibility = visible ? "visible" : "hidden"
 
             if (!visible) return
