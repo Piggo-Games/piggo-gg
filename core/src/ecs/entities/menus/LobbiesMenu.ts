@@ -13,7 +13,6 @@ export const LobbiesMenu = (world: World): RefreshableDiv => {
     left: "50%",
     width: "100%",
     height: "100%",
-    // minHeight: "300px",
     transform: "translate(-50%)",
     backgroundColor: "rgba(0, 0, 0, 0.2)",
     pointerEvents: "auto",
