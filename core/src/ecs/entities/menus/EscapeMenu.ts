@@ -125,7 +125,6 @@ export const EscapeMenu = (world: World): Entity => {
     width: "100%",
     top: "10px",
     flex: "1 1 auto",
-    // minHeight: "200px",
     maxHeight: "300px",
     display: "flex",
     border: "none",
