@@ -169,7 +169,7 @@ const VolleySystem = SystemBuilder({
           })
         }
 
-        if (state.phase === "serve") {
+        if (state.phase === "serve" && state.hit === 0) {
           let team1 = 0
           let team2 = 0
 
@@ -260,6 +260,10 @@ const controls: HUDSystemProps = {
     {
       label: "hit",
       buttons: [["mb1"]]
+    },
+    {
+      label: "switch team",
+      buttons: [["t"]]
     }
   ]
 }
