@@ -1,7 +1,7 @@
 import {
   Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
   HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
-  Renderable, ScorePanel, ScorePanelHtml, ShadowSystem, SpawnSystem, SystemBuilder, Team, screenWH, values
+  Renderable, ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, screenWH, values
 } from "@piggo-gg/core"
 import { Bot } from "./Bot"
 import { Ball, Bounds, Centerline, Court, Net, PostBottom, PostTop } from "./entities"
@@ -69,8 +69,7 @@ export const Volley: GameBuilder<VolleyState> = {
       Bounds("2"),
       Bounds("3"),
 
-      // ScorePanel(),
-      ScorePanelHtml(),
+      ScorePanel(),
       HtmlChat(),
       EscapeMenu(world),
       HtmlLagText()
