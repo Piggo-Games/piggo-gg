@@ -85,6 +85,8 @@ const Nametag = (player: Player, character: Character) => {
             team = player.components.team.data.team
             name = player.components.pc.data.name
 
+            console.log("updating nametag", name, team)
+
             renderable.c.removeChildren()
             renderable.c.addChild(render())
           }

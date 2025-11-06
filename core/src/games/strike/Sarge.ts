@@ -118,7 +118,7 @@ export const Sarge = (player: Player): Character => {
             const state = world.state<StrikeState>()
             if (state.phase !== "warmup") return
 
-            world.actions.push(world.tick, player.id, { actionId: "switchTeam" })
+            world.actions.push(world.tick, player.id, { actionId: "SwitchTeam" })
           },
 
           // "t": ({ hold }) => {
