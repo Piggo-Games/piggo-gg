@@ -40,8 +40,6 @@ export const ScorePanel = () => {
             document.body.appendChild(div)
           }
 
-          div.style.visibility = world.client?.busy ? "hidden" : "visible"
-
           const { scoreLeft, scoreRight } = world.game.state as { scoreLeft: number, scoreRight: number }
 
           if (Number(left.textContent) !== scoreLeft || Number(right.textContent) !== scoreRight) {
