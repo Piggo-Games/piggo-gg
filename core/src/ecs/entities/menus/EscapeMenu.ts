@@ -9,7 +9,7 @@ export const EscapeMenu = (world: World): Entity => {
   let activeMenu: "lobbies" | "skins" | "settings" = "lobbies"
 
   const bg = HtmlDiv({
-    width: "100%", height: "100%", left: "0px", top: "0px", backgroundColor: "rgba(0, 0, 0, 0.2)"
+    width: "100%", height: "100%", left: "0px", top: "0px", backgroundColor: "rgba(0, 0, 0, 0.3)"
   })
 
   const wrapper = HtmlDiv({
@@ -50,7 +50,7 @@ export const EscapeMenu = (world: World): Entity => {
     style: {
       left: "50%",
       transform: "translate(-50%)",
-      // marginBottom: "12px",
+      marginBottom: "12px",
       width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
       transition: "transform 0.8s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
@@ -93,10 +93,12 @@ export const EscapeMenu = (world: World): Entity => {
 
   const submenuButtons = HtmlDiv({
     position: "relative",
-    width: "100%",
+    width: "calc(100% + 4px)",
     display: "flex",
+    left: "-2px",
     justifyContent: "space-between",
-    border: ""
+    border: "",
+    marginTop: "14px"
   })
 
   const returnToHomescreen = HtmlButton({
@@ -142,9 +144,11 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(settings.div)
 
   // wrapper.appendChild(art)
-  wrapper.appendChild(submenuButtons)
+  // wrapper.appendChild(submenuButtons)
+  // if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
   wrapper.appendChild(shell)
-  if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
+  wrapper.appendChild(submenuButtons)
+  // if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
 
   const menu = Entity({
     id: "EscapeMenu",
