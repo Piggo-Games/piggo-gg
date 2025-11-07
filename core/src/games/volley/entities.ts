@@ -96,7 +96,7 @@ export const Bounds = (group: "2" | "3") => LineWall({
   ],
   sensor: (e2, world) => {
     if (e2.id !== "ball") return false
-    if (e2.components.position.data.z === 0) return false
+    if (e2.components.position.data.z <= 0) return false
 
     const state = world.game.state as VolleyState
     state.phase = "point"
