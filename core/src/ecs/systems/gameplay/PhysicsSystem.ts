@@ -67,7 +67,8 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           // cull static colliders
           entities = entities.filter((entity) => {
             const { collider, renderable } = entity.components
-            if (renderable?.visible === false) return false
+
+            // if (renderable?.visible === false) return false
             return (collider.isStatic === false || !collider.cullable || groups.has(collider.group))
           })
 

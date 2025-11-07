@@ -150,6 +150,8 @@ const VolleySystem = SystemBuilder({
           // wait for ball to land
           if (ballPos.data.z > 0) return
 
+          state.lastWinTick = world.tick
+
           // set score
           if (state.lastWin === 1) state.scoreLeft++
           if (state.lastWin === 2) state.scoreRight++
