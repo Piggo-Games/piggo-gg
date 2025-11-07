@@ -51,7 +51,7 @@ export const Scoreboard = () => {
         behavior: (_, world) => {
           if (!init) {
             init = true
-            document.body.appendChild(wrapper)
+            document.getElementById("canvas-parent")?.append(wrapper)
           }
 
           const players = world.players()

@@ -33,7 +33,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       }
     })
 
-    document.body.append(wrapper)
+    document.getElementById("canvas-parent")?.append(wrapper)
 
     let buttonElements: { element: HTMLElement, key: string }[] = []
 
@@ -103,7 +103,9 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       priority: 10,
       onTick: () => {
         const settings = world.settings<{ showControls: boolean }>()
-        // wrapper.style.visibility = settings.showControls ? "visible" : "hidden"
+        wrapper.style.visibility = settings.showControls ? "visible" : "hidden"
+
+        if (!settings.showControls) return
 
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
@@ -118,10 +120,10 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           }
         }
 
-        const state = world.state<{ phase: string }>()
+        // const state = world.state<{ phase: string }>()
 
-        const isConnected = world.client?.net.synced
-        const isWarmup = state.phase === "warmup"
+        // const isConnected = world.client?.net.synced
+        // const isWarmup = state.phase === "warmup"
 
         // cButton.style.visibility = isWarmup ? "visible" : "hidden"
         // teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
@@ -147,7 +149,6 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
     paddingLeft: "12px",
     height: "36px",
     fontSize: "20px",
-    visibility: props.visible === false ? "hidden" : "visible",
     ...ogButtonStyle
   }
 })

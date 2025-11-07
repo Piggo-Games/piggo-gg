@@ -128,7 +128,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             if (hold) return
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
-            if (world.client?.menu) return
 
             if (item.components.gun.data.reloading) return
 

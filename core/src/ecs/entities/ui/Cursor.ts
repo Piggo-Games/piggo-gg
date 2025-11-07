@@ -1,5 +1,4 @@
-import { Entity, Position, Renderable } from "@piggo-gg/core"
-import { Graphics } from "pixi.js"
+import { Entity, pixiCircle, Position, Renderable } from "@piggo-gg/core"
 
 export const Cursor = (): Entity => {
 
@@ -11,6 +10,7 @@ export const Cursor = (): Entity => {
         interpolate: true,
         onRender: ({ client, renderable }) => {
           renderable.visible = client.menu ? false : true
+
           document.body.style.cursor = client.menu ? "auto" : "none"
           document.documentElement.style.cursor = client.menu ? "auto" : "none"
 
@@ -19,11 +19,7 @@ export const Cursor = (): Entity => {
           cursor.components.position.data.y = y
         },
         setContainer: async () => {
-          const circle = new Graphics()
-          circle.circle(0, 0, 4)
-          circle.fill({ color: 0x00FFFF })
-
-          return circle
+          return pixiCircle({ x: 0, y: 0, r: 4, style: { color: 0x00ffff, alpha: 1 } })
         },
         zIndex: 12
       })

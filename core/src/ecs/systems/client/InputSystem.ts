@@ -62,7 +62,7 @@ export const InputSystem = ClientSystemBuilder({
     })
 
     document.addEventListener("pointerdown", (event) => {
-      if (client.busy) return
+      if (client.busy || client.menu) return
       if (world.tick <= client.clickThisFrame.value) return
 
       // @ts-expect-error

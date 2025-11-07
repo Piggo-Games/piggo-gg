@@ -24,13 +24,19 @@ export type VolleyState = {
   teamServing: 1 | 2
 }
 
-export const Volley: GameBuilder<VolleyState> = {
+export type VolleySettings = {
+  showControls: boolean
+}
+
+export const Volley: GameBuilder<VolleyState, VolleySettings> = {
   id: "volley",
   init: (world) => ({
     id: "volley",
     netcode: "rollback",
     renderer: "pixi",
-    settings: {},
+    settings: {
+      showControls: true
+    },
     state: {
       hit: 0,
       jumpHits: [],
