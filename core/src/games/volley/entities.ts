@@ -94,6 +94,7 @@ export const Bounds = (group: "2" | "3") => LineWall({
     234, 0,
     0, 0
   ],
+  // visible: true,
   sensor: (e2, world) => {
     if (e2.id !== "ball") return false
     if (e2.components.position.data.z <= 0) return false
