@@ -32,7 +32,7 @@ export const EscapeMenu = (world: World): Entity => {
 
   const artImage = HImg({
     id: "art-image",
-    style: { top: "50%", width: "144px", height: "144px", transform: "translate(-50%, -50%)" },
+    style: { top: "50%", width: "154px", height: "154px", transform: "translate(-50%, -50%)" },
     src: `${world.game.id}-256.jpg`,
     onClick: () => {
       rotation += 540
@@ -51,9 +51,8 @@ export const EscapeMenu = (world: World): Entity => {
       position: "relative",
       left: "50%",
       transform: "translate(-50%)",
-      // marginBottom: "6px",
-      width: "148px",
-      height: "148px",
+      width: "158px",
+      height: "158px",
       borderRadius: "12px",
       transition: "transform 0.8s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
@@ -143,17 +142,13 @@ export const EscapeMenu = (world: World): Entity => {
   },
     HImg({
       src: "home.svg",
-      style: {
-        transform: "translate(-50%, -50%)",
-        height: "32px"
-      }
+      style: { height: "32px" }
     })
   )
 
   const topRowDiv = HDiv({
     style: {
       position: "relative",
-      // border: "2px solid green",
       transform: "translate(-50%)",
       left: "50%",
       flexDirection: "row",
@@ -161,7 +156,7 @@ export const EscapeMenu = (world: World): Entity => {
       width: "calc(100% + 4px)",
     }
   })
-  topRowDiv.appendChild(art)
+  if (!world.client?.mobile) topRowDiv.appendChild(art)
   if (!world.client?.mobile) topRowDiv.appendChild(returnToHomescreen)
 
   wrapper.appendChild(topRowDiv)
