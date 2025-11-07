@@ -129,30 +129,26 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(skins.div)
   shell.appendChild(settings.div)
 
-  const returnToHomescreen = HImg({
-    src: "home.svg",
+  const returnToHomescreen = HButton({
     style: {
-      // position: "relative",
-      transform: "translate(0%)",
-      // marginTop: "16px",
-      // right: "0px",
-      // width: "200px",
-      right: "0px",
-      bottom: "0px",
+      width: "40px",
       height: "40px",
-      pointerEvents: "auto",
-      // border: "2px solid white",
-
-      border: "2px solid transparent",
-      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #999999)",
-      backgroundOrigin: "border-box",
-      backgroundClip: "content-box, border-box"
+      right: "0px",
+      bottom: "0px"
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
     }
-  })
+  },
+    HImg({
+      src: "home.svg",
+      style: {
+        transform: "translate(-50%, -50%)",
+        height: "32px"
+      }
+    })
+  )
 
   const topRowDiv = HDiv({
     style: {
