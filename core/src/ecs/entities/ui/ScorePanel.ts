@@ -37,7 +37,7 @@ export const ScorePanel = () => {
 
           if (!init) {
             div.append(left, right)
-            document.body.appendChild(div)
+            document.getElementById("canvas-parent")?.appendChild(div)
 
             init = true
           }

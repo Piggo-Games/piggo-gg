@@ -54,7 +54,7 @@ export const HtmlLagText = () => {
       npc: NPC({
         behavior: (_, world) => {
           if (!init) {
-            document.body.appendChild(div)
+            document.getElementById("canvas-parent")?.appendChild(div)
             init = true
           }
 

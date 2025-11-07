@@ -33,7 +33,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       }
     })
 
-    document.body.append(wrapper)
+    document.getElementById("canvas-parent")?.append(wrapper)
 
     let buttonElements: { element: HTMLElement, key: string }[] = []
 
