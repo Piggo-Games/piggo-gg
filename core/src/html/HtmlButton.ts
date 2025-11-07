@@ -1,4 +1,4 @@
-import { CSS, HtmlImg } from "@piggo-gg/core"
+import { CSS } from "@piggo-gg/core"
 
 export type HtmlButton = HTMLButtonElement
 
@@ -62,7 +62,7 @@ export type HtmlButtonProps = {
   onHoverOut?: (event: MouseEvent) => void
 }
 
-export const styleButton = (button: HtmlButton | HtmlImg, active: boolean, hovered: boolean): void => {
+export const styleButton = (button: HtmlButton, active: boolean, hovered: boolean): void => {
   button.style.boxShadow = active && hovered ? "0 0 6px 2px white" : "none"
   button.style.opacity = active ? "1" : "0.7"
 }

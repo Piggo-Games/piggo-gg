@@ -185,10 +185,6 @@ export const EscapeMenu = (world: World): Entity => {
             if (!visible) return
           }
 
-          // art.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "180px"
-          // art.style.height = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "170px"
-          // artImage.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "176px"
-
           // menu buttons
           styleButton(returnToHomescreen, world.client?.isLeader() ?? false, returnToHomescreen.matches(":hover"))
           styleButton(lobbiesButton, activeMenu !== "lobbies", lobbiesButton.matches(":hover"))
