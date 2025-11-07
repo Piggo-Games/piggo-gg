@@ -9,7 +9,7 @@ export const EscapeMenu = (world: World): Entity => {
   let activeMenu: "lobbies" | "skins" | "settings" = "lobbies"
 
   const bg = HtmlDiv({
-    width: "100%", height: "100%", left: "0px", top: "0px", backgroundColor: "rgba(0, 0, 0, 0.3)"
+    width: "100%", height: "100%", left: "0px", top: "0px", backgroundColor: "rgba(0, 0, 0, 0.4)"
   })
 
   const wrapper = HtmlDiv({
@@ -19,7 +19,7 @@ export const EscapeMenu = (world: World): Entity => {
     width: "404px",
     maxWidth: "94%",
     height: "70%",
-    maxHeight: "400px",
+    maxHeight: "460px",
     pointerEvents: "auto",
     border: "",
     display: "flex",
@@ -32,7 +32,7 @@ export const EscapeMenu = (world: World): Entity => {
 
   const artImage = HImg({
     id: "art-image",
-    style: { top: "50%", width: "176px", height: "166px", transform: "translate(-50%, -50%)" },
+    style: { top: "50%", width: "144px", height: "144px", transform: "translate(-50%, -50%)" },
     src: `${world.game.id}-256.jpg`,
     onClick: () => {
       rotation += 540
@@ -50,8 +50,11 @@ export const EscapeMenu = (world: World): Entity => {
     style: {
       left: "50%",
       transform: "translate(-50%)",
-      marginBottom: "12px",
-      width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
+      // marginBottom: "6px",
+      width: "148px",
+      height: "148px",
+      borderRadius: "12px",
+      position: "relative",
       transition: "transform 0.8s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
@@ -143,7 +146,7 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(skins.div)
   shell.appendChild(settings.div)
 
-  // wrapper.appendChild(art)
+  wrapper.appendChild(art)
   // wrapper.appendChild(submenuButtons)
   // if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
   wrapper.appendChild(shell)
@@ -172,9 +175,9 @@ export const EscapeMenu = (world: World): Entity => {
             if (!visible) return
           }
 
-          art.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "180px"
-          art.style.height = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "170px"
-          artImage.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "176px"
+          // art.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "180px"
+          // art.style.height = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "170px"
+          // artImage.style.width = (world.client?.mobile && window.outerHeight < window.outerWidth) ? "0px" : "176px"
 
           // menu buttons
           styleButton(returnToHomescreen, world.client?.isLeader() ?? false, returnToHomescreen.matches(":hover"))
