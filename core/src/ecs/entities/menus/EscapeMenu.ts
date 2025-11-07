@@ -1,5 +1,5 @@
 import {
-  CSS, Entity, HButton, HImg, HtmlButton, HtmlDiv, LobbiesMenu,
+  CSS, Entity, HButton, HDiv, HImg, HtmlButton, HtmlDiv, LobbiesMenu,
   NPC, Position, SettingsMenu, SkinsMenu, World, styleButton
 } from "@piggo-gg/core"
 
@@ -48,13 +48,13 @@ export const EscapeMenu = (world: World): Entity => {
 
   const art = HButton({
     style: {
+      position: "relative",
       left: "50%",
       transform: "translate(-50%)",
       // marginBottom: "6px",
       width: "148px",
       height: "148px",
       borderRadius: "12px",
-      position: "relative",
       transition: "transform 0.8s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
@@ -104,23 +104,6 @@ export const EscapeMenu = (world: World): Entity => {
     marginTop: "14px"
   })
 
-  const returnToHomescreen = HtmlButton({
-    text: "return home",
-    style: {
-      position: "relative",
-      transform: "translate(-50%)",
-      marginTop: "16px",
-      width: "200px",
-      left: "50%",
-      height: "40px",
-      pointerEvents: "auto"
-    },
-    onClick: () => {
-      if (!world.client?.isLeader()) return
-      world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
-    }
-  })
-
   submenuButtons.appendChild(lobbiesButton)
   submenuButtons.appendChild(skinsButton)
   submenuButtons.appendChild(settingsButton)
@@ -146,12 +129,48 @@ export const EscapeMenu = (world: World): Entity => {
   shell.appendChild(skins.div)
   shell.appendChild(settings.div)
 
-  wrapper.appendChild(art)
-  // wrapper.appendChild(submenuButtons)
-  // if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
+  const returnToHomescreen = HImg({
+    src: "home.svg",
+    style: {
+      // position: "relative",
+      transform: "translate(0%)",
+      // marginTop: "16px",
+      // right: "0px",
+      // width: "200px",
+      right: "0px",
+      bottom: "0px",
+      height: "40px",
+      pointerEvents: "auto",
+      // border: "2px solid white",
+
+      border: "2px solid transparent",
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #999999)",
+      backgroundOrigin: "border-box",
+      backgroundClip: "content-box, border-box"
+    },
+    onClick: () => {
+      if (!world.client?.isLeader()) return
+      world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
+    }
+  })
+
+  const topRowDiv = HDiv({
+    style: {
+      position: "relative",
+      // border: "2px solid green",
+      transform: "translate(-50%)",
+      left: "50%",
+      flexDirection: "row",
+      alignItems: "flex-end",
+      width: "calc(100% + 4px)",
+    }
+  })
+  topRowDiv.appendChild(art)
+  if (!world.client?.mobile) topRowDiv.appendChild(returnToHomescreen)
+
+  wrapper.appendChild(topRowDiv)
   wrapper.appendChild(shell)
   wrapper.appendChild(submenuButtons)
-  // if (!world.client?.mobile) wrapper.appendChild(returnToHomescreen)
 
   const menu = Entity({
     id: "EscapeMenu",
