@@ -35,6 +35,7 @@ export type BlockData = {
   neighbors: (chunk: XY, dist?: number) => XY[]
   invalidate: () => void
   loadMap: (map: Record<string, string>) => void
+  loadSparseMap?: (map: Record<string, string>) => void
   remove: (xyz: XYZ) => void
   needsUpdate: () => boolean
   visible: (at: XY[]) => Block[]
@@ -42,7 +43,7 @@ export type BlockData = {
 
 export const SparseBlocks = (): BlockData => {
 
-  const blocks: Record<number, Record<number, Int32Array>> = {}
+  const blocks: Record<number, Record<number, Int8Array>> = {}
 
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
@@ -77,36 +78,82 @@ export const SparseBlocks = (): BlockData => {
     clear: () => {
 
     },
+    // dump: () => {
+    //   const dump: Record<string, string> = {}
+
+    //   // const dump: string[] = []
+    //   for (let i = 0; i < chunks; i++) {
+    //     for (let j = 0; j < chunks; j++) {
+    //       const chunk = data[i][j]
+    //       if (chunk) {
+    //         const filled = chunk.some(v => v !== 0)
+    //         if (filled) {
+    //           const b64 = btoa(String.fromCharCode(...chunk))
+    //           dump[`${i}|${j}`] = b64
+    //         }
+    //       }
+    //     }
+    //   }
+    //   console.log(dump)
+    // },
     dump: () => {
       const dump: Record<string, string> = {}
 
       for (const xKey of keys(blocks)) {
-        const x = Number(xKey)
-        for (const yKey of keys(blocks[x])) {
-          const y = Number(yKey)
-          const chunk = blocks[x][y]
+        const chunkX = Number(xKey)
+        for (const yKey of keys(blocks[chunkX])) {
+          const chunkY = Number(yKey)
+          const chunk = blocks[chunkX][chunkY]
+
+
+
           if (chunk) {
-            const b64 = btoa(String.fromCharCode(...new Uint8Array(chunk.buffer)))
-            dump[`${x}|${y}`] = b64
+            const dumpable: number[] = []
+
+            for (let i = 0; i < chunk.length; i++) {
+              if (chunk[i] !== 0) {
+                
+                const x = i % 4
+                const y = floor((i % 16) / 4)
+                const z = floor(i / 16)
+
+                const packed = (x << 24) | (y << 16) | (z << 8) | chunk[i]
+
+                dumpable.push(packed)
+
+              }
+            }
+
+            const dumpableInt32 = Int32Array.from(dumpable)
+
+
+            console.log(chunkX, chunkY, dumpableInt32)
           }
         }
       }
-      console.log(dump)
+
+
+      //       const b64 = btoa(String.fromCharCode(...new Uint8Array(chunk.buffer)))
+      //       dump[`${x}|${y}`] = b64
+      //     }
+      //   }
+      // }
+      // console.log(dump)
     },
     setChunk: (chunk: XY, chunkData: string) => {
 
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
-      const chunkX = floor(x / 4)
-      const chunkY = floor(y / 4)
+      // const chunkX = floor(x / 4)
+      // const chunkY = floor(y / 4)
 
-      if (!blocks[chunkX]) blocks[chunkX] = {}
-      if (!blocks[chunkX][chunkY]) {
-        blocks[chunkX][chunkY] = new Int32Array(4 * 4 * 32)
-      }
+      // if (!blocks[chunkX]) blocks[chunkX] = {}
+      // if (!blocks[chunkX][chunkY]) {
+      //   blocks[chunkX][chunkY] = new Uint8Array(4 * 4 * 32)
+      // }
 
-      const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
-      blocks[chunkX][chunkY][offset] = type
+      // const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
+      // blocks[chunkX][chunkY][offset] = type
     },
     atIJK: (ijk: XYZ) => {
       const chunkX = floor(ijk.x / 4)
@@ -138,7 +185,7 @@ export const SparseBlocks = (): BlockData => {
 
         if (!blocks[x]) blocks[x] = {}
 
-        const decoded = new Int32Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
+        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
         blocks[x][y] = decoded
       }
     },
