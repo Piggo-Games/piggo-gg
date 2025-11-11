@@ -3,7 +3,8 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d,
+  SparseBlocks
 } from "@piggo-gg/core"
 
 export type World = {
@@ -66,7 +67,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   const world: World = {
     actions: TickBuffer(),
-    blocks: BlockData(),
+    blocks: SparseBlocks(),
     messages: TickBuffer(),
     client: undefined,
     commands: {},
