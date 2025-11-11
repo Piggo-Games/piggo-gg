@@ -3,14 +3,14 @@ import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from
 
 export type BubbleSounds = "bubble" | "hitmarker"
 export type MusicSounds = "track2" | "birdsong1"
-export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload"
-export type ToolSounds = "whiff" | "thud" | "clink" | "slash"
+export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
+export type ToolSounds = "whiff" | "thud" | "slash"
 export type EatSounds = "eat" | "eat2"
 export type VolleySounds = "spike"
 export type LaserSounds = "laser1"
 
 export type ValidSounds =
-  BubbleSounds | ClickSounds | MusicSounds | ToolSounds |
+  BubbleSounds | ClickSounds | MusicSounds |
   GunNames | EatSounds | VolleySounds | LaserSounds
 
 const load = (url: string, volume: number): Tone => {
@@ -69,14 +69,11 @@ export const Sound = (world: World): Sound => {
     ready: false,
     tones: {
       birdsong1: load("birdsong1.mp3", -20),
-      // steps: load("steps.mp3", 0),
       bubble: load("bubble.mp3", -10),
       hitmarker: load("hitmarker.mp3", -5),
-      // piano1: load("piano1.mp3", 5),
       track2: load("track2.mp3", -10),
       cassettePlay: load("cassettePlay.mp3", 0),
       cassetteStop: load("cassetteStop.mp3", -5),
-      // whoosh: load("whoosh.mp3", 0),
       click1: load("click1.mp3", -5),
       click2: load("click2.mp3", -5),
       click3: load("click3.mp3", -10),
@@ -84,14 +81,18 @@ export const Sound = (world: World): Sound => {
       ak: load("ak.mp3", -25),
       awp: load("awp.mp3", -30),
       reload: load("reload.mp3", -5),
-      // thud: load("thud.mp3", -15),
       clink: load("clink.mp3", -10),
-      // whiff: load("whiff.wav", -15),
-      // slash: load("slash.mp3", -20),
       eat: load("eat.mp3", -10),
       eat2: load("eat2.mp3", -10),
       spike: load("spike.mp3", 5),
       laser1: load("laser1.mp3", -15)
+
+      // thud: load("thud.mp3", -15),
+      // whiff: load("whiff.wav", -15),
+      // slash: load("slash.mp3", -20),
+      // steps: load("steps.mp3", 0),
+      // piano1: load("piano1.mp3", 5),
+      // whoosh: load("whoosh.mp3", 0),
     },
     stop: (name: ValidSounds) => {
       const tone = sound.tones[name]
