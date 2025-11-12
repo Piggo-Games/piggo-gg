@@ -173,16 +173,10 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             if (!beamResult) return
 
             if (world.debug) {
-              if (beamResult.inside.type === 12) {
-                world.blocks.setType(beamResult.inside, 3)
-                delete world.blocks.coloring[`${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`]
-              } else {
-                world.blocks.remove(beamResult.inside)
-              }
+              world.blocks.remove(beamResult.inside)
             } else if (beamResult.inside.type !== 12) {
               // world.blocks.setType(beamResult.inside, 12)
             } else {
-              world.blocks.setType(beamResult.inside, 12)
               const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`
               if (world.blocks.coloring[xyzstr]) {
                 const color = nextColor(world.blocks.coloring[xyzstr])
@@ -209,7 +203,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
 
           // gun
-          three.gLoader.load("laser-gun.glb", (gltf) => {
+          three.gLoader.load("deagle.glb", (gltf) => {
             mesh = gltf.scene
             mesh.scale.set(0.025, 0.025, 0.025)
 
@@ -218,7 +212,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
                 child.castShadow = true
-                child.receiveShadow = true
+                // child.receiveShadow = true
               }
             })
 
