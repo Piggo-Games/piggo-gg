@@ -7,6 +7,7 @@ import { Bob } from "./Bob"
 
 type BuildSettings = {
   showCrosshair: boolean
+  showControls: boolean
 }
 
 type BuildState = {
@@ -20,7 +21,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     netcode: "rollback",
     renderer: "three",
     settings: {
-      showCrosshair: true
+      showCrosshair: true,
+      showControls: true
     },
     state: {
       jumped: []
