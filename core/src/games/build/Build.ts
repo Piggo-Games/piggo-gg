@@ -10,7 +10,11 @@ type BuildSettings = {
   showCrosshair: boolean
 }
 
-export const Build: GameBuilder<{}, BuildSettings> = {
+type BuildState = {
+  jumped: string[]
+}
+
+export const Build: GameBuilder<BuildState, BuildSettings> = {
   id: "build",
   init: (world) => ({
     id: "build",
@@ -19,7 +23,9 @@ export const Build: GameBuilder<{}, BuildSettings> = {
     settings: {
       showCrosshair: true
     },
-    state: {},
+    state: {
+      jumped: []
+    },
     systems: [
       SpawnSystem(Bob),
       BlockPhysicsSystem("global"),
