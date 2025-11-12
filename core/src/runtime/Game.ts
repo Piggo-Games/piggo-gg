@@ -1,6 +1,6 @@
 import { Entity, NetworkedComponentData, SystemBuilder, World } from "@piggo-gg/core"
 
-export type GameTitle = "lobby" | "volley" | "craft" | "strike" | "volley3d" | ""
+export type GameTitle = "build" | "lobby" | "volley" | "craft" | "strike" | "volley3d" | ""
 // export const GameTitle: GameTitle[] = ["lobby", "volley", "craft", "strike", "volley3d"]
 
 export type Game<State extends NetworkedComponentData = {}, Settings extends {} = {}> = {
