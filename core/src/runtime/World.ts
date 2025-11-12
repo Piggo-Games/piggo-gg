@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build
 } from "@piggo-gg/core"
 
 export type World = {
@@ -74,7 +74,15 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     entities: {},
     entitiesAtTick: {},
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
-    games: { "craft": Craft, "lobby": Lobby, "strike": Strike, "volley": Volley, "volley3d": Volley3d, "": Lobby },
+    games: {
+      "build": Build,
+      "craft": Craft,
+      "lobby": Lobby,
+      "strike": Strike,
+      "volley": Volley,
+      "volley3d": Volley3d,
+      "": Lobby
+    },
     lastTick: 0,
     mode: mode ?? "client",
     pixi,
@@ -174,7 +182,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.time = now
 
       world.client?.discord?.login(world.client)
- 
+
       // store serialized entities
       world.entitiesAtTick[world.tick] = {}
       for (const entityId in world.entities) {
@@ -259,7 +267,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.game.id = game.id
 
       // set new game
-      world.game = { ... game.init(world), started: world.tick + 2 }
+      world.game = { ...game.init(world), started: world.tick + 2 }
 
       const gameStateEntity = Entity({
         id: "gameState",

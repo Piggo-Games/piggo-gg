@@ -1,12 +1,12 @@
 import {
-  Actions, Background, Entity, GameBuilder, getBrowser, HButton,
+  Actions, Background, Build, Entity, GameBuilder, getBrowser, HButton,
   HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
   NPC, piggoVersion, pixiGraphics, PixiRenderSystem, pixiText,
   Position, RefreshableDiv, Renderable, Strike, styleButton, Volley, World
 } from "@piggo-gg/core"
 
 type LobbyState = {
-  gameId: "volley" | "craft" | "strike"
+  gameId: "volley" | "craft" | "strike" | "build"
 }
 
 export const Lobby: GameBuilder = {
@@ -16,7 +16,7 @@ export const Lobby: GameBuilder = {
     renderer: "pixi",
     settings: {},
     state: {
-      gameId: "strike"
+      gameId: "build"
     },
     systems: [PixiRenderSystem],
     entities: [
@@ -87,7 +87,7 @@ const PlayButton = (world: World) => {
       if (!world.client?.isLeader()) return
 
       const state = world.state<LobbyState>()
-      if (["craft", "strike"].includes(state.gameId)) world.client?.pointerLock()
+      if (["craft", "strike", "build"].includes(state.gameId)) world.client?.pointerLock()
 
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: state.gameId } })
       world.actions.push(world.tick + 2, "world", { actionId: "game", params: { game: state.gameId } })
@@ -107,7 +107,7 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "94px", borderRadius: "8px", imageRendering: "pixelated", pointerEvents: "auto", visibility: "hidden", transform: "translate(-50%, -62%)"
+      width: "6vw", borderRadius: "8px", imageRendering: "pixelated", pointerEvents: "auto", visibility: "hidden", transform: "translate(-50%, -62%)"
     },
     id: `f${frame}`,
     src: `f${frame}.png`
@@ -141,7 +141,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "200px", height: "170px",
+        top: "16px", left: "16px", width: "13.4vw", aspectRatio: "20 / 17",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -163,7 +163,7 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "28px", color: "#ffc0cb", left: "50%", top: "120px", transform: "translate(-50%)"
+          fontSize: "2vw", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
         }
       })
     )
@@ -231,7 +231,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
 
 const GameLobby = (): Entity => {
 
-  const list: GameBuilder[] = [Strike, Volley]
+  const list: GameBuilder[] = [Strike, Build, Volley]
 
   let gameButtons: HTMLButtonElement[] = []
 
@@ -275,10 +275,9 @@ const GameLobby = (): Entity => {
 
             const shell = HtmlDiv({
               left: "50%",
-              top: "14%",
+              top: "calc(13.4vw + 20px)",
               transform: "translate(-50%)",
               display: "flex",
-              border: "none",
               flexDirection: "column"
             })
 
@@ -316,7 +315,7 @@ const GameLobby = (): Entity => {
 
             lobbiesMenu = LobbiesMenu(world)
             lobbiesShell.appendChild(lobbiesMenu.div)
-            shell.appendChild(lobbiesShell)
+            // shell.appendChild(lobbiesShell)
           }
 
 

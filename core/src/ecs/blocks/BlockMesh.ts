@@ -24,7 +24,7 @@ export const BlockMesh = (maxCount: number): BlockMesh => {
   return mesh
 }
 
-export const BlockMeshSysten = ClientSystemBuilder({
+export const BlockMeshSystem = ClientSystemBuilder({
   id: "BlockMeshSystem",
   init: (world) => {
     const { three } = world

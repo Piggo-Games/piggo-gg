@@ -2,7 +2,7 @@ import {
   BlockPhysicsSystem, Apple, ThreeCameraSystem, ThreeNametagSystem, logPerf,
   min, UIProfile, Random, randomInt, SpawnSystem, Sky, SystemBuilder,
   XYZdistance, HtmlChat, Crosshair, GameBuilder, spawnTerrain, EscapeMenu,
-  ThreeSystem, InventorySystem, BlockPreview, Sun, BlockMeshSysten, HUDSystem
+  ThreeSystem, InventorySystem, BlockPreview, Sun, BlockMeshSystem, HUDSystem
 } from "@piggo-gg/core"
 import { Carl } from "./Carl"
 import { MobileUI } from "./MobileUI"
@@ -58,11 +58,11 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       CraftSystem,
-      HUDSystem,
+      // HUDSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSysten
+      BlockMeshSystem
     ],
     entities: [
       Crosshair(),

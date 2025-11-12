@@ -88,7 +88,7 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
         const diff = msg.tick - world.tick
         latestClientDiff[msg.playerId] = diff
 
-        if (diff < 1 || world.tick % 200 === 0) {
+        if ((diff < 1 || world.tick % 200 === 0) && game !== "lobby") {
           console.log(`diff:${diff} lag:${latestClientLag[msg.playerId]}ms player:${ws.data.playerId} name:${ws.data.playerName}`)
         }
       }
