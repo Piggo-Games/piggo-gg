@@ -316,7 +316,7 @@ const GameLobby = (): Entity => {
 
             lobbiesMenu = LobbiesMenu(world)
             lobbiesShell.appendChild(lobbiesMenu.div)
-            shell.appendChild(lobbiesShell)
+            // shell.appendChild(lobbiesShell)
           }
 
 
