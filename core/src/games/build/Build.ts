@@ -1,19 +1,24 @@
-import { BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder, Hitmarker, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, SpawnSystem, Sun, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem } from "@piggo-gg/core"
+import {
+  BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
+  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem,
+  SpawnSystem, Sun, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
+} from "@piggo-gg/core"
 import { Bob } from "./Bob"
 
+type BuildSettings = {
+  showCrosshair: boolean
+}
 
-export const Build: GameBuilder = {
+export const Build: GameBuilder<{}, BuildSettings> = {
   id: "build",
   init: (world) => ({
     id: "build",
     netcode: "rollback",
     renderer: "three",
     settings: {
-
+      showCrosshair: true
     },
-    state: {
-
-    },
+    state: {},
     systems: [
       SpawnSystem(Bob),
       BlockPhysicsSystem("global"),
