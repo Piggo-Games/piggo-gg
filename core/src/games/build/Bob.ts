@@ -389,12 +389,12 @@ export const Bob = (player: Player): Character => {
           // entity.components.three.o.push(hitboxes.body, hitboxes.head)
 
           // character model
-          three.gLoader.load("swat.glb", (gltf) => {
+          three.gLoader.load("cowboy.glb", (gltf) => {
 
             pig = cloneSkeleton(gltf.scene)
             pig.animations = gltf.animations
             pig.frustumCulled = false
-            pig.scale.set(0.32, 0.32, 0.32)
+            pig.scale.set(0.18, 0.18, 0.18)
 
             // helper = new SkeletonHelper(pig.children[0].children[1])
 
@@ -403,8 +403,8 @@ export const Bob = (player: Player): Character => {
 
             pigMixer = new AnimationMixer(pig)
 
-            idleAnimation = pigMixer.clipAction(pig.animations[8])
-            runAnimation = pigMixer.clipAction(pig.animations[22])
+            idleAnimation = pigMixer.clipAction(pig.animations[2])
+            runAnimation = pigMixer.clipAction(pig.animations[8])
             deathAnimation = pigMixer.clipAction(pig.animations[0])
             deathAnimation.loop = 2200
             deathAnimation.clampWhenFinished = true
