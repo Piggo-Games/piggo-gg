@@ -141,7 +141,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "13vw", aspectRatio: "20 / 17",
+        top: "16px", left: "16px", width: "13.4vw", aspectRatio: "20 / 17",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -275,7 +275,7 @@ const GameLobby = (): Entity => {
 
             const shell = HtmlDiv({
               left: "50%",
-              top: "calc(13vw + 20px)",
+              top: "calc(13.4vw + 20px)",
               transform: "translate(-50%)",
               display: "flex",
               flexDirection: "column"
