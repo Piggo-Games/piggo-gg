@@ -62,14 +62,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
     }
   }
 
-  const item = Entity<ItemComponents | Gun>({
+  const item = Entity<ItemComponents>({
     id: `blaster-${character.id}`,
     components: {
       position: Position(),
       effects: Effects(),
       networked: Networked(),
       item: Item({ name: "blaster", stackable: false }),
-      gun: Gun({ name: "deagle", clipSize: 7, automatic: false, reloadTime: 60, damage: 35, fireRate: 5, bulletSize: 0.02, speed: 3 }),
       npc: NPC({
         behavior: (_, world) => {
           const { recoil } = character.components.position.data
@@ -81,15 +80,15 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           const { gun } = item.components
 
-          if (world.tick === gun.data.reloading) {
-            gun.ammo = 7
-            gun.data.reloading = null
-          }
+          // if (world.tick === gun.data.reloading) {
+          //   gun.ammo = 7
+          //   gun.data.reloading = null
+          // }
 
-          if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {
-            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
-            world.client.sound.play({ name: "reload" })
-          }
+          // if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {
+          //   world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
+          //   world.client.sound.play({ name: "reload" })
+          // }
 
           // dummy auto reload
           if (character.id.includes("dummy") && world.tick % 120 === 0) {
@@ -112,29 +111,9 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-          "r": ({ hold, client, world }) => {
-            if (hold) return
-
-            const { gun } = item.components
-
-            if (gun.ammo >= 7) return
-            if (gun.data.reloading) return
-
-            client.sound.play({ name: "reload" })
-
-            return { actionId: "reload", params: { value: world.tick + 40 } }
-          },
-          "mb1": ({ hold, character, world, aim, client, delta }) => {
-            if (hold) return
+          "mb1": ({ character, world, aim, client, delta }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
-
-            if (item.components.gun.data.reloading) return
-
-            if (item.components.gun!.ammo <= 0) {
-              world.client?.sound.play({ name: "clink" })
-              return
-            }
 
             if (cd + 5 > world.tick) return
             cd = world.tick
@@ -205,10 +184,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             aim.y += error.y
           }
 
-          if (!offline) item.components.gun!.ammo -= 1
-
           // apply recoil
-          character.components.position.data.recoil = min(1.4, recoil + 0.45)
+          // character.components.position.data.recoil = min(1.4, recoil + 0.45)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)
@@ -310,29 +287,27 @@ export const BlasterItem = ({ character }: { character: Character }) => {
               world.blocks.remove(hit.block.inside)
             }
 
-            // if (!beamResult) return
+            if (!beamResult) return
 
-            // item.components.gun!.ammo += 1
-
-            // if (world.debug) {
-            //   if (beamResult.inside.type === 12) {
-            //     world.blocks.setType(beamResult.inside, 3)
-            //     delete world.blocks.coloring[`${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`]
-            //   } else {
-            //     world.blocks.remove(beamResult.inside)
-            //   }
-            // } else if (beamResult.inside.type !== 12) {
-            //   world.blocks.setType(beamResult.inside, 12)
-            // } else {
-            //   world.blocks.setType(beamResult.inside, 12)
-            //   const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`
-            //   if (world.blocks.coloring[xyzstr]) {
-            //     const color = nextColor(world.blocks.coloring[xyzstr])
-            //     world.blocks.coloring[xyzstr] = color
-            //   } else {
-            //     world.blocks.coloring[xyzstr] = `slategray`
-            //   }
-            // }
+            if (world.debug) {
+              if (beamResult.inside.type === 12) {
+                world.blocks.setType(beamResult.inside, 3)
+                delete world.blocks.coloring[`${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`]
+              } else {
+                world.blocks.remove(beamResult.inside)
+              }
+            } else if (beamResult.inside.type !== 12) {
+              world.blocks.setType(beamResult.inside, 12)
+            } else {
+              world.blocks.setType(beamResult.inside, 12)
+              const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`
+              if (world.blocks.coloring[xyzstr]) {
+                const color = nextColor(world.blocks.coloring[xyzstr])
+                world.blocks.coloring[xyzstr] = color
+              } else {
+                world.blocks.coloring[xyzstr] = `slategray`
+              }
+            }
           }
         }),
       }),
@@ -438,11 +413,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           mesh.rotation.y = aim.x
           mesh.rotation.x = aim.y + localRecoil * 0.5
-
-          if (item.components.gun.data.reloading) {
-            const delta = item.components.gun.data.reloading - world.tick - ratio
-            mesh.rotation.x = -(PI * 6) / 40 * delta
-          }
         }
       })
     },
