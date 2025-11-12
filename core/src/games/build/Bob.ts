@@ -30,16 +30,14 @@ export const Bob = (player: Player): Character => {
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
 
-  const isDummy = player.id.includes("dummy")
-
   const bob = Character({
     id: `bob-${player.id}`,
     components: {
       position: Position({
+        x: 8.12, y: 8, z: 2,
         friction: true,
         gravity: 0.003,
-        x: isDummy ? 7.2 + player.components.team.data.team * 0.6 : 8.12, y: isDummy ? 5.3 : 8, z: 2,
-        aim: isDummy ? { x: -3.14, y: 0 } : { x: 0, y: 0 }
+        aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
       inventory: Inventory([BlasterItem, HookItem]),
@@ -108,7 +106,7 @@ export const Bob = (player: Player): Character => {
             bob.components.position.data.flying = !bob.components.position.data.flying
           },
 
-          "t" : ({ hold, world, character }) => {
+          "t": ({ hold, world, character }) => {
             if (hold) return
 
             const pos = character?.components.position.data
