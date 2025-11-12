@@ -31,251 +31,13 @@ export type BlockData = {
   setChunk: (chunk: XY, data: string) => void
   setType: (ijk: XYZ, type: number) => void
   atIJK: (ijk: XYZ) => number | undefined
-  // highestBlockIJ: (pos: XY, max?: number) => XYZ | undefined
+  highestBlockIJ: (pos: XY, max?: number) => XYZ | undefined
   neighbors: (chunk: XY, dist?: number) => XY[]
   invalidate: () => void
   loadMap: (map: Record<string, string>) => void
-  loadSparseMap?: (map: Record<string, string>) => void
   remove: (xyz: XYZ) => void
   needsUpdate: () => boolean
   visible: (at: XY[]) => Block[]
-}
-
-export const SparseBlocks = (): BlockData => {
-
-  const blocks: Record<number, Record<number, Int8Array>> = {}
-
-  let visibleCache: Record<string, Block[]> = {}
-  let visibleDirty: Record<string, boolean> = {}
-
-  const chunkey = (x: number, y: number) => `${x}:${y}`
-  const chunkval = (x: number, y: number) => blocks[x]?.[y]
-
-  const val = (x: number, y: number, z: number) => {
-    const chunkX = floor(x / 4)
-    const chunkY = floor(y / 4)
-
-    const chunk = chunkval(chunkX, chunkY)
-    if (!chunk) return chunk
-
-    const xIndex = x - chunkX * 4
-    const yIndex = y - chunkY * 4
-    const index = z * 16 + yIndex * 4 + xIndex
-
-    return chunk[index]
-  }
-
-  const s: BlockData = {
-    coloring: {
-      // "34,49,3": "mediumseagreen"
-    },
-    add: (block: Block) => {
-      return false
-    },
-    addPlan: (plan: BlockPlan) => {
-      return false
-    },
-    clear: () => {
-
-    },
-    // dump: () => {
-    //   const dump: Record<string, string> = {}
-
-    //   // const dump: string[] = []
-    //   for (let i = 0; i < chunks; i++) {
-    //     for (let j = 0; j < chunks; j++) {
-    //       const chunk = data[i][j]
-    //       if (chunk) {
-    //         const filled = chunk.some(v => v !== 0)
-    //         if (filled) {
-    //           const b64 = btoa(String.fromCharCode(...chunk))
-    //           dump[`${i}|${j}`] = b64
-    //         }
-    //       }
-    //     }
-    //   }
-    //   console.log(dump)
-    // },
-    dump: () => {
-      const dump: Record<string, string> = {}
-
-      for (const xKey of keys(blocks)) {
-        const chunkX = Number(xKey)
-        for (const yKey of keys(blocks[chunkX])) {
-          const chunkY = Number(yKey)
-          const chunk = blocks[chunkX][chunkY]
-
-
-
-          if (chunk) {
-            const dumpable: number[] = []
-
-            for (let i = 0; i < chunk.length; i++) {
-              if (chunk[i] !== 0) {
-                
-                const x = i % 4
-                const y = floor((i % 16) / 4)
-                const z = floor(i / 16)
-
-                const packed = (x << 24) | (y << 16) | (z << 8) | chunk[i]
-
-                dumpable.push(packed)
-
-              }
-            }
-
-            const dumpableInt32 = Int32Array.from(dumpable)
-
-
-            console.log(chunkX, chunkY, dumpableInt32)
-          }
-        }
-      }
-
-
-      //       const b64 = btoa(String.fromCharCode(...new Uint8Array(chunk.buffer)))
-      //       dump[`${x}|${y}`] = b64
-      //     }
-      //   }
-      // }
-      // console.log(dump)
-    },
-    setChunk: (chunk: XY, chunkData: string) => {
-
-    },
-    setType: ({ x, y, z }: XYZ, type: number) => {
-      // const chunkX = floor(x / 4)
-      // const chunkY = floor(y / 4)
-
-      // if (!blocks[chunkX]) blocks[chunkX] = {}
-      // if (!blocks[chunkX][chunkY]) {
-      //   blocks[chunkX][chunkY] = new Uint8Array(4 * 4 * 32)
-      // }
-
-      // const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
-      // blocks[chunkX][chunkY][offset] = type
-    },
-    atIJK: (ijk: XYZ) => {
-      const chunkX = floor(ijk.x / 4)
-      const chunkY = floor(ijk.y / 4)
-
-      const indexX = ijk.z * 16 + (ijk.y - chunkY * 4) * 4 + (ijk.x - chunkX * 4)
-
-      if (blocks[chunkX]?.[chunkY]?.[indexX] === undefined) return undefined
-
-      return blocks[chunkX]?.[chunkY]?.[indexX]
-    },
-    neighbors: (chunk: XY, dist: number = 1) => {
-      const neighbors: XY[] = []
-
-      for (let dx = -dist; dx <= dist; dx++) {
-        for (let dy = -dist; dy <= dist; dy++) {
-          if (!blocks[chunk.x + dx]?.[chunk.y + dy]) continue
-          neighbors.push({ x: chunk.x + dx, y: chunk.y + dy })
-        }
-      }
-      return neighbors
-    },
-    invalidate: () => {
-
-    },
-    loadMap: (map: Record<string, string>) => {
-      for (const chunk in map) {
-        const [x, y] = chunk.split("|").map(Number)
-
-        if (!blocks[x]) blocks[x] = {}
-
-        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
-        blocks[x][y] = decoded
-      }
-    },
-    remove: ({ x, y, z }) => {
-      const chunkX = floor(x / 4)
-      const chunkY = floor(y / 4)
-
-      if (!blocks[chunkX]?.[chunkY]) {
-        // console.error("CHUNK NOT FOUND", chunkX, chunkY)
-        return
-      }
-
-      const xIndex = x - chunkX * 4
-      const yIndex = y - chunkY * 4
-
-      const index = z * 16 + yIndex * 4 + xIndex
-
-      if (blocks[chunkX][chunkY][index] === undefined) {
-        console.error("INVALID INDEX", index, xIndex, yIndex, z)
-        return
-      }
-
-      blocks[chunkX][chunkY][index] = 0
-    },
-    needsUpdate: () => {
-      return false
-    },
-    visible: (at: XY[]) => {
-      const result: Block[] = []
-      const time = performance.now()
-
-      const start = 0
-      const end = at.length
-      const step = 1
-
-      for (let i = start; i !== end; i += step) {
-        const pos = at[i]
-
-        // chunk exists
-        const chunk = chunkval(pos.x, pos.y)
-        if (!chunk) continue
-
-        // check cache
-        const key = `${pos.x}:${pos.y}`
-        if (visibleCache[key] && !visibleDirty[key]) {
-          result.push(...visibleCache[key])
-          continue
-        }
-
-        const chunkResult: Block[] = []
-
-        // find blocks in the chunk
-        for (let z = 0; z < 32; z++) {
-          for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
-
-              const index = z * 16 + y * 4 + x
-              const type = chunk[index]
-              if (type === 0) continue
-
-              const thisX = pos.x * 4 + x
-              const thisY = pos.y * 4 + y
-
-              // check if the block is visible
-              if (
-                !val(thisX + 1, thisY, z) || !val(thisX - 1, thisY, z) ||
-                !val(thisX, thisY + 1, z) || !val(thisX, thisY - 1, z) ||
-                !val(thisX, thisY, z + 1) || !val(thisX, thisY, z - 1)
-              ) {
-                const ijk = { x: x + pos.x * 4, y: y + pos.y * 4, z }
-
-                const block: Block = { ...ijk, type }
-                chunkResult.push(block)
-              }
-            }
-          }
-        }
-        visibleCache[key] = chunkResult
-        result.push(...chunkResult)
-      }
-
-      visibleDirty = {}
-      logPerf("BlockData.visible", time)
-      return result
-    },
-
-
-  }
-
-  return s
 }
 
 export const BlockData = (): BlockData => {
@@ -314,30 +76,30 @@ export const BlockData = (): BlockData => {
     coloring: {
       // "34,49,3": "mediumseagreen"
     },
-    // highestBlockIJ: (pos: XY, max?: number): XYZ | undefined => {
-    //   let level = 0
+    highestBlockIJ: (pos: XY, max?: number): XYZ | undefined => {
+      let level = 0
 
-    //   const xChunk = floor(pos.x / 4)
-    //   const yChunk = floor(pos.y / 4)
+      const xChunk = floor(pos.x / 4)
+      const yChunk = floor(pos.y / 4)
 
-    //   const chunk = data[xChunk]?.[yChunk]
+      const chunk = data[xChunk]?.[yChunk]
 
-    //   if (max && max > 32) max = 32
+      if (max && max > 32) max = 32
 
-    //   if (chunk !== undefined) {
+      if (chunk !== undefined) {
 
-    //     const offset = (pos.x - xChunk * 4) + (pos.y - yChunk * 4) * 4
+        const offset = (pos.x - xChunk * 4) + (pos.y - yChunk * 4) * 4
 
-    //     const zStart = 0
-    //     for (let z = zStart; z < (max ?? 32); z++) {
-    //       const index = z * 16 + offset
-    //       const type = chunk[index]
-    //       if (type !== 0) level = z
-    //     }
-    //     return { x: pos.x, y: pos.y, z: level }
-    //   }
-    //   return undefined
-    // },
+        const zStart = 0
+        for (let z = zStart; z < (max ?? 32); z++) {
+          const index = z * 16 + offset
+          const type = chunk[index]
+          if (type !== 0) level = z
+        }
+        return { x: pos.x, y: pos.y, z: level }
+      }
+      return undefined
+    },
     clear: () => {
       for (let i = 0; i < chunks; i++) {
         for (let j = 0; j < chunks; j++) {
