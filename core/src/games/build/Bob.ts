@@ -95,30 +95,30 @@ export const Bob = (player: Player): Character => {
             return { actionId: "ready" }
           },
 
-          "t": ({ hold, world }) => {
-            if (hold) return
-            const state = world.state<StrikeState>()
-            if (state.phase !== "warmup") return
+          // "t": ({ hold, world }) => {
+          //   if (hold) return
+          //   const state = world.state<StrikeState>()
+          //   if (state.phase !== "warmup") return
 
-            world.actions.push(world.tick, player.id, { actionId: "SwitchTeam" })
+          //   world.actions.push(world.tick, player.id, { actionId: "SwitchTeam" })
+          // },
+
+          "f": ({ hold }) => {
+            if (hold) return
+            bob.components.position.data.flying = !bob.components.position.data.flying
           },
 
-          // "t": ({ hold }) => {
-          //   if (hold) return
-          //   bob.components.position.data.flying = !bob.components.position.data.flying
-          // },
+          "t" : ({ hold, world, character }) => {
+            if (hold) return
 
-          // "e" : ({ hold, world, character }) => {
-          //   if (hold) return
+            const pos = character?.components.position.data
+            const dir = world.three?.camera.dir(world)
+            const camera = world.three?.camera.pos()
 
-          //   const pos = character?.components.position.data
-          //   const dir = world.three?.camera.dir(world)
-          //   const camera = world.three?.camera.pos()
+            if (!pos || !dir || !camera) return
 
-          //   if (!pos || !dir || !camera) return
-
-          //   return { actionId: "hook", params: { pos, dir, camera } }
-          // },
+            return { actionId: "hook", params: { pos, dir, camera } }
+          },
 
           "q": ({ world, hold }) => {
             if (hold) return

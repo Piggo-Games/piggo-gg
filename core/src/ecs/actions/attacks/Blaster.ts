@@ -1,6 +1,6 @@
 import {
   Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
-  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, nextColor, NPC, PI,
+  hypot, Input, Item, ItemComponents, max, min, Networked, nextColor, NPC,
   Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
   rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
@@ -24,21 +24,11 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   const mvtError = 0.04
   const jmpError = 0.12
 
-  const recoilRate = 0.04
+  const recoilRate = 0.06
 
   const spawnParticles = (pos: XYZ, world: World, blood = false) => {
     const proto = particles[0]
     if (!proto) return
-
-    // decal particle
-    if (!blood) {
-      const decal = proto.mesh.clone()
-      decal.material = new MeshPhongMaterial({ color: decalColor, emissive: decalColor })
-      decal.position.set(pos.x, pos.z, pos.y)
-
-      particles.push({ mesh: decal, tick: world.tick, velocity: { x: 0, y: 0, z: 0 }, pos: { ...pos }, duration: 240, gravity: 0 })
-      world.three?.scene.add(decal)
-    }
 
     // explosion particles
     for (let i = 0; i < 20; i++) {
@@ -73,22 +63,9 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         behavior: (_, world) => {
           const { recoil } = character.components.position.data
 
-          // TODO move to a system
           if (recoil > 0) {
             character.components.position.data.recoil = max(0, recoil - recoilRate)
           }
-
-          const { gun } = item.components
-
-          // if (world.tick === gun.data.reloading) {
-          //   gun.ammo = 7
-          //   gun.data.reloading = null
-          // }
-
-          // if (gun.ammo <= 0 && world.client?.mobile && !gun.data.reloading && recoil <= 0) {
-          //   world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
-          //   world.client.sound.play({ name: "reload" })
-          // }
 
           // dummy auto reload
           if (character.id.includes("dummy") && world.tick % 120 === 0) {
@@ -174,18 +151,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           const { recoil } = character.components.position.data
 
-          if (recoil) {
-            aim.y += recoil * 0.1
-            aim.x += recoil * params.rng * 0.5
-          }
-
-          if (error) {
-            aim.x += error.x
-            aim.y += error.y
-          }
-
           // apply recoil
-          // character.components.position.data.recoil = min(1.4, recoil + 0.45)
+          character.components.position.data.recoil = min(0.7, recoil + 0.45)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)
