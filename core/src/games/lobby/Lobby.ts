@@ -1,12 +1,12 @@
 import {
-  Actions, Background, Entity, GameBuilder, getBrowser, HButton,
+  Actions, Background, Build, Entity, GameBuilder, getBrowser, HButton,
   HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
   NPC, piggoVersion, pixiGraphics, PixiRenderSystem, pixiText,
   Position, RefreshableDiv, Renderable, Strike, styleButton, Volley, World
 } from "@piggo-gg/core"
 
 type LobbyState = {
-  gameId: "volley" | "craft" | "strike"
+  gameId: "volley" | "craft" | "strike" | "build"
 }
 
 export const Lobby: GameBuilder = {
@@ -16,7 +16,7 @@ export const Lobby: GameBuilder = {
     renderer: "pixi",
     settings: {},
     state: {
-      gameId: "strike"
+      gameId: "build"
     },
     systems: [PixiRenderSystem],
     entities: [
@@ -87,7 +87,7 @@ const PlayButton = (world: World) => {
       if (!world.client?.isLeader()) return
 
       const state = world.state<LobbyState>()
-      if (["craft", "strike"].includes(state.gameId)) world.client?.pointerLock()
+      if (["craft", "strike", "build"].includes(state.gameId)) world.client?.pointerLock()
 
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: state.gameId } })
       world.actions.push(world.tick + 2, "world", { actionId: "game", params: { game: state.gameId } })
@@ -231,7 +231,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
 
 const GameLobby = (): Entity => {
 
-  const list: GameBuilder[] = [Strike, Volley]
+  const list: GameBuilder[] = [Strike, Build, Volley]
 
   let gameButtons: HTMLButtonElement[] = []
 
