@@ -25,7 +25,7 @@ export type CSS = Partial<{
   flexShrink: number
   float: "left" | "right" | "none"
   fontFamily: "Courier New" | "Arial"
-  fontSize: `${number}px`
+  fontSize: `${number}px` | `${number}vw` | `${number}vh`
   fontWeight: "normal" | "bold" | "bolder" | "lighter" | number
   gap: `${number}px` | `${number}%`
   height: "inherit" | `${number}px` | `${number}%` | "auto" | `${number}vh` | `${number}dvh` | "fit-content"
@@ -61,7 +61,7 @@ export type CSS = Partial<{
   textDecoration: "none" | "underline" | "line-through"
   textDecorationStyle: "solid" | "dashed" | "dotted"
   textShadow: "none" | `${number}px ${number}px ${number}px rgba(${number}, ${number}, ${number}, ${number})`
-  top: `${number}%` | `${number}px` | `${number}dvh`
+  top: `${number}%` | `${number}px` | `${number}dvh` | `calc(${string})`
   touchAction: "none" | "pan-x" | "pan-y" | "pan-x pan-y" | "manipulation"
   transform: `translate(${number}%)` | `translate(${number}%, ${number}%)` | `rotate(${number}deg)`
   transition: string

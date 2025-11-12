@@ -141,7 +141,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "12vw", aspectRatio: "20 / 17",
+        top: "16px", left: "16px", width: "13vw", aspectRatio: "20 / 17",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -163,7 +163,7 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "28px", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
+          fontSize: "2vw", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
         }
       })
     )
@@ -275,10 +275,9 @@ const GameLobby = (): Entity => {
 
             const shell = HtmlDiv({
               left: "50%",
-              top: "14%",
+              top: "calc(13vw + 20px)",
               transform: "translate(-50%)",
               display: "flex",
-              border: "none",
               flexDirection: "column"
             })
 
