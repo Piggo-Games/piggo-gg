@@ -1,6 +1,6 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
-  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, spawnFlat,
+  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
   SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
@@ -43,6 +43,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       Crosshair(),
       EscapeMenu(world),
       HtmlChat(),
+      Sky(),
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
@@ -62,6 +63,10 @@ const BuildSystem = SystemBuilder({
       query: [],
       priority: 3,
       onTick: () => {
+
+        if (world.client && !world.client.mobile) {
+          world.client.menu = document.pointerLockElement === null
+        }
 
       }
     }
