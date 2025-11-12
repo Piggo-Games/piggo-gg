@@ -44,8 +44,6 @@ export const Discord = (): Discord | undefined => {
             client.lobbyCreate("lobby")
           })
         })
-
-        // client.lobbyCreate("lobby")
       }
 
       client.discordMe(foundCookie, noCookie)
