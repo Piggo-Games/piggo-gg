@@ -351,7 +351,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
 
           // gun
-          three.gLoader.load("deagle.glb", (gltf) => {
+          three.gLoader.load("laser-gun.glb", (gltf) => {
             mesh = gltf.scene
             mesh.scale.set(0.025, 0.025, 0.025)
 
