@@ -1,7 +1,6 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
-  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem,
-  spawnFlat,
+  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, spawnFlat,
   SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
