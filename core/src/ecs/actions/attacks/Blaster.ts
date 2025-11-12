@@ -1,13 +1,12 @@
 import {
   Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
-  hypot, Input, Item, ItemComponents, max, min, Networked, nextColor, NPC,
-  Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
-  rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance, XYZstring
+  Input, Item, ItemComponents, max, min, Networked, nextColor, NPC, Position,
+  randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
 import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
-  pos: XYZ, aim: XY, targets: Target[], rng: number, error: XY
+  pos: XYZ, aim: XY
 }
 
 export const BlasterItem = ({ character }: { character: Character }) => {
@@ -17,16 +16,12 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let tracerState = { tick: 0, velocity: { x: 0, y: 0, z: 0 }, pos: { x: 0, y: 0, z: 0 } }
 
   const particles: { mesh: Mesh, velocity: XYZ, pos: XYZ, duration: number, tick: number, gravity: number }[] = []
-  const decalColor = new Color("#333333")
 
   let cd = -100
 
-  const mvtError = 0.04
-  const jmpError = 0.12
-
   const recoilRate = 0.06
 
-  const spawnParticles = (pos: XYZ, world: World, blood = false) => {
+  const spawnParticles = (pos: XYZ, world: World) => {
     const proto = particles[0]
     if (!proto) return
 
@@ -36,16 +31,16 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       mesh.position.set(pos.x, pos.z, pos.y)
 
       // vary the color
-      const color = blood ? new Color(`rgb(200, 0, 0)`) : new Color(`rgb(255, ${randomInt(256)}, 0)`)
+      const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
       mesh.material = new MeshPhongMaterial({ color, emissive: color })
 
       particles.push({
         mesh,
         tick: world.tick,
-        velocity: randomVector3(blood ? 0.015 : 0.03),
+        velocity: randomVector3(0.03),
         pos: { ...pos },
-        duration: blood ? 16 : 6,
-        gravity: blood ? 0.0023 : 0
+        duration: 6,
+        gravity: 0
       })
 
       world.three?.scene.add(mesh)
@@ -95,33 +90,9 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             if (cd + 5 > world.tick) return
             cd = world.tick
 
-            const { position, team } = character.components
-            const pos = position.xyz()
+            const pos = character.components.position.xyz()
 
-            const targets: Target[] = world.characters()
-              .filter(c => c.id !== character.id)
-              .filter(c => c.components.health && c.components.health.data.hp > 0)
-              .filter(c => c.components.team.data.team !== team.data.team)
-              .map(target => ({
-                ...target.components.position.interpolate(world, delta ?? 0),
-                id: target.id
-              }))
-
-            targets.sort((a, b) => {
-              const aDist = XYZdistance(pos, a)
-              const bDist = XYZdistance(pos, b)
-              return aDist - bDist
-            })
-
-            const velocity = hypot(position.data.velocity.x, position.data.velocity.y, position.data.velocity.z)
-            const errorFactor = mvtError * velocity + (position.data.standing ? 0 : jmpError)
-            const error = { x: randomLR(errorFactor), y: randomLR(errorFactor) }
-
-            const params: ShootParams = {
-              aim, targets, error, pos, rng: randomLR(0.1)
-            }
-
-            return { actionId: "shoot", params }
+            return { actionId: "shoot", params: { aim, pos } }
           },
         }
       }),
@@ -144,7 +115,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             world.client?.sound.play({ name: "deagle" })
           }
 
-          const { pos, aim, targets, error } = params
+          const { pos, aim } = params
 
           const eyePos = { x: pos.x, y: pos.y, z: pos.z + 0.5 }
           const eyes = new Vector3(eyePos.x, eyePos.z, eyePos.y)
@@ -180,10 +151,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             }
           }
 
-          let hit: { player: Player | undefined, block: BlockInLine | undefined, headshot: boolean, distance: number | undefined } = {
-            player: undefined,
+          let hit: { block: BlockInLine | undefined, distance: number | undefined } = {
             block: undefined,
-            headshot: false,
             distance: undefined
           }
 
@@ -194,60 +163,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             hit.distance = XYZdistance(eyePos, beamResult.edge)
           }
 
-          // raycast against characters
-          for (const target of targets) {
-
-            const targetEntity = world.entity<Position>(target.id)
-            if (!targetEntity) continue
-
-            // head
-            const headCapsule = {
-              A: { x: target.x, y: target.y, z: target.z + 0.52 },
-              B: { x: target.x, y: target.y, z: target.z + 0.55 },
-              radius: 0.04
-            }
-
-            const dist = XYZdistance(eyePos, target)
-            if (hit.distance && dist > hit.distance) continue
-
-            const headHit = rayCapsuleIntersect(eyePos, { x: dir.x, y: dir.z, z: dir.y }, headCapsule)
-            if (headHit) {
-              hit.player = playerForCharacter(world, target.id)
-              hit.distance = XYZdistance(eyePos, target)
-              hit.headshot = true
-              hit.block = undefined
-              spawnParticles({ ...headCapsule.A, z: headCapsule.A.z + 0.03 * headHit.tc }, world, true)
-              break
-            }
-
-            // body
-            const bodyCapsule = {
-              A: { x: target.x, y: target.y, z: target.z + 0.09 },
-              B: { x: target.x, y: target.y, z: target.z + 0.43 },
-              radius: 0.064
-            }
-
-            if (rayCapsuleIntersect(eyePos, { x: dir.x, y: dir.z, z: dir.y }, bodyCapsule)) {
-              hit.player = playerForCharacter(world, target.id)
-              hit.distance = XYZdistance(eyePos, target)
-              hit.block = undefined
-              break
-            }
-          }
-
-          if (hit.player) {
-            if (character.id === world.client?.character()?.id) {
-              world.client.controls.localHit = { tick: world.tick, headshot: hit.headshot }
-            }
-
-            const hitCharacter = hit.player.components.controlling.getCharacter(world)
-            if (hitCharacter?.components.health) {
-              const damage = hit.headshot ? 100 : 35
-              hitCharacter.components.health.damage(
-                damage, world, playerForCharacter(world, character.id)?.id, hit.headshot ? "headshot" : "body"
-              )
-            }
-          } else if (hit.block) {
+          if (hit.block) {
             spawnParticles(hit.block.edge, world)
 
             if (hit.block.inside.type === 6) {
@@ -264,7 +180,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
                 world.blocks.remove(beamResult.inside)
               }
             } else if (beamResult.inside.type !== 12) {
-              world.blocks.setType(beamResult.inside, 12)
+              // world.blocks.setType(beamResult.inside, 12)
             } else {
               world.blocks.setType(beamResult.inside, 12)
               const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`

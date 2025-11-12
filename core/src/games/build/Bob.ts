@@ -42,7 +42,7 @@ export const Bob = (player: Player): Character => {
         aim: isDummy ? { x: -3.14, y: 0 } : { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([BlasterItem]),
+      inventory: Inventory([BlasterItem, HookItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
@@ -87,7 +87,7 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
-            return { actionId: "place", params: { dir, camera, pos, type: 3 } }
+            return { actionId: "place", params: { dir, camera, pos, type: 12 } }
           },
 
           "z": ({ hold }) => {
