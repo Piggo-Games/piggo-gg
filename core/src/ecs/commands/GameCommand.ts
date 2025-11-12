@@ -17,6 +17,7 @@ export const GameCommand: Command<GameCommandParams> = {
   invoke: ({ params, world }) => {
     const gameId = params.game as GameTitle
     if (world.games[gameId] && world.game.id !== gameId) {
+      console.log(`Switching to game: ${gameId}`)
       world.setGame(gameId)
     }
   },

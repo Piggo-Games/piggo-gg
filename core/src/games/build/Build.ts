@@ -1,7 +1,8 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
   HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem,
-  SpawnSystem, Sun, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
+  spawnFlat,
+  SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 
@@ -25,6 +26,7 @@ export const Build: GameBuilder<{}, BuildSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       HUDSystem(controls),
+      BuildSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
@@ -42,6 +44,23 @@ export const Build: GameBuilder<{}, BuildSettings> = {
   })
 }
 
+const BuildSystem = SystemBuilder({
+  id: "BuildSystem",
+  init: (world) => {
+
+    spawnFlat(world)
+
+    return {
+      id: "BuildSystem",
+      query: [],
+      priority: 3,
+      onTick: () => {
+
+      }
+    }
+  }
+})
+
 const controls: HUDSystemProps = {
   clusters: [
     {
@@ -57,4 +76,3 @@ const controls: HUDSystemProps = {
     }
   ]
 }
-
