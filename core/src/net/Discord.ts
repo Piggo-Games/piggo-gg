@@ -40,10 +40,12 @@ export const Discord = (): Discord | undefined => {
 
           authenticated.then((auth) => {
             client.player.components.pc.data.name = auth.user.username
+
+            client.lobbyCreate("lobby")
           })
         })
 
-        client.lobbyCreate("lobby")
+        // client.lobbyCreate("lobby")
       }
 
       client.discordMe(foundCookie, noCookie)

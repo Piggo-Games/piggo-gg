@@ -107,7 +107,7 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "94px", borderRadius: "8px", imageRendering: "pixelated", pointerEvents: "auto", visibility: "hidden", transform: "translate(-50%, -62%)"
+      width: "6vw", borderRadius: "8px", imageRendering: "pixelated", pointerEvents: "auto", visibility: "hidden", transform: "translate(-50%, -62%)"
     },
     id: `f${frame}`,
     src: `f${frame}.png`
@@ -141,7 +141,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "200px", height: "170px",
+        top: "16px", left: "16px", width: "12vw", aspectRatio: "20 / 17",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -163,7 +163,7 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "28px", color: "#ffc0cb", left: "50%", top: "120px", transform: "translate(-50%)"
+          fontSize: "28px", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
         }
       })
     )

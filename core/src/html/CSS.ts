@@ -3,6 +3,7 @@ export type LexColor = PrimaryColor | `#${string}` | `rgba(${number}, ${number},
 
 export type CSS = Partial<{
   alignItems: "center" | "flex-start" | "flex-end" | "stretch"
+  aspectRatio: `${number} / ${number}` | "auto"
   background: string
   backgroundClip: "border-box" | "content-box" | "padding-box" | "text" | "content-box, border-box"
   backgroundColor: LexColor
@@ -67,7 +68,7 @@ export type CSS = Partial<{
   userSelect: "none" | "auto" | "text" | "all"
   visibility: "visible" | "hidden"
   whiteSpace: "normal" | "nowrap" | "pre" | "pre-wrap" | "pre-line"
-  width: `${number}px` | `${number}%` | "auto" | "inherit" | "fit-content" | `calc(${string})` | `${number}dvw`
+  width: `${number}px` | `${number}%` | "auto" | "inherit" | "fit-content" | `calc(${string})` | `${number}dvw` | `${number}vw`
   wordBreak: "normal" | "break-word" | "break-all"
   zIndex: number
 }>
