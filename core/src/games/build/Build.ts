@@ -1,6 +1,6 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
-  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
+  HtmlChat, HtmlInventory, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
   SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
@@ -8,6 +8,7 @@ import { Bob } from "./Bob"
 type BuildSettings = {
   showCrosshair: boolean
   showControls: boolean
+  showNametags: boolean
 }
 
 type BuildState = {
@@ -22,7 +23,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     renderer: "three",
     settings: {
       showCrosshair: true,
-      showControls: true
+      showControls: true,
+      showNametags: true
     },
     state: {
       jumped: []
@@ -41,6 +43,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     ],
     entities: [
       Crosshair(),
+      HtmlInventory(),
       EscapeMenu(world),
       HtmlChat(),
       Sky(),
@@ -66,6 +69,20 @@ const BuildSystem = SystemBuilder({
 
         if (world.client && !world.client.mobile) {
           world.client.menu = document.pointerLockElement === null
+        }
+
+        const players = world.players()
+
+        for (const player of players) {
+          const character = player.components.controlling.getCharacter(world)
+          if (!character) continue
+
+          const { position } = character.components
+
+          // fell off the map
+          if (position.data.z < -8) {
+            position.setPosition({ x: 10, y: 10, z: 8 })
+          }
         }
 
       }

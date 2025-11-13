@@ -12,6 +12,7 @@ export type Inventory = Component<"inventory", {
   itemBuilders: ItemBuilder[]
   activeItem: (world: World) => ItemEntity | null
   addItem: (item: ItemEntity, world: World) => void
+  setItem: (index: number, item: ItemEntity, world: World) => void
   cleanup: (world: World) => void
   removeItem: (itemId: string, world: World) => void
   dropActiveItem: () => void
@@ -22,7 +23,7 @@ export const Inventory = (itemBuilders: ItemBuilder[] = []): Inventory => {
   const inventory: Inventory = {
     data: {
       activeItemIndex: 0,
-      items: [undefined, undefined, undefined, undefined, undefined]
+      items: [undefined, undefined, undefined, undefined, undefined, undefined, undefined]
     },
     type: "inventory",
     itemBuilders,
@@ -64,6 +65,12 @@ export const Inventory = (itemBuilders: ItemBuilder[] = []): Inventory => {
 
       // add to world
       if (added && !world.entity(item.id)) {
+        world.addEntity(item)
+      }
+    },
+    setItem: (index: number, item: ItemEntity, world: World) => {
+      inventory.data.items[index] = [item.id]
+      if (!world.entity(item.id)) {
         world.addEntity(item)
       }
     },

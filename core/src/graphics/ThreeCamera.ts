@@ -87,7 +87,12 @@ export const ThreeCameraSystem = () => ClientSystemBuilder({
           } else {
             camera.c.position.set(firstPos.x, firstPos.z, firstPos.y)
           }
-          camera.c.rotation.set(y + recoil * 0.03, x, 0)
+
+          if (world.game.id === "build") {
+            camera.c.rotation.set(y, x, 0)
+          } else {
+            camera.c.rotation.set(y + recoil * 0.03, x, 0)
+          }
         } else {
           if (camera.transition < 100) {
             camera.c.position.set(

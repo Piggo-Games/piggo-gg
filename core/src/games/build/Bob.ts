@@ -1,8 +1,8 @@
 import {
-  Action, Actions, Character, Collider, copyMaterials, DeagleItem, Health,
+  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
   Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
-  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin
+  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -30,19 +30,17 @@ export const Bob = (player: Player): Character => {
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
 
-  const isDummy = player.id.includes("dummy")
-
   const bob = Character({
     id: `bob-${player.id}`,
     components: {
       position: Position({
+        x: 8.12, y: 8, z: 2,
         friction: true,
         gravity: 0.003,
-        x: isDummy ? 7.2 + player.components.team.data.team * 0.6 : 8.12, y: isDummy ? 5.3 : 8, z: 2,
-        aim: isDummy ? { x: -3.14, y: 0 } : { x: 0, y: 0 }
+        aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([DeagleItem]),
+      inventory: Inventory([BlasterItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
@@ -82,30 +80,12 @@ export const Bob = (player: Player): Character => {
           "mb2": ({ hold, world, character }) => {
             if (hold) return
             if (!character) return
-            if (world.debug) {
 
-              const dir = world.three!.camera.dir(world)
-              const camera = world.three!.camera.pos()
-              const pos = character.components.position.xyz()
+            const dir = world.three!.camera.dir(world)
+            const camera = world.three!.camera.pos()
+            const pos = character.components.position.xyz()
 
-              return { actionId: "place", params: { dir, camera, pos, type: 3 } }
-            } else if (!world.client?.net.synced) {
-              const dummy = world.entity<Position>(`bob-player-dummy`)
-              if (dummy) {
-                const dir = world.three!.camera.dir(world)
-                const camera = world.three!.camera.pos()
-
-                const { position } = dummy.components
-
-                position.setPosition({
-                  x: camera.x + dir.x,
-                  y: camera.y + dir.z,
-                  z: camera.z,
-                })
-
-                position.data.aim = { x: -Math.atan2(dir.z, dir.x) + PI / 2, y: 0 }
-              }
-            }
+            return { actionId: "place", params: { dir, camera, pos, type: 12 } }
           },
 
           "z": ({ hold }) => {
@@ -113,20 +93,12 @@ export const Bob = (player: Player): Character => {
             return { actionId: "ready" }
           },
 
-          "t": ({ hold, world }) => {
+          "f": ({ hold }) => {
             if (hold) return
-            const state = world.state<StrikeState>()
-            if (state.phase !== "warmup") return
-
-            world.actions.push(world.tick, player.id, { actionId: "SwitchTeam" })
+            bob.components.position.data.flying = !bob.components.position.data.flying
           },
 
-          // "t": ({ hold }) => {
-          //   if (hold) return
-          //   bob.components.position.data.flying = !bob.components.position.data.flying
-          // },
-
-          // "e" : ({ hold, world, character }) => {
+          // "t": ({ hold, world, character }) => {
           //   if (hold) return
 
           //   const pos = character?.components.position.data
@@ -389,12 +361,12 @@ export const Bob = (player: Player): Character => {
           // entity.components.three.o.push(hitboxes.body, hitboxes.head)
 
           // character model
-          three.gLoader.load("swat.glb", (gltf) => {
+          three.gLoader.load("cowboy.glb", (gltf) => {
 
             pig = cloneSkeleton(gltf.scene)
             pig.animations = gltf.animations
             pig.frustumCulled = false
-            pig.scale.set(0.32, 0.32, 0.32)
+            pig.scale.set(0.18, 0.18, 0.18)
 
             // helper = new SkeletonHelper(pig.children[0].children[1])
 
@@ -403,8 +375,8 @@ export const Bob = (player: Player): Character => {
 
             pigMixer = new AnimationMixer(pig)
 
-            idleAnimation = pigMixer.clipAction(pig.animations[8])
-            runAnimation = pigMixer.clipAction(pig.animations[22])
+            idleAnimation = pigMixer.clipAction(pig.animations[2])
+            runAnimation = pigMixer.clipAction(pig.animations[8])
             deathAnimation = pigMixer.clipAction(pig.animations[0])
             deathAnimation.loop = 2200
             deathAnimation.clampWhenFinished = true
@@ -422,6 +394,8 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
+
+            // bob.components.inventory?.setItem(7, HookItem({ character: bob }), world)
           })
         }
       })
