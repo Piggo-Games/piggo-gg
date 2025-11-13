@@ -87,7 +87,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
-            if (cd + 5 > world.tick) return
+            if (cd + 6 > world.tick) return
             cd = world.tick
 
             const pos = character.components.position.xyz()

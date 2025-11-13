@@ -1,6 +1,6 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
-  HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
+  HtmlChat, HtmlInventory, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
   SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
@@ -41,6 +41,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     ],
     entities: [
       Crosshair(),
+      HtmlInventory(),
       EscapeMenu(world),
       HtmlChat(),
       Sky(),

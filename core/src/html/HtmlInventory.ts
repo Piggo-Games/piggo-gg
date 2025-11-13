@@ -1,6 +1,33 @@
-import { Client, HtmlDiv, HtmlImg, RefreshableDiv } from "@piggo-gg/core"
+import { Client, Entity, HtmlDiv, HtmlImg, NPC, RefreshableDiv } from "@piggo-gg/core"
 
-export const HtmlInventory = (client: Client): RefreshableDiv => {
+export const HtmlInventory = () => {
+
+  let hInv: RefreshableDiv | undefined = undefined
+  let init = false
+
+  return Entity({
+    id: "HtmlInventory",
+    components: {
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!world.client) return
+
+
+          if (!init) {
+            init = true
+
+            hInv = HInv(world.client)
+            document.body.appendChild(hInv.div)
+          }
+
+          hInv?.update()
+        }
+      })
+    }
+  })
+}
+
+const HInv = (client: Client): RefreshableDiv => {
 
   const cells: HTMLDivElement[] = []
   const active: HTMLDivElement = activeCell()
@@ -64,6 +91,9 @@ export const HtmlInventory = (client: Client): RefreshableDiv => {
         if (!item) continue
 
         cells[i].innerHTML = ""
+
+        const url = `${item.split("-")[0]}.png`
+        console.log("loading item image:", url)
 
         const img = HtmlImg(`${item.split("-")[0]}.png`, {
           width: "46px",

@@ -40,7 +40,7 @@ export const Bob = (player: Player): Character => {
         aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([BlasterItem, HookItem]),
+      inventory: Inventory([BlasterItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
@@ -402,6 +402,8 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
+
+            // bob.components.inventory?.setItem(7, HookItem({ character: bob }), world)
           })
         }
       })
