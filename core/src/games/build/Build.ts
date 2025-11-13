@@ -69,6 +69,20 @@ const BuildSystem = SystemBuilder({
           world.client.menu = document.pointerLockElement === null
         }
 
+        const players = world.players()
+
+        for (const player of players) {
+          const character = player.components.controlling.getCharacter(world)
+          if (!character) continue
+
+          const { position } = character.components
+
+          // fell off the map
+          if (position.data.z < -4) {
+            position.setPosition({ x: 10, y: 10, z: 8 })
+          }
+        }
+
       }
     }
   }
