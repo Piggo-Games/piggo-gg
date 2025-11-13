@@ -151,40 +151,33 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             }
           }
 
-          let hit: { block: BlockInLine | undefined, distance: number | undefined } = {
-            block: undefined,
-            distance: undefined
-          }
+          // let hit: { block: BlockInLine | undefined, distance: number | undefined } = {
+          //   block: undefined,
+          //   distance: undefined
+          // }
 
           // raycast against blocks
-          const beamResult = blockInLine({ from: eyePos, dir, world, cap: 60, maxDist: 30 })
-          if (beamResult) {
-            hit.block = beamResult
-            hit.distance = XYZdistance(eyePos, beamResult.edge)
-          }
+          const hit = blockInLine({ from: eyePos, dir, world, cap: 60, maxDist: 30 })
+          if (!hit) return
 
-          if (hit.block) {
-            spawnParticles(hit.block.edge, world)
+          spawnParticles(hit.edge, world)
 
-            if (hit.block.inside.type === 6) {
-              world.blocks.remove(hit.block.inside)
-            }
+          if (hit.inside.z === 0) return
 
-            if (!beamResult) return
-
-            if (world.debug) {
-              world.blocks.remove(beamResult.inside)
-            } else if (beamResult.inside.type !== 12) {
-              // world.blocks.setType(beamResult.inside, 12)
+          if (!world.debug) {
+            world.blocks.remove(hit.inside)
+          } else if (hit.inside.type !== 12) {
+            // world.blocks.setType(hit.inside, 12)
+          } else {
+            const xyzstr: XYZstring = `${hit.inside.x},${hit.inside.y},${hit.inside.z}`
+            if (world.blocks.coloring[xyzstr]) {
+              const color = nextColor(world.blocks.coloring[xyzstr])
+              world.blocks.coloring[xyzstr] = color
             } else {
-              const xyzstr: XYZstring = `${beamResult.inside.x},${beamResult.inside.y},${beamResult.inside.z}`
-              if (world.blocks.coloring[xyzstr]) {
-                const color = nextColor(world.blocks.coloring[xyzstr])
-                world.blocks.coloring[xyzstr] = color
-              } else {
-                world.blocks.coloring[xyzstr] = `slategray`
-              }
+              world.blocks.coloring[xyzstr] = `slategray`
             }
+
+            world.blocks.invalidate()
           }
         }),
       }),

@@ -92,9 +92,6 @@ const HInv = (client: Client): RefreshableDiv => {
 
         cells[i].innerHTML = ""
 
-        const url = `${item.split("-")[0]}.png`
-        console.log("loading item image:", url)
-
         const img = HtmlImg(`${item.split("-")[0]}.png`, {
           width: "46px",
           height: "46px",

@@ -251,7 +251,9 @@ export const BlockData = (): BlockData => {
         result.push(...chunkResult)
       }
 
-      visibleDirty = {}
+      for (const key of keys(visibleDirty)) {
+        visibleDirty[key] = false
+      }
       logPerf("BlockData.visible", time)
       return result
     },
@@ -271,7 +273,12 @@ export const BlockData = (): BlockData => {
       return data[chunkX]?.[chunkY]?.[indexX]
     },
     needsUpdate: () => {
-      return Boolean(keys(visibleDirty).length)
+      for (const key of keys(visibleDirty)) {
+        if (visibleDirty[key]) {
+          return true
+        }
+      }
+      return false
     },
     loadMap: (map: Record<string, string>) => {
       for (const chunk in map) {
