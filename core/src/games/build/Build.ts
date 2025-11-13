@@ -8,6 +8,7 @@ import { Bob } from "./Bob"
 type BuildSettings = {
   showCrosshair: boolean
   showControls: boolean
+  showNametags: boolean
 }
 
 type BuildState = {
@@ -22,7 +23,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     renderer: "three",
     settings: {
       showCrosshair: true,
-      showControls: true
+      showControls: true,
+      showNametags: true
     },
     state: {
       jumped: []
@@ -78,7 +80,7 @@ const BuildSystem = SystemBuilder({
           const { position } = character.components
 
           // fell off the map
-          if (position.data.z < -4) {
+          if (position.data.z < -8) {
             position.setPosition({ x: 10, y: 10, z: 8 })
           }
         }

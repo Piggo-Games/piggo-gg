@@ -162,7 +162,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           spawnParticles(hit.edge, world)
 
-          if (hit.inside.z === 0) return
+          if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
           if (!world.debug) {
             world.blocks.remove(hit.inside)
