@@ -12,7 +12,8 @@ export const BlockColors: BlockColor[] = [
   "cornflowerblue", "rosybrown", "sandybrown", "palevioletred", "mediumseagreen"
 ]
 
-export const nextColor = (current: BlockColor): BlockColor => {
+export const nextColor = (current: BlockColor | undefined): BlockColor => {
+  if (!current) return BlockColors[0]
   const index = BlockColors.indexOf(current)
   return BlockColors[(index + 1) % BlockColors.length]
 }

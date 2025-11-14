@@ -2,7 +2,8 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
   Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
-  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin, BlockColor
+  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin, BlockColor,
+  nextColor
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -90,9 +91,12 @@ export const Bob = (player: Player): Character => {
             return { actionId: "place", params: { dir, camera, pos, type: 12, blockColor } }
           },
 
-          "z": ({ hold }) => {
-            if (hold) return
-            return { actionId: "ready" }
+          "scrolldown": ({ client }) => {
+            const bufferScroll = client.bufferScroll
+            if (bufferScroll < 20) return
+
+            client.bufferScroll = 0
+            blockColor = nextColor(blockColor)
           },
 
           // toggle flying
