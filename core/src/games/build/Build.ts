@@ -93,6 +93,14 @@ const BuildSystem = SystemBuilder({
 const controls: HUDSystemProps = {
   clusters: [
     {
+      label: "place",
+      buttons: [["mb2"]]
+    },
+    {
+      label: "shoot",
+      buttons: [["mb1"]]
+    },
+    {
       label: "move",
       buttons: [
         ["A", "S", "D"],

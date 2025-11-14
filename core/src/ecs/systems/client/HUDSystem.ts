@@ -83,7 +83,8 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         keyWrapper.appendChild(rowDiv)
 
         for (const button of row) {
-          const btn = button === "mb1" ? KeyImg("mb1.svg") : KeyButton({ text: button })
+          const btn = ["mb1", "mb2"].includes(button) ? KeyImg(`${button}.svg`) : KeyButton({ text: button })
+          // const btn = button === "mb1" ? KeyImg("mb1.svg") : KeyButton({ text: button })
 
           rowDiv.appendChild(btn)
           buttonElements.push({ element: btn, key: button.toLowerCase() })
@@ -112,7 +113,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           for (const btn of buttonElements) {
             const check = btn.key === "spacebar" ? " " : btn.key
 
-            if (check === "mb1") {
+            if (["mb1", "mb2"].includes(check)) {
               btn.element.style.filter = down.includes(check) ? "sepia(83%) saturate(8000%) hue-rotate(170deg)" : ""
             } else {
               btn.element.style.backgroundColor = down.includes(check) ? active : inactive
