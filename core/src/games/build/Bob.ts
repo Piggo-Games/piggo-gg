@@ -101,17 +101,13 @@ export const Bob = (player: Player): Character => {
 
           // down
           "shift": () => {
-            const { flying } = bob.components.position.data
-            if (!flying) return
-
+            if (!bob.components.position.data.flying) return
             return { actionId: "down" }
           },
 
           // jump/p
-          // " ": ({ hold }) => ({ actionId: "jump", params: { hold } }),
           " ": ({ hold }) => {
-            const { flying } = bob.components.position.data
-            if (flying) {
+            if (bob.components.position.data.flying) {
               return { actionId: "up" }
             } else {
               return { actionId: "jump", params: { hold } }
