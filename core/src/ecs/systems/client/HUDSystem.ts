@@ -84,7 +84,6 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
 
         for (const button of row) {
           const btn = ["mb1", "mb2"].includes(button) ? KeyImg(`${button}.svg`) : KeyButton({ text: button })
-          // const btn = button === "mb1" ? KeyImg("mb1.svg") : KeyButton({ text: button })
 
           rowDiv.appendChild(btn)
           buttonElements.push({ element: btn, key: button.toLowerCase() })
