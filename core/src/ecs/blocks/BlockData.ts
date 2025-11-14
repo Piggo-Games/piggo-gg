@@ -1,26 +1,6 @@
 import {
-  Block, BlockPlan, BlockTree, floor, keys, logPerf, World, XY, XYZ, XYZstring
+  Block, BlockColor, BlockPlan, BlockTree, floor, keys, logPerf, World, XY, XYZ, XYZstring
 } from "@piggo-gg/core"
-
-export type BlockColor = "rebeccapurple" | "slategray" |
-  "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" |
-  "rosybrown" | "sandybrown" | "tan" | "palevioletred" | "mediumseagreen"
-
-export const nextColor = (current: BlockColor): BlockColor => {
-  switch (current) {
-    case "tan": return "slategray"
-    case "slategray": return "mediumseagreen"
-    case "mediumseagreen": return "chocolate"
-    case "chocolate": return "saddlebrown"
-    case "saddlebrown": return "cadetblue"
-    case "cadetblue": return "rebeccapurple"
-    case "rebeccapurple": return "cornflowerblue"
-    case "cornflowerblue": return "rosybrown"
-    case "rosybrown": return "palevioletred"
-    case "palevioletred": return "sandybrown"
-    case "sandybrown": return "tan"
-  }
-}
 
 export type BlockData = {
   coloring: Record<XYZstring, BlockColor>

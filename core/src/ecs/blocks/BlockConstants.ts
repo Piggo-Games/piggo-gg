@@ -43,6 +43,33 @@ export type BlockType =
   "oak" | "spruceLeaf" | "oakLeaf" |
   "marble"
 
+export type BlockColor = "tan" | "rebeccapurple" | "slategray" |
+  "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" |
+  "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen"
+
+export const BlockColors: BlockColor[] = [
+  "tan", "rebeccapurple", "slategray", "chocolate", "saddlebrown", "cadetblue",
+  "cornflowerblue", "rosybrown", "sandybrown", "palevioletred", "mediumseagreen"
+]
+
+export const nextColor = (current: BlockColor): BlockColor => {
+  const index = BlockColors.indexOf(current)
+  return BlockColors[(index + 1) % BlockColors.length]
+  // switch (current) {
+  //   case "tan": return "slategray"
+  //   case "slategray": return "mediumseagreen"
+  //   case "mediumseagreen": return "chocolate"
+  //   case "chocolate": return "saddlebrown"
+  //   case "saddlebrown": return "cadetblue"
+  //   case "cadetblue": return "rebeccapurple"
+  //   case "rebeccapurple": return "cornflowerblue"
+  //   case "cornflowerblue": return "rosybrown"
+  //   case "rosybrown": return "palevioletred"
+  //   case "palevioletred": return "sandybrown"
+  //   case "sandybrown": return "tan"
+  // }
+}
+
 // export const BlockColors: Record<BlockType, [number, number, number]> = {
 //   stone: [0x7b7b7b, 0x5E5E3E, 0x9b9b9b],
 //   grass: [0x08d000, 0x6E260E, 0x7B3F00],
