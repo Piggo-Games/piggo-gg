@@ -367,7 +367,11 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           if (applyZ) position.data.z += position.data.velocity.z
 
           if (position.data.flying) {
-            position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
+            position.data.velocity.z *= 0.8
+            if (abs(position.data.velocity.z) < 0.01) {
+              position.data.velocity.z = 0
+            }
+            // position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
           } else {
             position.data.velocity.z -= position.data.gravity
             position.data.velocity.z = max(position.data.velocity.z, -0.2)
@@ -381,7 +385,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           if (position.data.friction && !position.data.tether) {
             const { flying, standing } = position.data
 
-            const scale = flying ? 0.98 : (standing ? 0.82 : 0.94)
+            const scale = flying ? 0.9 : (standing ? 0.82 : 0.94)
             entity.components.position.scaleVelocity(scale)
           }
         }

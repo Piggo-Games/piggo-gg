@@ -93,9 +93,29 @@ export const Bob = (player: Player): Character => {
             return { actionId: "ready" }
           },
 
+          // toggle flying
           "f": ({ hold }) => {
             if (hold) return
             bob.components.position.data.flying = !bob.components.position.data.flying
+          },
+
+          // down
+          "shift": () => {
+            const { flying } = bob.components.position.data
+            if (!flying) return
+
+            return { actionId: "down" }
+          },
+
+          // jump/p
+          // " ": ({ hold }) => ({ actionId: "jump", params: { hold } }),
+          " ": ({ hold }) => {
+            const { flying } = bob.components.position.data
+            if (flying) {
+              return { actionId: "up" }
+            } else {
+              return { actionId: "jump", params: { hold } }
+            }
           },
 
           // "t": ({ hold, world, character }) => {
@@ -133,9 +153,6 @@ export const Bob = (player: Player): Character => {
             }
           },
 
-          // jump
-          " ": ({ hold }) => ({ actionId: "jump", params: { hold } }),
-
           // no movement
           "w,s": () => null, "a,d": () => null,
 
@@ -155,6 +172,18 @@ export const Bob = (player: Player): Character => {
         point: Point,
         ready: Ready,
         hook: Hook(),
+        up: Action("up", () => {
+          const { position } = bob.components
+
+          // position.data.velocity.z = 1
+          position.impulse({ z: 0.015 })
+        }),
+        down: Action("down", () => {
+          const { position } = bob.components
+
+          // position.data.velocity.z = -1
+          position.impulse({ z: -0.015 })
+        }),
         jump: Action("jump", ({ world, params }) => {
           const { position } = bob.components
 
@@ -249,7 +278,7 @@ export const Bob = (player: Player): Character => {
           let factor = 0
 
           if (position.data.flying) {
-            factor = params.sprint ? 0.16 : 0.14
+            factor = 0.36
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else {
