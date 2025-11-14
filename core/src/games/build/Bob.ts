@@ -3,7 +3,8 @@ import {
   Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
   Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
   cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin, BlockColor,
-  nextColor
+  nextColor,
+  BuildSettings
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -30,8 +31,6 @@ export const Bob = (player: Player): Character => {
 
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
-
-  let blockColor: BlockColor | undefined = "cadetblue"
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -88,15 +87,21 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
+            const { blockColor } = world.settings<BuildSettings>()
+
             return { actionId: "place", params: { dir, camera, pos, type: 12, blockColor } }
           },
 
-          "scrolldown": ({ client }) => {
+          "scrolldown": ({ client, world }) => {
             const bufferScroll = client.bufferScroll
             if (bufferScroll < 20) return
 
             client.bufferScroll = 0
-            blockColor = nextColor(blockColor)
+
+            const { blockColor } = world.settings<BuildSettings>()
+
+            // @ts-expect-error
+            world.game.settings.blockColor = nextColor(blockColor)
           },
 
           // toggle flying

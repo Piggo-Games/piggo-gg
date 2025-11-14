@@ -1,14 +1,17 @@
 import {
-  BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu, GameBuilder,
-  HtmlChat, HtmlInventory, HtmlLagText, HUDSystem, HUDSystemProps, InventorySystem, Sky, spawnFlat,
-  SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
+  BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
+  GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
+  InventorySystem, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
+  ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
+import { ColorIndicator } from "./ColorIndicator"
 
-type BuildSettings = {
+export type BuildSettings = {
   showCrosshair: boolean
   showControls: boolean
   showNametags: boolean
+  blockColor: BlockColor | undefined
 }
 
 type BuildState = {
@@ -24,7 +27,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     settings: {
       showCrosshair: true,
       showControls: true,
-      showNametags: true
+      showNametags: true,
+      blockColor: undefined
     },
     state: {
       jumped: []
@@ -50,7 +54,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
-      HtmlLagText()
+      HtmlLagText(),
+      ColorIndicator(world)
     ]
   })
 }
