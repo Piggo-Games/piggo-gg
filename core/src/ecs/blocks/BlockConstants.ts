@@ -3,13 +3,14 @@ import { XYZ } from "@piggo-gg/core"
 export type Block = XYZ & { type: number }
 export type BlockPlan = Block[]
 
-export type BlockColor = "white" | "tan" | "rebeccapurple" | "slategray" |
-  "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" |
+export type BlockColor = "white" | "hotpink" | "lightpink" | "rebeccapurple" | "slategray" |
+  "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" | "black" |
   "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen"
 
 export const BlockColors: BlockColor[] = [
-  "white", "tan", "rebeccapurple", "slategray", "chocolate", "saddlebrown", "cadetblue",
-  "cornflowerblue", "rosybrown", "sandybrown", "palevioletred", "mediumseagreen"
+  "white", "hotpink", "lightpink", "rebeccapurple", "slategray",
+  "chocolate", "saddlebrown", "cadetblue", "cornflowerblue",
+  "rosybrown", "sandybrown", "palevioletred", "mediumseagreen", "black"
 ]
 
 export const nextColor = (current: BlockColor, backward = false): BlockColor => {
