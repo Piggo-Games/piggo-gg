@@ -37,11 +37,9 @@ export const BlockTypeString: Record<number, BlockType> = {
 }
 
 export type BlockType =
-  "white" | "stone" | "grass" |
-  "moss" | "moonrock" | "asteroid" |
-  "saphire" | "spruce" | "ruby" |
-  "oak" | "spruceLeaf" | "oakLeaf" |
-  "marble"
+  "white" | "stone" | "grass" | "moss" | "moonrock" |
+  "asteroid" | "saphire" | "spruce" | "ruby" | "oak" |
+  "spruceLeaf" | "oakLeaf" | "marble"
 
 export type BlockColor = "tan" | "rebeccapurple" | "slategray" |
   "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" |
