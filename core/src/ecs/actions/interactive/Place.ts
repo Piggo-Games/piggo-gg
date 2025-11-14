@@ -1,10 +1,11 @@
-import { Action, blockFromXYZ, blockInLine, XYZ, XYZequal } from "@piggo-gg/core"
+import { Action, BlockColor, blockFromXYZ, blockInLine, XYZ, XYZequal } from "@piggo-gg/core"
 
 export type PlaceParams = {
   camera: XYZ
   dir: XYZ
   pos: XYZ
   type?: number
+  blockColor?: BlockColor
 }
 
 export const Place = Action<PlaceParams>("place", ({ params, world }) => {
@@ -21,4 +22,8 @@ export const Place = Action<PlaceParams>("place", ({ params, world }) => {
   // place the block
   const placed = world.blocks.add({ type: params.type ?? inside.type, ...outside })
   if (placed) world.client?.sound.play({ name: "click2" })
+
+  if (params.blockColor !== undefined) {
+    world.blocks.coloring[`${outside.x},${outside.y},${outside.z}`] = params.blockColor
+  }
 })

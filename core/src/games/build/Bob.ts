@@ -2,7 +2,7 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
   Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
-  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
+  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin, BlockColor
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -29,6 +29,8 @@ export const Bob = (player: Player): Character => {
 
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
+
+  let blockColor: BlockColor | undefined = "cadetblue"
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -85,7 +87,7 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
-            return { actionId: "place", params: { dir, camera, pos, type: 12 } }
+            return { actionId: "place", params: { dir, camera, pos, type: 12, blockColor } }
           },
 
           "z": ({ hold }) => {
