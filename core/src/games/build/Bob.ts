@@ -1,10 +1,8 @@
 import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
-  Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
-  Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
-  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin, BlockColor,
-  nextColor,
-  BuildSettings
+  hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
+  Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
+  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -133,18 +131,6 @@ export const Bob = (player: Player): Character => {
             }
           },
 
-          // "t": ({ hold, world, character }) => {
-          //   if (hold) return
-
-          //   const pos = character?.components.position.data
-          //   const dir = world.three?.camera.dir(world)
-          //   const camera = world.three?.camera.pos()
-
-          //   if (!pos || !dir || !camera) return
-
-          //   return { actionId: "hook", params: { pos, dir, camera } }
-          // },
-
           "q": ({ world, hold }) => {
             if (hold) return
             const { camera } = world.three!
@@ -186,7 +172,6 @@ export const Bob = (player: Player): Character => {
         place: Place,
         point: Point,
         ready: Ready,
-        hook: Hook(),
         up: Action("up", () => {
           const { position } = bob.components
 
@@ -438,8 +423,6 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
-
-            // bob.components.inventory?.setItem(7, HookItem({ character: bob }), world)
           })
         }
       })
