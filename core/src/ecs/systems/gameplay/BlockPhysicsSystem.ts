@@ -337,9 +337,9 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             }
           }
 
-          const { tether } = position.data
+          if (position.data.tether) {
+            const { tether } = position.data
 
-          if (tether) {
             const dx = position.data.x - tether.x
             const dy = position.data.y - tether.y
             const dz = position.data.z - tether.z
@@ -347,7 +347,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
             if (dist < 0.7 || dist > 10) {
-              position.data.tether = undefined
+              position.data.tether = null
             } else {
               if (mode === "local") {
                 position.localVelocity.x -= dx / 200
@@ -367,7 +367,11 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           if (applyZ) position.data.z += position.data.velocity.z
 
           if (position.data.flying) {
-            position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
+            position.data.velocity.z *= 0.8
+            if (abs(position.data.velocity.z) < 0.01) {
+              position.data.velocity.z = 0
+            }
+            // position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
           } else {
             position.data.velocity.z -= position.data.gravity
             position.data.velocity.z = max(position.data.velocity.z, -0.2)
@@ -378,10 +382,10 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           position.data.y += position.data.velocity.y / 40
 
           // friction
-          if (position.data.friction && !tether) {
+          if (position.data.friction && !position.data.tether) {
             const { flying, standing } = position.data
 
-            const scale = flying ? 0.98 : (standing ? 0.82 : 0.94)
+            const scale = flying ? 0.9 : (standing ? 0.82 : 0.94)
             entity.components.position.scaleVelocity(scale)
           }
         }

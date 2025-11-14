@@ -43,7 +43,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
     ],
     entities: [
       Crosshair(),
-      HtmlInventory(),
+      // HtmlInventory(),
       EscapeMenu(world),
       HtmlChat(),
       Sky(),
@@ -92,6 +92,18 @@ const BuildSystem = SystemBuilder({
 
 const controls: HUDSystemProps = {
   clusters: [
+    {
+      label: "place",
+      buttons: [["mb2"]]
+    },
+    {
+      label: "shoot",
+      buttons: [["mb1"]]
+    },
+    {
+      label: "fly",
+      buttons: [["f"]]
+    },
     {
       label: "move",
       buttons: [
