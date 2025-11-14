@@ -1,8 +1,8 @@
 import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
-  Hook, HookItem, hypot, Input, Inventory, max, Networked, PI, Place, Player,
-  Point, Position, Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState,
-  cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
+  hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
+  Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
+  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
@@ -85,12 +85,29 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
-            return { actionId: "place", params: { dir, camera, pos, type: 12 } }
+            const { blockColor } = world.settings<BuildSettings>()
+
+            return { actionId: "place", params: { dir, camera, pos, type: 12, blockColor } }
           },
 
-          "z": ({ hold }) => {
-            if (hold) return
-            return { actionId: "ready" }
+          "scrolldown": ({ client, world }) => {
+            if (client.bufferScroll < 20) return
+            client.bufferScroll = 0
+
+            const { blockColor } = world.settings<BuildSettings>()
+
+            // @ts-expect-error
+            world.game.settings.blockColor = nextColor(blockColor)
+          },
+
+          "scrollup": ({ client, world }) => {
+            if (client.bufferScroll > -20) return
+            client.bufferScroll = 0
+
+            const { blockColor } = world.settings<BuildSettings>()
+
+            // @ts-expect-error
+            world.game.settings.blockColor = nextColor(blockColor, true)
           },
 
           // toggle flying
@@ -113,18 +130,6 @@ export const Bob = (player: Player): Character => {
               return { actionId: "jump", params: { hold } }
             }
           },
-
-          // "t": ({ hold, world, character }) => {
-          //   if (hold) return
-
-          //   const pos = character?.components.position.data
-          //   const dir = world.three?.camera.dir(world)
-          //   const camera = world.three?.camera.pos()
-
-          //   if (!pos || !dir || !camera) return
-
-          //   return { actionId: "hook", params: { pos, dir, camera } }
-          // },
 
           "q": ({ world, hold }) => {
             if (hold) return
@@ -167,7 +172,6 @@ export const Bob = (player: Player): Character => {
         place: Place,
         point: Point,
         ready: Ready,
-        hook: Hook(),
         up: Action("up", () => {
           const { position } = bob.components
 
@@ -419,8 +423,6 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
-
-            // bob.components.inventory?.setItem(7, HookItem({ character: bob }), world)
           })
         }
       })

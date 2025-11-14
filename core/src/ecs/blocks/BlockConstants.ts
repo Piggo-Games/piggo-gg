@@ -1,8 +1,31 @@
 import { XYZ } from "@piggo-gg/core"
 
 export type Block = XYZ & { type: number }
-
 export type BlockPlan = Block[]
+
+export type BlockColor = "white" | "hotpink" | "lightpink" | "rebeccapurple" | "slategray" |
+  "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" | "black" |
+  "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen"
+
+export const BlockColors: BlockColor[] = [
+  "white", "hotpink", "lightpink", "rebeccapurple", "slategray",
+  "chocolate", "saddlebrown", "cadetblue", "cornflowerblue",
+  "rosybrown", "sandybrown", "palevioletred", "mediumseagreen", "black"
+]
+
+export const nextColor = (current: BlockColor, backward = false): BlockColor => {
+  let nextIndex = BlockColors.indexOf(current)
+
+  if (backward && nextIndex === 0) {
+    nextIndex = BlockColors.length - 1
+  } else if (backward) {
+    nextIndex -= 1
+  } else {
+    nextIndex += 1
+  }
+
+  return BlockColors[nextIndex % BlockColors.length]
+}
 
 export const BlockTypeInt: Record<BlockType, number> = {
   stone: 0,
@@ -37,11 +60,9 @@ export const BlockTypeString: Record<number, BlockType> = {
 }
 
 export type BlockType =
-  "white" | "stone" | "grass" |
-  "moss" | "moonrock" | "asteroid" |
-  "saphire" | "spruce" | "ruby" |
-  "oak" | "spruceLeaf" | "oakLeaf" |
-  "marble"
+  "white" | "stone" | "grass" | "moss" | "moonrock" |
+  "asteroid" | "saphire" | "spruce" | "ruby" | "oak" |
+  "spruceLeaf" | "oakLeaf" | "marble"
 
 // export const BlockColors: Record<BlockType, [number, number, number]> = {
 //   stone: [0x7b7b7b, 0x5E5E3E, 0x9b9b9b],

@@ -88,8 +88,9 @@ export const BlockMeshSystem = ClientSystemBuilder({
               spruceCount++
             } else if (type === "marble") {
 
-              if (world.blocks.coloring[`${x},${y},${z}`]) {
-                const color = new Color(world.blocks.coloring[`${x},${y},${z}`])
+              const coloring = world.blocks.coloring[`${x},${y},${z}`]
+              if (coloring && coloring !== "white") {
+                let color = new Color(coloring)
                 marble.setColorAt(marbleCount, color)
               } else {
                 marble.setColorAt(marbleCount, new Color(z === 0 ? 0xd2b48c : 0xbbbbbb))
