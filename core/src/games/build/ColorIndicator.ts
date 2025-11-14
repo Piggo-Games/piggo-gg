@@ -32,7 +32,8 @@ export const ColorIndicator = (world: World) => {
           }
 
           const { blockColor } = world.settings<BuildSettings>()
-          div.style.backgroundColor = blockColor || "white"
+
+          div.style.backgroundColor = blockColor === "white" ? "#fae79d" : blockColor
         }
       })
     }

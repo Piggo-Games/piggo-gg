@@ -11,7 +11,7 @@ export type BuildSettings = {
   showCrosshair: boolean
   showControls: boolean
   showNametags: boolean
-  blockColor: BlockColor | undefined
+  blockColor: BlockColor
 }
 
 type BuildState = {
@@ -28,7 +28,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       showCrosshair: true,
       showControls: true,
       showNametags: true,
-      blockColor: undefined
+      blockColor: "white"
     },
     state: {
       jumped: []

@@ -3,19 +3,27 @@ import { XYZ } from "@piggo-gg/core"
 export type Block = XYZ & { type: number }
 export type BlockPlan = Block[]
 
-export type BlockColor = "tan" | "rebeccapurple" | "slategray" |
+export type BlockColor = "white" | "tan" | "rebeccapurple" | "slategray" |
   "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" |
   "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen"
 
 export const BlockColors: BlockColor[] = [
-  "tan", "rebeccapurple", "slategray", "chocolate", "saddlebrown", "cadetblue",
+  "white", "tan", "rebeccapurple", "slategray", "chocolate", "saddlebrown", "cadetblue",
   "cornflowerblue", "rosybrown", "sandybrown", "palevioletred", "mediumseagreen"
 ]
 
-export const nextColor = (current: BlockColor | undefined): BlockColor => {
-  if (!current) return BlockColors[0]
-  const index = BlockColors.indexOf(current)
-  return BlockColors[(index + 1) % BlockColors.length]
+export const nextColor = (current: BlockColor, backward = false): BlockColor => {
+  let nextIndex = BlockColors.indexOf(current)
+
+  if (backward && nextIndex === 0) {
+    nextIndex = BlockColors.length - 1
+  } else if (backward) {
+    nextIndex -= 1
+  } else {
+    nextIndex += 1
+  }
+
+  return BlockColors[nextIndex % BlockColors.length]
 }
 
 export const BlockTypeInt: Record<BlockType, number> = {

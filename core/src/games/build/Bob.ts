@@ -93,15 +93,23 @@ export const Bob = (player: Player): Character => {
           },
 
           "scrolldown": ({ client, world }) => {
-            const bufferScroll = client.bufferScroll
-            if (bufferScroll < 20) return
-
+            if (client.bufferScroll < 20) return
             client.bufferScroll = 0
 
             const { blockColor } = world.settings<BuildSettings>()
 
             // @ts-expect-error
             world.game.settings.blockColor = nextColor(blockColor)
+          },
+
+          "scrollup": ({ client, world }) => {
+            if (client.bufferScroll > -20) return
+            client.bufferScroll = 0
+
+            const { blockColor } = world.settings<BuildSettings>()
+
+            // @ts-expect-error
+            world.game.settings.blockColor = nextColor(blockColor, true)
           },
 
           // toggle flying
