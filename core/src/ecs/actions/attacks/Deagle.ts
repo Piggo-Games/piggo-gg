@@ -1,6 +1,6 @@
 import {
   Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
-  Gun, hypot, Input, Item, ItemComponents, max, min, Networked, NPC, PI,
+  Gun, hypot, Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Player, playerForCharacter, Position, randomInt, randomLR, randomVector3,
   rayCapsuleIntersect, sin, Target, Three, World, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
@@ -424,23 +424,4 @@ export const DeagleItem = ({ character }: { character: Character }) => {
   })
 
   return item
-}
-
-const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
-  const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
-  const right = { x: cos(localAim.x), y: -sin(localAim.x) }
-
-  const offset = {
-    x: -dir.x * 0.05 + right.x * 0.05,
-    y: recoil * 0.03,
-    z: -dir.y * 0.05 + right.y * 0.05
-  }
-
-  if (tip) {
-    offset.x -= dir.x * 0.1
-    offset.y -= 0.035 - localAim.y * 0.1
-    offset.z -= dir.y * 0.1
-  }
-
-  return offset
 }

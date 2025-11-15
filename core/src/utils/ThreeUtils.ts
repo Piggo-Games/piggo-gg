@@ -1,4 +1,4 @@
-import { randomLR, TeamNumber } from "@piggo-gg/core"
+import { cos, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
 import { Color, Mesh, Object3D, Vector3 } from "three"
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
@@ -59,4 +59,30 @@ export const cloneThree = <O extends Object3D>(o: O): O => {
 
 export const randomVector3 = (scale = 1) => {
   return new Vector3(randomLR(), randomLR(), randomLR()).normalize().multiplyScalar(scale)
+}
+
+export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
+  const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
+  const right = { x: cos(localAim.x), y: -sin(localAim.x) }
+
+  const offset = {
+    x: -dir.x * 0.05 + right.x * 0.05,
+    y: recoil * 0.03,
+    z: -dir.y * 0.05 + right.y * 0.05
+  }
+
+  if (localAim.y > 0) {
+    offset.y += localAim.y * 0.04
+  } else {
+    offset.x -= dir.x * localAim.y * 0.04
+    offset.z -= dir.y * localAim.y * 0.04
+  }
+
+  if (tip) {
+    offset.x -= dir.x * 0.1
+    offset.y -= 0.035 - localAim.y * 0.1
+    offset.z -= dir.y * 0.1
+  }
+
+  return offset
 }
