@@ -296,8 +296,15 @@ const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
 
   const offset = {
     x: -dir.x * 0.05 + right.x * 0.05,
-    y: recoil * 0.03 + localAim.y * 0.04,
+    y: recoil * 0.03,
     z: -dir.y * 0.05 + right.y * 0.05
+  }
+
+  if (localAim.y > 0) {
+    offset.y += localAim.y * 0.04
+  } else {
+    offset.x -= dir.x * localAim.y * 0.04
+    offset.z -= dir.y * localAim.y * 0.04
   }
 
   if (tip) {
