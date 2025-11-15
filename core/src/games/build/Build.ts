@@ -55,7 +55,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
       HtmlLagText(),
-      ColorIndicator(world)
+      // ColorIndicator(world)
     ]
   })
 }

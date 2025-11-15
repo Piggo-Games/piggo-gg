@@ -9,11 +9,12 @@ export type ThreeCamera = {
   dir: (world: World, factor?: number) => XYZ
   right: (world: World, factor?: number) => XYZ
   left: (world: World, factor?: number) => XYZ
+  forward: (world: World, factor?: number) => XYZ
 }
 
 export const ThreeCamera = (): ThreeCamera => {
 
-  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000)
+  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 1000)
   camera.rotation.order = "YXZ"
 
   const ThreeCamera: ThreeCamera = {
@@ -53,6 +54,17 @@ export const ThreeCamera = (): ThreeCamera => {
       return XYZ(new Vector3(
         -cos(localAim.x),
         sin(localAim.x),
+        0
+      ).normalize().multiplyScalar(factor || 1))
+    },
+    forward: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        -sin(localAim.x) * cos(localAim.y),
+        -cos(localAim.x) * cos(localAim.y),
         0
       ).normalize().multiplyScalar(factor || 1))
     }

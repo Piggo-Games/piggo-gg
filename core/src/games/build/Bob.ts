@@ -3,8 +3,7 @@ import {
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
   Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
   Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings, Block,
-  MarbleTexture,
-  BlockMaterial
+  MarbleTexture, BlockMaterial
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -33,7 +32,7 @@ export const Bob = (player: Player): Character => {
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
 
-  let AA: undefined | Block = undefined
+  let placeCD = -100
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -83,8 +82,10 @@ export const Bob = (player: Player): Character => {
         },
         press: {
           "mb2": ({ hold, world, character }) => {
-            if (hold) return
+            if (hold && placeCD + 6 > world.tick) return
             if (!character) return
+
+            placeCD = hold ? world.tick : world.tick + 6
 
             const dir = world.three!.camera.dir(world)
             const camera = world.three!.camera.pos()
@@ -310,9 +311,11 @@ export const Bob = (player: Player): Character => {
           // position
           pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
           if (block) {
-            block.position.set(interpolated.x, interpolated.z + 0.48, interpolated.y)
-            block.position.add(three.camera.dir(world, 0.04))
-            block.position.add(three.camera.left(world, 0.02))
+            block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
+            block.position.add(three.camera.dir(world, 0.002))
+
+            block.quaternion.copy(three.camera.c.quaternion)
+            block.rotation.y = 0
           }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
@@ -383,6 +386,12 @@ export const Bob = (player: Player): Character => {
               }
             })
           }
+
+          // update block color
+          if (block) {
+            const { blockColor } = world.settings<BuildSettings>()
+            block.material.forEach((mat) => mat.color.set(blockColor))
+          }
         },
         init: async (entity, world, three) => {
 
@@ -433,9 +442,10 @@ export const Bob = (player: Player): Character => {
 
             entity.components.three.o.push(pig)
 
-            block = new Mesh(new BoxGeometry(0.016, 0.016, 0.016), BlockMaterial())
+            block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
             block.castShadow = true
             block.frustumCulled = false
+            block.rotation.order = "ZXY"
             MarbleTexture(block.material, three)
 
             entity.components.three.o.push(block)
