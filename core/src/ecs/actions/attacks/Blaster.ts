@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Input,
-  Item, ItemComponents, max, min, Networked, nextColor, NPC, Position,
+  Item, ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
   randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
 import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
@@ -288,30 +288,4 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   })
 
   return item
-}
-
-const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
-  const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
-  const right = { x: cos(localAim.x), y: -sin(localAim.x) }
-
-  const offset = {
-    x: -dir.x * 0.05 + right.x * 0.05,
-    y: recoil * 0.03,
-    z: -dir.y * 0.05 + right.y * 0.05
-  }
-
-  if (localAim.y > 0) {
-    offset.y += localAim.y * 0.04
-  } else {
-    offset.x -= dir.x * localAim.y * 0.04
-    offset.z -= dir.y * localAim.y * 0.04
-  }
-
-  if (tip) {
-    offset.x -= dir.x * 0.1
-    offset.y -= 0.035 - localAim.y * 0.2
-    offset.z -= dir.y * 0.1
-  }
-
-  return offset
 }
