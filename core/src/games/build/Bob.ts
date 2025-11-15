@@ -1,9 +1,8 @@
 import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
-  Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
-  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings, Block,
-  MarbleTexture, BlockMaterial
+  Team, Three, upAndDir, XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping,
+  colorMaterials, cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -128,7 +127,7 @@ export const Bob = (player: Player): Character => {
             return { actionId: "down" }
           },
 
-          // jump/p
+          // jump/up
           " ": ({ hold }) => {
             if (bob.components.position.data.flying) {
               return { actionId: "up" }
@@ -147,7 +146,7 @@ export const Bob = (player: Player): Character => {
           "n": ({ world, hold }) => {
             if (hold) return
 
-            const settings = world.settings<StrikeSettings>()
+            const settings = world.settings<BuildSettings>()
             settings.showNametags = !settings.showNametags
 
             return
@@ -194,14 +193,19 @@ export const Bob = (player: Player): Character => {
           const { position } = bob.components
 
           if (position.data.flying) return
-          if (!position.data.standing && params.hold) return
           if (bob.components.health?.dead()) return
 
-          const state = world.state<StrikeState>()
-          if (!position.data.standing && state.jumped.includes(bob.id)) return
+          const state = world.state<BuildState>()
 
-          state.jumped.push(bob.id)
-          position.setVelocity({ z: max(0.05, 0.025 + position.data.velocity.z) })
+          if (!position.data.standing && state.doubleJumped.includes(bob.id)) return
+          if (!position.data.standing && params.hold) return
+
+          if (!position.data.standing) {
+            position.setVelocity({ z: max(0.05, 0.025 + position.data.velocity.z) })
+            state.doubleJumped.push(bob.id)
+          } else {
+            position.setVelocity({ z: 0.05 })
+          }
 
           world.client?.sound.play({ name: "bubble", threshold: { pos: position.data, distance: 5 } })
         }),
