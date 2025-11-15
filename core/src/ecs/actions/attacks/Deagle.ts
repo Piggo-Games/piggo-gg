@@ -353,8 +353,6 @@ export const DeagleItem = ({ character }: { character: Character }) => {
             aim = client.controls.localAim
           }
 
-          const offset = modelOffset(aim)
-
           // tracer
           if (tracer) {
             if (world.tick - tracerState.tick < 2) {
@@ -403,6 +401,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
           }
 
           // gun
+          const offset = modelOffset(aim)
           mesh.position.set(
             pos.x + offset.x,
             pos.z + 0.45 + offset.y,

@@ -5,8 +5,10 @@ export type ThreeCamera = {
   c: PerspectiveCamera
   mode: "first" | "third"
   transition: number
-  dir: (world: World, factor?: number) => XYZ
   pos: () => XYZ
+  dir: (world: World, factor?: number) => XYZ
+  right: (world: World, factor?: number) => XYZ
+  left: (world: World, factor?: number) => XYZ
 }
 
 export const ThreeCamera = (): ThreeCamera => {
@@ -18,6 +20,9 @@ export const ThreeCamera = (): ThreeCamera => {
     c: camera,
     mode: "first",
     transition: 125,
+    pos: () => {
+      return XYZ(ThreeCamera.c.position)
+    },
     dir: (world: World, factor: number) => {
       if (!world.client) return new Vector3(0, 0, 0)
 
@@ -29,8 +34,27 @@ export const ThreeCamera = (): ThreeCamera => {
         sin(localAim.y),
       ).normalize().multiplyScalar(factor || 1))
     },
-    pos: () => {
-      return XYZ(ThreeCamera.c.position)
+    right: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        cos(localAim.x),
+        -sin(localAim.x),
+        0
+      ).normalize().multiplyScalar(factor || 1))
+    },
+    left: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        -cos(localAim.x),
+        sin(localAim.x),
+        0
+      ).normalize().multiplyScalar(factor || 1))
     }
   }
   return ThreeCamera
