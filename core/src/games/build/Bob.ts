@@ -309,7 +309,10 @@ export const Bob = (player: Player): Character => {
 
           // position
           pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
-          if (block) block.position.set(interpolated.x, interpolated.z + 0.05, interpolated.y)
+          if (block) {
+            block.position.set(interpolated.x, interpolated.z + 0.4, interpolated.y)
+            block.position.add(three.camera.dir(world, 0.2))
+          }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
           hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
@@ -429,7 +432,7 @@ export const Bob = (player: Player): Character => {
 
             entity.components.three.o.push(pig)
 
-            block = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), BlockMaterial())
+            block = new Mesh(new BoxGeometry(0.05, 0.05, 0.05), BlockMaterial())
             MarbleTexture(block.material, three)
             entity.components.three.o.push(block)
           })
