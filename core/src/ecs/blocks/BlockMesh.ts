@@ -8,15 +8,16 @@ import {
 
 export type BlocksMesh = InstancedMesh<BoxGeometry, MeshPhysicalMaterial[], InstancedMeshEventMap>
 
-export const BlocksMesh = (maxCount: number): BlocksMesh => {
+export const BlockMaterial = (): MeshPhysicalMaterial[] => {
   const mat = () => new MeshPhysicalMaterial({
     vertexColors: false, visible: false, specularIntensity: 0.05, wireframe: false
   })
+  return [mat(), mat(), mat(), mat(), mat(), mat()]
+}
 
+export const BlocksMesh = (maxCount: number): BlocksMesh => {
   const mesh = new InstancedMesh(
-    new BoxGeometry(0.3, 0.3, 0.3),
-    [mat(), mat(), mat(), mat(), mat(), mat()],
-    maxCount
+    new BoxGeometry(0.3, 0.3, 0.3), BlockMaterial(), maxCount
   )
 
   mesh.castShadow = true
