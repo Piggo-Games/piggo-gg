@@ -2,11 +2,11 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
   Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
-  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings
+  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings, Block
 } from "@piggo-gg/core"
 import {
-  AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
-  MeshPhongMaterial, Object3D, SkeletonHelper, Vector3
+  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
+  MeshPhongMaterial, MeshPhysicalMaterial, Object3D, SkeletonHelper, Vector3
 } from "three"
 
 const walk = 0.42
@@ -19,6 +19,7 @@ export const Bob = (player: Player): Character => {
   let hitboxes: { body: undefined | Mesh, head: undefined | Mesh } = { body: undefined, head: undefined }
 
   let pig: Object3D = new Object3D()
+  let block: Object3D = new Object3D()
   let helper: SkeletonHelper | undefined = undefined
 
   let pigMixer: AnimationMixer | undefined
@@ -29,6 +30,8 @@ export const Bob = (player: Player): Character => {
 
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
+
+  let AA: undefined | Block = undefined
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -304,10 +307,10 @@ export const Bob = (player: Player): Character => {
 
           // position
           pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
-          // if (world.debug) {
+          block.position.set(interpolated.x, interpolated.z + 0.05, interpolated.y)
+
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
           hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
-          // }
 
           // rotation
           pig.rotation.y = orientation.x + PI
@@ -423,6 +426,9 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
+
+            // block = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), new MeshPhysicalMaterial({ color: 0x }))
+            entity.components.three.o.push(block)
           })
         }
       })

@@ -1,5 +1,5 @@
-import { BlockMesh, ThreeRenderer } from "@piggo-gg/core"
-import { LinearMipMapNearestFilter, NearestFilter, SRGBColorSpace, Texture } from "three"
+import { ThreeRenderer } from "@piggo-gg/core"
+import { LinearMipMapNearestFilter, MeshPhysicalMaterial, NearestFilter, SRGBColorSpace, Texture } from "three"
 
 type BlockTextureProps = {
   side: string
@@ -9,9 +9,7 @@ type BlockTextureProps = {
   roughness?: number
 }
 
-export const BlockTexture = ({ side, top, bottom, norm, roughness }: BlockTextureProps) => (mesh: BlockMesh, three: ThreeRenderer) => {
-
-  const { material } = mesh
+export const BlockTexture = ({ side, top, bottom, norm, roughness }: BlockTextureProps) => (material: MeshPhysicalMaterial[], three: ThreeRenderer) => {
 
   three.tLoader.load(`${side}.png`, (texture: Texture) => {
     for (let i = 0; i < 6; i++) {
@@ -51,8 +49,6 @@ export const BlockTexture = ({ side, top, bottom, norm, roughness }: BlockTextur
       material[i].roughness = roughness
     }
   }
-
-  return mesh
 }
 
 export const SpruceTexture = BlockTexture({ side: "spruce-log", norm: "spruce-norm" })
