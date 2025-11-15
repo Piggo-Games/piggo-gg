@@ -12,6 +12,8 @@ export type HUDSystemProps = {
   clusters: Cluster[]
 }
 
+const mb = ["mb1", "mb2", "mb3"]
+
 export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
   id: "HUDSystem",
   init: (world) => {
@@ -83,7 +85,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         keyWrapper.appendChild(rowDiv)
 
         for (const button of row) {
-          const btn = ["mb1", "mb2"].includes(button) ? KeyImg(`${button}.svg`) : KeyButton({ text: button })
+          const btn = mb.includes(button) ? KeyImg(`${button}.svg`) : KeyButton({ text: button })
 
           rowDiv.appendChild(btn)
           buttonElements.push({ element: btn, key: button.toLowerCase() })
@@ -112,7 +114,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
           for (const btn of buttonElements) {
             const check = btn.key === "spacebar" ? " " : btn.key
 
-            if (["mb1", "mb2"].includes(check)) {
+            if (mb.includes(check)) {
               btn.element.style.filter = down.includes(check) ? "sepia(83%) saturate(8000%) hue-rotate(170deg)" : ""
             } else {
               btn.element.style.backgroundColor = down.includes(check) ? active : inactive

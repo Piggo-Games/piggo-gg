@@ -20,6 +20,8 @@ character mesh 2 | https://quaternius.com/packs/ultimatemodularcharacters.html |
 
 health icon | https://www.svgrepo.com/svg/499213/health | license: GPL
 
+scroll down icon | https://www.svgrepo.com/svg/522650/scroll-down | license: attribution
+
 block textures | https://github.com/shackhornold/UwUCraft/ | license: MIT
 
 eagle mesh | https://opengameart.org/content/animated-animales-low-poly
