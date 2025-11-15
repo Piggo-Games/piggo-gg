@@ -75,7 +75,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     entitiesAtTick: {},
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
     games: {
-      "build": Build,
+      "builders": Build,
       "craft": Craft,
       "lobby": Lobby,
       "strike": Strike,

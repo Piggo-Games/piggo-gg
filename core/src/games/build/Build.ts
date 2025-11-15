@@ -18,9 +18,9 @@ export type BuildState = {
 }
 
 export const Build: GameBuilder<BuildState, BuildSettings> = {
-  id: "build",
+  id: "builders",
   init: (world) => ({
-    id: "build",
+    id: "builders",
     netcode: "rollback",
     renderer: "three",
     settings: {

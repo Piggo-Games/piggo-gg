@@ -124,7 +124,7 @@ export const ThreeCameraSystem = () => ClientSystemBuilder({
             camera.c.position.set(firstPos.x, firstPos.z, firstPos.y)
           }
 
-          if (world.game.id === "build") {
+          if (world.game.id === "builders") {
             camera.c.rotation.set(y, x, 0)
           } else {
             camera.c.rotation.set(y + recoil * 0.03, x, 0)
