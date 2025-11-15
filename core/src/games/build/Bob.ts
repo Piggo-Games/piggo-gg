@@ -310,11 +310,9 @@ export const Bob = (player: Player): Character => {
           // position
           pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
           if (block) {
-            block.position.set(interpolated.x, interpolated.z + 0.45, interpolated.y)
-            block.position.add(three.camera.dir(world, 0.05))
-            block.position.add(three.camera.right(world, 0.05))
-
-            // console.log(block.position.y)
+            block.position.set(interpolated.x, interpolated.z + 0.48, interpolated.y)
+            block.position.add(three.camera.dir(world, 0.04))
+            block.position.add(three.camera.left(world, 0.02))
           }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
@@ -435,7 +433,7 @@ export const Bob = (player: Player): Character => {
 
             entity.components.three.o.push(pig)
 
-            block = new Mesh(new BoxGeometry(0.05, 0.05, 0.05), BlockMaterial())
+            block = new Mesh(new BoxGeometry(0.016, 0.016, 0.016), BlockMaterial())
             block.castShadow = true
             block.frustumCulled = false
             MarbleTexture(block.material, three)
