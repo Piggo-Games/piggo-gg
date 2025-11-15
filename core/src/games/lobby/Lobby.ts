@@ -6,17 +6,17 @@ import {
 } from "@piggo-gg/core"
 
 type LobbyState = {
-  gameId: "volley" | "craft" | "strike" | "build"
+  gameId: "volley" | "craft" | "strike" | "builders"
 }
 
-export const Lobby: GameBuilder = {
+export const Lobby: GameBuilder<LobbyState> = {
   id: "lobby",
   init: () => ({
     id: "lobby",
     renderer: "pixi",
     settings: {},
     state: {
-      gameId: "build"
+      gameId: "builders"
     },
     systems: [PixiRenderSystem],
     entities: [
@@ -87,7 +87,7 @@ const PlayButton = (world: World) => {
       if (!world.client?.isLeader()) return
 
       const state = world.state<LobbyState>()
-      if (["craft", "strike", "build"].includes(state.gameId)) world.client?.pointerLock()
+      if (["craft", "strike", "builders"].includes(state.gameId)) world.client?.pointerLock()
 
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: state.gameId } })
       world.actions.push(world.tick + 2, "world", { actionId: "game", params: { game: state.gameId } })

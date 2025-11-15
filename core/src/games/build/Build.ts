@@ -5,7 +5,6 @@ import {
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
-import { ColorIndicator } from "./ColorIndicator"
 
 export type BuildSettings = {
   showCrosshair: boolean
@@ -14,14 +13,14 @@ export type BuildSettings = {
   blockColor: BlockColor
 }
 
-type BuildState = {
-  jumped: string[]
+export type BuildState = {
+  doubleJumped: string[]
 }
 
 export const Build: GameBuilder<BuildState, BuildSettings> = {
-  id: "build",
+  id: "builders",
   init: (world) => ({
-    id: "build",
+    id: "builders",
     netcode: "rollback",
     renderer: "three",
     settings: {
@@ -31,7 +30,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       blockColor: "white"
     },
     state: {
-      jumped: []
+      doubleJumped: []
     },
     systems: [
       SpawnSystem(Bob),
@@ -54,8 +53,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
-      HtmlLagText(),
-      // ColorIndicator(world)
+      HtmlLagText()
     ]
   })
 }
@@ -72,6 +70,8 @@ const BuildSystem = SystemBuilder({
       priority: 3,
       onTick: () => {
 
+        const state = world.game.state as BuildState
+
         if (world.client && !world.client.mobile) {
           world.client.menu = document.pointerLockElement === null
         }
@@ -83,10 +83,16 @@ const BuildSystem = SystemBuilder({
           if (!character) continue
 
           const { position } = character.components
+          const { velocity, standing } = position.data
 
           // fell off the map
           if (position.data.z < -8) {
             position.setPosition({ x: 10, y: 10, z: 8 })
+          }
+
+          // double-jump state cleanup
+          if (standing) {
+            state.doubleJumped = state.doubleJumped.filter(id => id !== character.id)
           }
         }
 
@@ -97,6 +103,10 @@ const BuildSystem = SystemBuilder({
 
 const controls: HUDSystemProps = {
   clusters: [
+    {
+      label: "color",
+      buttons: [["mb3"]]
+    },
     {
       label: "place",
       buttons: [["mb2"]]
