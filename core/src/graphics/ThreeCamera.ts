@@ -5,20 +5,26 @@ export type ThreeCamera = {
   c: PerspectiveCamera
   mode: "first" | "third"
   transition: number
-  dir: (world: World) => XYZ
   pos: () => XYZ
+  dir: (world: World, factor?: number) => XYZ
+  right: (world: World, factor?: number) => XYZ
+  left: (world: World, factor?: number) => XYZ
+  forward: (world: World, factor?: number) => XYZ
 }
 
 export const ThreeCamera = (): ThreeCamera => {
 
-  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000)
+  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 1000)
   camera.rotation.order = "YXZ"
 
   const ThreeCamera: ThreeCamera = {
     c: camera,
     mode: "first",
     transition: 125,
-    dir: (world: World) => {
+    pos: () => {
+      return XYZ(ThreeCamera.c.position)
+    },
+    dir: (world: World, factor: number) => {
       if (!world.client) return new Vector3(0, 0, 0)
 
       const { localAim } = world.client.controls
@@ -27,10 +33,40 @@ export const ThreeCamera = (): ThreeCamera => {
         -sin(localAim.x) * cos(localAim.y),
         -cos(localAim.x) * cos(localAim.y),
         sin(localAim.y),
-      ).normalize())
+      ).normalize().multiplyScalar(factor || 1))
     },
-    pos: () => {
-      return XYZ(ThreeCamera.c.position)
+    right: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        cos(localAim.x),
+        -sin(localAim.x),
+        0
+      ).normalize().multiplyScalar(factor || 1))
+    },
+    left: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        -cos(localAim.x),
+        sin(localAim.x),
+        0
+      ).normalize().multiplyScalar(factor || 1))
+    },
+    forward: (world: World, factor: number) => {
+      if (!world.client) return new Vector3(0, 0, 0)
+
+      const { localAim } = world.client.controls
+
+      return XYZ(new Vector3(
+        -sin(localAim.x) * cos(localAim.y),
+        -cos(localAim.x) * cos(localAim.y),
+        0
+      ).normalize().multiplyScalar(factor || 1))
     }
   }
   return ThreeCamera

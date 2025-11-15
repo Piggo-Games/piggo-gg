@@ -1,6 +1,6 @@
 import {
-  Action, Actions, BlockInLine, blockInLine, Character, cos, Effects, Entity,
-  Input, Item, ItemComponents, max, min, Networked, nextColor, NPC, Position,
+  Action, Actions, blockInLine, Character, cos, Effects, Entity, Input,
+  Item, ItemComponents, max, min, Networked, nextColor, NPC, Position,
   randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
 import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
@@ -222,8 +222,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             aim = client.controls.localAim
           }
 
-          const offset = modelOffset(aim)
-
           // tracer
           if (tracer) {
             if (world.tick - tracerState.tick < 2) {
@@ -272,6 +270,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           // gun
+          const offset = modelOffset(aim)
           mesh.position.set(
             pos.x + offset.x,
             pos.z + 0.45 + offset.y,
@@ -297,13 +296,13 @@ const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
 
   const offset = {
     x: -dir.x * 0.05 + right.x * 0.05,
-    y: recoil * 0.03,
+    y: recoil * 0.03 + localAim.y * 0.04,
     z: -dir.y * 0.05 + right.y * 0.05
   }
 
   if (tip) {
     offset.x -= dir.x * 0.1
-    offset.y -= 0.035 - localAim.y * 0.1
+    offset.y -= 0.035 - localAim.y * 0.2
     offset.z -= dir.y * 0.1
   }
 

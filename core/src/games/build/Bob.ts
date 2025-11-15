@@ -2,11 +2,12 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
   Team, Three, upAndDir, XYZ, XZ, StrikeSettings, StrikeState, cloneSkeleton,
-  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings
+  Ready, ColorMapping, colorMaterials, cos, sin, nextColor, BuildSettings, Block,
+  MarbleTexture, BlockMaterial
 } from "@piggo-gg/core"
 import {
-  AnimationAction, AnimationMixer, CapsuleGeometry, Mesh,
-  MeshPhongMaterial, Object3D, SkeletonHelper, Vector3
+  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
+  MeshPhongMaterial, MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
 } from "three"
 
 const walk = 0.42
@@ -19,6 +20,7 @@ export const Bob = (player: Player): Character => {
   let hitboxes: { body: undefined | Mesh, head: undefined | Mesh } = { body: undefined, head: undefined }
 
   let pig: Object3D = new Object3D()
+  let block: undefined | Mesh<BoxGeometry, MeshPhysicalMaterial[], Object3DEventMap> = undefined
   let helper: SkeletonHelper | undefined = undefined
 
   let pigMixer: AnimationMixer | undefined
@@ -29,6 +31,8 @@ export const Bob = (player: Player): Character => {
 
   let animation: "idle" | "run" | "dead" = "idle"
   let lastTeamNumber = player.components.team.data.team
+
+  let placeCD = -100
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -78,8 +82,10 @@ export const Bob = (player: Player): Character => {
         },
         press: {
           "mb2": ({ hold, world, character }) => {
-            if (hold) return
+            if (hold && placeCD + 6 > world.tick) return
             if (!character) return
+
+            placeCD = hold ? world.tick : world.tick + 6
 
             const dir = world.three!.camera.dir(world)
             const camera = world.three!.camera.pos()
@@ -304,10 +310,16 @@ export const Bob = (player: Player): Character => {
 
           // position
           pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
-          // if (world.debug) {
+          if (block) {
+            block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
+            block.position.add(three.camera.dir(world, 0.002))
+
+            block.quaternion.copy(three.camera.c.quaternion)
+            block.rotation.y = 0
+          }
+
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
           hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
-          // }
 
           // rotation
           pig.rotation.y = orientation.x + PI
@@ -374,6 +386,12 @@ export const Bob = (player: Player): Character => {
               }
             })
           }
+
+          // update block color
+          if (block) {
+            const { blockColor } = world.settings<BuildSettings>()
+            block.material.forEach((mat) => mat.color.set(blockColor))
+          }
         },
         init: async (entity, world, three) => {
 
@@ -423,6 +441,14 @@ export const Bob = (player: Player): Character => {
             })
 
             entity.components.three.o.push(pig)
+
+            block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
+            block.castShadow = true
+            block.frustumCulled = false
+            block.rotation.order = "ZXY"
+            MarbleTexture(block.material, three)
+
+            entity.components.three.o.push(block)
           })
         }
       })

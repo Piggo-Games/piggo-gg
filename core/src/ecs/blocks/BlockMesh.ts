@@ -1,20 +1,23 @@
 import {
-  BlockTypeString, ClientSystemBuilder, entries, GrassTexture,
-  LeafTexture, logPerf, MarbleTexture, OakTexture, SpruceTexture
+  BlockTypeString, ClientSystemBuilder, GrassTexture, LeafTexture,
+  logPerf, MarbleTexture, OakTexture, SpruceTexture
 } from "@piggo-gg/core"
-import { BoxGeometry, Color, InstancedMesh, InstancedMeshEventMap, MeshPhysicalMaterial, Object3D } from "three"
+import {
+  BoxGeometry, Color, InstancedMesh, InstancedMeshEventMap, MeshPhysicalMaterial, Object3D
+} from "three"
 
-export type BlockMesh = InstancedMesh<BoxGeometry, MeshPhysicalMaterial[], InstancedMeshEventMap>
+export type BlocksMesh = InstancedMesh<BoxGeometry, MeshPhysicalMaterial[], InstancedMeshEventMap>
 
-export const BlockMesh = (maxCount: number): BlockMesh => {
+export const BlockMaterial = (): MeshPhysicalMaterial[] => {
   const mat = () => new MeshPhysicalMaterial({
     vertexColors: false, visible: false, specularIntensity: 0.05, wireframe: false
   })
+  return [mat(), mat(), mat(), mat(), mat(), mat()]
+}
 
+export const BlocksMesh = (maxCount: number): BlocksMesh => {
   const mesh = new InstancedMesh(
-    new BoxGeometry(0.3, 0.3, 0.3),
-    [mat(), mat(), mat(), mat(), mat(), mat()],
-    maxCount
+    new BoxGeometry(0.3, 0.3, 0.3), BlockMaterial(), maxCount
   )
 
   mesh.castShadow = true
@@ -30,11 +33,17 @@ export const BlockMeshSystem = ClientSystemBuilder({
     const { three } = world
     if (!three) return
 
-    let grass = GrassTexture(BlockMesh(32000), three)
-    let leaf = LeafTexture(BlockMesh(5000), three)
-    let oak = OakTexture(BlockMesh(5000), three)
-    let spruce = SpruceTexture(BlockMesh(5000), three)
-    let marble = MarbleTexture(BlockMesh(4000), three)
+    let grass = BlocksMesh(32000)
+    let leaf = BlocksMesh(5000)
+    let oak = BlocksMesh(5000)
+    let spruce = BlocksMesh(5000)
+    let marble = BlocksMesh(4000)
+
+    GrassTexture(grass.material, three)
+    LeafTexture(leaf.material, three)
+    OakTexture(oak.material, three)
+    SpruceTexture(spruce.material, three)
+    MarbleTexture(marble.material, three)
 
     let rendered = false
 
