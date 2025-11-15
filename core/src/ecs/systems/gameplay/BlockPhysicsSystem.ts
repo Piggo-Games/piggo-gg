@@ -275,25 +275,21 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
                 position.data.z = round(blockMin.z - 0.1, 5)
                 position.data.velocity.z = 0
                 position.data.standing = false
-                // console.log("not standing 1")
               }
             } else if (velocity.z < 0 && wouldGo.z + 0.1 < blockMax.z) {
               if (mode === "local") {
                 position.localVelocity.z = round(blockMax.z - position.data.z, 5)
               } else {
-                // console.log("standing 1", velocity.z)
                 position.data.z = round(blockMax.z, 5)
                 position.data.velocity.z = 0
                 position.data.standing = true
               }
             } else if (mode !== "local") {
               position.data.standing = false
-              // console.log("not standing 2 ")
               applyZ = true
             }
           } else if (mode !== "local") {
             position.data.standing = false
-            // console.log("not standing 3")
             applyZ = true
           }
 
@@ -368,12 +364,9 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           if (mode === "local") continue
 
-          // console.log("standing", position.data.standing, position.data.velocity.z)
-
           if (applyZ) {
             position.data.z += position.data.velocity.z
             if (position.data.velocity.z > 0) {
-              // console.log("not standing 4")
               position.data.standing = false
             }
           }
