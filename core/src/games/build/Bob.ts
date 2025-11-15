@@ -18,7 +18,7 @@ export const Bob = (player: Player): Character => {
 
   let hitboxes: { body: undefined | Mesh, head: undefined | Mesh } = { body: undefined, head: undefined }
 
-  let pig: Object3D = new Object3D()
+  let mesh: Object3D = new Object3D()
   let block: undefined | Mesh<BoxGeometry, MeshPhysicalMaterial[], Object3DEventMap> = undefined
   let helper: SkeletonHelper | undefined = undefined
 
@@ -312,11 +312,26 @@ export const Bob = (player: Player): Character => {
 
           const orientation = player.id === client.playerId() ? client.controls.localAim : position.data.aim
 
-          // position
-          pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
+          // mesh position
+          mesh.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
+
+          // block position
           if (block) {
             block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
-            block.position.add(three.camera.dir(world, 0.002))
+
+            const { localAim } = client.controls
+            const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
+
+            let offset = three.camera.dir(world, 0.002)
+
+            // vertical adjustment
+            offset.x -= dir.x * localAim.y * 0.001
+            offset.z -= dir.y * localAim.y * 0.001
+            if (localAim.y > 0) {
+              offset.y += localAim.y * 0.0007
+            }
+
+            block.position.add(offset)
 
             block.quaternion.copy(three.camera.c.quaternion)
             block.rotation.y = 0
@@ -326,11 +341,11 @@ export const Bob = (player: Player): Character => {
           hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
 
           // rotation
-          pig.rotation.y = orientation.x + PI
+          mesh.rotation.y = orientation.x + PI
 
           // team color
           if (lastTeamNumber !== player.components.team.data.team) {
-            colorMaterials(pig, BobColors, player.components.team.data.team)
+            colorMaterials(mesh, BobColors, player.components.team.data.team)
             lastTeamNumber = player.components.team.data.team
           }
 
@@ -384,7 +399,7 @@ export const Bob = (player: Player): Character => {
 
             const opacity = three.camera.mode === "first" ? 1 - (three.camera.transition / 100) : three.camera.transition / 100
 
-            pig.traverse((child) => {
+            mesh.traverse((child) => {
               if (child instanceof Mesh) {
                 child.material.opacity = opacity
               }
@@ -414,27 +429,27 @@ export const Bob = (player: Player): Character => {
           // character model
           three.gLoader.load("cowboy.glb", (gltf) => {
 
-            pig = cloneSkeleton(gltf.scene)
-            pig.animations = gltf.animations
-            pig.frustumCulled = false
-            pig.scale.set(0.18, 0.18, 0.18)
+            mesh = cloneSkeleton(gltf.scene)
+            mesh.animations = gltf.animations
+            mesh.frustumCulled = false
+            mesh.scale.set(0.18, 0.18, 0.18)
 
-            // helper = new SkeletonHelper(pig.children[0].children[1])
+            // helper = new SkeletonHelper(mesh.children[0].children[1])
 
-            copyMaterials(gltf.scene, pig)
-            colorMaterials(pig, BobColors, player.components.team.data.team)
+            copyMaterials(gltf.scene, mesh)
+            colorMaterials(mesh, BobColors, player.components.team.data.team)
 
-            pigMixer = new AnimationMixer(pig)
+            pigMixer = new AnimationMixer(mesh)
 
-            idleAnimation = pigMixer.clipAction(pig.animations[2])
-            runAnimation = pigMixer.clipAction(pig.animations[8])
-            deathAnimation = pigMixer.clipAction(pig.animations[0])
+            idleAnimation = pigMixer.clipAction(mesh.animations[2])
+            runAnimation = pigMixer.clipAction(mesh.animations[8])
+            deathAnimation = pigMixer.clipAction(mesh.animations[0])
             deathAnimation.loop = 2200
             deathAnimation.clampWhenFinished = true
 
             idleAnimation?.play()
 
-            pig.traverse((child) => {
+            mesh.traverse((child) => {
               if (child instanceof Mesh) {
                 child.material.transparent = true
                 child.material.opacity = player.id === world.client!.playerId() ? 0 : 1
@@ -444,7 +459,7 @@ export const Bob = (player: Player): Character => {
               }
             })
 
-            entity.components.three.o.push(pig)
+            entity.components.three.o.push(mesh)
 
             block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
             block.castShadow = true

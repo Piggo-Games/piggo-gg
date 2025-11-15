@@ -5,7 +5,6 @@ import {
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
-import { ColorIndicator } from "./ColorIndicator"
 
 export type BuildSettings = {
   showCrosshair: boolean
@@ -15,7 +14,6 @@ export type BuildSettings = {
 }
 
 export type BuildState = {
-  // jumped: string[]
   doubleJumped: string[]
 }
 
@@ -55,8 +53,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
-      HtmlLagText(),
-      // ColorIndicator(world)
+      HtmlLagText()
     ]
   })
 }
