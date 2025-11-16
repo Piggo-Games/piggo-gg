@@ -107,13 +107,13 @@ const controls: HUDSystemProps = {
       label: "color",
       buttons: [["mb3"]]
     },
+    // {
+    //   label: "place",
+    //   buttons: [["mb2"]]
+    // },
     {
-      label: "place",
-      buttons: [["mb2"]]
-    },
-    {
-      label: "shoot",
-      buttons: [["mb1"]]
+      label: "shoot|place",
+      buttons: [["mb1", "mb2"]]
     },
     {
       label: "fly",
