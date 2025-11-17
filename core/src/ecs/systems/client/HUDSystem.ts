@@ -5,6 +5,7 @@ import {
 type Cluster = {
   buttons: string[][]
   label: string
+  fontSize?: `${number}px`
 }
 
 export type HUDSystemProps = {
@@ -92,7 +93,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         }
       }
 
-      const label = KeyLabel(cluster.label)
+      const label = KeyLabel(cluster.label, cluster.fontSize ?? "18px")
       clusterDiv.appendChild(label)
     }
 
@@ -164,11 +165,12 @@ const KeyImg = (src: string) => HImg({
   }
 })
 
-const KeyLabel = (text: string) => HtmlText({
+const KeyLabel = (text: string, fontSize: `${number}px`) => HtmlText({
   text,
   style: {
     position: "relative",
     textAlign: "center",
-    marginTop: "6px"
+    marginTop: "6px",
+    fontSize: fontSize
   }
 })
