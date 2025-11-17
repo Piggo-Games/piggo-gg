@@ -5,6 +5,7 @@ import {
 type Cluster = {
   buttons: string[][]
   label: string
+  fontSize?: `${number}px`
 }
 
 export type HUDSystemProps = {
@@ -92,7 +93,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         }
       }
 
-      const label = KeyLabel(cluster.label)
+      const label = KeyLabel(cluster.label, cluster.fontSize ?? "18px")
       clusterDiv.appendChild(label)
     }
 
@@ -102,7 +103,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     return {
       id: "HUDSystem",
       query: [],
-      priority: 10,
+      priority: 0,
       onTick: () => {
         const settings = world.settings<{ showControls: boolean }>()
         wrapper.style.visibility = settings.showControls ? "visible" : "hidden"
@@ -112,26 +113,17 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         const down = client.bufferDown.all()?.map(key => key.key)
         if (down) {
           for (const btn of buttonElements) {
-            const check = btn.key === "spacebar" ? " " : btn.key
+            let check = [btn.key]
+            if (btn.key === "spacebar") check = [" "]
+            if (btn.key === "mb3") check = ["scrolldown", "scrollup"]
 
-            if (mb.includes(check)) {
-              btn.element.style.filter = down.includes(check) ? "sepia(83%) saturate(8000%) hue-rotate(170deg)" : ""
+            if (mb.includes(btn.key)) {
+              btn.element.style.filter = check.some(x => down.includes(x)) ? "sepia(83%) saturate(8000%) hue-rotate(170deg)" : ""
             } else {
-              btn.element.style.backgroundColor = down.includes(check) ? active : inactive
+              btn.element.style.backgroundColor = check.some(x => down.includes(x)) ? active : inactive
             }
           }
         }
-
-        // const state = world.state<{ phase: string }>()
-
-        // const isConnected = world.client?.net.synced
-        // const isWarmup = state.phase === "warmup"
-
-        // cButton.style.visibility = isWarmup ? "visible" : "hidden"
-        // teamLabel.style.visibility = isWarmup ? "visible" : "hidden"
-
-        // zButton.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
-        // readyLabel.style.visibility = isWarmup && isConnected ? "visible" : "hidden"
       }
     }
   }
@@ -164,11 +156,12 @@ const KeyImg = (src: string) => HImg({
   }
 })
 
-const KeyLabel = (text: string) => HtmlText({
+const KeyLabel = (text: string, fontSize: `${number}px`) => HtmlText({
   text,
   style: {
     position: "relative",
     textAlign: "center",
-    marginTop: "6px"
+    marginTop: "6px",
+    fontSize: fontSize
   }
 })
