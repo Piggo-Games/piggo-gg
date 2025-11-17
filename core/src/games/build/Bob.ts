@@ -33,6 +33,8 @@ export const Bob = (player: Player): Character => {
 
   let placeCD = -100
 
+  let wipStart: undefined | XYZ = undefined
+
   const bob = Character({
     id: `bob-${player.id}`,
     components: {
@@ -157,6 +159,16 @@ export const Bob = (player: Player): Character => {
             if (hold === 5) {
               world.debug = !world.debug
             }
+          },
+
+          "e": ({ hold, world, character }) => {
+            if (hold || !character) return
+
+            const dir = world.three!.camera.dir(world)
+            const camera = world.three!.camera.pos()
+            const pos = character.components.position.xyz()
+
+            return { actionId: "place", params: { type: 7, dir, camera, pos } }
           },
 
           // no movement

@@ -35,7 +35,7 @@ export const BlockTypeInt: Record<BlockType, number> = {
   asteroid: 4,
   saphire: 5,
   spruce: 6,
-  ruby: 7,
+  wip: 7,
   white: 8,
   oak: 9,
   spruceLeaf: 10,
@@ -51,7 +51,7 @@ export const BlockTypeString: Record<number, BlockType> = {
   4: "asteroid",
   5: "saphire",
   6: "spruce",
-  7: "ruby",
+  7: "wip",
   8: "white",
   9: "oak",
   10: "spruceLeaf",
@@ -61,7 +61,7 @@ export const BlockTypeString: Record<number, BlockType> = {
 
 export type BlockType =
   "white" | "stone" | "grass" | "moss" | "moonrock" |
-  "asteroid" | "saphire" | "spruce" | "ruby" | "oak" |
+  "asteroid" | "saphire" | "spruce" | "wip" | "oak" |
   "spruceLeaf" | "oakLeaf" | "marble"
 
 // export const BlockColors: Record<BlockType, [number, number, number]> = {

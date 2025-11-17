@@ -8,8 +8,8 @@ import {
 import { decode, encode } from "@msgpack/msgpack"
 
 const servers: Record<ENV, string> = {
-  // local: "ws://localhost:3000",
-  local: `wss://${DiscordDomain}/.proxy/api-local`,
+  local: "ws://localhost:3000",
+  // local: `wss://${DiscordDomain}/.proxy/api-local`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
   discord: `wss://${DiscordDomain}/.proxy/api`
