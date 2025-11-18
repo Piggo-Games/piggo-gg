@@ -1,8 +1,8 @@
 import {
-  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem, hypot,
-  Input, Inventory, max, Networked, PI, Place, Player, Point, Position, Team, Three,
-  upAndDir, XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials,
-  cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState, blockInLine, BlocksMesh
+  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem, hypot, Input,
+  Inventory, max, Networked, PI, Place, Player, Point, Position, Team, Three, upAndDir,
+  XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
+  nextColor, MarbleTexture, BlockMaterial, BuildState, blockInLine, BlocksMesh, nextBlock
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -168,11 +168,12 @@ export const Bob = (player: Player): Character => {
             const dir = world.three!.camera.dir(world)
             const camera = world.three!.camera.pos()
 
-            const beamResult = blockInLine({ from: camera, dir, world })
-            if (!beamResult) return
+            let wipEnd = blockInLine({ from: camera, dir, world })?.outside
+            if (!wipEnd && wipStart) {
+              wipEnd = nextBlock({ from: camera, dir, dist: 2 })
+            }
 
-            if (wipStart) {
-              const wipEnd = beamResult.outside
+            if (wipStart && wipEnd) {
 
               const xDir = wipEnd.x >= wipStart.x ? 1 : -1
               for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
@@ -188,7 +189,7 @@ export const Bob = (player: Player): Character => {
 
               wipStart = undefined
             } else {
-              wipStart = beamResult.outside
+              wipStart = wipEnd
             }
           },
 
@@ -348,13 +349,10 @@ export const Bob = (player: Player): Character => {
           const dir = three.camera.dir(world)
           const camera = three.camera.pos()
 
-          const beamResult = blockInLine({ from: camera, dir, world })
-          if (!beamResult) {
-            return
-            // beamResult.inside
+          let wipEnd = blockInLine({ from: camera, dir, world })?.outside
+          if (!wipEnd) {
+            wipEnd = nextBlock({ from: camera, dir, dist: 2 })
           }
-
-          const wipEnd = beamResult.outside
 
           let count = 0
           let dummy = new Object3D()
