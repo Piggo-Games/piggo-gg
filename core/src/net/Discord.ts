@@ -24,6 +24,7 @@ export const Discord = (): Discord | undefined => {
       if (discord.loggedIn) return
       if (!client.net.connected) return
 
+      await sdk.ready()
       discord.loggedIn = true
 
       // already authorized
