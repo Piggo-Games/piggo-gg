@@ -2,7 +2,8 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
   Team, Three, upAndDir, XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping,
-  colorMaterials, cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState
+  colorMaterials, cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState,
+  blockInLine
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -168,7 +169,38 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
-            return { actionId: "place", params: { type: 7, dir, camera, pos } }
+            const beamResult = blockInLine({ from: camera, dir, world })
+            if (!beamResult) return
+
+            
+
+
+            if (wipStart) {
+              const wipEnd = beamResult.inside
+              console.log("place between", wipStart, wipEnd)
+
+              // put block between start and end
+
+              // x axis
+              const xDir = wipEnd.x >= wipStart.x ? 1 : -1
+              for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
+                // y axis
+                const yDir = wipEnd.y >= wipStart.y ? 1 : -1
+                for (let y = wipStart.y; y !== wipEnd.y + yDir; y += yDir) {
+                  // z axis
+                  const zDir = wipEnd.z >= wipStart.z ? 1 : -1
+                  for (let z = wipStart.z; z !== wipEnd.z + zDir; z += zDir) {
+                    world.blocks.add({ type: 7, x, y, z })
+                  }
+                }
+              }
+
+              wipStart = undefined
+            } else {
+              wipStart = beamResult.outside
+            }
+
+            // return { actionId: "place", params: { type: 7, dir, camera, pos } }
           },
 
           // no movement
