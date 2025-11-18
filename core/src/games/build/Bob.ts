@@ -172,7 +172,7 @@ export const Bob = (player: Player): Character => {
             if (!beamResult) return
 
             if (wipStart) {
-              const wipEnd = beamResult.inside
+              const wipEnd = beamResult.outside
 
               const xDir = wipEnd.x >= wipStart.x ? 1 : -1
               for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
@@ -339,15 +339,22 @@ export const Bob = (player: Player): Character => {
       three: Three({
         onTick: ({ three, world }) => {
           if (!wipMesh) return
-          if (!wipStart) return
+
+          if (!wipStart) {
+            wipMesh.count = 0
+            return
+          }
 
           const dir = three.camera.dir(world)
           const camera = three.camera.pos()
 
           const beamResult = blockInLine({ from: camera, dir, world })
-          if (!beamResult) return
+          if (!beamResult) {
+            return
+            // beamResult.inside
+          }
 
-          const wipEnd = beamResult.inside
+          const wipEnd = beamResult.outside
 
           let count = 0
           let dummy = new Object3D()
