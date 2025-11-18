@@ -2,19 +2,29 @@ import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position
 import { Object3D } from "three"
 
 type ThreeInit = (entity: Entity<Three | Position>, world: World, three: ThreeRenderer) => Promise<void>
-type OnRenderProps = { entity: Entity<Three | Position>, world: World, client: Client, delta: number, since: number, three: ThreeRenderer }
+
+type OnRenderProps = {
+  entity: Entity<Three | Position>
+  world: World
+  client: Client
+  delta: number
+  since: number
+  three: ThreeRenderer
+}
 
 export type Three = Component<"three", {}> & {
   initialized: boolean
   o: Object3D[]
   init: undefined | ThreeInit
   onRender: undefined | ((_: OnRenderProps) => void)
+  onTick: undefined | ((_: Omit<OnRenderProps, "delta" | "since">) => void)
   cleanup: (world: World) => void
 }
 
 export type ThreeProps = {
   init?: ThreeInit
   onRender?: (_: OnRenderProps) => void
+  onTick?: (_: Omit<OnRenderProps, "delta" | "since">) => void
 }
 
 export const Three = (props: ThreeProps = {}): Three => {
@@ -25,6 +35,7 @@ export const Three = (props: ThreeProps = {}): Three => {
     o: [],
     init: props.init,
     onRender: props.onRender,
+    onTick: props.onTick,
     cleanup: (world) => {
       world.three?.scene.remove(...three.o)
     }
@@ -67,6 +78,8 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
               world.three?.scene.add(o)
             }
           }
+
+          three.onTick?.({ entity, world, client: world.client!, three: world.three! })
         }
       },
       onRender: (entities: Entity<Three | Position>[], delta, since) => {

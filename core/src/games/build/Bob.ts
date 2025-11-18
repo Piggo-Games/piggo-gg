@@ -1,8 +1,8 @@
 import {
-  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
-  hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
-  Team, Three, upAndDir, XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping,
-  colorMaterials, cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState
+  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem, hypot, Input,
+  Inventory, max, Networked, PI, Place, Player, Point, Position, Team, Three, upAndDir,
+  XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
+  nextColor, MarbleTexture, BlockMaterial, BuildState, blockInLine, BlocksMesh, nextBlock
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -32,6 +32,9 @@ export const Bob = (player: Player): Character => {
   let lastTeamNumber = player.components.team.data.team
 
   let placeCD = -100
+
+  let wipStart: undefined | XYZ = undefined
+  let wipMesh: undefined | BlocksMesh = undefined
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -156,6 +159,38 @@ export const Bob = (player: Player): Character => {
           "g": ({ world, hold }) => {
             if (hold === 5) {
               world.debug = !world.debug
+            }
+          },
+
+          "x": ({ hold, world, character, client }) => {
+            if (hold || !character || !wipMesh) return
+
+            const dir = world.three!.camera.dir(world)
+            const camera = world.three!.camera.pos()
+
+            let wipEnd = blockInLine({ from: camera, dir, world })?.outside
+            if (!wipEnd) {
+              wipEnd = nextBlock({ from: camera, dir, dist: 2 })
+            }
+
+            // TODO doesn't work in multiplayer
+            if (wipStart && wipEnd) {
+              const xDir = wipEnd.x >= wipStart.x ? 1 : -1
+              for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
+                const yDir = wipEnd.y >= wipStart.y ? 1 : -1
+                for (let y = wipStart.y; y !== wipEnd.y + yDir; y += yDir) {
+                  const zDir = wipEnd.z >= wipStart.z ? 1 : -1
+                  for (let z = wipStart.z; z !== wipEnd.z + zDir; z += zDir) {
+                    world.blocks.add({ x, y, z, type: 12 })
+                    world.blocks.coloring[`${x},${y},${z}`] = world.settings<BuildSettings>().blockColor
+                  }
+                }
+              }
+
+              client.sound.play({ name: "click2" })
+              wipStart = undefined
+            } else {
+              wipStart = wipEnd
             }
           },
 
@@ -304,6 +339,43 @@ export const Bob = (player: Player): Character => {
       }),
       team: Team(player.components.team.data.team),
       three: Three({
+        onTick: ({ three, world }) => {
+          if (!wipMesh) return
+
+          if (!wipStart) {
+            wipMesh.count = 0
+            return
+          }
+
+          const dir = three.camera.dir(world)
+          const camera = three.camera.pos()
+
+          let wipEnd = blockInLine({ from: camera, dir, world })?.outside
+          if (!wipEnd) {
+            wipEnd = nextBlock({ from: camera, dir, dist: 2 })
+          }
+
+          let count = 0
+          let dummy = new Object3D()
+
+          const xDir = wipEnd.x >= wipStart.x ? 1 : -1
+          for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
+            const yDir = wipEnd.y >= wipStart.y ? 1 : -1
+            for (let y = wipStart.y; y !== wipEnd.y + yDir; y += yDir) {
+              const zDir = wipEnd.z >= wipStart.z ? 1 : -1
+              for (let z = wipStart.z; z !== wipEnd.z + zDir; z += zDir) {
+                dummy.position.set(x * 0.3, z * 0.3 + 0.15, y * 0.3)
+                dummy.updateMatrix()
+
+                wipMesh.setMatrixAt(count, dummy.matrix)
+                count++
+              }
+            }
+          }
+          wipMesh.count = count
+          wipMesh.instanceMatrix.needsUpdate = true
+
+        },
         onRender: ({ entity, world, delta, client, three, since }) => {
           const ratio = since / 25
 
@@ -425,6 +497,15 @@ export const Bob = (player: Player): Character => {
           hitboxes.head = new Mesh(headGeo, headMat)
 
           // entity.components.three.o.push(hitboxes.body, hitboxes.head)
+
+          if (world.client?.playerId() === player.id) {
+            wipMesh = BlocksMesh(1000)
+            wipMesh.material.forEach((mat) => {
+              mat.wireframe = true
+              mat.visible = true
+            })
+            entity.components.three.o.push(wipMesh)
+          }
 
           // character model
           three.gLoader.load("cowboy.glb", (gltf) => {
