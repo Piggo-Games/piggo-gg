@@ -336,6 +336,11 @@ export const Api = (): Api => {
 
             const { access_token } = await response.json() as { access_token: string }
 
+            if (!access_token) {
+              console.error("failed getting discord access_token")
+              return HttpError(401, "could not get access token", origin)
+            }
+
             return HttpOk(origin, { access_token }, { "Set-Cookie": DiscordCookie(access_token) })
           }
 

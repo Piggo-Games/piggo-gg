@@ -3,13 +3,13 @@ import { Client, DiscordMe, GoodResponse } from "@piggo-gg/core"
 
 export type Discord = {
   sdk: DiscordSDK
+  loggedIn: boolean
   login: (client: Client) => Promise<void>
 }
 
 export const Discord = (): Discord | undefined => {
 
   let sdk: DiscordSDK | undefined = undefined
-  let loggedIn = false
 
   try {
     sdk = new DiscordSDK("1433003541521236100")
@@ -17,12 +17,14 @@ export const Discord = (): Discord | undefined => {
     return undefined
   }
 
-  return {
+  const discord = {
     sdk,
+    loggedIn: false,
     login: async (client: Client) => {
-      if (loggedIn) return
+      if (discord.loggedIn) return
+      if (!client.net.connected) return
 
-      loggedIn = true
+      discord.loggedIn = true
 
       // already authorized
       const foundCookie = async (response: GoodResponse<DiscordMe["response"]>) => {
@@ -49,4 +51,6 @@ export const Discord = (): Discord | undefined => {
       client.discordMe(foundCookie, noCookie)
     }
   }
+
+  return discord
 }

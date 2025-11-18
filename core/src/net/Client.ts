@@ -10,6 +10,7 @@ import { decode, encode } from "@msgpack/msgpack"
 const servers: Record<ENV, string> = {
   local: "ws://localhost:3000",
   // local: `wss://${DiscordDomain}/.proxy/api-local`,
+  // local: `wss://${DiscordDomain}/.proxy/api`,
   dev: "wss://piggo-api-staging.up.railway.app",
   production: "wss://api.piggo.gg",
   discord: `wss://${DiscordDomain}/.proxy/api`
@@ -390,6 +391,10 @@ export const Client = ({ world }: ClientProps): Client => {
       console.log("connected to server")
       client.net.connected = true
 
+      if (client.discord?.loggedIn) {
+        client.lobbyCreate("lobby")
+      }
+
       if (localStorage) {
         const token = localStorage.getItem("token")
         if (token) {
@@ -407,7 +412,7 @@ export const Client = ({ world }: ClientProps): Client => {
         console.log("reconnecting to server")
         client.ws = new WebSocket(servers[env])
         setupWs()
-      }, 2000)
+      }, 1000)
     }
   }
 
