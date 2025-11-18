@@ -39,13 +39,6 @@ export const BlockMeshSystem = ClientSystemBuilder({
     let spruce = BlocksMesh(5000)
     let marble = BlocksMesh(4000)
 
-    // let wip = BlocksMesh(1000)
-
-    // wip.material.forEach((mat) => {
-    //   mat.wireframe = true
-    //   mat.visible = true
-    // })
-
     GrassTexture(grass.material, three)
     LeafTexture(leaf.material, three)
     OakTexture(oak.material, three)
@@ -76,7 +69,6 @@ export const BlockMeshSystem = ClientSystemBuilder({
           let oakCount = 0
           let leafCount = 0
           let marbleCount = 0
-          let wipCount = 0
           let otherCount = 0
 
           // for each block
@@ -115,9 +107,6 @@ export const BlockMeshSystem = ClientSystemBuilder({
 
               marble.setMatrixAt(marbleCount, dummy.matrix)
               marbleCount++
-            // } else if (type === "wip") {
-            //   wip.setMatrixAt(wipCount, dummy.matrix)
-            //   wipCount++
             } else {
               grass.setMatrixAt(otherCount, dummy.matrix)
               otherCount++
@@ -129,7 +118,6 @@ export const BlockMeshSystem = ClientSystemBuilder({
           oak.instanceMatrix.needsUpdate = true
           leaf.instanceMatrix.needsUpdate = true
           marble.instanceMatrix.needsUpdate = true
-          // wip.instanceMatrix.needsUpdate = true
 
           if (spruce.instanceColor) spruce.instanceColor.needsUpdate = true
           if (oak.instanceColor) oak.instanceColor.needsUpdate = true
@@ -141,7 +129,6 @@ export const BlockMeshSystem = ClientSystemBuilder({
           oak.count = oakCount
           spruce.count = spruceCount
           marble.count = marbleCount
-          // wip.count = wipCount
 
           rendered = true
         }
