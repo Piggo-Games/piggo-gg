@@ -39,12 +39,12 @@ export const BlockMeshSystem = ClientSystemBuilder({
     let spruce = BlocksMesh(5000)
     let marble = BlocksMesh(4000)
 
-    let wip = BlocksMesh(1000)
+    // let wip = BlocksMesh(1000)
 
-    wip.material.forEach((mat) => {
-      mat.wireframe = true
-      mat.visible = true
-    })
+    // wip.material.forEach((mat) => {
+    //   mat.wireframe = true
+    //   mat.visible = true
+    // })
 
     GrassTexture(grass.material, three)
     LeafTexture(leaf.material, three)
@@ -54,7 +54,7 @@ export const BlockMeshSystem = ClientSystemBuilder({
 
     let rendered = false
 
-    three.scene.add(grass, leaf, oak, spruce, marble, wip)
+    three.scene.add(grass, leaf, oak, spruce, marble)
 
     return {
       id: "BlockMeshSystem",
@@ -115,9 +115,9 @@ export const BlockMeshSystem = ClientSystemBuilder({
 
               marble.setMatrixAt(marbleCount, dummy.matrix)
               marbleCount++
-            } else if (type === "wip") {
-              wip.setMatrixAt(wipCount, dummy.matrix)
-              wipCount++
+            // } else if (type === "wip") {
+            //   wip.setMatrixAt(wipCount, dummy.matrix)
+            //   wipCount++
             } else {
               grass.setMatrixAt(otherCount, dummy.matrix)
               otherCount++
@@ -129,7 +129,7 @@ export const BlockMeshSystem = ClientSystemBuilder({
           oak.instanceMatrix.needsUpdate = true
           leaf.instanceMatrix.needsUpdate = true
           marble.instanceMatrix.needsUpdate = true
-          wip.instanceMatrix.needsUpdate = true
+          // wip.instanceMatrix.needsUpdate = true
 
           if (spruce.instanceColor) spruce.instanceColor.needsUpdate = true
           if (oak.instanceColor) oak.instanceColor.needsUpdate = true
@@ -141,7 +141,7 @@ export const BlockMeshSystem = ClientSystemBuilder({
           oak.count = oakCount
           spruce.count = spruceCount
           marble.count = marbleCount
-          wip.count = wipCount
+          // wip.count = wipCount
 
           rendered = true
         }

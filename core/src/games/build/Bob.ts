@@ -3,7 +3,8 @@ import {
   hypot, Input, Inventory, max, Networked, PI, Place, Player, Point, Position,
   Team, Three, upAndDir, XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping,
   colorMaterials, cos, sin, nextColor, MarbleTexture, BlockMaterial, BuildState,
-  blockInLine
+  blockInLine,
+  BlocksMesh
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -35,6 +36,7 @@ export const Bob = (player: Player): Character => {
   let placeCD = -100
 
   let wipStart: undefined | XYZ = undefined
+  let wipMesh: undefined | BlocksMesh = undefined
 
   const bob = Character({
     id: `bob-${player.id}`,
@@ -163,7 +165,7 @@ export const Bob = (player: Player): Character => {
           },
 
           "e": ({ hold, world, character }) => {
-            if (hold || !character) return
+            if (hold || !character || !wipMesh) return
 
             const dir = world.three!.camera.dir(world)
             const camera = world.three!.camera.pos()
@@ -172,35 +174,36 @@ export const Bob = (player: Player): Character => {
             const beamResult = blockInLine({ from: camera, dir, world })
             if (!beamResult) return
 
-            
-
-
             if (wipStart) {
               const wipEnd = beamResult.inside
               console.log("place between", wipStart, wipEnd)
 
               // put block between start and end
 
-              // x axis
+              let count = 0
+              let dummy = new Object3D()
+
               const xDir = wipEnd.x >= wipStart.x ? 1 : -1
               for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
-                // y axis
                 const yDir = wipEnd.y >= wipStart.y ? 1 : -1
                 for (let y = wipStart.y; y !== wipEnd.y + yDir; y += yDir) {
-                  // z axis
                   const zDir = wipEnd.z >= wipStart.z ? 1 : -1
                   for (let z = wipStart.z; z !== wipEnd.z + zDir; z += zDir) {
-                    world.blocks.add({ type: 7, x, y, z })
+                    dummy.position.set(x * 0.3, z * 0.3 + 0.15, y * 0.3)
+                    dummy.updateMatrix()
+
+                    wipMesh.setMatrixAt(count, dummy.matrix)
+                    count++
                   }
                 }
               }
+              wipMesh.count = count
+              wipMesh.instanceMatrix.needsUpdate = true
 
               wipStart = undefined
             } else {
               wipStart = beamResult.outside
             }
-
-            // return { actionId: "place", params: { type: 7, dir, camera, pos } }
           },
 
           // no movement
@@ -469,6 +472,15 @@ export const Bob = (player: Player): Character => {
           hitboxes.head = new Mesh(headGeo, headMat)
 
           // entity.components.three.o.push(hitboxes.body, hitboxes.head)
+
+          if (world.client?.playerId() === player.id) {
+            wipMesh = BlocksMesh(1000)
+            wipMesh.material.forEach((mat) => {
+              mat.wireframe = true
+              mat.visible = true
+            })
+            entity.components.three.o.push(wipMesh)
+          }
 
           // character model
           three.gLoader.load("cowboy.glb", (gltf) => {
