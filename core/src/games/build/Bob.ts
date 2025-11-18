@@ -176,9 +176,6 @@ export const Bob = (player: Player): Character => {
 
             if (wipStart) {
               const wipEnd = beamResult.inside
-              console.log("place between", wipStart, wipEnd)
-
-              // put block between start and end
 
               let count = 0
               let dummy = new Object3D()
