@@ -9,12 +9,14 @@ export type Three = Component<"three", {}> & {
   o: Object3D[]
   init: undefined | ThreeInit
   onRender: undefined | ((_: OnRenderProps) => void)
+  onTick: undefined | ((_: Omit<OnRenderProps, "delta" | "since">) => void)
   cleanup: (world: World) => void
 }
 
 export type ThreeProps = {
   init?: ThreeInit
   onRender?: (_: OnRenderProps) => void
+  onTick?: (_: Omit<OnRenderProps, "delta" | "since">) => void
 }
 
 export const Three = (props: ThreeProps = {}): Three => {
@@ -25,6 +27,7 @@ export const Three = (props: ThreeProps = {}): Three => {
     o: [],
     init: props.init,
     onRender: props.onRender,
+    onTick: props.onTick,
     cleanup: (world) => {
       world.three?.scene.remove(...three.o)
     }
@@ -67,6 +70,8 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
               world.three?.scene.add(o)
             }
           }
+
+          three.onTick?.({ entity, world, client: world.client!, three: world.three! })
         }
       },
       onRender: (entities: Entity<Three | Position>[], delta, since) => {
