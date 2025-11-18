@@ -162,19 +162,19 @@ export const Bob = (player: Player): Character => {
             }
           },
 
-          "e": ({ hold, world, character }) => {
+          "x": ({ hold, world, character, client }) => {
             if (hold || !character || !wipMesh) return
 
             const dir = world.three!.camera.dir(world)
             const camera = world.three!.camera.pos()
 
             let wipEnd = blockInLine({ from: camera, dir, world })?.outside
-            if (!wipEnd && wipStart) {
+            if (!wipEnd) {
               wipEnd = nextBlock({ from: camera, dir, dist: 2 })
             }
 
+            // TODO doesn't work in multiplayer
             if (wipStart && wipEnd) {
-
               const xDir = wipEnd.x >= wipStart.x ? 1 : -1
               for (let x = wipStart.x; x !== wipEnd.x + xDir; x += xDir) {
                 const yDir = wipEnd.y >= wipStart.y ? 1 : -1
@@ -187,6 +187,7 @@ export const Bob = (player: Player): Character => {
                 }
               }
 
+              client.sound.play({ name: "click2" })
               wipStart = undefined
             } else {
               wipStart = wipEnd
