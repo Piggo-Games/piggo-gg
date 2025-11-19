@@ -11,7 +11,6 @@ export type BlockData = {
   setChunk: (chunk: XY, data: string) => void
   setType: (ijk: XYZ, type: number) => void
   atIJK: (ijk: XYZ) => number | undefined
-  highestBlockIJ: (pos: XY, max?: number) => XYZ | undefined
   neighbors: (chunk: XY, dist?: number) => XY[]
   invalidate: () => void
   loadMap: (map: Record<string, string>) => void
@@ -22,7 +21,11 @@ export type BlockData = {
 
 export const BlockData = (): BlockData => {
 
-  const data: Int8Array[][] = []
+  // indexed by Z ascending
+  // type Chunk = Int8Array[]
+  type Chunk = Record<number, Int8Array>
+
+  const data: Chunk[][] = []
 
   const chunks = 48 // TODO dynamic?
   for (let i = 0; i < chunks; i++) {
@@ -47,82 +50,60 @@ export const BlockData = (): BlockData => {
 
     const xIndex = x - chunkX * 4
     const yIndex = y - chunkY * 4
-    const index = z * 16 + yIndex * 4 + xIndex
+    const index = yIndex * 4 + xIndex
 
-    return chunk[index]
+    return chunk[z]?.[index]
   }
 
   const blocks: BlockData = {
     coloring: {
       // "34,49,3": "mediumseagreen"
     },
-    highestBlockIJ: (pos: XY, max?: number): XYZ | undefined => {
-      let level = 0
-
-      const xChunk = floor(pos.x / 4)
-      const yChunk = floor(pos.y / 4)
-
-      const chunk = data[xChunk]?.[yChunk]
-
-      if (max && max > 32) max = 32
-
-      if (chunk !== undefined) {
-
-        const offset = (pos.x - xChunk * 4) + (pos.y - yChunk * 4) * 4
-
-        const zStart = 0
-        for (let z = zStart; z < (max ?? 32); z++) {
-          const index = z * 16 + offset
-          const type = chunk[index]
-          if (type !== 0) level = z
-        }
-        return { x: pos.x, y: pos.y, z: level }
-      }
-      return undefined
-    },
     clear: () => {
       for (let i = 0; i < chunks; i++) {
         for (let j = 0; j < chunks; j++) {
           if (!data[i][j]) continue
-          data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
+          data[i][j] = []
+          // data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
         }
       }
       visibleCache = {}
       visibleDirty = {}
     },
     dump: () => {
-      const dump: Record<string, string> = {}
+      // const dump: Record<string, string> = {}
 
-      // const dump: string[] = []
-      for (let i = 0; i < chunks; i++) {
-        for (let j = 0; j < chunks; j++) {
-          const chunk = data[i][j]
-          if (chunk) {
-            const filled = chunk.some(v => v !== 0)
-            if (filled) {
-              const b64 = btoa(String.fromCharCode(...chunk))
-              dump[`${i}|${j}`] = b64
-            }
-          }
-        }
-      }
-      console.log(dump)
+      // // const dump: string[] = []
+      // for (let i = 0; i < chunks; i++) {
+      //   for (let j = 0; j < chunks; j++) {
+      //     const chunk = data[i][j]
+      //     if (chunk) {
+      //       const filled = chunk.some(v => v !== 0)
+      //       if (filled) {
+      //         const b64 = btoa(String.fromCharCode(...chunk))
+      //         dump[`${i}|${j}`] = b64
+      //       }
+      //     }
+      //   }
+      // }
+      // console.log(dump)
     },
     setChunk: (chunk: XY, chunkData: string) => {
-      if (!data[chunk.x]) data[chunk.x] = []
+      // if (!data[chunk.x]) data[chunk.x] = []
 
-      visibleDirty[chunkey(chunk.x, chunk.y)] = true
+      // visibleDirty[chunkey(chunk.x, chunk.y)] = true
 
-      const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
-      data[chunk.x][chunk.y] = decoded
+      // const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
+      // data[chunk.x][chunk.y] = decoded
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
       const chunkX = floor(x / 4)
       const chunkY = floor(y / 4)
 
       if (data[chunkX]?.[chunkY]) {
-        const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
-        data[chunkX][chunkY][offset] = type
+        // const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
+        const offset = x - chunkX * 4 + (y - chunkY * 4) * 4
+        data[chunkX][chunkY][z][offset] = type
       }
 
       visibleDirty[chunkey(chunkX, chunkY)] = true
@@ -145,25 +126,30 @@ export const BlockData = (): BlockData => {
       if (!data[chunkX]) data[chunkX] = []
 
       if (!data[chunkX][chunkY]) {
-        data[chunkX][chunkY] = new Int8Array(4 * 4 * 32)
+        data[chunkX][chunkY] = []
+      }
+
+      if (!data[chunkX][chunkY][block.z]) {
+        data[chunkX][chunkY][block.z] = new Int8Array(16)
       }
 
       const x = block.x - chunkX * 4
       const y = block.y - chunkY * 4
 
-      const index = block.z * 16 + y * 4 + x
+      // const index = block.z * 16 + y * 4 + x
+      const index = x + y * 4
 
-      if (data[chunkX][chunkY][index] === undefined) {
+      if (data[chunkX][chunkY][block.z][index] === undefined) {
         console.error("INVALID INDEX", index, x, y, block.z)
         return false
       }
 
-      if (data[chunkX][chunkY][index] !== 0) {
+      // if (data[chunkX][chunkY][index] !== 0) {
         // console.error("BLOCK ALREADY EXISTS", x, y, block.z)
-        return false
-      }
+        // return false
+      // }
 
-      data[chunkX][chunkY][index] = block.type
+      data[chunkX][chunkY][block.z][index] = block.type
 
       const key = chunkey(chunkX, chunkY)
 
@@ -204,12 +190,12 @@ export const BlockData = (): BlockData => {
         const chunkResult: Block[] = []
 
         // find blocks in the chunk
-        for (let z = 0; z < 32; z++) {
+        for (let z of keys(chunk).map(Number)) {
           for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 4; x++) {
 
-              const index = z * 16 + y * 4 + x
-              const type = chunk[index]
+              const index = x + y * 4
+              const type = chunk[z]?.[index] || 0
               if (type === 0) continue
 
               const thisX = pos.x * 4 + x
@@ -248,11 +234,12 @@ export const BlockData = (): BlockData => {
       const chunkX = floor(ijk.x / 4)
       const chunkY = floor(ijk.y / 4)
 
-      const indexX = ijk.z * 16 + (ijk.y - chunkY * 4) * 4 + (ijk.x - chunkX * 4)
+      // const index = ijk.z * 16 + (ijk.y - chunkY * 4) * 4 + (ijk.x - chunkX * 4)
 
-      if (data[chunkX]?.[chunkY]?.[indexX] === undefined) return undefined
+      const index = (ijk.x - chunkX * 4) + (ijk.y - chunkY * 4) * 4
+      if (data[chunkX]?.[chunkY]?.[ijk.z]?.[index] === undefined) return undefined
 
-      return data[chunkX]?.[chunkY]?.[indexX]
+      return data[chunkX]?.[chunkY]?.[ijk.z]?.[index]
     },
     needsUpdate: () => {
       for (const key of keys(visibleDirty)) {
@@ -281,9 +268,10 @@ export const BlockData = (): BlockData => {
       const xIndex = x - chunkX * 4
       const yIndex = y - chunkY * 4
 
-      const index = z * 16 + yIndex * 4 + xIndex
+      // const index = z * 16 + yIndex * 4 + xIndex
+      const index = xIndex + yIndex * 4
 
-      if (data[chunkX][chunkY][index] === undefined) {
+      if (data[chunkX][chunkY][z]?.[index] === undefined) {
         console.error("INVALID INDEX", index, xIndex, yIndex, z)
         return
       }
@@ -304,7 +292,8 @@ export const BlockData = (): BlockData => {
       //   }
       // }
 
-      data[chunkX][chunkY][index] = 0
+      // data[chunkX][chunkY][index] = 0
+      data[chunkX][chunkY][z][xIndex + yIndex * 4] = 0
 
       const key = chunkey(chunkX, chunkY)
       visibleDirty[key] = true
