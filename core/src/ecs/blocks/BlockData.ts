@@ -273,11 +273,8 @@ export const BlockData = (): BlockData => {
         const zHeight = decoded.length / area
         for (let z = 0; z < zHeight; z++) {
           const slice = decoded.slice(z * area, (z + 1) * area)
-          // if it's all 0s skip
-          if (slice.every(v => v === 0)) {
-            console.log("skipping empty slice")
-            continue
-          }
+          if (slice.every(v => v === 0)) continue
+
           if (!stitched[chunkX]) stitched[chunkX] = []
           if (!stitched[chunkX][chunkY]) stitched[chunkX][chunkY] = []
           stitched[chunkX][chunkY][z] = decoded.slice(z * 16, (z + 1) * 16)
