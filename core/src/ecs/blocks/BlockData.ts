@@ -11,7 +11,6 @@ export type BlockData = {
   setChunk: (chunk: XY, data: string) => void
   setType: (ijk: XYZ, type: number) => void
   atIJK: (ijk: XYZ) => number | undefined
-  highestBlockIJ: (pos: XY, max?: number) => XYZ | undefined
   neighbors: (chunk: XY, dist?: number) => XY[]
   invalidate: () => void
   loadMap: (map: Record<string, string>) => void
@@ -20,7 +19,8 @@ export type BlockData = {
   visible: (at: XY[]) => Block[]
 }
 
-const width = 4
+const width = 8
+const area = width * width
 
 export const BlockData = (): BlockData => {
 
@@ -41,7 +41,7 @@ export const BlockData = (): BlockData => {
 
     const xIndex = x - chunkX * width
     const yIndex = y - chunkY * width
-    const index = z * 16 + yIndex * width + xIndex
+    const index = z * area + yIndex * width + xIndex
 
     return chunk[index]
   }
@@ -49,30 +49,6 @@ export const BlockData = (): BlockData => {
   const blocks: BlockData = {
     coloring: {
       // "34,49,3": "mediumseagreen"
-    },
-    highestBlockIJ: (pos: XY, max?: number): XYZ | undefined => {
-      let level = 0
-
-      const xChunk = floor(pos.x / width)
-      const yChunk = floor(pos.y / width)
-
-      const chunk = data[xChunk]?.[yChunk]
-
-      if (max && max > 32) max = 32
-
-      if (chunk !== undefined) {
-
-        const offset = (pos.x - xChunk * width) + (pos.y - yChunk * width) * width
-
-        const zStart = 0
-        for (let z = zStart; z < (max ?? 32); z++) {
-          const index = z * 16 + offset
-          const type = chunk[index]
-          if (type !== 0) level = z
-        }
-        return { x: pos.x, y: pos.y, z: level }
-      }
-      return undefined
     },
     clear: () => {
       data = []
@@ -84,8 +60,9 @@ export const BlockData = (): BlockData => {
 
       // const dump: string[] = []
       for (let i = 0; i < data.length; i++) {
+        if (!data[i]) continue
         for (let j = 0; j < data[i].length; j++) {
-          const chunk = data[i][j]
+          const chunk = data[i]?.[j]
           if (chunk) {
             const filled = chunk.some(v => v !== 0)
             if (filled) {
@@ -95,6 +72,7 @@ export const BlockData = (): BlockData => {
           }
         }
       }
+      console.log(data)
       console.log(dump)
     },
     setChunk: (chunk: XY, chunkData: string) => {
@@ -110,7 +88,7 @@ export const BlockData = (): BlockData => {
       const chunkY = floor(y / width)
 
       if (data[chunkX]?.[chunkY]) {
-        const offset = z * 16 + (y - chunkY * width) * width + (x - chunkX * width)
+        const offset = z * area + (y - chunkY * width) * width + (x - chunkX * width)
         data[chunkX][chunkY][offset] = type
       }
 
@@ -140,7 +118,7 @@ export const BlockData = (): BlockData => {
       const x = block.x - chunkX * width
       const y = block.y - chunkY * width
 
-      const index = block.z * 16 + y * width + x
+      const index = block.z * area + y * width + x
 
       if (data[chunkX][chunkY][index] === undefined) {
         console.error("INVALID INDEX", index, x, y, block.z)
@@ -197,7 +175,9 @@ export const BlockData = (): BlockData => {
           for (let y = 0; y < width; y++) {
             for (let x = 0; x < width; x++) {
 
-              const index = z * 16 + y * width + x
+              const area = width * width
+
+              const index = z * area + y * width + x
               const type = chunk[index]
               if (type === 0) continue
 
@@ -237,7 +217,7 @@ export const BlockData = (): BlockData => {
       const chunkX = floor(ijk.x / width)
       const chunkY = floor(ijk.y / width)
 
-      const indexX = ijk.z * 16 + (ijk.y - chunkY * width) * width + (ijk.x - chunkX * width)
+      const indexX = ijk.z * area + (ijk.y - chunkY * width) * width + (ijk.x - chunkX * width)
 
       if (data[chunkX]?.[chunkY]?.[indexX] === undefined) return undefined
 
@@ -251,11 +231,57 @@ export const BlockData = (): BlockData => {
       }
       return false
     },
-    loadMap: (map: Record<string, string>) => {
-      for (const chunk in map) {
-        const [x, y] = chunk.split("|").map(Number)
+    // loadMap: (map: Record<string, string>) => {
+    //   for (const chunk in map) {
+    //     const [x, y] = chunk.split("|").map(Number)
 
-        blocks.setChunk({ x, y }, map[chunk])
+    //     blocks.setChunk({ x, y }, map[chunk])
+    //   }
+    // },
+    loadMap: (map: Record<string, string>) => {
+
+      let stitched: Int8Array[][] = []
+
+      for (const chunk in map) {
+        const [chunkX, chunkY] = chunk.split("|").map(Number)
+
+        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
+
+        const zHeight = decoded.length / 16
+        for (let z = 0; z < zHeight; z++) {
+
+          stitched[chunkX] = stitched[chunkX] || []
+          stitched[chunkX][chunkY] = decoded
+        }
+      }
+      console.log("stitched chunks", stitched)
+
+      // convert stitched 4x4 chunks into widthXwidth chunks
+      for (let i = 0; i < stitched.length; i++) {
+        for (let j = 0; j < stitched[i]?.length; j++) {
+          if (!stitched[i] || !stitched[i][j]) continue
+
+          for (const index in stitched[i][j]) {
+            const z = floor(Number(index) / 16)
+            const subY = floor((Number(index) % 16) / 4)
+            const subX = (Number(index) % 16) % 4
+
+            blocks.add({ x: i * 4 + subX, y: j * 4 + subY, z, type: stitched[i][j][index] })
+          }
+
+          // for (let subX = 0; subX < 4; subX++) {
+          //   for (let subY = 0; subY < 4; subY++) {
+
+          //     const chunkX = i * 4 + subX
+          //     const chunkY = j * 4 + subY
+
+
+
+          // const index = z * 16 + subY * 4 + subX
+          // blocks.add({ x: chunkX, y: chunkY, z, type: stitched[i][j][index] })
+          //     }
+          // }
+        }
       }
     },
     remove: ({ x, y, z }) => {
@@ -270,7 +296,7 @@ export const BlockData = (): BlockData => {
       const xIndex = x - chunkX * width
       const yIndex = y - chunkY * width
 
-      const index = z * 16 + yIndex * width + xIndex
+      const index = z * area + yIndex * width + xIndex
 
       if (data[chunkX][chunkY][index] === undefined) {
         console.error("INVALID INDEX", index, xIndex, yIndex, z)
@@ -364,9 +390,10 @@ export const spawnTerrain = (world: World, num: number = 10) => {
   logPerf("spawnTerrain", time)
 }
 
-export const spawnFlat = (world: World, chunks = 12) => {
-  for (let i = 2; i < chunks + 2; i++) {
-    for (let j = 2; j < chunks + 2; j++) {
+export const spawnFlat = (world: World, chunks = 8) => {
+  for (let i = 0; i < chunks; i++) {
+    for (let j = 0; j < chunks; j++) {
+
       for (let z = 0; z < 1; z++) {
         for (let x = 0; x < width; x++) {
           for (let y = 0; y < width; y++) {
