@@ -8,9 +8,10 @@ export type BlockData = {
   addPlan: (plan: BlockPlan) => boolean
   clear: () => void
   dump: () => void
-  setChunk: (chunk: XY, decoded: Int8Array<ArrayBuffer>) => void
+  setChunk: (chunk: XY, data: string) => void
   setType: (ijk: XYZ, type: number) => void
   atIJK: (ijk: XYZ) => number | undefined
+  highestBlockIJ: (pos: XY, max?: number) => XYZ | undefined
   neighbors: (chunk: XY, dist?: number) => XY[]
   invalidate: () => void
   loadMap: (map: Record<string, string>) => void
@@ -19,15 +20,19 @@ export type BlockData = {
   visible: (at: XY[]) => Block[]
 }
 
-const width = 16
+const width = 4
 
 export const BlockData = (): BlockData => {
 
-  // indexed by Z ascending
-  // type Chunk = Int8Array[]
-  type Chunk = Record<number, Int8Array>
+  let data: Int8Array[][] = []
 
-  let data: Chunk[][] = []
+  // const chunks = 48 // TODO dynamic?
+  // for (let i = 0; i < chunks; i++) {
+  //   data[i] = []
+  //   for (let j = 0; j < chunks; j++) {
+  //     data[i][j] = new Int8Array(width * width * 32)
+  //   }
+  // }
 
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
@@ -36,85 +41,91 @@ export const BlockData = (): BlockData => {
   const chunkval = (x: number, y: number) => data[x]?.[y]
 
   const val = (x: number, y: number, z: number) => {
-    const chunkX = floor(x / width)
-    const chunkY = floor(y / width)
+    const chunkX = floor(x / 4)
+    const chunkY = floor(y / 4)
 
     const chunk = chunkval(chunkX, chunkY)
     if (!chunk) return chunk
 
-    const xIndex = x - chunkX * width
-    const yIndex = y - chunkY * width
-    const index = yIndex * width + xIndex
+    const xIndex = x - chunkX * 4
+    const yIndex = y - chunkY * 4
+    const index = z * 16 + yIndex * 4 + xIndex
 
-    return chunk[z]?.[index]
+    return chunk[index]
   }
 
   const blocks: BlockData = {
     coloring: {
       // "34,49,3": "mediumseagreen"
     },
+    highestBlockIJ: (pos: XY, max?: number): XYZ | undefined => {
+      let level = 0
+
+      const xChunk = floor(pos.x / 4)
+      const yChunk = floor(pos.y / 4)
+
+      const chunk = data[xChunk]?.[yChunk]
+
+      if (max && max > 32) max = 32
+
+      if (chunk !== undefined) {
+
+        const offset = (pos.x - xChunk * 4) + (pos.y - yChunk * 4) * 4
+
+        const zStart = 0
+        for (let z = zStart; z < (max ?? 32); z++) {
+          const index = z * 16 + offset
+          const type = chunk[index]
+          if (type !== 0) level = z
+        }
+        return { x: pos.x, y: pos.y, z: level }
+      }
+      return undefined
+    },
     clear: () => {
       // for (let i = 0; i < chunks; i++) {
       //   for (let j = 0; j < chunks; j++) {
-      //     if (!data[i][j]) continue
-      //     data[i][j] = []
-          // data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
+      //     data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
       //   }
       // }
+
       data = []
       visibleCache = {}
       visibleDirty = {}
     },
     dump: () => {
+      const dump: Record<string, string> = {}
 
-      console.log(data)
-      // const dump: Record<string, string> = {}
-
-      // // const dump: string[] = []
-      // for (let i = 0; i < chunks; i++) {
-      //   for (let j = 0; j < chunks; j++) {
-      //     const chunk = data[i][j]
-      //     if (chunk) {
-      //       const filled = chunk.some(v => v !== 0)
-      //       if (filled) {
-      //         const b64 = btoa(String.fromCharCode(...chunk))
-      //         dump[`${i}|${j}`] = b64
-      //       }
-      //     }
-      //   }
-      // }
-      // console.log(dump)
-    },
-    setChunk: (chunk: XY, decoded: Int8Array<ArrayBuffer>) => {
-      if (!data[chunk.x]) data[chunk.x] = []
-      if (!data[chunk.x][chunk.y]) data[chunk.x][chunk.y] = []
-
-      // const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
-
-      // const area = width * width
-      const area = 4 * 4
-
-      const zHeight = decoded.length / area
-      for (let z = 0; z < zHeight; z++) {
-        const slice = decoded.slice(z * area, (z + 1) * area)
-        // if it's all 0s skip
-        if (slice.every(v => v === 0)) {
-          console.log("skipping empty slice")
-          continue
+      // const dump: string[] = []
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data[i].length; j++) {
+          const chunk = data[i][j]
+          if (chunk) {
+            const filled = chunk.some(v => v !== 0)
+            if (filled) {
+              const b64 = btoa(String.fromCharCode(...chunk))
+              dump[`${i}|${j}`] = b64
+            }
+          }
         }
-        data[chunk.x][chunk.y][z] = decoded.slice(z * 16, (z + 1) * 16)
       }
+      console.log(dump)
+    },
+    setChunk: (chunk: XY, chunkData: string) => {
+      if (!data[chunk.x]) data[chunk.x] = []
 
       visibleDirty[chunkey(chunk.x, chunk.y)] = true
+
+      const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
+      data[chunk.x][chunk.y] = decoded
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
-      const chunkX = floor(x / width)
-      const chunkY = floor(y / width)
+      const chunkX = floor(x / 4)
+      const chunkY = floor(y / 4)
 
       if (data[chunkX]?.[chunkY]) {
-        // const offset = z * 16 + (y - chunkY * width) * width + (x - chunkX * width)
-        const offset = x - chunkX * width + (y - chunkY * width) * width
-        data[chunkX][chunkY][z][offset] = type
+        const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
+        data[chunkX][chunkY][offset] = type
       }
 
       visibleDirty[chunkey(chunkX, chunkY)] = true
@@ -131,36 +142,31 @@ export const BlockData = (): BlockData => {
       return neighbors
     },
     add: (block: Block) => {
-      const chunkX = floor(block.x / width)
-      const chunkY = floor(block.y / width)
+      const chunkX = floor(block.x / 4)
+      const chunkY = floor(block.y / 4)
 
       if (!data[chunkX]) data[chunkX] = []
 
       if (!data[chunkX][chunkY]) {
-        data[chunkX][chunkY] = []
+        data[chunkX][chunkY] = new Int8Array(width * width * 32)
       }
 
-      if (!data[chunkX][chunkY][block.z]) {
-        data[chunkX][chunkY][block.z] = new Int8Array(width * width)
-      }
+      const x = block.x - chunkX * 4
+      const y = block.y - chunkY * 4
 
-      const x = block.x - chunkX * width
-      const y = block.y - chunkY * width
+      const index = block.z * 16 + y * 4 + x
 
-      // const index = block.z * 16 + y * width + x
-      const index = x + y * width
-
-      if (data[chunkX][chunkY][block.z][index] === undefined) {
+      if (data[chunkX][chunkY][index] === undefined) {
         console.error("INVALID INDEX", index, x, y, block.z)
         return false
       }
 
-      // if (data[chunkX][chunkY][index] !== 0) {
+      if (data[chunkX][chunkY][index] !== 0) {
         // console.error("BLOCK ALREADY EXISTS", x, y, block.z)
-        // return false
-      // }
+        return false
+      }
 
-      data[chunkX][chunkY][block.z][index] = block.type
+      data[chunkX][chunkY][index] = block.type
 
       const key = chunkey(chunkX, chunkY)
 
@@ -201,16 +207,16 @@ export const BlockData = (): BlockData => {
         const chunkResult: Block[] = []
 
         // find blocks in the chunk
-        for (let z of keys(chunk).map(Number)) {
-          for (let y = 0; y < width; y++) {
-            for (let x = 0; x < width; x++) {
+        for (let z = 0; z < 32; z++) {
+          for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 4; x++) {
 
-              const index = x + y * width
-              const type = chunk[z]?.[index] || 0
+              const index = z * 16 + y * 4 + x
+              const type = chunk[index]
               if (type === 0) continue
 
-              const thisX = pos.x * width + x
-              const thisY = pos.y * width + y
+              const thisX = pos.x * 4 + x
+              const thisY = pos.y * 4 + y
 
               // check if the block is visible
               if (
@@ -218,7 +224,7 @@ export const BlockData = (): BlockData => {
                 !val(thisX, thisY + 1, z) || !val(thisX, thisY - 1, z) ||
                 !val(thisX, thisY, z + 1) || !val(thisX, thisY, z - 1)
               ) {
-                const ijk = { x: x + pos.x * width, y: y + pos.y * width, z }
+                const ijk = { x: x + pos.x * 4, y: y + pos.y * 4, z }
 
                 const block: Block = { ...ijk, type }
                 chunkResult.push(block)
@@ -242,15 +248,14 @@ export const BlockData = (): BlockData => {
       }
     },
     atIJK: (ijk: XYZ) => {
-      const chunkX = floor(ijk.x / width)
-      const chunkY = floor(ijk.y / width)
+      const chunkX = floor(ijk.x / 4)
+      const chunkY = floor(ijk.y / 4)
 
-      // const index = ijk.z * 16 + (ijk.y - chunkY * width) * width + (ijk.x - chunkX * width)
+      const indexX = ijk.z * 16 + (ijk.y - chunkY * 4) * 4 + (ijk.x - chunkX * 4)
 
-      const index = (ijk.x - chunkX * width) + (ijk.y - chunkY * width) * width
-      if (data[chunkX]?.[chunkY]?.[ijk.z]?.[index] === undefined) return undefined
+      if (data[chunkX]?.[chunkY]?.[indexX] === undefined) return undefined
 
-      return data[chunkX]?.[chunkY]?.[ijk.z]?.[index]
+      return data[chunkX]?.[chunkY]?.[indexX]
     },
     needsUpdate: () => {
       for (const key of keys(visibleDirty)) {
@@ -261,62 +266,27 @@ export const BlockData = (): BlockData => {
       return false
     },
     loadMap: (map: Record<string, string>) => {
-
-      let stitched: Chunk[][] = []
-      
       for (const chunk in map) {
-        const [chunkX, chunkY] = chunk.split("|").map(Number)
-        
-        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
+        const [x, y] = chunk.split("|").map(Number)
 
-        const area = 16
-        const zHeight = decoded.length / area
-        for (let z = 0; z < zHeight; z++) {
-          const slice = decoded.slice(z * area, (z + 1) * area)
-          if (slice.every(v => v === 0)) continue
-
-          if (!stitched[chunkX]) stitched[chunkX] = []
-          if (!stitched[chunkX][chunkY]) stitched[chunkX][chunkY] = []
-          stitched[chunkX][chunkY][z] = decoded.slice(z * 16, (z + 1) * 16)
-        }
-      }
-
-      // convert stitched 4x4 chunks into widthXwidth chunks
-      for (let i = 0; i < stitched.length; i++) {
-        for (let j = 0; j < stitched[i]?.length; j++) {
-          if (!stitched[i] || !stitched[i][j]) continue
-
-          for (let z of keys(stitched[i][j]).map(Number)) {
-
-            for (let subX = 0; subX < 4; subX++) {
-              for (let subY = 0; subY < 4; subY++) {
-
-                const chunkX = i * 4 + subX
-                const chunkY = j * 4 + subY
-
-                blocks.add({ x: chunkX, y: chunkY, z, type: stitched[i][j][z][subX + subY * 4] })
-              }
-            }
-          }
-        }
+        blocks.setChunk({ x, y }, map[chunk])
       }
     },
     remove: ({ x, y, z }) => {
-      const chunkX = floor(x / width)
-      const chunkY = floor(y / width)
+      const chunkX = floor(x / 4)
+      const chunkY = floor(y / 4)
 
       if (!data[chunkX]?.[chunkY]) {
         // console.error("CHUNK NOT FOUND", chunkX, chunkY)
         return
       }
 
-      const xIndex = x - chunkX * width
-      const yIndex = y - chunkY * width
+      const xIndex = x - chunkX * 4
+      const yIndex = y - chunkY * 4
 
-      // const index = z * 16 + yIndex * width + xIndex
-      const index = xIndex + yIndex * width
+      const index = z * 16 + yIndex * 4 + xIndex
 
-      if (data[chunkX][chunkY][z]?.[index] === undefined) {
+      if (data[chunkX][chunkY][index] === undefined) {
         console.error("INVALID INDEX", index, xIndex, yIndex, z)
         return
       }
@@ -337,17 +307,16 @@ export const BlockData = (): BlockData => {
       //   }
       // }
 
-      // data[chunkX][chunkY][index] = 0
-      data[chunkX][chunkY][z][xIndex + yIndex * width] = 0
+      data[chunkX][chunkY][index] = 0
 
       const key = chunkey(chunkX, chunkY)
       visibleDirty[key] = true
 
       // check if neighbors are also dirty
-      if (x % width === 0) visibleDirty[chunkey(chunkX - 1, chunkY)] = true
-      if (x % width === 3) visibleDirty[chunkey(chunkX + 1, chunkY)] = true
-      if (y % width === 0) visibleDirty[chunkey(chunkX, chunkY - 1)] = true
-      if (y % width === 3) visibleDirty[chunkey(chunkX, chunkY + 1)] = true
+      if (x % 4 === 0) visibleDirty[chunkey(chunkX - 1, chunkY)] = true
+      if (x % 4 === 3) visibleDirty[chunkey(chunkX + 1, chunkY)] = true
+      if (y % 4 === 0) visibleDirty[chunkey(chunkX, chunkY - 1)] = true
+      if (y % 4 === 3) visibleDirty[chunkey(chunkX, chunkY + 1)] = true
     }
   }
 
@@ -409,13 +378,13 @@ export const spawnTerrain = (world: World, num: number = 10) => {
   logPerf("spawnTerrain", time)
 }
 
-export const spawnFlat = (world: World, chunks = 3) => {
-  for (let i = 0; i < chunks; i++) {
-    for (let j = 0; j < chunks; j++) {
+export const spawnFlat = (world: World, chunks = 12) => {
+  for (let i = 2; i < chunks + 2; i++) {
+    for (let j = 2; j < chunks + 2; j++) {
       for (let z = 0; z < 1; z++) {
-        for (let x = 0; x < width; x++) {
-          for (let y = 0; y < width; y++) {
-            world.blocks.add({ x: i * width + x, y: j * width + y, z, type: 4 })
+        for (let x = 0; x < 4; x++) {
+          for (let y = 0; y < 4; y++) {
+            world.blocks.add({ x: i * 4 + x, y: j * 4 + y, z, type: 4 })
           }
         }
       }
