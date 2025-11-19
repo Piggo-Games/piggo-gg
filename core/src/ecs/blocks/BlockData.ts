@@ -25,15 +25,15 @@ export const BlockData = (): BlockData => {
   // type Chunk = Int8Array[]
   type Chunk = Record<number, Int8Array>
 
-  const data: Chunk[][] = []
+  let data: Chunk[][] = []
 
-  const chunks = 48 // TODO dynamic?
-  for (let i = 0; i < chunks; i++) {
-    data[i] = []
-    for (let j = 0; j < chunks; j++) {
+  // const chunks = 48 // TODO dynamic?
+  // for (let i = 0; i < chunks; i++) {
+  //   data[i] = []
+  //   for (let j = 0; j < chunks; j++) {
       // data[i][j] = new Int8Array(4 * 4 * 32)
-    }
-  }
+  //   }
+  // }
 
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
@@ -60,17 +60,20 @@ export const BlockData = (): BlockData => {
       // "34,49,3": "mediumseagreen"
     },
     clear: () => {
-      for (let i = 0; i < chunks; i++) {
-        for (let j = 0; j < chunks; j++) {
-          if (!data[i][j]) continue
-          data[i][j] = []
+      // for (let i = 0; i < chunks; i++) {
+      //   for (let j = 0; j < chunks; j++) {
+      //     if (!data[i][j]) continue
+      //     data[i][j] = []
           // data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
-        }
-      }
+      //   }
+      // }
+      data = []
       visibleCache = {}
       visibleDirty = {}
     },
     dump: () => {
+
+      console.log(data)
       // const dump: Record<string, string> = {}
 
       // // const dump: string[] = []
@@ -96,6 +99,12 @@ export const BlockData = (): BlockData => {
 
       const zHeight = decoded.length / 16
       for (let z = 0; z < zHeight; z++) {
+        const slice = decoded.slice(z * 16, (z + 1) * 16)
+        // if it's all 0s skip
+        if (slice.every(v => v === 0)) {
+          console.log("skipping empty slice")
+          continue
+        }
         data[chunk.x][chunk.y][z] = decoded.slice(z * 16, (z + 1) * 16)
       }
 
