@@ -28,7 +28,7 @@ export const BlockData = (): BlockData => {
   for (let i = 0; i < chunks; i++) {
     data[i] = []
     for (let j = 0; j < chunks; j++) {
-      data[i][j] = new Int8Array(4 * 4 * 32)
+      // data[i][j] = new Int8Array(4 * 4 * 32)
     }
   }
 
@@ -83,6 +83,7 @@ export const BlockData = (): BlockData => {
     clear: () => {
       for (let i = 0; i < chunks; i++) {
         for (let j = 0; j < chunks; j++) {
+          if (!data[i][j]) continue
           data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
         }
       }
@@ -141,9 +142,10 @@ export const BlockData = (): BlockData => {
       const chunkX = floor(block.x / 4)
       const chunkY = floor(block.y / 4)
 
-      if (!data[chunkX]?.[chunkY]) {
-        // console.error("CHUNK NOT FOUND", chunkX, chunkY)
-        return false
+      if (!data[chunkX]) data[chunkX] = []
+
+      if (!data[chunkX][chunkY]) {
+        data[chunkX][chunkY] = new Int8Array(4 * 4 * 32)
       }
 
       const x = block.x - chunkX * 4
