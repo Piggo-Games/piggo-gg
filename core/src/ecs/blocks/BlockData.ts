@@ -75,12 +75,6 @@ export const BlockData = (): BlockData => {
       return undefined
     },
     clear: () => {
-      // for (let i = 0; i < chunks; i++) {
-      //   for (let j = 0; j < chunks; j++) {
-      //     data[i][j].fill(0) // todo craft -> strike doesn't clear all blocks properly
-      //   }
-      // }
-
       data = []
       visibleCache = {}
       visibleDirty = {}
