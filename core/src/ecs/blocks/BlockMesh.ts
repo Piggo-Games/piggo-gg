@@ -62,7 +62,7 @@ export const BlockMeshSystem = ClientSystemBuilder({
         if (!rendered) {
           const dummy = new Object3D()
 
-          const neighbors = world.blocks.neighbors(playerChunk, 6)
+          const neighbors = world.blocks.neighbors(playerChunk, 24)
           console.log("neighboring chunks", neighbors)
           const chunkData = world.blocks.visible(neighbors)
           console.log(`rendering ${chunkData.length} blocks ${neighbors.length} chunks`)

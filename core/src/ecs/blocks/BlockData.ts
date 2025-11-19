@@ -8,7 +8,7 @@ export type BlockData = {
   addPlan: (plan: BlockPlan) => boolean
   clear: () => void
   dump: () => void
-  setChunk: (chunk: XY, data: string) => void
+  setChunk: (chunk: XY, decoded: Int8Array<ArrayBuffer>) => void
   setType: (ijk: XYZ, type: number) => void
   atIJK: (ijk: XYZ) => number | undefined
   neighbors: (chunk: XY, dist?: number) => XY[]
@@ -85,15 +85,18 @@ export const BlockData = (): BlockData => {
       // }
       // console.log(dump)
     },
-    setChunk: (chunk: XY, chunkData: string) => {
+    setChunk: (chunk: XY, decoded: Int8Array<ArrayBuffer>) => {
       if (!data[chunk.x]) data[chunk.x] = []
       if (!data[chunk.x][chunk.y]) data[chunk.x][chunk.y] = []
 
-      const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
+      // const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
 
-      const zHeight = decoded.length / 16
+      // const area = width * width
+      const area = 4 * 4
+
+      const zHeight = decoded.length / area
       for (let z = 0; z < zHeight; z++) {
-        const slice = decoded.slice(z * 16, (z + 1) * 16)
+        const slice = decoded.slice(z * area, (z + 1) * area)
         // if it's all 0s skip
         if (slice.every(v => v === 0)) {
           console.log("skipping empty slice")
@@ -258,10 +261,47 @@ export const BlockData = (): BlockData => {
       return false
     },
     loadMap: (map: Record<string, string>) => {
-      for (const chunk in map) {
-        const [x, y] = chunk.split("|").map(Number)
 
-        blocks.setChunk({ x, y }, map[chunk])
+      let stitched: Chunk[][] = []
+      
+      for (const chunk in map) {
+        const [chunkX, chunkY] = chunk.split("|").map(Number)
+        
+        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
+
+        const area = 16
+        const zHeight = decoded.length / area
+        for (let z = 0; z < zHeight; z++) {
+          const slice = decoded.slice(z * area, (z + 1) * area)
+          // if it's all 0s skip
+          if (slice.every(v => v === 0)) {
+            console.log("skipping empty slice")
+            continue
+          }
+          if (!stitched[chunkX]) stitched[chunkX] = []
+          if (!stitched[chunkX][chunkY]) stitched[chunkX][chunkY] = []
+          stitched[chunkX][chunkY][z] = decoded.slice(z * 16, (z + 1) * 16)
+        }
+      }
+
+      // convert stitched 4x4 chunks into widthXwidth chunks
+      for (let i = 0; i < stitched.length; i++) {
+        for (let j = 0; j < stitched[i]?.length; j++) {
+          if (!stitched[i] || !stitched[i][j]) continue
+
+          for (let z of keys(stitched[i][j]).map(Number)) {
+
+            for (let subX = 0; subX < 4; subX++) {
+              for (let subY = 0; subY < 4; subY++) {
+
+                const chunkX = i * 4 + subX
+                const chunkY = j * 4 + subY
+
+                blocks.add({ x: chunkX, y: chunkY, z, type: stitched[i][j][z][subX + subY * 4] })
+              }
+            }
+          }
+        }
       }
     },
     remove: ({ x, y, z }) => {
