@@ -64,6 +64,7 @@ export const BlockMeshSystem = ClientSystemBuilder({
 
           const neighbors = world.blocks.neighbors(playerChunk, 24)
           const chunkData = world.blocks.visible(neighbors)
+          console.log(`rendering ${chunkData.length} blocks`)
 
           let spruceCount = 0
           let oakCount = 0

@@ -19,6 +19,8 @@ export type BlockData = {
   visible: (at: XY[]) => Block[]
 }
 
+const width = 4
+
 export const BlockData = (): BlockData => {
 
   // indexed by Z ascending
@@ -27,14 +29,6 @@ export const BlockData = (): BlockData => {
 
   let data: Chunk[][] = []
 
-  // const chunks = 48 // TODO dynamic?
-  // for (let i = 0; i < chunks; i++) {
-  //   data[i] = []
-  //   for (let j = 0; j < chunks; j++) {
-      // data[i][j] = new Int8Array(4 * 4 * 32)
-  //   }
-  // }
-
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
 
@@ -42,15 +36,15 @@ export const BlockData = (): BlockData => {
   const chunkval = (x: number, y: number) => data[x]?.[y]
 
   const val = (x: number, y: number, z: number) => {
-    const chunkX = floor(x / 4)
-    const chunkY = floor(y / 4)
+    const chunkX = floor(x / width)
+    const chunkY = floor(y / width)
 
     const chunk = chunkval(chunkX, chunkY)
     if (!chunk) return chunk
 
-    const xIndex = x - chunkX * 4
-    const yIndex = y - chunkY * 4
-    const index = yIndex * 4 + xIndex
+    const xIndex = x - chunkX * width
+    const yIndex = y - chunkY * width
+    const index = yIndex * width + xIndex
 
     return chunk[z]?.[index]
   }
@@ -111,12 +105,12 @@ export const BlockData = (): BlockData => {
       visibleDirty[chunkey(chunk.x, chunk.y)] = true
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
-      const chunkX = floor(x / 4)
-      const chunkY = floor(y / 4)
+      const chunkX = floor(x / width)
+      const chunkY = floor(y / width)
 
       if (data[chunkX]?.[chunkY]) {
-        // const offset = z * 16 + (y - chunkY * 4) * 4 + (x - chunkX * 4)
-        const offset = x - chunkX * 4 + (y - chunkY * 4) * 4
+        // const offset = z * 16 + (y - chunkY * width) * width + (x - chunkX * width)
+        const offset = x - chunkX * width + (y - chunkY * width) * width
         data[chunkX][chunkY][z][offset] = type
       }
 
@@ -134,8 +128,8 @@ export const BlockData = (): BlockData => {
       return neighbors
     },
     add: (block: Block) => {
-      const chunkX = floor(block.x / 4)
-      const chunkY = floor(block.y / 4)
+      const chunkX = floor(block.x / width)
+      const chunkY = floor(block.y / width)
 
       if (!data[chunkX]) data[chunkX] = []
 
@@ -144,14 +138,14 @@ export const BlockData = (): BlockData => {
       }
 
       if (!data[chunkX][chunkY][block.z]) {
-        data[chunkX][chunkY][block.z] = new Int8Array(16)
+        data[chunkX][chunkY][block.z] = new Int8Array(width * width)
       }
 
-      const x = block.x - chunkX * 4
-      const y = block.y - chunkY * 4
+      const x = block.x - chunkX * width
+      const y = block.y - chunkY * width
 
-      // const index = block.z * 16 + y * 4 + x
-      const index = x + y * 4
+      // const index = block.z * 16 + y * width + x
+      const index = x + y * width
 
       if (data[chunkX][chunkY][block.z][index] === undefined) {
         console.error("INVALID INDEX", index, x, y, block.z)
@@ -205,15 +199,15 @@ export const BlockData = (): BlockData => {
 
         // find blocks in the chunk
         for (let z of keys(chunk).map(Number)) {
-          for (let y = 0; y < 4; y++) {
-            for (let x = 0; x < 4; x++) {
+          for (let y = 0; y < width; y++) {
+            for (let x = 0; x < width; x++) {
 
-              const index = x + y * 4
+              const index = x + y * width
               const type = chunk[z]?.[index] || 0
               if (type === 0) continue
 
-              const thisX = pos.x * 4 + x
-              const thisY = pos.y * 4 + y
+              const thisX = pos.x * width + x
+              const thisY = pos.y * width + y
 
               // check if the block is visible
               if (
@@ -221,7 +215,7 @@ export const BlockData = (): BlockData => {
                 !val(thisX, thisY + 1, z) || !val(thisX, thisY - 1, z) ||
                 !val(thisX, thisY, z + 1) || !val(thisX, thisY, z - 1)
               ) {
-                const ijk = { x: x + pos.x * 4, y: y + pos.y * 4, z }
+                const ijk = { x: x + pos.x * width, y: y + pos.y * width, z }
 
                 const block: Block = { ...ijk, type }
                 chunkResult.push(block)
@@ -245,12 +239,12 @@ export const BlockData = (): BlockData => {
       }
     },
     atIJK: (ijk: XYZ) => {
-      const chunkX = floor(ijk.x / 4)
-      const chunkY = floor(ijk.y / 4)
+      const chunkX = floor(ijk.x / width)
+      const chunkY = floor(ijk.y / width)
 
-      // const index = ijk.z * 16 + (ijk.y - chunkY * 4) * 4 + (ijk.x - chunkX * 4)
+      // const index = ijk.z * 16 + (ijk.y - chunkY * width) * width + (ijk.x - chunkX * width)
 
-      const index = (ijk.x - chunkX * 4) + (ijk.y - chunkY * 4) * 4
+      const index = (ijk.x - chunkX * width) + (ijk.y - chunkY * width) * width
       if (data[chunkX]?.[chunkY]?.[ijk.z]?.[index] === undefined) return undefined
 
       return data[chunkX]?.[chunkY]?.[ijk.z]?.[index]
@@ -271,19 +265,19 @@ export const BlockData = (): BlockData => {
       }
     },
     remove: ({ x, y, z }) => {
-      const chunkX = floor(x / 4)
-      const chunkY = floor(y / 4)
+      const chunkX = floor(x / width)
+      const chunkY = floor(y / width)
 
       if (!data[chunkX]?.[chunkY]) {
         // console.error("CHUNK NOT FOUND", chunkX, chunkY)
         return
       }
 
-      const xIndex = x - chunkX * 4
-      const yIndex = y - chunkY * 4
+      const xIndex = x - chunkX * width
+      const yIndex = y - chunkY * width
 
-      // const index = z * 16 + yIndex * 4 + xIndex
-      const index = xIndex + yIndex * 4
+      // const index = z * 16 + yIndex * width + xIndex
+      const index = xIndex + yIndex * width
 
       if (data[chunkX][chunkY][z]?.[index] === undefined) {
         console.error("INVALID INDEX", index, xIndex, yIndex, z)
@@ -307,16 +301,16 @@ export const BlockData = (): BlockData => {
       // }
 
       // data[chunkX][chunkY][index] = 0
-      data[chunkX][chunkY][z][xIndex + yIndex * 4] = 0
+      data[chunkX][chunkY][z][xIndex + yIndex * width] = 0
 
       const key = chunkey(chunkX, chunkY)
       visibleDirty[key] = true
 
       // check if neighbors are also dirty
-      if (x % 4 === 0) visibleDirty[chunkey(chunkX - 1, chunkY)] = true
-      if (x % 4 === 3) visibleDirty[chunkey(chunkX + 1, chunkY)] = true
-      if (y % 4 === 0) visibleDirty[chunkey(chunkX, chunkY - 1)] = true
-      if (y % 4 === 3) visibleDirty[chunkey(chunkX, chunkY + 1)] = true
+      if (x % width === 0) visibleDirty[chunkey(chunkX - 1, chunkY)] = true
+      if (x % width === 3) visibleDirty[chunkey(chunkX + 1, chunkY)] = true
+      if (y % width === 0) visibleDirty[chunkey(chunkX, chunkY - 1)] = true
+      if (y % width === 3) visibleDirty[chunkey(chunkX, chunkY + 1)] = true
     }
   }
 
@@ -382,9 +376,9 @@ export const spawnFlat = (world: World, chunks = 12) => {
   for (let i = 2; i < chunks + 2; i++) {
     for (let j = 2; j < chunks + 2; j++) {
       for (let z = 0; z < 1; z++) {
-        for (let x = 0; x < 4; x++) {
-          for (let y = 0; y < 4; y++) {
-            world.blocks.add({ x: i * 4 + x, y: j * 4 + y, z, type: 4 })
+        for (let x = 0; x < width; x++) {
+          for (let y = 0; y < width; y++) {
+            world.blocks.add({ x: i * width + x, y: j * width + y, z, type: 4 })
           }
         }
       }
