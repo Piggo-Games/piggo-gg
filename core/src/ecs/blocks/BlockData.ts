@@ -89,12 +89,17 @@ export const BlockData = (): BlockData => {
       // console.log(dump)
     },
     setChunk: (chunk: XY, chunkData: string) => {
-      // if (!data[chunk.x]) data[chunk.x] = []
+      if (!data[chunk.x]) data[chunk.x] = []
+      if (!data[chunk.x][chunk.y]) data[chunk.x][chunk.y] = []
 
-      // visibleDirty[chunkey(chunk.x, chunk.y)] = true
+      const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
 
-      // const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
-      // data[chunk.x][chunk.y] = decoded
+      const zHeight = decoded.length / 16
+      for (let z = 0; z < zHeight; z++) {
+        data[chunk.x][chunk.y][z] = decoded.slice(z * 16, (z + 1) * 16)
+      }
+
+      visibleDirty[chunkey(chunk.x, chunk.y)] = true
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
       const chunkX = floor(x / 4)
