@@ -19,7 +19,7 @@ export type BlockData = {
   visible: (at: XY[]) => Block[]
 }
 
-const width = 8
+const width = 4
 const area = width * width
 
 export const BlockData = (): BlockData => {
@@ -344,10 +344,9 @@ export const spawnTerrain = (world: World, num: number = 10) => {
   logPerf("spawnTerrain", time)
 }
 
-export const spawnFlat = (world: World, chunks = 8) => {
+export const spawnFlat = (world: World, chunks = 10) => {
   for (let i = 0; i < chunks; i++) {
     for (let j = 0; j < chunks; j++) {
-
       for (let z = 0; z < 1; z++) {
         for (let x = 0; x < width; x++) {
           for (let y = 0; y < width; y++) {
