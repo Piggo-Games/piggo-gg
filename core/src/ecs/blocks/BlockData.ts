@@ -231,57 +231,11 @@ export const BlockData = (): BlockData => {
       }
       return false
     },
-    // loadMap: (map: Record<string, string>) => {
-    //   for (const chunk in map) {
-    //     const [x, y] = chunk.split("|").map(Number)
-
-    //     blocks.setChunk({ x, y }, map[chunk])
-    //   }
-    // },
     loadMap: (map: Record<string, string>) => {
-
-      let stitched: Int8Array[][] = []
-
       for (const chunk in map) {
-        const [chunkX, chunkY] = chunk.split("|").map(Number)
+        const [x, y] = chunk.split("|").map(Number)
 
-        const decoded = new Int8Array(atob(map[chunk] as unknown as string).split("").map(c => c.charCodeAt(0)))
-
-        const zHeight = decoded.length / 16
-        for (let z = 0; z < zHeight; z++) {
-
-          stitched[chunkX] = stitched[chunkX] || []
-          stitched[chunkX][chunkY] = decoded
-        }
-      }
-      console.log("stitched chunks", stitched)
-
-      // convert stitched 4x4 chunks into widthXwidth chunks
-      for (let i = 0; i < stitched.length; i++) {
-        for (let j = 0; j < stitched[i]?.length; j++) {
-          if (!stitched[i] || !stitched[i][j]) continue
-
-          for (const index in stitched[i][j]) {
-            const z = floor(Number(index) / 16)
-            const subY = floor((Number(index) % 16) / 4)
-            const subX = (Number(index) % 16) % 4
-
-            blocks.add({ x: i * 4 + subX, y: j * 4 + subY, z, type: stitched[i][j][index] })
-          }
-
-          // for (let subX = 0; subX < 4; subX++) {
-          //   for (let subY = 0; subY < 4; subY++) {
-
-          //     const chunkX = i * 4 + subX
-          //     const chunkY = j * 4 + subY
-
-
-
-          // const index = z * 16 + subY * 4 + subX
-          // blocks.add({ x: chunkX, y: chunkY, z, type: stitched[i][j][index] })
-          //     }
-          // }
-        }
+        blocks.setChunk({ x, y }, map[chunk])
       }
     },
     remove: ({ x, y, z }) => {
