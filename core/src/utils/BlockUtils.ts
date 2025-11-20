@@ -33,9 +33,13 @@ export const blockInLine = ({ from, dir, world, maxDist = 10, cap = 10 }: BlockI
     const yGap = (current.y + 0.15) % 0.3
     const zGap = current.z % 0.3
 
-    const xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
-    const yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
-    const zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+    let xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
+    let yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
+    let zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+
+    xStep = abs(xStep)
+    yStep = abs(yStep)
+    zStep = abs(zStep)
 
     const minStep = min(xStep, yStep, zStep)
 
@@ -80,9 +84,13 @@ export const nextBlock = ({ from, dir, dist }: { from: XYZ, dir: XYZ, dist: numb
     const yGap = (current.y + 0.15) % 0.3
     const zGap = current.z % 0.3
 
-    const xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
-    const yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
-    const zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+    let xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
+    let yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
+    let zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+
+    xStep = abs(xStep)
+    yStep = abs(yStep)
+    zStep = abs(zStep)
 
     const minStep = min(xStep, yStep, zStep)
 
