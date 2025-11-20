@@ -1,5 +1,6 @@
 import {
-  Block, BlockColor, BlockPlan, BlockTree, floor, keys, logPerf, World, XY, XYZ, XYZstring
+  arrHash, Block, BlockColor, BlockPlan, BlockTree,
+  floor, keys, logPerf, World, XY, XYZ, XYZstring
 } from "@piggo-gg/core"
 
 export type BlockData = {
@@ -25,6 +26,7 @@ const area = width * width
 export const BlockData = (): BlockData => {
 
   let data: Int8Array[][] = []
+  let chunkHashes: Record<string, number> = {}
 
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
@@ -72,16 +74,20 @@ export const BlockData = (): BlockData => {
           }
         }
       }
-      console.log(data)
       console.log(dump)
+      console.log(data)
+      console.log(chunkHashes)
     },
     setChunk: (chunk: XY, chunkData: string) => {
       if (!data[chunk.x]) data[chunk.x] = []
 
-      visibleDirty[chunkey(chunk.x, chunk.y)] = true
+      const key = chunkey(chunk.x, chunk.y)
 
       const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
       data[chunk.x][chunk.y] = decoded
+
+      chunkHashes[key] = arrHash(decoded)
+      visibleDirty[key] = true
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
       const chunkX = floor(x / width)
@@ -134,6 +140,7 @@ export const BlockData = (): BlockData => {
 
       const key = chunkey(chunkX, chunkY)
 
+      chunkHashes[key] = arrHash(data[chunkX][chunkY])
       visibleDirty[key] = true
 
       return true
@@ -257,22 +264,6 @@ export const BlockData = (): BlockData => {
         return
       }
 
-      // const blockType = BlockTypeString[data[chunkX][chunkY][index]]
-
-      // // spawn item
-      // if (blockType && world) {
-      //   const playerCharacter = world.client?.character()
-      //   if (playerCharacter) {
-      //     const item = BlockItem(blockType)({ character: playerCharacter, id: randomHash() })
-      //     const xy = intToXY(x, y)
-      //     item.components.position.data.follows = undefined
-      //     item.components.position.setPosition({ ...xy, z: (z + 1) * 21 })
-      //     item.components.item.dropped = true
-
-      //     world.addEntity(item)
-      //   }
-      // }
-
       data[chunkX][chunkY][index] = 0
 
       const key = chunkey(chunkX, chunkY)
@@ -289,7 +280,18 @@ export const BlockData = (): BlockData => {
   return blocks
 }
 
-export const spawnChunk = (chunk: XY, world: World) => {
+export const spawnTerrain = (world: World, num: number = 10) => {
+  const time = performance.now()
+  for (let i = 0; i < num; i++) {
+    for (let j = 0; j < num; j++) {
+      const chunk = { x: i, y: j }
+      spawnTerrainChunk(chunk, world)
+    }
+  }
+  logPerf("spawnTerrain", time)
+}
+
+export const spawnTerrainChunk = (chunk: XY, world: World) => {
   const size = width
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
@@ -320,28 +322,6 @@ export const spawnChunk = (chunk: XY, world: World) => {
       }
     }
   }
-}
-
-// export const spawnTiny = () => {
-//   const num = 8
-//   for (let i = 0; i < num; i++) {
-//     for (let j = 0; j < num; j++) {
-//       blocks.add({ x: i + 5, y: j + 5, z: 0, type: 1 })
-//     }
-//   }
-
-//   blocks.add({ x: 9, y: 9, z: 1, type: 2 })
-// }
-
-export const spawnTerrain = (world: World, num: number = 10) => {
-  const time = performance.now()
-  for (let i = 0; i < num; i++) {
-    for (let j = 0; j < num; j++) {
-      const chunk = { x: i, y: j }
-      spawnChunk(chunk, world)
-    }
-  }
-  logPerf("spawnTerrain", time)
 }
 
 export const spawnFlat = (world: World, chunks = 10) => {

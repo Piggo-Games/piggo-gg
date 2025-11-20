@@ -2,7 +2,7 @@ import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
   InventorySystem, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
+  ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 
@@ -50,6 +50,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       EscapeMenu(world),
       HtmlChat(),
       Sky(),
+      Water(),
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
@@ -62,7 +63,7 @@ const BuildSystem = SystemBuilder({
   id: "BuildSystem",
   init: (world) => {
 
-    spawnFlat(world)
+    spawnFlat(world, 11)
 
     return {
       id: "BuildSystem",
@@ -83,11 +84,11 @@ const BuildSystem = SystemBuilder({
           if (!character) continue
 
           const { position } = character.components
-          const { velocity, standing } = position.data
+          const { velocity, standing, z, flying } = position.data
 
           // fell off the map
-          if (position.data.z < -8) {
-            position.setPosition({ x: 10, y: 10, z: 8 })
+          if (z < -3 && !flying) {
+            position.setPosition({ x: 6, y: 6, z: 8 })
           }
 
           // double-jump state cleanup

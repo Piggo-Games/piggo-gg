@@ -8,7 +8,7 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        init: async () => {
+        init: async (o, _, __, three) => {
           const geo = new SphereGeometry(500, 60, 40)
 
           const material = new ShaderMaterial({
@@ -19,7 +19,8 @@ export const Sky = () => {
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
               uCloudDensity: { value: 0.9 },
-              uCloudSpeed: { value: 0.05 }
+              uCloudSpeed: { value: 0.05 },
+              uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
             vertexShader,
             fragmentShader,
@@ -38,7 +39,7 @@ export const Sky = () => {
           //   material.uniforms.uTime.value = clock.getElapsedTime()
           // }
 
-          sky.components.three.o.push(mesh)
+          o.push(mesh)
         }
       })
     }
@@ -203,6 +204,17 @@ const fragmentShader = /* glsl */`
     return minDist;
   }
 
+  vec3 getSun(vec3 dir, vec3 sunDir) {
+    float sun = max(dot(dir, sunDir), 0.0);
+
+    float core = pow(sun, 200.0) * 10000000000000.0;
+    // float glow = pow(sun, 10.0);
+
+    float intensity = core;
+
+    return vec3(1.0, 0.8, 0.2) * intensity;
+  }
+
   void main(){
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
@@ -237,9 +249,12 @@ const fragmentShader = /* glsl */`
     vec3 stars = starLayers(dir, uv);
     stars *= (1.0 - dayFactor);
 
+    vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
+    vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
+
     // dither using hash12
     // float dither = (hash12(uv + uTime*0.123) - 0.5) * 0.003;
-    vec3 color = bg + stars;
+    vec3 color = bg + stars + sun;
 
     gl_FragColor = vec4(color, 1.0);
   }

@@ -110,7 +110,7 @@ export const Carl = (player: Player): Character => {
             // })
           }
         },
-        init: async (entity, world, three) => {
+        init: async (o, entity, world, three) => {
           three.gLoader.load("cowboy.glb", (gltf) => {
 
             pig = cloneSkeleton(gltf.scene)
@@ -137,7 +137,7 @@ export const Carl = (player: Player): Character => {
               }
             })
 
-            entity.components.three.o.push(pig)
+            o.push(pig)
           })
 
           // three.gLoader.load("eagle.glb", (gltf) => {
