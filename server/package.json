@@ -12,11 +12,11 @@
     "@prisma/client": "6.16.0",
     "google-auth-library": "9.15.1",
     "jsonwebtoken": "9.0.2",
-    "mock-browser": "0.92.14"
+    "mock-browser": "0.92.14",
+    "prisma": "6.16.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.8",
-    "bun-types": "1.2.2",
-    "prisma": "6.16.0"
+    "@types/jsonwebtoken": "9.0.8",
+    "bun-types": "1.2.2"
   }
 }

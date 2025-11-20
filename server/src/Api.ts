@@ -37,7 +37,9 @@ export type Api = {
 
 export const Api = (): Api => {
 
-  const prisma = new PrismaClient()
+  const prisma = new PrismaClient({
+    // datasourceUrl: process.env["DATABASE_URL"] ?? "postgresql://postgres@localhost:5432/piggo"
+  })
   const JWT_SECRET = process.env["JWT_SECRET"] ?? "piggo"
   const DISCORD_SECRET = process.env["DISCORD_SECRET"] ?? ""
   const google = new OAuth2Client("1064669120093-9727dqiidriqmrn0tlpr5j37oefqdam3.apps.googleusercontent.com")

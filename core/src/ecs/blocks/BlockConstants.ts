@@ -5,12 +5,12 @@ export type BlockPlan = Block[]
 
 export type BlockColor = "white" | "hotpink" | "lightpink" | "rebeccapurple" | "slategray" |
   "chocolate" | "saddlebrown" | "cadetblue" | "cornflowerblue" | "black" |
-  "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen"
+  "rosybrown" | "sandybrown" | "palevioletred" | "mediumseagreen" | "tan"
 
 export const BlockColors: BlockColor[] = [
   "white", "hotpink", "lightpink", "rebeccapurple", "slategray",
   "chocolate", "saddlebrown", "cadetblue", "cornflowerblue",
-  "rosybrown", "sandybrown", "palevioletred", "mediumseagreen", "black"
+  "rosybrown", "sandybrown", "palevioletred", "mediumseagreen", "black", "tan"
 ]
 
 export const nextColor = (current: BlockColor, backward = false): BlockColor => {

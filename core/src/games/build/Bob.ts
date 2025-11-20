@@ -169,9 +169,9 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
 
             let wipEnd = blockInLine({ from: camera, dir, world })?.outside
-            if (!wipEnd) {
-              wipEnd = nextBlock({ from: camera, dir, dist: 2 })
-            }
+            if (!wipEnd) wipEnd = nextBlock({ from: camera, dir, dist: 2 })
+
+            if (!wipEnd) return
 
             // TODO doesn't work in multiplayer
             if (wipStart && wipEnd) {
@@ -351,9 +351,9 @@ export const Bob = (player: Player): Character => {
           const camera = three.camera.pos()
 
           let wipEnd = blockInLine({ from: camera, dir, world })?.outside
-          if (!wipEnd) {
-            wipEnd = nextBlock({ from: camera, dir, dist: 2 })
-          }
+          if (!wipEnd) wipEnd = nextBlock({ from: camera, dir, dist: 2 })
+
+          if (!wipEnd) return
 
           let count = 0
           let dummy = new Object3D()
