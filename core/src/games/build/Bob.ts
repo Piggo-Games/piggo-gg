@@ -374,7 +374,6 @@ export const Bob = (player: Player): Character => {
           }
           wipMesh.count = count
           wipMesh.instanceMatrix.needsUpdate = true
-
         },
         onRender: ({ entity, world, delta, client, three, since }) => {
           const ratio = since / 25
