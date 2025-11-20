@@ -1,16 +1,26 @@
 import { Entity, Position, Three } from "@piggo-gg/core"
-import { Color, Mesh, SphereGeometry, ShaderMaterial } from "three"
+import { Color, Mesh, SphereGeometry, ShaderMaterial, Clock } from "three"
 
 export const NewSky = () => {
+
+  let clock = new Clock()
+
+  let mat: ShaderMaterial | undefined = undefined
+
   const sky = Entity<Three>({
     id: "sky",
     components: {
       position: Position(),
       three: Three({
+        onRender: () => {
+          if (mat) {
+            mat.uniforms.uTime.value = clock.getElapsedTime()
+          }
+        },
         init: async (_, __, three) => {
           const geo = new SphereGeometry(500, 60, 40)
 
-          const material = new ShaderMaterial({
+          mat = new ShaderMaterial({
             uniforms: {
               uTime: { value: 0.0 },
               uDensity: { value: 0.0015 },
@@ -31,13 +41,8 @@ export const NewSky = () => {
             toneMapped: true
           })
 
-          const mesh = new Mesh(geo, material)
+          const mesh = new Mesh(geo, mat)
           mesh.frustumCulled = false
-
-          // const clock = new Clock()
-          // const update = () => {
-          //   material.uniforms.uTime.value = clock.getElapsedTime()
-          // }
 
           sky.components.three.o.push(mesh)
         }
@@ -60,11 +65,32 @@ const vertexShader = /* glsl */`
 const fragmentShader = /* glsl */`
 
   uniform vec2 uResolution;
+  uniform float uTime;
+
   varying vec3 vWorldPosition;
 
   #define PI 3.14159265359
 
   const vec3 SUN_POS = vec3(0.5, 0.5, 0.5);   // fixed sky location
+
+  vec3 getWater(vec3 dir, vec3 skyColor, vec3 sunColor) {
+    // waves (cheap fake normal)
+    float t = uTime * 0.1;
+    float wave = sin(dir.x*20.0 + t) * 0.02 +
+                 sin(dir.z*15.0 - t*1.3) * 0.02;
+    float fresnel = pow(1.0 - max(dir.y, 0.0), 3.0);
+
+    // reflection: mostly sky + boosted sun
+    vec3 refl = skyColor + sunColor * 1.5;
+
+    // dark base water
+    vec3 waterBase = vec3(0.02, 0.05, 0.07);
+
+    // mix reflection and dark deep water
+    vec3 color = mix(waterBase, refl, fresnel + wave);
+
+    return color;
+  }
 
   vec3 getSky(vec2 uv) {
     float atmosphere = sqrt(1.0-uv.y);
@@ -88,23 +114,31 @@ const fragmentShader = /* glsl */`
     return vec3(1.0, 0.6, 0.05) * intensity;
   }
 
-
   void main() {
-      // world direction
-      vec3 dir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
+    // world direction
+    vec3 dir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
 
-      // convert to stable sky UV
-      // float u = atan(dir.x, dir.z) / (2.0 * PI) + 0.5;
-      float rawU = atan(dir.x, dir.z) / (2.0 * PI);
-      float u = fract(rawU + 1.0);   // ensures wrap is seamless 0→1
+    // convert to stable sky UV
+    // float u = atan(dir.x, dir.z) / (2.0 * PI) + 0.5;
+    float rawU = atan(dir.x, dir.z) / (2.0 * PI);
+    float u = fract(rawU + 1.0);   // ensures wrap is seamless 0→1
 
-      float v = dir.y * 0.5 + 0.5;
-      vec2 skyUV = vec2(u, v);
+    float v = dir.y * 0.5 + 0.5;
+    vec2 skyUV = vec2(u, v);
 
-      vec3 sky = getSky(skyUV);
-      vec3 sun = getSun(dir);
+    // vec3 sky = getSky(skyUV);
+    // vec3 sun = getSun(dir);
 
-      gl_FragColor = vec4(sky + sun, 1.0);
+    float horizon = smoothstep(-0.02, 0.0, dir.y); // 0=water, 1=sky
+
+    vec3 sky = getSky(skyUV);
+    vec3 sun = getSun(dir);
+    vec3 water = getWater(dir, sky, sun);
+
+    vec3 color = mix(water, sky + sun, horizon);
+
+    gl_FragColor = vec4(color, 1.0);
+
+    // gl_FragColor = vec4(sky + sun, 1.0);
   }
-
 `
