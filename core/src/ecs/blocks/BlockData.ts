@@ -1,6 +1,6 @@
 import {
-  arrHash,
-  Block, BlockColor, BlockPlan, BlockTree, floor, keys, logPerf, World, XY, XYZ, XYZstring
+  arrHash, Block, BlockColor, BlockPlan, BlockTree,
+  floor, keys, logPerf, World, XY, XYZ, XYZstring
 } from "@piggo-gg/core"
 
 export type BlockData = {
