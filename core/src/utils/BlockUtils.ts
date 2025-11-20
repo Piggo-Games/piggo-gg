@@ -47,8 +47,6 @@ export const blockInLine = ({ from, dir, world, maxDist = 10, cap = 10 }: BlockI
     current.y += yDist
     current.z += zDist
 
-    if (current.z <= 0) return undefined
-
     travelled += hypot(xDist, yDist, zDist)
     cap -= 1
 
@@ -97,8 +95,6 @@ export const nextBlock = ({ from, dir, dist }: { from: XYZ, dir: XYZ, dist: numb
     current.z += zDist
 
     cap -= 1
-
-    if (current.z <= 0) return undefined
 
     travelled += hypot(xDist, yDist, zDist)
   }
