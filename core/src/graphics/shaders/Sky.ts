@@ -204,6 +204,17 @@ const fragmentShader = /* glsl */`
     return minDist;
   }
 
+  vec3 getSun(vec3 dir, vec3 sunDir) {
+    float sun = max(dot(dir, sunDir), 0.0);
+
+    float core = pow(sun, 200.0) * 10000000000000.0;
+    // float glow = pow(sun, 10.0);
+
+    float intensity = core;
+
+    return vec3(1.0, 0.8, 0.2) * intensity;
+  }
+
   void main(){
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
@@ -238,9 +249,12 @@ const fragmentShader = /* glsl */`
     vec3 stars = starLayers(dir, uv);
     stars *= (1.0 - dayFactor);
 
+    vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
+    vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
+
     // dither using hash12
     // float dither = (hash12(uv + uTime*0.123) - 0.5) * 0.003;
-    vec3 color = bg + stars;
+    vec3 color = bg + stars + sun;
 
     gl_FragColor = vec4(color, 1.0);
   }
