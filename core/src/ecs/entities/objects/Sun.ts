@@ -28,7 +28,7 @@ export const Sun = (props: SunProps = {}) => {
           const sphere = new Mesh(
             new SphereGeometry(8, 32, 32),
             new MeshPhysicalMaterial({
-              emissive: colors.evening,
+              emissive: colors.night,
               emissiveIntensity: 1
             })
           )
@@ -41,7 +41,7 @@ export const Sun = (props: SunProps = {}) => {
 
           // const helper = new CameraHelper(light.shadow.camera)
 
-          sun.components.three.o.push(light, sphere, hemi)
+          sun.components.three.o.push(light, hemi)
         }
       })
     }

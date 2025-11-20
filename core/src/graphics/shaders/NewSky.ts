@@ -19,7 +19,8 @@ export const NewSky = () => {
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
               uCloudDensity: { value: 0.9 },
               uCloudSpeed: { value: 0.05 },
-              uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
+              uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } },
+              uSunPos: { value: { x: 100, y: 200, z: 100 } }
             },
             vertexShader,
             fragmentShader,
@@ -61,52 +62,49 @@ const fragmentShader = /* glsl */`
   uniform vec2 uResolution;
   varying vec3 vWorldPosition;
 
-  #define iMouse vec2(500, 500)
   #define PI 3.14159265359
+
+  const vec3 SUN_POS = vec3(0.5, 0.5, 0.5);   // fixed sky location
 
   vec3 getSky(vec2 uv) {
     float atmosphere = sqrt(1.0-uv.y);
-    vec3 skyColor = vec3(0.2, 0.4, 0.8);
-    
-    float scatter = pow(iMouse.y / uResolution.y, 1.0 / 15.0);
+    vec3 skyColor = vec3(0.2, 0.4, 0.85);
+
+    float scatter = pow(0.8, 1.0 / 15.0);
     scatter = 1.0 - clamp(scatter, 0.8, 1.0);
 
     vec3 scatterColor = mix(vec3(1.0), vec3(1.0, 0.3, 0.0) * 1.5, scatter);
-    return mix(skyColor, vec3(scatterColor), atmosphere / 1.3);
+    return mix(skyColor, scatterColor, atmosphere / 1.7);
   }
 
-  vec3 getSun(vec2 uv) {
-    float sun = 1.0 - distance(uv,iMouse.xy / uResolution.y);
-    sun = clamp(sun, 0.0, 1.0);
+  vec3 getSun(vec3 dir) {
+    float sun = max(dot(dir, SUN_POS), 0.0);
 
-    float glow = sun;
-    glow = clamp(glow, 0.0, 1.0);
+    float core = pow(sun, 100.0) * 900000.0;
+    float glow = pow(sun, 10.0);
 
-    sun = pow(sun, 100.0);
-    sun *= 100.0;
-    sun = clamp(sun, 0.0, 1.0);
+    float intensity = core + glow;
 
-    glow = pow(glow, 6.0) * 1.0;
-    glow = pow(glow, (uv.y));
-    glow = clamp(glow, 0.0, 1.0);
-
-    sun *= pow(dot(uv.y, uv.y), 1.0 / 1.65);
-
-    glow *= pow(dot(uv.y, uv.y), 1.0 / 2.0);
-
-    sun += glow;
-
-    vec3 sunColor = vec3(1.0, 0.6, 0.05) * sun;
-
-    return vec3(sunColor);
+    return vec3(1.0, 0.6, 0.05) * intensity;
   }
+
 
   void main() {
-    vec2 uv = gl_FragCoord.xy / uResolution;
+      // world direction
+      vec3 dir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
 
-    vec3 sky = getSky(uv);
-    vec3 sun = getSun(uv);
+      // convert to stable sky UV
+      // float u = atan(dir.x, dir.z) / (2.0 * PI) + 0.5;
+      float rawU = atan(dir.x, dir.z) / (2.0 * PI);
+      float u = fract(rawU + 1.0);   // ensures wrap is seamless 0→1
 
-    gl_FragColor = vec4(sky + sun, 1.0);
+      float v = dir.y * 0.5 + 0.5;
+      vec2 skyUV = vec2(u, v);
+
+      vec3 sky = getSky(skyUV);
+      vec3 sun = getSun(dir);
+
+      gl_FragColor = vec4(sky + sun, 1.0);
   }
+
 `
