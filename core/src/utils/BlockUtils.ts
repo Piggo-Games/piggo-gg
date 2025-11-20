@@ -1,4 +1,4 @@
-import { Block, floor, hypot, min, World, XYZ } from "@piggo-gg/core"
+import { abs, Block, floor, hypot, min, World, XYZ } from "@piggo-gg/core"
 
 export const blockFromXYZ = (xyz: XYZ) => ({
   x: floor((0.15 + xyz.x) / 0.3),
@@ -33,9 +33,13 @@ export const blockInLine = ({ from, dir, world, maxDist = 10, cap = 10 }: BlockI
     const yGap = (current.y + 0.15) % 0.3
     const zGap = current.z % 0.3
 
-    const xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
-    const yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
-    const zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+    let xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
+    let yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
+    let zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+
+    xStep = abs(xStep)
+    yStep = abs(yStep)
+    zStep = abs(zStep)
 
     const minStep = min(xStep, yStep, zStep)
 
@@ -46,8 +50,6 @@ export const blockInLine = ({ from, dir, world, maxDist = 10, cap = 10 }: BlockI
     current.x += xDist
     current.y += yDist
     current.z += zDist
-
-    if (current.z <= 0) return undefined
 
     travelled += hypot(xDist, yDist, zDist)
     cap -= 1
@@ -73,17 +75,22 @@ export const blockInLine = ({ from, dir, world, maxDist = 10, cap = 10 }: BlockI
 
 export const nextBlock = ({ from, dir, dist }: { from: XYZ, dir: XYZ, dist: number }): XYZ | undefined => {
   const current = { ...from }
+  let cap = 6
 
   let travelled = 0
 
-  while (travelled < dist) {
+  while (travelled < dist && cap > 0) {
     const xGap = (current.x + 0.15) % 0.3
     const yGap = (current.y + 0.15) % 0.3
     const zGap = current.z % 0.3
 
-    const xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
-    const yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
-    const zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+    let xStep = dir.x >= 0 ? (0.3 - xGap) / dir.x : (xGap / -dir.x)
+    let yStep = dir.z >= 0 ? (0.3 - yGap) / dir.z : (yGap / -dir.z)
+    let zStep = dir.y >= 0 ? (0.3 - zGap) / dir.y : (zGap / -dir.y)
+
+    xStep = abs(xStep)
+    yStep = abs(yStep)
+    zStep = abs(zStep)
 
     const minStep = min(xStep, yStep, zStep)
 
@@ -95,7 +102,7 @@ export const nextBlock = ({ from, dir, dist }: { from: XYZ, dir: XYZ, dist: numb
     current.y += yDist
     current.z += zDist
 
-    if (current.z <= 0) return undefined
+    cap -= 1
 
     travelled += hypot(xDist, yDist, zDist)
   }
