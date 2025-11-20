@@ -8,7 +8,7 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        init: async (_, __, three) => {
+        init: async (o, _, __, three) => {
           const geo = new SphereGeometry(500, 60, 40)
 
           const material = new ShaderMaterial({
@@ -39,7 +39,7 @@ export const Sky = () => {
           //   material.uniforms.uTime.value = clock.getElapsedTime()
           // }
 
-          sky.components.three.o.push(mesh)
+          o.push(mesh)
         }
       })
     }

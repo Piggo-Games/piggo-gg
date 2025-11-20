@@ -47,8 +47,8 @@ export const HookItem = ({ character }: { character: Character }) => {
         }
       }),
       three: Three({
-        init: async (entity) => {
-          entity.components.three.o.push(mesh)
+        init: async (o) => {
+          o.push(mesh)
         },
         onRender: ({ world, delta }) => {
           // mesh needs to be between tether position and player

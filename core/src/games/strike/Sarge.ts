@@ -374,7 +374,7 @@ export const Sarge = (player: Player): Character => {
             })
           }
         },
-        init: async (entity, world, three) => {
+        init: async (o, entity, world, three) => {
 
           // body
           const bodyGeo = new CapsuleGeometry(0.064, 0.34)
@@ -386,7 +386,7 @@ export const Sarge = (player: Player): Character => {
           const headMat = new MeshPhongMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 })
           hitboxes.head = new Mesh(headGeo, headMat)
 
-          // entity.components.three.o.push(hitboxes.body, hitboxes.head)
+          // o.push(hitboxes.body, hitboxes.head)
 
           // character model
           three.gLoader.load("swat.glb", (gltf) => {
@@ -421,7 +421,7 @@ export const Sarge = (player: Player): Character => {
               }
             })
 
-            entity.components.three.o.push(pig)
+            o.push(pig)
           })
         }
       })

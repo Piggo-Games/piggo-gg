@@ -13,10 +13,10 @@ export const Water = () => {
       three: Three({
         onRender: ({ delta }) => {
           if (water) {
-            water.material.uniforms['time'].value += delta / 25 * 0.002
+            water.material.uniforms['time'].value += delta / 25 * 0.0016
           }
         },
-        init: async () => {
+        init: async (o) => {
           const waterGeo = new PlaneGeometry(10000, 10000)
 
           water = new ThreeWater(waterGeo, {
@@ -39,7 +39,7 @@ export const Water = () => {
           water.rotation.x = - Math.PI / 2
           water.position.y = -0.02
 
-          sky.components.three.o.push(water)
+          o.push(water)
         }
       })
     }

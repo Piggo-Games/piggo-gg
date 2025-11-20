@@ -63,7 +63,7 @@ const BuildSystem = SystemBuilder({
   id: "BuildSystem",
   init: (world) => {
 
-    spawnFlat(world)
+    spawnFlat(world, 11)
 
     return {
       id: "BuildSystem",

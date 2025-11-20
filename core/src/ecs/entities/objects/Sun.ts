@@ -12,7 +12,7 @@ export const Sun = (props: SunProps = {}) => {
     components: {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
-        init: async () => {
+        init: async (o) => {
           const light = new DirectionalLight(colors.evening, 8)
 
           light.shadow.normalBias = 0.02
@@ -41,7 +41,7 @@ export const Sun = (props: SunProps = {}) => {
 
           // const helper = new CameraHelper(light.shadow.camera)
 
-          sun.components.three.o.push(light, hemi)
+          o.push(light, hemi)
         }
       })
     }

@@ -484,7 +484,7 @@ export const Bob = (player: Player): Character => {
             block.material.forEach((mat) => mat.color.set(blockColor))
           }
         },
-        init: async (entity, world, three) => {
+        init: async (o, entity, world, three) => {
 
           // body
           const bodyGeo = new CapsuleGeometry(0.064, 0.34)
@@ -496,7 +496,7 @@ export const Bob = (player: Player): Character => {
           const headMat = new MeshPhongMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 })
           hitboxes.head = new Mesh(headGeo, headMat)
 
-          // entity.components.three.o.push(hitboxes.body, hitboxes.head)
+          // o.push(hitboxes.body, hitboxes.head)
 
           if (world.client?.playerId() === player.id) {
             wipMesh = BlocksMesh(1000)
@@ -504,7 +504,7 @@ export const Bob = (player: Player): Character => {
               mat.wireframe = true
               mat.visible = true
             })
-            entity.components.three.o.push(wipMesh)
+            o.push(wipMesh)
           }
 
           // character model
@@ -540,7 +540,7 @@ export const Bob = (player: Player): Character => {
               }
             })
 
-            entity.components.three.o.push(mesh)
+            o.push(mesh)
 
             block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
             block.castShadow = true
@@ -548,7 +548,7 @@ export const Bob = (player: Player): Character => {
             block.rotation.order = "ZXY"
             MarbleTexture(block.material, three)
 
-            entity.components.three.o.push(block)
+            o.push(block)
           })
         }
       })

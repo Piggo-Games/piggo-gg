@@ -313,7 +313,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
         }),
       }),
       three: Three({
-        init: async (_, __, three) => {
+        init: async (o, _, __, three) => {
 
           // tracer
           const tracerGeometry = new CylinderGeometry(0.004, 0.004, 0.1, 8)
@@ -340,7 +340,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
               }
             })
 
-            item.components.three?.o.push(mesh)
+            o.push(mesh)
           })
         },
         onRender: ({ world, delta, client, three }) => {
