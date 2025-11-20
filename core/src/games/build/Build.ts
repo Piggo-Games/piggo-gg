@@ -50,7 +50,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       EscapeMenu(world),
       HtmlChat(),
       Sky(),
-      Water(),
+      // Water(),
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),

@@ -1,4 +1,4 @@
-export const piggoVersion: `0.${number}.${number}` = "0.46.7"
+export const piggoVersion: `0.${number}.${number}` = "0.47.1"
 
 export const isMobile = (): boolean => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
