@@ -74,8 +74,9 @@ export const BlockData = (): BlockData => {
           }
         }
       }
-      console.log(data)
       console.log(dump)
+      console.log(data)
+      console.log(chunkHashes)
     },
     setChunk: (chunk: XY, chunkData: string) => {
       if (!data[chunk.x]) data[chunk.x] = []
@@ -139,6 +140,7 @@ export const BlockData = (): BlockData => {
 
       const key = chunkey(chunkX, chunkY)
 
+      chunkHashes[key] = arrHash(data[chunkX][chunkY])
       visibleDirty[key] = true
 
       return true

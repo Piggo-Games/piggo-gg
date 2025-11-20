@@ -1,6 +1,5 @@
 import { Entity, Position, World } from "@piggo-gg/core"
 import { Vector3 } from "three"
-import { Container } from "pixi.js"
 
 export type Capsule = { A: XYZ, B: XYZ, radius: number }
 export type XY = { x: number, y: number }
@@ -269,9 +268,9 @@ export const rayCapsuleIntersect = (from: XYZ, dir: XYZ, capsule: Capsule): fals
 
   const EPS = 1e-8
 
-  // Degenerate capsule -> sphere at A (or very short segment)
+  // bad capsule -> sphere at A (or very short segment)
   if (c < EPS) {
-    console.error("degenerate capsule")
+    console.error("bad capsule")
     // return raySphereIntersect(from, dir, A, radius)
   }
 
@@ -332,7 +331,6 @@ export const rayCapsuleIntersect = (from: XYZ, dir: XYZ, capsule: Capsule): fals
   return result ? { sc, tc } : false
 }
 
-// Minimal robust ray-sphere fallback used above
 export const raySphereIntersect = (from: XYZ, dir: XYZ, C: XYZ, r: number) => {
   const m = XYZsub(from, C)
   const b = XYZdot(m, dir)
@@ -342,86 +340,4 @@ export const raySphereIntersect = (from: XYZ, dir: XYZ, C: XYZ, r: number) => {
 
   const discr = b * b - XYZdot(dir, dir) * c
   return discr >= 0
-}
-
-// DEPRECATED
-
-export const tileIndex = (n: number, tileMap: number[]): number => {
-  let numZeros = 0
-  for (let i = 0; i < n; i++) {
-    if (tileMap[i] === 0) numZeros++
-  }
-  return n - numZeros
-}
-
-export const searchVisibleTiles = (start: XY, floorTilesArray: Entity, tileMap: number[]): Set<Container> => {
-  const visibleTilesContainers: Set<Container> = new Set()
-
-  const directions: (XY & { plus?: number })[] = [
-    { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 0, y: -1 },
-    { x: 0.1, y: 0.9 },
-    { x: 0.2, y: 0.8 },
-    { x: 0.3, y: 0.7, plus: 1 },
-    { x: 0.4, y: 0.6, plus: 1 },
-    { x: 0.45, y: 0.55, plus: 1 },
-    { x: 0.5, y: 0.5, plus: 2 },
-    { x: 0.55, y: 0.45, plus: 1 },
-    { x: 0.6, y: 0.4, plus: 1 },
-    { x: 0.7, y: 0.3, plus: 1 },
-    { x: 0.8, y: 0.2 },
-    { x: 0.9, y: 0.1 },
-    { x: -0.1, y: 0.9 },
-    { x: -0.2, y: 0.8 },
-    { x: -0.3, y: 0.7, plus: 1 },
-    { x: -0.4, y: 0.6, plus: 1 },
-    { x: -0.45, y: 0.55, plus: 1 },
-    { x: -0.5, y: 0.5, plus: 2 },
-    { x: -0.55, y: 0.45, plus: 1 },
-    { x: -0.6, y: 0.4, plus: 1 },
-    { x: -0.7, y: 0.3, plus: 1 },
-    { x: -0.8, y: 0.2 },
-    { x: -0.9, y: 0.1 },
-    { x: 0.1, y: -0.9 },
-    { x: 0.2, y: -0.8 },
-    { x: 0.3, y: -0.7, plus: 1 },
-    { x: 0.4, y: -0.6, plus: 1 },
-    { x: 0.45, y: -0.55, plus: 1 },
-    { x: 0.5, y: -0.5, plus: 2 },
-    { x: 0.55, y: -0.45, plus: 1 },
-    { x: 0.6, y: -0.4, plus: 1 },
-    { x: 0.7, y: -0.3, plus: 1 },
-    { x: 0.8, y: -0.2 },
-    { x: 0.9, y: -0.1 },
-    { x: -0.1, y: -0.9 },
-    { x: -0.2, y: -0.8 },
-    { x: -0.3, y: -0.7, plus: 1 },
-    { x: -0.4, y: -0.6, plus: 1 },
-    { x: -0.45, y: -0.55, plus: 1 },
-    { x: -0.5, y: -0.5, plus: 2 },
-    { x: -0.55, y: -0.45, plus: 1 },
-    { x: -0.6, y: -0.4, plus: 1 },
-    { x: -0.7, y: -0.3, plus: 1 },
-    { x: -0.8, y: -0.2 },
-    { x: -0.9, y: -0.1 }
-  ]
-
-  const castRay = (direction: XY, maxDistance: number): void => {
-    for (let i = 0; i < maxDistance; i++) {
-      const x = round(start.x + direction.x * i)
-      const y = round(start.y + direction.y * i)
-
-      if (tileMap[x + (y * 80)] === 0) break
-
-      const index = tileIndex(x + (y * 80), tileMap)
-      const tile = floorTilesArray.components.renderable?.c.children[index]
-      if (!tile) continue
-      visibleTilesContainers.add(tile)
-    }
-  }
-
-  directions.forEach(({ x, y, plus = 0 }) => {
-    castRay({ x, y }, 15 + plus)
-  })
-
-  return visibleTilesContainers
 }
