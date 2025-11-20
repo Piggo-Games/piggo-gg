@@ -73,25 +73,6 @@ const fragmentShader = /* glsl */`
 
   const vec3 SUN_POS = vec3(0.5, 0.5, 0.5);   // fixed sky location
 
-  vec3 getWater(vec3 dir, vec3 skyColor, vec3 sunColor) {
-    // waves (cheap fake normal)
-    float t = uTime * 0.1;
-    float wave = sin(dir.x*20.0 + t) * 0.02 +
-                 sin(dir.z*15.0 - t*1.3) * 0.02;
-    float fresnel = pow(1.0 - max(dir.y, 0.0), 3.0);
-
-    // reflection: mostly sky + boosted sun
-    vec3 refl = skyColor + sunColor * 1.5;
-
-    // dark base water
-    vec3 waterBase = vec3(0.02, 0.05, 0.07);
-
-    // mix reflection and dark deep water
-    vec3 color = mix(waterBase, refl, fresnel + wave);
-
-    return color;
-  }
-
   vec3 getSky(vec2 uv) {
     float atmosphere = sqrt(1.0-uv.y);
     vec3 skyColor = vec3(0.2, 0.4, 0.85);
@@ -101,6 +82,64 @@ const fragmentShader = /* glsl */`
 
     vec3 scatterColor = mix(vec3(1.0), vec3(1.0, 0.3, 0.0) * 1.5, scatter);
     return mix(skyColor, scatterColor, atmosphere / 1.7);
+  }
+
+  // Gerstner wave
+  vec3 gerstner(vec2 pos, float steep, float amp, float freq, vec2 dir, float t) {
+      float phase = dot(pos, dir) * freq + t;
+      float disp = sin(phase);
+
+      // horizontal displacement (fake but good looking)
+      vec2 horiz = dir * (steep * amp * cos(phase));
+
+      return vec3(horiz, disp * amp);
+  }
+
+  // Multiple waves stacked
+  vec3 getWaveDisplacement(vec2 pos, float t) {
+      vec3 d = vec3(0.0);
+
+      d += gerstner(pos, 0.4, 0.15, 1.5, normalize(vec2(1.0, 0.6)), t * 0.8);
+      d += gerstner(pos, 0.25, 0.10, 2.1, normalize(vec2(-0.7, 1.0)), t * 1.1);
+      d += gerstner(pos, 0.15, 0.05, 3.8, normalize(vec2(0.4, -1.0)), t * 1.4);
+
+      return d;
+  }
+
+  // Compute surface normal from displaced height
+  vec3 computeWaveNormal(vec2 pos, float t) {
+      float eps = 0.05;
+
+      float h  = getWaveDisplacement(pos, t).z;
+      float hx = getWaveDisplacement(pos + vec2(eps, 0.0), t).z - h;
+      float hy = getWaveDisplacement(pos + vec2(0.0, eps), t).z - h;
+
+      vec3 n = normalize(vec3(-hx, 1.0, -hy));
+      return n;
+  }
+
+
+  vec3 getWater(vec3 dir, vec2 skyUV) {
+    // project to local water plane coords
+    vec2 pos = skyUV * 40.0;   // scale controls wave size
+
+    vec3 disp = getWaveDisplacement(pos, uTime);
+    vec3 normal = computeWaveNormal(pos, uTime);
+
+    // cheap lighting: sunlight approximation
+    float nl = max(dot(normal, SUN_POS), 0.0);
+
+    vec3 shallowColor = vec3(0.05, 0.12, 0.20);
+    vec3 deepColor    = vec3(0.01, 0.04, 0.08);
+
+    float depthMix = smoothstep(0.0, 1.0, disp.z + 0.3);
+
+    vec3 color = mix(deepColor, shallowColor, depthMix);
+
+    // add highlight from sun
+    color += nl * vec3(1.0, 0.9, 0.5) * 0.5;
+
+    return color;
   }
 
   vec3 getSun(vec3 dir) {
@@ -115,30 +154,24 @@ const fragmentShader = /* glsl */`
   }
 
   void main() {
-    // world direction
-    vec3 dir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
+    vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
+    vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    // convert to stable sky UV
-    // float u = atan(dir.x, dir.z) / (2.0 * PI) + 0.5;
     float rawU = atan(dir.x, dir.z) / (2.0 * PI);
-    float u = fract(rawU + 1.0);   // ensures wrap is seamless 0→1
+    float u = fract(rawU + 1.0);
 
     float v = dir.y * 0.5 + 0.5;
     vec2 skyUV = vec2(u, v);
 
-    // vec3 sky = getSky(skyUV);
-    // vec3 sun = getSun(dir);
-
-    float horizon = smoothstep(-0.02, 0.0, dir.y); // 0=water, 1=sky
+    float horizon = smoothstep(-0.02, 0.0, dir.y);
 
     vec3 sky = getSky(skyUV);
-    vec3 sun = getSun(dir);
-    vec3 water = getWater(dir, sky, sun);
+    vec3 sun = getSun(sunDir);
+
+    vec3 water = getWater(dir, skyUV);
 
     vec3 color = mix(water, sky + sun, horizon);
 
     gl_FragColor = vec4(color, 1.0);
-
-    // gl_FragColor = vec4(sky + sun, 1.0);
   }
 `
