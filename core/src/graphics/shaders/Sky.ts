@@ -8,7 +8,7 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        init: async () => {
+        init: async (_, __, three) => {
           const geo = new SphereGeometry(500, 60, 40)
 
           const material = new ShaderMaterial({
@@ -19,7 +19,8 @@ export const Sky = () => {
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
               uCloudDensity: { value: 0.9 },
-              uCloudSpeed: { value: 0.05 }
+              uCloudSpeed: { value: 0.05 },
+              uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
             vertexShader,
             fragmentShader,

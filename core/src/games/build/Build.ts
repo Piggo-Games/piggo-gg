@@ -2,7 +2,7 @@ import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
   InventorySystem, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ThreeNametagSystem, ThreeSystem
+  ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, NewSky
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 
@@ -49,7 +49,8 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       // HtmlInventory(),
       EscapeMenu(world),
       HtmlChat(),
-      Sky(),
+      // Sky(),
+      NewSky(),
       Sun({
         bounds: { left: -10, right: 12, top: 0, bottom: -9 },
       }),
