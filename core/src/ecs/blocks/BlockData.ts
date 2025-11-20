@@ -1,4 +1,5 @@
 import {
+  arrHash,
   Block, BlockColor, BlockPlan, BlockTree, floor, keys, logPerf, World, XY, XYZ, XYZstring
 } from "@piggo-gg/core"
 
@@ -25,7 +26,7 @@ const area = width * width
 export const BlockData = (): BlockData => {
 
   let data: Int8Array[][] = []
-  let chunkHashes: Record<string, string> = {}
+  let chunkHashes: Record<string, number> = {}
 
   let visibleCache: Record<string, Block[]> = {}
   let visibleDirty: Record<string, boolean> = {}
@@ -79,10 +80,13 @@ export const BlockData = (): BlockData => {
     setChunk: (chunk: XY, chunkData: string) => {
       if (!data[chunk.x]) data[chunk.x] = []
 
-      visibleDirty[chunkey(chunk.x, chunk.y)] = true
+      const key = chunkey(chunk.x, chunk.y)
 
       const decoded = new Int8Array(atob(chunkData as unknown as string).split("").map(c => c.charCodeAt(0)))
       data[chunk.x][chunk.y] = decoded
+
+      chunkHashes[key] = arrHash(decoded)
+      visibleDirty[key] = true
     },
     setType: ({ x, y, z }: XYZ, type: number) => {
       const chunkX = floor(x / width)
