@@ -111,6 +111,7 @@ export const Client = ({ world }: ClientProps): Client => {
 
   let env = environments[location?.hostname] || "local"
   if (navigator.userAgent.includes("discord")) env = "discord"
+  const wsUrl = () => env === "local" ? `ws://localhost:3000` : `wss://${servers[env]}`
   
 
   const client: Client = {
@@ -174,7 +175,7 @@ export const Client = ({ world }: ClientProps): Client => {
     player,
     sound: Sound(world),
     token: undefined,
-    ws: new WebSocket(`wss://${servers[env]}`),
+    ws: new WebSocket(wsUrl()),
     isLeader: () => {
       return !client.net.lobbyId || client.player.components.pc.data.leader
     },
@@ -412,7 +413,7 @@ export const Client = ({ world }: ClientProps): Client => {
 
       setTimeout(() => {
         console.log("reconnecting to server")
-        client.ws = new WebSocket(`wss://${servers[env]}`)
+        client.ws = new WebSocket(wsUrl())
         setupWs()
       }, 1000)
     }

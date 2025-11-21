@@ -13,9 +13,9 @@ export const Title = ({ world, loginState, setLoginState }: TitleProps) => (
     marginBottom: 5
   }}>
 
-    <div style={{ position: "absolute", left: 0, bottom: 0 }}>
+    {/* <div style={{ position: "absolute", left: 0, bottom: 0 }}>
       <Login loginState={loginState} setLoginState={setLoginState} world={world} />
-    </div>
+    </div> */}
 
     <div style={{ display: "flex", alignItems: "center" }}>
       <h1 style={{ fontFamily: "Courier New", fontSize: 38, margin: "0 10px" }}>
