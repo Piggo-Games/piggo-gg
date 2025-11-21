@@ -208,10 +208,10 @@ const fragmentShader = /* glsl */`
   vec3 getSun(vec3 dir, vec3 sunDir) {
     float sun = max(dot(dir, sunDir), 0.0);
 
-    if (sun < 0.86) return vec3(0.0);
+    // if (sun < 0.86) return vec3(0.0);
 
-    float core = sun * 4.0;
-    // float core = pow(sun, 200.0) * 10000000000000.0;
+    // float core = sun * 4.0;
+    float core = pow(sun, 200.0) * 10000000000000.0;
     // float glow = pow(sun, 10.0);
 
     float intensity = core;

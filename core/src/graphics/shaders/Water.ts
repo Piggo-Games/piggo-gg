@@ -37,7 +37,7 @@ export const Water = () => {
           water.frustumCulled = false
 
           water.rotation.x = - Math.PI / 2
-          water.position.y = -0.02
+          water.position.y = -0.4
 
           o.push(water)
         }
