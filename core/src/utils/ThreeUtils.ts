@@ -1,5 +1,5 @@
 import { cos, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
-import { Color, Mesh, Object3D, Vector3 } from "three"
+import { Box3, BoxGeometry, Color, Matrix4, Mesh, MeshBasicMaterial, Object3D, Ray, Scene, Vector3 } from "three"
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 export type ColorMapping = Record<string, Record<TeamNumber, `#${string}`>>
@@ -86,3 +86,67 @@ export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
 
   return offset
 }
+
+export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
+  const box = new Box3().setFromObject(mesh)
+  console.log("destroyIntoVoxels box", box)
+  // const bounds = new Vector3()
+  // box.getSize(bounds)
+
+  const particles = []
+  for (let x = box.min.x; x < box.max.x; x += size) {
+    for (let y = box.min.y; y < box.max.y; y += size) {
+      for (let z = box.min.z; z < box.max.z; z += size) {
+        const p = new Vector3(x, y, z)
+        if (pointInsideMesh(p, mesh)) particles.push(p.clone())
+      }
+    }
+  }
+
+  for (const p of particles) {
+    const voxel = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color: 0xffffff }))
+    
+    voxel.position.copy(p)
+    console.log(voxel.position)
+    scene.add(voxel)
+  }
+
+  mesh.visible = false
+  scene.add(mesh)
+}
+
+const pointInsideMesh = (point: Vector3, mesh: Mesh) => {
+  // We need vertices in world space
+  const invMatrix = new Matrix4().copy(mesh.matrixWorld).invert()
+  const localPoint = point.clone().applyMatrix4(invMatrix)
+
+  // Create a ray in local space of the mesh
+  const ray = new Ray(localPoint, new Vector3(1, 0, 0))
+
+  // Grab mesh geometry
+  const geometry = mesh.geometry
+
+  // If mesh has a BVH (optional, speeds up massively)
+  // (using three-mesh-bvh)
+  if (geometry.boundingBox) {
+    const hits = ray.intersectBox(geometry.boundingBox, point)
+    return Boolean(hits)
+  }
+
+  console.error("pointInsideMesh: Mesh does not have boundingBox for fast intersection test.")
+  return false
+
+  // ---- Fallback: use normal raycasting ----
+
+  // Convert to three.js Raycaster
+  // const raycaster = new THREE.Raycaster();
+  // raycaster.ray.copy(ray);
+
+  // // Ensure raycaster works in mesh-local coords
+  // const intersections = raycaster.intersectObject(mesh, true);
+
+  // // Odd number of intersections = inside
+  // return intersections.length % 2 === 1;
+}
+
+
