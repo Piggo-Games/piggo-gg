@@ -1,5 +1,5 @@
 import { cos, randomInt, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
-import { Box3, BoxGeometry, Color, Matrix4, Mesh, MeshBasicMaterial, Object3D, Ray, Scene, Vector3 } from "three"
+import { Box3, BoxGeometry, Color, Matrix4, Mesh, MeshBasicMaterial, Object3D, Ray, Raycaster, Scene, Vector3 } from "three"
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 export type ColorMapping = Record<string, Record<TeamNumber, `#${string}`>>
@@ -87,51 +87,43 @@ export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
   return offset
 }
 
-export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
+export const destroyIntoVoxels = (mesh: Mesh, size: number = 0.05) => {
   const box = new Box3().setFromObject(mesh)
-  console.log("destroyIntoVoxels box", box)
 
   const particles = []
+
   for (let x = box.min.x; x < box.max.x; x += size) {
     for (let y = box.min.y; y < box.max.y; y += size) {
       for (let z = box.min.z; z < box.max.z; z += size) {
         const p = new Vector3(x, y, z)
-        console.log("voxel at", p, x, y, z)
 
         if (pointInsideMesh(p, mesh)) {
           particles.push(p.clone())
-          // console.log("voxel at", p, x, y, z)
         }
       }
     }
   }
+
+  const voxels = []
 
   for (const p of particles) {
     const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
     const voxel = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color }))
     
     voxel.position.copy(p)
-
-    // console.log(voxel.position)
-    scene.add(voxel)
+    voxels.push(voxel)
   }
 
-  mesh.visible = false
-  scene.add(mesh)
+  return voxels
 }
 
+const insideRaycaster = new Raycaster()
+const insideDir = new Vector3(0, 0, -1)
+
 const pointInsideMesh = (point: Vector3, mesh: Mesh) => {
-  const invMatrix = new Matrix4().copy(mesh.matrixWorld).invert()
-  const localPoint = point.clone().applyMatrix4(invMatrix)
+  insideRaycaster.set(point, insideDir)
 
-  const ray = new Ray(localPoint, new Vector3(1, 0, 0))
+  const hits = insideRaycaster.intersectObject(mesh, false)
 
-  const geometry = mesh.geometry
-
-  if (geometry.boundingBox) {
-    const hits = ray.intersectBox(geometry.boundingBox, localPoint)
-    return Boolean(hits)
-  }
-
-  return false
+  return Boolean(hits.length)
 }

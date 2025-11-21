@@ -159,7 +159,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           if (pinatas?.length) {
             pinatas.forEach(p => {
               p.visible = false
-              destroyIntoVoxels(p, world.three!.scene, 0.05)
+              destroyIntoVoxels(p, world.three!.scene, 0.005)
             })
           }
 
@@ -222,7 +222,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
                 if (!pinatas) pinatas = []
                 const destr = child.clone() as Mesh
                 // const destr = new DestructibleMesh(child.geometry, child.material as MeshPhongMaterial)
-                destr.scale.set(0.05, 0.05, 0.05)
+                destr.scale.set(0.005, 0.005, 0.005)
                 destr.position.set(5, 1, 5)
 
                 pinatas.push(destr)
