@@ -66,9 +66,9 @@ export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
   const right = { x: cos(localAim.x), y: -sin(localAim.x) }
 
   const offset = {
-    x: -dir.x * 0.05 + right.x * 0.05,
+    x: -dir.x * 0.05 + right.x * 0.025,
     y: recoil * 0.03,
-    z: -dir.y * 0.05 + right.y * 0.05
+    z: -dir.y * 0.05 + right.y * 0.025
   }
 
   if (localAim.y > 0) {
