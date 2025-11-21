@@ -9,11 +9,11 @@ import { decode, encode } from "@msgpack/msgpack"
 
 const servers: Record<ENV, string> = {
   local: "ws://localhost:3000",
-  // local: `wss://${DiscordDomain}/.proxy/api-local`,
-  // local: `wss://${DiscordDomain}/.proxy/api`,
-  dev: "wss://piggo-api-staging.up.railway.app",
-  production: "wss://api.piggo.gg",
-  discord: `wss://${DiscordDomain}/.proxy/api`
+  // local: `${DiscordDomain}/.proxy/api-local`,
+  // local: `${DiscordDomain}/.proxy/api`,
+  dev: "piggo-api-staging.up.railway.app",
+  production: "api.piggo.gg",
+  discord: `${DiscordDomain}/.proxy/api`
 } as const
 
 const environments: Record<string, ENV> = {
@@ -109,7 +109,10 @@ export const Client = ({ world }: ClientProps): Client => {
     // TODO handle timeout
   }
 
-  const env = environments[location?.hostname] || "local"
+  let env = environments[location?.hostname] || "local"
+  if (navigator.userAgent.includes("discord")) env = "discord"
+  const wsUrl = () => env === "local" ? `ws://localhost:3000` : `wss://${servers[env]}`
+  
 
   const client: Client = {
     bufferDown: KeyBuffer(),
@@ -172,7 +175,7 @@ export const Client = ({ world }: ClientProps): Client => {
     player,
     sound: Sound(world),
     token: undefined,
-    ws: new WebSocket(servers[env]),
+    ws: new WebSocket(wsUrl()),
     isLeader: () => {
       return !client.net.lobbyId || client.player.components.pc.data.leader
     },
@@ -257,7 +260,7 @@ export const Client = ({ world }: ClientProps): Client => {
       })
     },
     discordMe: (callback, errorCallback) => {
-      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/me`, {
+      fetch(`https://${servers[env]}/discord/me`, {
         method: "GET",
         credentials: "include"
       }).then(async (res) => {
@@ -272,7 +275,7 @@ export const Client = ({ world }: ClientProps): Client => {
       })
     },
     discordLogin: (code, callback) => {
-      fetch(`https://${DiscordDomain}/.proxy/api-local/discord/login?code=${code}`, {
+      fetch(`https://${servers[env]}/discord/login?code=${code}`, {
         method: "GET",
         credentials: "include"
       }).then(async (res) => {
@@ -410,7 +413,7 @@ export const Client = ({ world }: ClientProps): Client => {
 
       setTimeout(() => {
         console.log("reconnecting to server")
-        client.ws = new WebSocket(servers[env])
+        client.ws = new WebSocket(wsUrl())
         setupWs()
       }, 1000)
     }

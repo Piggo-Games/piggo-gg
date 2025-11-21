@@ -61,7 +61,7 @@ export const ThreeRenderer = (): ThreeRenderer => {
         canvas: renderer.canvas,
         powerPreference: "high-performance",
         precision: "highp",
-        logarithmicDepthBuffer: true
+        // logarithmicDepthBuffer: true
       })
 
       webgl.setPixelRatio(window.devicePixelRatio)

@@ -67,6 +67,7 @@ const fragmentShader = /* glsl */`
   uniform vec3  uZenith;
   uniform float uCloudDensity;
   uniform float uCloudSpeed;
+  uniform vec2  uResolution;
 
   varying vec3 vWorldPosition;
 
@@ -236,15 +237,9 @@ const fragmentShader = /* glsl */`
     // Smaller scale = bigger puffs, larger scale = smaller puffs
     float w = worley(cloudUV * 3.0);
 
-    // Invert so blobs are solid inside, soft outside
-    // float clouds = 1.0 - smoothstep(0.25, 0.5, w);
-    float clouds = 0.0;
-
     // blend clouds on top (white tinted)
     vec3 cloudColor = mix(vec3(1.0), daySky, 0.2);
-    // bg = mix(bg, cloudColor, clouds * clouds * uCloudDensity * dayFactor);
 
-    // stars (your existing starLayers + octaProject)
     vec2 uv = octaProject(dir);
     vec3 stars = starLayers(dir, uv);
     stars *= (1.0 - dayFactor);
