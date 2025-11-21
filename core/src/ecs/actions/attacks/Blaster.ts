@@ -159,7 +159,19 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           if (pinatas?.length) {
             pinatas.forEach(p => {
               p.visible = false
-              destroyIntoVoxels(p, world.three!.scene, 0.005)
+              const voxels = destroyIntoVoxels(p, 0.005)
+              for (const voxel of voxels) {
+                // add to particles
+                particles.push({
+                  mesh: voxel,
+                  tick: world.tick,
+                  velocity: randomVector3(0.005),
+                  pos: { x: voxel.position.x, y: voxel.position.z, z: voxel.position.y },
+                  duration: 20,
+                  gravity: 0.0003
+                })
+                world.three?.scene.add(voxel)
+              }
             })
           }
 
