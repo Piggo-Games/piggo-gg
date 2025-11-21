@@ -89,16 +89,19 @@ export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
 
 export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
   const box = new Box3().setFromObject(mesh)
-  const bounds = new Vector3()
-  box.getSize(bounds)
-  console.log("destroyIntoVoxels bounds", bounds, "box", box)
+  console.log("destroyIntoVoxels box", box)
 
   const particles = []
   for (let x = box.min.x; x < box.max.x; x += size) {
     for (let y = box.min.y; y < box.max.y; y += size) {
       for (let z = box.min.z; z < box.max.z; z += size) {
         const p = new Vector3(x, y, z)
-        if (pointInsideMesh(p, mesh)) particles.push(p.clone())
+        console.log("voxel at", p, x, y, z)
+
+        if (pointInsideMesh(p, mesh)) {
+          particles.push(p.clone())
+          // console.log("voxel at", p, x, y, z)
+        }
       }
     }
   }
@@ -107,14 +110,9 @@ export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
     const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
     const voxel = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color }))
     
-    // const modelOffset = p.divide(box.)
-    // voxel.position.copy(mesh.position.clone().add(p).sub(box.getCenter(new Vector3())))
-    voxel.position.copy(mesh.position)
-    voxel.position.x += p.x * size * 1.1
-    voxel.position.y += p.y * size * 1.1
-    voxel.position.z += p.z * size * 1.1
+    voxel.position.copy(p)
 
-    console.log(voxel.position)
+    // console.log(voxel.position)
     scene.add(voxel)
   }
 
@@ -131,7 +129,7 @@ const pointInsideMesh = (point: Vector3, mesh: Mesh) => {
   const geometry = mesh.geometry
 
   if (geometry.boundingBox) {
-    const hits = ray.intersectBox(geometry.boundingBox, point)
+    const hits = ray.intersectBox(geometry.boundingBox, localPoint)
     return Boolean(hits)
   }
 
