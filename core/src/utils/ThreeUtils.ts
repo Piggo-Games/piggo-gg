@@ -1,4 +1,4 @@
-import { cos, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
+import { cos, randomInt, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
 import { Box3, BoxGeometry, Color, Matrix4, Mesh, MeshBasicMaterial, Object3D, Ray, Scene, Vector3 } from "three"
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
@@ -89,9 +89,9 @@ export const modelOffset = (localAim: XY, tip = false, recoil = 0): XYZ => {
 
 export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
   const box = new Box3().setFromObject(mesh)
-  console.log("destroyIntoVoxels box", box)
-  // const bounds = new Vector3()
-  // box.getSize(bounds)
+  const bounds = new Vector3()
+  box.getSize(bounds)
+  console.log("destroyIntoVoxels bounds", bounds, "box", box)
 
   const particles = []
   for (let x = box.min.x; x < box.max.x; x += size) {
@@ -104,9 +104,16 @@ export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
   }
 
   for (const p of particles) {
-    const voxel = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color: 0xffffff }))
+    const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
+    const voxel = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color }))
     
-    voxel.position.copy(p)
+    // const modelOffset = p.divide(box.)
+    // voxel.position.copy(mesh.position.clone().add(p).sub(box.getCenter(new Vector3())))
+    voxel.position.copy(mesh.position)
+    voxel.position.x += p.x * size * 1.1
+    voxel.position.y += p.y * size * 1.1
+    voxel.position.z += p.z * size * 1.1
+
     console.log(voxel.position)
     scene.add(voxel)
   }
@@ -116,37 +123,17 @@ export const destroyIntoVoxels = (mesh: Mesh, scene: Scene, size: number) => {
 }
 
 const pointInsideMesh = (point: Vector3, mesh: Mesh) => {
-  // We need vertices in world space
   const invMatrix = new Matrix4().copy(mesh.matrixWorld).invert()
   const localPoint = point.clone().applyMatrix4(invMatrix)
 
-  // Create a ray in local space of the mesh
   const ray = new Ray(localPoint, new Vector3(1, 0, 0))
 
-  // Grab mesh geometry
   const geometry = mesh.geometry
 
-  // If mesh has a BVH (optional, speeds up massively)
-  // (using three-mesh-bvh)
   if (geometry.boundingBox) {
     const hits = ray.intersectBox(geometry.boundingBox, point)
     return Boolean(hits)
   }
 
-  console.error("pointInsideMesh: Mesh does not have boundingBox for fast intersection test.")
   return false
-
-  // ---- Fallback: use normal raycasting ----
-
-  // Convert to three.js Raycaster
-  // const raycaster = new THREE.Raycaster();
-  // raycaster.ray.copy(ray);
-
-  // // Ensure raycaster works in mesh-local coords
-  // const intersections = raycaster.intersectObject(mesh, true);
-
-  // // Odd number of intersections = inside
-  // return intersections.length % 2 === 1;
 }
-
-
