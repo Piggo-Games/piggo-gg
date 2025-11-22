@@ -169,7 +169,7 @@ const fragmentShader = /* glsl */`
                                   (centerUV * rot(-2.07));
 
           vec3 cDir = octaUnproject(fract(centerUV));
-          if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
+          // if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
 
           float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
@@ -280,24 +280,20 @@ float noise2(vec2 p) {
     bg = mix(bg, daySky, dayFactor);
 
     vec2 uv = octaProject(dir);
-    vec3 stars = starLayers(dir, uv);
-
-    stars *= (1.0 - dayFactor);
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
     vec3 clouds = getClouds(dir);
 
-    vec3 color = bg + stars + sun;
-    // vec3 color = max(bg + stars, sun);
-    // vec3 color = max(sun, clouds);
-    // if (length(color) < 0.9) {
-    //   color = bg + stars;
-    // } else if (length(color) < 1.5) {
-    //   color = mix(bg + stars, sun, smoothstep(0.9, 1.5, length(color)));
-      // color = mix(bg + stars, sun, smoothstep(0.9, 1.5, length(color)));
-    // }
+    vec3 color = bg + sun;
+    if (dir.y > 0.01) {
+      vec3 stars = starLayers(dir, uv);
+      stars *= (1.0 - dayFactor);
+      color += stars;
+    } else {
+      color += vec3(0.0, 0.0, 0.1);
+    }
 
     color += clouds * uCloudDensity;
 

@@ -1,31 +1,43 @@
-import { Entity, Position, Three } from "@piggo-gg/core"
+import { Entity, max, min, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial } from "three"
 
 export const Water = () => {
 
-  // let water: ThreeWater | undefined = undefined
   let surface: Mesh | undefined = undefined
-  let volume: Mesh | undefined = undefined
 
   const sky = Entity<Three>({
     id: "new-sky",
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta }) => {
+        onRender: ({ delta, client }) => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
             mat.uniforms._Time.value += delta / 1000
+
+            const pc = client.character()
+            if (!pc) return
+
+            let z = pc.components.position.data.z + 0.0
+
+            // adjust the water height
+            if (z > 0) {
+              surface.position.y = -min(z, 5)
+            } else if (z < -0.51) {
+              z += 0.51
+              surface.position.y = max(z / 4, -1)
+            } else {
+              surface.position.y = 0
+            }
           }
         },
         init: async (o, _, __, three) => {
           surface = new Mesh()
-          volume = new Mesh()
 
           const halfSize = 1500
           const depth = 1000
-          const surfaceY = -0.3
+          const surfaceY = -0.06
 
           const surfaceVertices = new Float32Array([
             -halfSize, surfaceY, -halfSize,
@@ -58,58 +70,19 @@ export const Water = () => {
             }
           })
 
-          three.tLoader.loadAsync("waterNormal1.png").then((texture1) => {
-            texture1.wrapS = RepeatWrapping
-            texture1.wrapT = RepeatWrapping
-
-            surfaceMat.uniforms._NormalMap1.value = texture1
+          three.tLoader.loadAsync("waterNormal1.png").then((t) => {
+            t.wrapS = RepeatWrapping
+            t.wrapT = RepeatWrapping
+            surfaceMat.uniforms._NormalMap1.value = t
           })
 
-          three.tLoader.loadAsync("waterNormal2.png").then((texture2) => {
-            texture2.wrapS = RepeatWrapping
-            texture2.wrapT = RepeatWrapping
-
-            surfaceMat.uniforms._NormalMap2.value = texture2
+          three.tLoader.loadAsync("waterNormal2.png").then((t) => {
+            t.wrapS = RepeatWrapping
+            t.wrapT = RepeatWrapping
+            surfaceMat.uniforms._NormalMap2.value = t
           })
 
           surface.material = surfaceMat;
-
-          // const volumeVertices = new Float32Array([
-          //   -halfSize, -depth, -halfSize,
-          //   halfSize, -depth, -halfSize,
-          //   -halfSize, -depth, halfSize,
-          //   halfSize, -depth, halfSize,
-
-          //   -halfSize, 0, -halfSize,
-          //   halfSize, 0, -halfSize,
-          //   -halfSize, 0, halfSize,
-          //   halfSize, 0, halfSize
-          // ])
-
-          // const volumeIndices = [
-          //   2, 3, 0, 3, 1, 0,
-          //   0, 1, 4, 1, 5, 4,
-          //   1, 3, 5, 3, 7, 5,
-          //   3, 2, 7, 2, 6, 7,
-          //   2, 0, 6, 0, 4, 6
-          // ]
-
-          // const volumeGeometry = new BufferGeometry()
-          // volumeGeometry.setAttribute("position", new BufferAttribute(volumeVertices, 3))
-          // volumeGeometry.setIndex(volumeIndices)
-
-          // volume.geometry = volumeGeometry
-
-          // const volumeMat = new ShaderMaterial({
-          //   vertexShader: volumeVertex,
-          //   fragmentShader: volumeFragment,
-          //   uniforms: {}
-          // })
-
-          // volume.material = volumeMat
-
-          // volume.parent = surface
-          surface.add(volume)
 
           o.push(surface)
         }
@@ -182,24 +155,23 @@ export const surfaceFragment =
         normal += vec3(0.0, 0.0, 1.0);
         normal = normalize(normal).xzy;
 
-        if (cameraPosition.y > -0.3)
-        {
-            vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
-            float specular = max(0.0, dot(normal, halfWayDir));
-            specular = pow(specular, SPECULAR_SHARPNESS);
+        if (cameraPosition.y > 0.0) {
+          vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
+          float specular = max(0.0, dot(normal, halfWayDir));
+          specular = pow(specular, SPECULAR_SHARPNESS);
 
-            float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
+          float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
-            // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-            vec3 blue = vec3(0.46, 0.46, 1.0);
-            vec3 surface = reflectivity * blue;
+          // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
+          vec3 blue = vec3(0.46, 0.46, 1.0);
+          vec3 surface = reflectivity * blue;
 
-            surface += vec3(0.8, 0.4, 0.1) * specular * specular;
-            surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
-            // surface = min(surface, 0.8);
+          surface += vec3(0.8, 0.4, 0.1) * specular * specular;
+          surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
+          // surface = min(surface, 0.8);
 
-            gl_FragColor = vec4(surface, max(reflectivity, specular));
-            return;
+          gl_FragColor = vec4(surface, max(reflectivity, specular));
+          return;
         }
 
         float originY = cameraPosition.y;

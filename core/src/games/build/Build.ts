@@ -87,7 +87,7 @@ const BuildSystem = SystemBuilder({
           const { velocity, standing, z, flying } = position.data
 
           // fell off the map
-          if (z < -3 && !flying) {
+          if (z < -5 && !flying) {
             position.setPosition({ x: 6, y: 6, z: 8 })
           }
 
