@@ -25,10 +25,8 @@ export const Sun = (props: SunProps = {}) => {
           if (!target) return
 
           light.target = target
-          
         },
         init: async (o) => {
-          // light = new DirectionalLight(colors.evening, 7)
           light = new DirectionalLight(colors.evening, 7)
 
           light.shadow.normalBias = 0.02
@@ -36,12 +34,10 @@ export const Sun = (props: SunProps = {}) => {
           light.castShadow = true
 
           // widen the shadow
-          if (props.bounds) {
-            light.shadow.camera.left = props.bounds.left
-            light.shadow.camera.right = props.bounds.right
-            light.shadow.camera.top = props.bounds.top
-            light.shadow.camera.bottom = props.bounds.bottom
-          }
+          light.shadow.camera.left = props.bounds?.left ?? -20
+          light.shadow.camera.right = props.bounds?.right ?? 20
+          light.shadow.camera.top = props.bounds?.top ?? 14
+          light.shadow.camera.bottom = props.bounds?.bottom ?? -14
 
           const sphere = new Mesh(
             new SphereGeometry(8, 32, 32),
