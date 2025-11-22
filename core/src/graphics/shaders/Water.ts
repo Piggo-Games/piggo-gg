@@ -71,9 +71,6 @@ export const Water = () => {
             }
           })
 
-          // @ts-expect-error
-          Mesh.receiveShadow = true
-
           three.tLoader.loadAsync("waterNormal1.png").then((t) => {
             t.wrapS = RepeatWrapping
             t.wrapT = RepeatWrapping
