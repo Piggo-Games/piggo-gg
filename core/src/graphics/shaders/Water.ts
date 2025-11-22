@@ -36,7 +36,6 @@ export const Water = () => {
           surface = new Mesh()
 
           const halfSize = 1500
-          const depth = 1000
           const surfaceY = -0.06
 
           const surfaceVertices = new Float32Array([
@@ -196,45 +195,4 @@ export const surfaceFragment =
 
         gl_FragColor = vec4(light, t);
     }
-`;
-
-export const volumeVertex =
-/*glsl*/`
-    varying vec3 _worldPos;
-
-    void main()
-    {
-        vec4 worldPos = modelMatrix * vec4(position, 1.0);
-        _worldPos = worldPos.xyz;
-        gl_Position = projectionMatrix * viewMatrix * worldPos;
-    }
-`;
-
-export const volumeFragment =
-/*glsl*/`
-    // #include <ocean>
-
-    varying vec3 _worldPos;
-
-    void main()
-    {
-        vec3 viewVec = _worldPos - cameraPosition;
-        float viewLen = length(viewVec);
-        vec3 viewDir = viewVec / viewLen;
-        float originY = cameraPosition.y;
-
-        if (cameraPosition.y > 0.0)
-        {
-            float distAbove = cameraPosition.y / -viewDir.y;
-            viewLen -= distAbove;
-            originY = 0.0;
-        }
-        viewLen = min(viewLen, MAX_VIEW_DEPTH);
-
-        float sampleY = originY + viewDir.y * viewLen;
-        vec3 light = exp((sampleY - viewLen * DENSITY) * ABSORPTION);
-        light *= _Light;
-        
-        gl_FragColor = vec4(light, 1.0);
-    }
-`;
+`
