@@ -39,6 +39,5 @@ export const Pig = () => {
       })
     }
   })
-
   return pig
 }
