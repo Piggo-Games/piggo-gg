@@ -23,7 +23,7 @@ export const Water = () => {
 
             // adjust the water height
             if (z > 0) {
-              surface.position.y = -min(z, 5)
+              surface.position.y = -min(z / 4, 1)
             } else if (z < -0.51) {
               z += 0.51
               surface.position.y = max(z / 4, -1)
