@@ -56,8 +56,6 @@ export const Water = () => {
 
           surface.geometry = surfaceGeometry
 
-          const ctx = three.canvas?.getContext("2d")
-
           const surfaceMat = new ShaderMaterial({
             vertexShader: surfaceVertex,
             fragmentShader: surfaceFragment,
@@ -65,7 +63,6 @@ export const Water = () => {
             lights: true,
             uniforms: {
               ...UniformsLib.lights,
-              maskTex: { value: ctx },
               _NormalMap1: { value: null },
               _NormalMap2: { value: null },
               _DirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
