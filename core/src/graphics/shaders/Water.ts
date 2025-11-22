@@ -3,7 +3,7 @@ import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderM
 
 export const Water = () => {
 
-  let surface: Mesh | undefined = undefined
+  let surface: Mesh<BufferGeometry, ShaderMaterial> | undefined = undefined
 
   const sky = Entity<Three>({
     id: "new-sky",
@@ -56,6 +56,8 @@ export const Water = () => {
 
           surface.geometry = surfaceGeometry
 
+          const ctx = three.canvas?.getContext("2d")
+
           const surfaceMat = new ShaderMaterial({
             vertexShader: surfaceVertex,
             fragmentShader: surfaceFragment,
@@ -63,6 +65,7 @@ export const Water = () => {
             lights: true,
             uniforms: {
               ...UniformsLib.lights,
+              maskTex: { value: ctx },
               _NormalMap1: { value: null },
               _NormalMap2: { value: null },
               _DirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
@@ -70,6 +73,9 @@ export const Water = () => {
               _Light: { value: new Vector3(0.5, 0.5, 0.5) }
             }
           })
+
+          // @ts-expect-error
+          Mesh.receiveShadow = true
 
           three.tLoader.loadAsync("waterNormal1.png").then((t) => {
             t.wrapS = RepeatWrapping
@@ -300,7 +306,8 @@ export const surfaceFragment = /*glsl*/`
       // surface = min(surface, 0.8);
 
       vec4 final = vec4(surface, max(reflectivity, specular));
-      gl_FragColor.rgb *= getShadowMask();
+      gl_FragColor = final;
+      gl_FragColor.b *= getShadowMask();
       return;
     }
 
