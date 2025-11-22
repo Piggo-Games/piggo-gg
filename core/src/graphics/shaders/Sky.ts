@@ -186,25 +186,6 @@ const fragmentShader = /* glsl */`
           (d - b) * u.x * u.y;
   }
 
-  // Worley / cellular noise, returns distance to nearest random feature point
-  float worley(vec2 uv) {
-    vec2 i = floor(uv);
-    vec2 f = fract(uv);
-
-    float minDist = 1.0;
-    // check 3x3 neighborhood of cells
-    for (int y = -1; y <= 1; y++) {
-      for (int x = -1; x <= 1; x++) {
-        vec2 cell = i + vec2(x, y);
-        vec2 rand = hash22(cell);       // random feature point in cell
-        vec2 diff = (vec2(x, y) + rand) - f;
-        float d = length(diff);
-        minDist = min(minDist, d);
-      }
-    }
-    return minDist;
-  }
-
   vec3 getSun(vec3 dir, vec3 sunDir) {
     float sun = max(dot(dir, sunDir), 0.0);
 
@@ -216,7 +197,7 @@ const fragmentShader = /* glsl */`
     return vec3(1.0, 0.8, 0.2) * intensity;
   }
 
-  void main(){
+  void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
     // Horizon → Zenith gradient
@@ -229,16 +210,6 @@ const fragmentShader = /* glsl */`
     vec3 daySky = vec3(0.5, 0.75, 1.0); // light blue
 
     bg = mix(bg, daySky, dayFactor);
-    
-    // project dir onto XZ plane for clouds
-    vec2 cloudUV = normalize(dir).xz * 0.5;
-    cloudUV += uTime * uCloudSpeed;
-
-    // Smaller scale = bigger puffs, larger scale = smaller puffs
-    float w = worley(cloudUV * 3.0);
-
-    // blend clouds on top (white tinted)
-    vec3 cloudColor = mix(vec3(1.0), daySky, 0.2);
 
     vec2 uv = octaProject(dir);
     vec3 stars = starLayers(dir, uv);
