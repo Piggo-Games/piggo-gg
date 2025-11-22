@@ -1,5 +1,5 @@
 import { Bounds, colors, Entity, Position, Three } from "@piggo-gg/core"
-import { CameraHelper, DirectionalLight, HemisphereLight, Mesh, MeshPhysicalMaterial, SphereGeometry } from "three"
+import { CameraHelper, DirectionalLight, HemisphereLight, Mesh, MeshPhysicalMaterial, Scene, SphereGeometry } from "three"
 
 export type SunProps = {
   bounds?: Bounds
@@ -7,23 +7,41 @@ export type SunProps = {
 }
 
 export const Sun = (props: SunProps = {}) => {
+
+  let light: DirectionalLight | undefined = undefined
+
   const sun = Entity<Three>({
     id: "sun",
     components: {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
+        onTick: ({ client }) => {
+          if (!light) return
+
+          const pc = client.character()
+          if (!pc) return
+
+          const target = pc.components.three?.o[1] as Scene
+          if (!target) return
+
+          light.target = target
+          
+        },
         init: async (o) => {
-          const light = new DirectionalLight(colors.evening, 7)
+          // light = new DirectionalLight(colors.evening, 7)
+          light = new DirectionalLight(colors.evening, 7)
 
           light.shadow.normalBias = 0.02
           light.shadow.mapSize.set(2048 * 2, 2048 * 2)
           light.castShadow = true
 
           // widen the shadow
-          light.shadow.camera.left = props.bounds?.left ?? -20
-          light.shadow.camera.right = props.bounds?.right ?? 20
-          light.shadow.camera.top = props.bounds?.top ?? 30
-          light.shadow.camera.bottom = props.bounds?.bottom ?? -30
+          if (props.bounds) {
+            light.shadow.camera.left = props.bounds.left
+            light.shadow.camera.right = props.bounds.right
+            light.shadow.camera.top = props.bounds.top
+            light.shadow.camera.bottom = props.bounds.bottom
+          }
 
           const sphere = new Mesh(
             new SphereGeometry(8, 32, 32),
@@ -39,7 +57,8 @@ export const Sun = (props: SunProps = {}) => {
 
           const hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)
 
-          // const helper = new CameraHelper(light.shadow.camera)
+          const helper = new CameraHelper(light.shadow.camera)
+          o.push(helper)
 
           o.push(light, hemi)
         }

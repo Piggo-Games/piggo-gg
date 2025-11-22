@@ -52,9 +52,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       HtmlChat(),
       Sky(),
       Water(),
-      Sun({
-        bounds: { left: -10, right: 12, top: 0, bottom: -9 },
-      }),
+      Sun(),
       HtmlLagText(),
       Pig()
     ]
