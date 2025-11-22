@@ -8,8 +8,6 @@ export const Water = () => {
   let surface: Mesh | undefined = undefined
   let volume: Mesh | undefined = undefined
 
-  let init = false
-
   const sky = Entity<Three>({
     id: "new-sky",
     components: {
@@ -19,14 +17,10 @@ export const Water = () => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
-            const timeVal = mat.uniforms._Time.value as number
-
             mat.uniforms._Time.value += delta / 1000
           }
         },
         init: async (o, _, __, three) => {
-          if (init) return
-
           surface = new Mesh()
           volume = new Mesh()
 
@@ -59,7 +53,7 @@ export const Water = () => {
             uniforms: {
               _NormalMap1: { value: null },
               _NormalMap2: { value: null },
-              _DirToLight: { value: new Vector3(0.9, 0.7, 0.9).normalize() },
+              _DirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
               _Time: { value: 0 },
               _Light: { value: new Vector3(0.5, 0.5, 0.5) }
             }
@@ -155,8 +149,7 @@ export const surfaceFragment =
     const float NORMAL_MAP_STRENGTH = 0.2;
     const vec2 VELOCITY_1 = vec2(0.1, 0.0);
     const vec2 VELOCITY_2 = vec2(0.0, 0.1);
-    const float SPECULAR_SHARPNESS = 100.0;
-    const float SPECULAR_SIZE = 1.1;
+    const float SPECULAR_SHARPNESS = 5.0;
     const float MAX_VIEW_DEPTH = 100.0;
     const float DENSITY = 0.35;
     const float MAX_VIEW_DEPTH_DENSITY = MAX_VIEW_DEPTH * DENSITY;
@@ -181,8 +174,8 @@ export const surfaceFragment =
     void main()
     {
         vec3 viewVec = vec3(_worldPos.x, 0.0, _worldPos.y) - cameraPosition;
-        float viewLen = length(viewVec);
-        vec3 viewDir = viewVec / viewLen;
+        float viewLen = length(viewVec) * 0.992;
+        vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
 
         vec3 normal = texture2D(_NormalMap1, _uv + VELOCITY_1 * _Time).xyz * 2.0 - 1.0;
         normal += texture2D(_NormalMap2, _uv + VELOCITY_2 * _Time).xyz * 2.0 - 1.0;
@@ -192,18 +185,19 @@ export const surfaceFragment =
 
         if (cameraPosition.y > -0.3)
         {
-            vec3 halfWayDir = normalize(_DirToLight - viewDir);
+            vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
             float specular = max(0.0, dot(normal, halfWayDir));
-            specular = pow(specular, SPECULAR_SHARPNESS) * 0.4;
+            specular = pow(specular, SPECULAR_SHARPNESS);
 
             float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
             // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-            vec3 reflection = vec3(0.22, 0.22, 0.5);
-            // reflection = vec3(1.0);
+            vec3 blue = vec3(0.24, 0.24, 0.6);
+            vec3 surface = reflectivity * blue;
 
-            vec3 surface = reflectivity * reflection;
-            surface = max(surface, specular);
+            surface += vec3(0.8, 0.4, 0.1) * specular * specular;
+            surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
+            // surface = min(surface, 0.8);
 
             gl_FragColor = vec4(surface, max(reflectivity, specular));
             return;
