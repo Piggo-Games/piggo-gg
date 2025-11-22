@@ -1,6 +1,5 @@
-import { Entity, loadTexture, Position, Three } from "@piggo-gg/core"
-import { PlaneGeometry, TextureLoader, RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial } from "three"
-import { Water as ThreeWater } from "three/examples/jsm/objects/Water.js"
+import { Entity, Position, Three } from "@piggo-gg/core"
+import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial } from "three"
 
 export const Water = () => {
 
