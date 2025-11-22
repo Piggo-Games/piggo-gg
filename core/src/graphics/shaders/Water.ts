@@ -59,9 +59,9 @@ export const Water = () => {
             uniforms: {
               _NormalMap1: { value: null },
               _NormalMap2: { value: null },
-              _DirToLight: { value: new Vector3(0.5, 0.8, 0.5).normalize() },
+              _DirToLight: { value: new Vector3(0.9, 0.7, 0.9).normalize() },
               _Time: { value: 0 },
-              _Light: { value: new Vector3(10, 8, 2) }
+              _Light: { value: new Vector3(0.5, 0.5, 0.5) }
             }
           })
 
@@ -174,18 +174,6 @@ export const surfaceFragment =
 
     uniform vec3 _DirToLight;
 
-    // void sampleDither(vec2 fragCoord)
-    // {
-    //     dither = (texture2D(_DitherTexture, (fragCoord - vec2(0.5)) / _DitherTextureSize).x - 0.5) * DITHER_STRENGTH;
-    // }
-
-    void sampleDither(vec2 fragCoord) {
-      // without texture
-
-      dither = (fract(sin(dot(fragCoord.xy ,vec2(12.9898,78.233))) * 43758.5453) - 0.5) * 0.1;
-    }
-
-
     float pow2(float v) {
       return v * v;
     }
@@ -202,9 +190,7 @@ export const surfaceFragment =
         normal += vec3(0.0, 0.0, 1.0);
         normal = normalize(normal).xzy;
 
-        // sampleDither(gl_FragCoord.xy);
-
-        if (cameraPosition.y > 0.0)
+        if (cameraPosition.y > -0.3)
         {
             vec3 halfWayDir = normalize(_DirToLight - viewDir);
             float specular = max(0.0, dot(normal, halfWayDir));
@@ -213,19 +199,13 @@ export const surfaceFragment =
             float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
             // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-            vec3 reflection = vec3(0.22, 0.22, 0.8) * normal;
-            reflection = vec3(1.0);
+            vec3 reflection = vec3(0.22, 0.22, 0.5);
+            // reflection = vec3(1.0);
 
             vec3 surface = reflectivity * reflection;
+            surface = max(surface, specular);
 
-
-            // surface = max(surface, specular);
-
-            float fog = clamp(viewLen / FOG_DISTANCE + dither, 0.0, 1.0);
-            fog = 0.0;
-            // surface = mix(surface, sampleFog(viewDir), fog);
-
-            gl_FragColor = vec4(surface, max(max(reflectivity, specular), fog));
+            gl_FragColor = vec4(surface, max(reflectivity, specular));
             return;
         }
 

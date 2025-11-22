@@ -206,7 +206,7 @@ const fragmentShader = /* glsl */`
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    // dayFactor = 1.0;
+    dayFactor = 1.0;
 
     vec3 daySky = vec3(0.5, 0.75, 1.0);
 
@@ -220,7 +220,15 @@ const fragmentShader = /* glsl */`
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
-    vec3 color = bg + stars + sun;
+    // vec3 color = bg + stars + sun;
+    // vec3 color = max(bg + stars, sun);
+    vec3 color = sun;
+    if (length(color) < 0.9) {
+      color = bg + stars;
+    } else if (length(color) < 1.5) {
+      color = mix(bg + stars, sun, smoothstep(0.9, 1.5, length(color)));
+      // color = mix(bg + stars, sun, smoothstep(0.9, 1.5, length(color)));
+    }
 
     gl_FragColor = vec4(color, 1.0);
   }
