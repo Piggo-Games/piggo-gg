@@ -161,7 +161,7 @@ export const surfaceFragment = /*glsl*/`
   }
 
   float VSMShadow(sampler2D shadow,vec2 uv,float compare) {
-    float occlusion=1.0;
+    float occlusion = 1.0;
     vec2 distribution=texture2DDistribution(shadow,uv);
     float hard_shadow=step(compare,distribution.x); // Hard Shadow
     if(hard_shadow!=1.0){
@@ -174,24 +174,23 @@ export const surfaceFragment = /*glsl*/`
     return occlusion;
   }
 
-  float getShadow(sampler2D shadowMap,vec2 shadowMapSize,float shadowIntensity,float shadowBias,float shadowRadius,vec4 shadowCoord){
+  float getShadow(sampler2D shadowMap,vec2 shadowMapSize,float shadowIntensity,float shadowBias,float shadowRadius,vec4 shadowCoord) {
+    float shadow = 1.0;
+    shadowCoord.xyz /= shadowCoord.w;
+    shadowCoord.z += shadowBias;
 
-  float shadow=1.0;
-  shadowCoord.xyz/=shadowCoord.w;
-  shadowCoord.z+=shadowBias;
+    bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
+    bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
 
-  bool inFrustum=shadowCoord.x>=0.0 && shadowCoord.x<=1.0 && shadowCoord.y>=0.0 && shadowCoord.y<=1.0;
-  bool frustumTest=inFrustum && shadowCoord.z<=1.0;
+    if (frustumTest) {
+      #if defined(SHADOWMAP_TYPE_VSM)
+      shadow = VSMShadow(shadowMap, shadowCoord.xy, shadowCoord.z);
+      #else // no percentage-closer filtering:
+      shadow = texture2DCompare(shadowMap, shadowCoord.xy, shadowCoord.z);
+      #endif
+    }
 
-  if (frustumTest) {
-    #if defined(SHADOWMAP_TYPE_VSM)
-    shadow=VSMShadow(shadowMap,shadowCoord.xy,shadowCoord.z);
-    #else // no percentage-closer filtering:
-    shadow=texture2DCompare(shadowMap,shadowCoord.xy,shadowCoord.z);
-    #endif
-  }
-
-  return mix(1.0,shadow,shadowIntensity);
+    return mix(1.0, shadow, shadowIntensity);
   }
 
 
