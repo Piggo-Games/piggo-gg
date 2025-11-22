@@ -1,5 +1,5 @@
 import { Entity, max, min, Position, Three } from "@piggo-gg/core"
-import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial } from "three"
+import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
 
@@ -60,7 +60,9 @@ export const Water = () => {
             vertexShader: surfaceVertex,
             fragmentShader: surfaceFragment,
             side: 2,
+            lights: true,
             uniforms: {
+              ...UniformsLib.lights,
               _NormalMap1: { value: null },
               _NormalMap2: { value: null },
               _DirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
@@ -109,9 +111,7 @@ export const surfaceVertex =
     }
 `;
 
-export const surfaceFragment =
-/*glsl*/`
-    // #include <ocean>
+export const surfaceFragment = /*glsl*/`
 
     varying vec2 _worldPos;
     varying vec2 _uv;
@@ -128,9 +128,6 @@ export const surfaceFragment =
     const float CRITICAL_ANGLE = asin(1.0 / 1.33) / 1.5708;
     const float FOG_DISTANCE = 1000.0;
 
-    //  float dither = 0.0;
-    float dither = 0.0;
-
     uniform float _Time;
     uniform sampler2D _NormalMap1;
     uniform sampler2D _NormalMap2;
@@ -138,61 +135,60 @@ export const surfaceFragment =
 
     uniform vec3 _DirToLight;
 
-    float pow2(float v) {
-      return v * v;
-    }
+    // float pow2(float v) {
+    //   return v * v;
+    // }
 
-    void main()
-    {
-        vec3 viewVec = vec3(_worldPos.x, 0.0, _worldPos.y) - cameraPosition;
-        float viewLen = length(viewVec) * 0.992;
-        vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
+    void main() {
+      vec3 viewVec = vec3(_worldPos.x, 0.0, _worldPos.y) - cameraPosition;
+      float viewLen = length(viewVec) * 0.992;
+      vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
 
-        vec3 normal = texture2D(_NormalMap1, _uv + VELOCITY_1 * _Time).xyz * 2.0 - 1.0;
-        normal += texture2D(_NormalMap2, _uv + VELOCITY_2 * _Time).xyz * 2.0 - 1.0;
-        normal *= NORMAL_MAP_STRENGTH;
-        normal += vec3(0.0, 0.0, 1.0);
-        normal = normalize(normal).xzy;
+      vec3 normal = texture2D(_NormalMap1, _uv + VELOCITY_1 * _Time).xyz * 2.0 - 1.0;
+      normal += texture2D(_NormalMap2, _uv + VELOCITY_2 * _Time).xyz * 2.0 - 1.0;
+      normal *= NORMAL_MAP_STRENGTH;
+      normal += vec3(0.0, 0.0, 1.0);
+      normal = normalize(normal).xzy;
 
-        if (cameraPosition.y > 0.0) {
-          vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
-          float specular = max(0.0, dot(normal, halfWayDir));
-          specular = pow(specular, SPECULAR_SHARPNESS);
+      if (cameraPosition.y > 0.0) {
+        vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
+        float specular = max(0.0, dot(normal, halfWayDir));
+        specular = pow(specular, SPECULAR_SHARPNESS);
 
-          float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
+        float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
-          // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-          vec3 blue = vec3(0.46, 0.46, 1.0);
-          vec3 surface = reflectivity * blue;
+        // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
+        vec3 blue = vec3(0.46, 0.46, 1.0);
+        vec3 surface = reflectivity * blue;
 
-          surface += vec3(0.8, 0.4, 0.1) * specular * specular;
-          surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
-          // surface = min(surface, 0.8);
+        surface += vec3(0.8, 0.4, 0.1) * specular * specular;
+        surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
+        // surface = min(surface, 0.8);
 
-          gl_FragColor = vec4(surface, max(reflectivity, specular));
+        gl_FragColor = vec4(surface, max(reflectivity, specular));
+        return;
+      }
+
+      float originY = cameraPosition.y;
+      viewLen = min(viewLen, MAX_VIEW_DEPTH);
+      float sampleY = originY + viewDir.y * viewLen;
+      vec3 light = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
+      light *= _Light;
+
+      float reflectivity = pow2(1.0 - max(0.0, dot(viewDir, normal)));
+      float t = clamp(max(reflectivity, viewLen / MAX_VIEW_DEPTH), 0.0, 1.0);
+
+      if (dot(viewDir, normal) < CRITICAL_ANGLE)
+      {
+          vec3 r = reflect(viewDir, -normal);
+          sampleY = r.y * (MAX_VIEW_DEPTH - viewLen);
+          vec3 rColor = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
+          rColor *= _Light;
+
+          gl_FragColor = vec4(mix(rColor, light, t), 1.0);
           return;
-        }
+      }
 
-        float originY = cameraPosition.y;
-        viewLen = min(viewLen, MAX_VIEW_DEPTH);
-        float sampleY = originY + viewDir.y * viewLen;
-        vec3 light = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-        light *= _Light;
-
-        float reflectivity = pow2(1.0 - max(0.0, dot(viewDir, normal)));
-        float t = clamp(max(reflectivity, viewLen / MAX_VIEW_DEPTH) + dither, 0.0, 1.0);
-
-        if (dot(viewDir, normal) < CRITICAL_ANGLE)
-        {
-            vec3 r = reflect(viewDir, -normal);
-            sampleY = r.y * (MAX_VIEW_DEPTH - viewLen);
-            vec3 rColor = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-            rColor *= _Light;
-
-            gl_FragColor = vec4(mix(rColor, light, t), 1.0);
-            return;
-        }
-
-        gl_FragColor = vec4(light, t);
+      gl_FragColor = vec4(light, t);
     }
 `
