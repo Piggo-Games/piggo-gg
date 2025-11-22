@@ -125,7 +125,7 @@ const fragmentShader = /* glsl */`
   // -------------------- starfield --------------------
   mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
 
-  vec3 starLayers(vec3 dir, vec2 uv){
+  vec3 starLayers(vec3 dir, vec2 uv) {
     vec3 acc = vec3(0.0);
 
     const int R = 1;
@@ -160,8 +160,9 @@ const fragmentShader = /* glsl */`
                                   (centerUV * rot(-2.07));
 
           vec3 cDir = octaUnproject(fract(centerUV));
-          float r = radius * mix(0.7, 1.8, sizeSeed);
+          if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
 
+          float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
         }
       }
@@ -205,19 +206,20 @@ const fragmentShader = /* glsl */`
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    vec3 daySky = vec3(0.5, 0.75, 1.0); // light blue
+    // dayFactor = 1.0;
+
+    vec3 daySky = vec3(0.5, 0.75, 1.0);
 
     bg = mix(bg, daySky, dayFactor);
 
     vec2 uv = octaProject(dir);
     vec3 stars = starLayers(dir, uv);
+
     stars *= (1.0 - dayFactor);
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
-    // dither using hash12
-    // float dither = (hash12(uv + uTime*0.123) - 0.5) * 0.003;
     vec3 color = bg + stars + sun;
 
     gl_FragColor = vec4(color, 1.0);
