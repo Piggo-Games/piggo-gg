@@ -1,12 +1,11 @@
 import {
-  BlockColor, BlockMeshSystem, BlockPhysicsSystem, Collider, Crosshair, Entity, EscapeMenu,
+  BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
-  InventorySystem, Position, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
-  Three,
+  InventorySystem, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
-import { Group, Mesh, Object3DEventMap } from "three"
+import { Pig } from "./Pig"
 
 export type BuildSettings = {
   showCrosshair: boolean
@@ -132,46 +131,4 @@ const controls: HUDSystemProps = {
       buttons: [["spacebar"]]
     }
   ]
-}
-
-export const Pig = () => {
-
-  let mesh: Group<Object3DEventMap> | undefined = undefined
-
-  const pig = Entity<Position>({
-    id: "pig",
-    components: {
-      position: Position({ x: 4, y: 4, z: 2, gravity: 0.003 }),
-      collider: Collider({ shape: "ball", radius: 0.1 }),
-      three: Three({
-        onRender: ({ delta, world }) => {
-          const pos = pig.components.position.interpolate(world, delta)
-
-          if (mesh) {
-            mesh.position.set(pos.x, pos.z, pos.y)
-          }
-        },
-        init: async (o, _, __, three) => {
-          three.gLoader.load("pig.gltf", (gltf) => {
-
-            mesh = gltf.scene
-            mesh.animations = gltf.animations
-            mesh.frustumCulled = false
-            mesh.scale.set(0.0125, 0.0125, 0.0125)
-
-            mesh.traverse((child) => {
-              if (child instanceof Mesh) {
-                child.castShadow = true
-                child.receiveShadow = true
-              }
-            })
-
-            o.push(mesh)
-          })
-        }
-      })
-    }
-  })
-
-  return pig
 }
