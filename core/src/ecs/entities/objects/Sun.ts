@@ -13,7 +13,7 @@ export const Sun = (props: SunProps = {}) => {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
         init: async (o) => {
-          const light = new DirectionalLight(colors.evening, 8)
+          const light = new DirectionalLight(colors.evening, 7)
 
           light.shadow.normalBias = 0.02
           light.shadow.mapSize.set(2048 * 2, 2048 * 2)
