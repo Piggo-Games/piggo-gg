@@ -1,17 +1,15 @@
 import {
-  Action, Actions, blockInLine, Character, cos, destroyIntoVoxels, Effects, Entity, Input,
-  Item, ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
+  Action, Actions, blockInLine, Character, cos, Effects, Entity, Input, Item,
+  ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
   randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
-import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector2, Vector3 } from "three"
+import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
 }
 
 export const BlasterItem = ({ character }: { character: Character }) => {
-
-  let pinatas: Mesh[] | undefined = undefined
 
   let mesh: Object3D | undefined = undefined
   let tracer: Object3D | undefined = undefined
@@ -153,28 +151,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             }
           }
 
-
-          // hide original mesh
-          if (mesh) mesh.visible = false
-          if (pinatas?.length) {
-            pinatas.forEach(p => {
-              p.visible = false
-              const voxels = destroyIntoVoxels(p, 0.005)
-              for (const voxel of voxels) {
-                // add to particles
-                particles.push({
-                  mesh: voxel,
-                  tick: world.tick,
-                  velocity: randomVector3(0.005),
-                  pos: { x: voxel.position.x, y: voxel.position.z, z: voxel.position.y },
-                  duration: 20,
-                  gravity: 0.0003
-                })
-                world.three?.scene.add(voxel)
-              }
-            })
-          }
-
           // let hit: { block: BlockInLine | undefined, distance: number | undefined } = {
           //   block: undefined,
           //   distance: undefined
@@ -230,22 +206,10 @@ export const BlasterItem = ({ character }: { character: Character }) => {
               if (child instanceof Mesh) {
                 child.castShadow = true
                 // child.receiveShadow = true
-
-                if (!pinatas) pinatas = []
-                const destr = child.clone() as Mesh
-                // const destr = new DestructibleMesh(child.geometry, child.material as MeshPhongMaterial)
-                destr.scale.set(0.005, 0.005, 0.005)
-                destr.position.set(5, 1, 5)
-
-                pinatas.push(destr)
-                o.push(destr)
               }
             })
 
             o.push(mesh)
-
-            // pinataMesh = new DestructibleMesh(mesh.)
-
           })
         },
         onRender: ({ world, delta, client, three }) => {
