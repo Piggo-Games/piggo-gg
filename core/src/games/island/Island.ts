@@ -5,6 +5,7 @@ import {
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
+import { Pig } from "./Pig"
 
 export type BuildSettings = {
   showCrosshair: boolean
@@ -18,9 +19,9 @@ export type BuildState = {
 }
 
 export const Build: GameBuilder<BuildState, BuildSettings> = {
-  id: "builders",
+  id: "island",
   init: (world) => ({
-    id: "builders",
+    id: "island",
     netcode: "rollback",
     renderer: "three",
     settings: {
@@ -51,10 +52,9 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       HtmlChat(),
       Sky(),
       Water(),
-      Sun({
-        bounds: { left: -10, right: 12, top: 0, bottom: -9 },
-      }),
-      HtmlLagText()
+      Sun(),
+      HtmlLagText(),
+      Pig()
     ]
   })
 }
