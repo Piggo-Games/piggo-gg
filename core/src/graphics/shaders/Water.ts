@@ -195,9 +195,9 @@ export const surfaceFragment = /*glsl*/`
 
 
   vec2 cubeToUV(vec3 v,float texelSizeY) {
-    vec3 absV=abs(v);
-    float scaleToCube=1.0/max(absV.x,max(absV.y,absV.z));
-    absV*=scaleToCube;
+    vec3 absV = abs(v);
+    float scaleToCube = 1.0/max(absV.x,max(absV.y,absV.z));
+    absV *= scaleToCube;
     v*=scaleToCube*(1.0-2.0*texelSizeY);
     vec2 planar=v.xy;
     float almostATexel=1.5*texelSizeY;
