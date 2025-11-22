@@ -18,10 +18,13 @@ export const Water = () => {
         onRender: ({ delta }) => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
-            mat.uniforms._Time.value += delta
+
+            const timeVal = mat.uniforms._Time.value as number
+
+            mat.uniforms._Time.value += delta / 1000
           }
         },
-        init: async (o) => {
+        init: async (o, _, __, three) => {
           if (init) return
 
           surface = new Mesh()
@@ -49,23 +52,31 @@ export const Water = () => {
 
           surface.geometry = surfaceGeometry
 
-          // const normalMap1 = await loadTexture("waterNormal1.png")
-          // console.log("loaded normal 1", normalMap1)
-
-
-
-
           const surfaceMat = new ShaderMaterial({
             vertexShader: surfaceVertex,
             fragmentShader: surfaceFragment,
             side: 2,
             uniforms: {
-              _NormalMap1: { value: new TextureLoader().load("waterNormal1.png") },
-              _NormalMap2: { value: new TextureLoader().load("waterNormal2.png") },
-              _DirToLight: { value: new Vector3(0.5, 1, 0.75).normalize() },
+              _NormalMap1: { value: null },
+              _NormalMap2: { value: null },
+              _DirToLight: { value: new Vector3(0.5, 0.8, 0.5).normalize() },
               _Time: { value: 0 },
-              _Light: { value: new Vector3(1, 1, 1) }
+              _Light: { value: new Vector3(10, 8, 2) }
             }
+          })
+
+          three.tLoader.loadAsync("waterNormal1.png").then((texture1) => {
+            texture1.wrapS = RepeatWrapping
+            texture1.wrapT = RepeatWrapping
+
+            surfaceMat.uniforms._NormalMap1.value = texture1
+          })
+
+          three.tLoader.loadAsync("waterNormal2.png").then((texture2) => {
+            texture2.wrapS = RepeatWrapping
+            texture2.wrapT = RepeatWrapping
+
+            surfaceMat.uniforms._NormalMap2.value = texture2
           })
 
           surface.material = surfaceMat;
@@ -140,7 +151,7 @@ export const surfaceFragment =
     varying vec2 _worldPos;
     varying vec2 _uv;
 
-    const float NORMAL_MAP_SCALE = 0.1;
+    const float NORMAL_MAP_SCALE = 0.01;
     const float NORMAL_MAP_STRENGTH = 0.2;
     const vec2 VELOCITY_1 = vec2(0.1, 0.0);
     const vec2 VELOCITY_2 = vec2(0.0, 0.1);
@@ -152,7 +163,9 @@ export const surfaceFragment =
     const vec3 ABSORPTION = vec3(1.0) / vec3(10.0, 40.0, 100.0);
     const float CRITICAL_ANGLE = asin(1.0 / 1.33) / 1.5708;
     const float FOG_DISTANCE = 1000.0;
-    const float dither = 0.0;
+
+    //  float dither = 0.0;
+    float dither = 0.0;
 
     uniform float _Time;
     uniform sampler2D _NormalMap1;
@@ -165,6 +178,13 @@ export const surfaceFragment =
     // {
     //     dither = (texture2D(_DitherTexture, (fragCoord - vec2(0.5)) / _DitherTextureSize).x - 0.5) * DITHER_STRENGTH;
     // }
+
+    void sampleDither(vec2 fragCoord) {
+      // without texture
+
+      dither = (fract(sin(dot(fragCoord.xy ,vec2(12.9898,78.233))) * 43758.5453) - 0.5) * 0.1;
+    }
+
 
     float pow2(float v) {
       return v * v;
@@ -188,16 +208,21 @@ export const surfaceFragment =
         {
             vec3 halfWayDir = normalize(_DirToLight - viewDir);
             float specular = max(0.0, dot(normal, halfWayDir));
-            // specular = pow(specular, SPECULAR_SHARPNESS) * _SpecularVisibility;
+            specular = pow(specular, SPECULAR_SHARPNESS) * 0.4;
 
             float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
             // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-            vec3 reflection = vec3(0.0, 0.3, 0.5); // approximate sky color
+            vec3 reflection = vec3(0.22, 0.22, 0.8) * normal;
+            reflection = vec3(1.0);
+
             vec3 surface = reflectivity * reflection;
-            surface = max(surface, specular);
+
+
+            // surface = max(surface, specular);
 
             float fog = clamp(viewLen / FOG_DISTANCE + dither, 0.0, 1.0);
+            fog = 0.0;
             // surface = mix(surface, sampleFog(viewDir), fog);
 
             gl_FragColor = vec4(surface, max(max(reflectivity, specular), fog));
@@ -266,169 +291,5 @@ export const volumeFragment =
         light *= _Light;
         
         gl_FragColor = vec4(light, 1.0);
-    }
-`;
-
-export const objectVertex =
-/*glsl*/`
-    varying vec3 _worldPos;
-    varying vec3 _normal;
-    varying vec2 _uv;
-    
-    void main()
-    {
-        vec4 worldPos = modelMatrix * vec4(position, 1.0);
-        _worldPos = worldPos.xyz;
-        _normal = normal;
-        _uv = uv;
-        gl_Position = projectionMatrix * viewMatrix * worldPos;
-    }
-`;
-
-export const objectFragment =
-/*glsl*/`
-    // #include <ocean>
-
-    uniform vec3 _CameraForward;
-    uniform sampler2D _MainTexture;
-    uniform float _SpotLightSharpness;
-    uniform float _SpotLightDistance;
-
-    varying vec3 _worldPos;
-    varying vec3 _normal;
-    varying vec2 _uv;
-
-    void main()
-    {
-        float dirLighting = max(0.333, dot(_normal, _DirToLight));
-        vec3 texture = texture2D(_MainTexture, _uv).xyz * dirLighting;
-        
-        vec3 viewVec = _worldPos - cameraPosition;
-        float viewLen = length(viewVec);
-        vec3 viewDir = viewVec / viewLen;
-
-        if (_worldPos.y > 0.0)
-        {
-            if (cameraPosition.y < 0.0)
-            {
-                viewLen -= cameraPosition.y / -viewDir.y;
-            }
-
-            sampleDither(gl_FragCoord.xy);
-            vec3 fogColor = sampleFog(viewDir);
-            float fog = clamp(viewLen / FOG_DISTANCE + dither, 0.0, 1.0);
-            gl_FragColor = vec4(mix(texture, fogColor, fog), 1.0);
-            return;
-        }
-
-        float originY = cameraPosition.y;
-
-        if (cameraPosition.y > 0.0)
-        {
-            viewLen -= cameraPosition.y / -viewDir.y;
-            originY = 0.0;
-        }
-        viewLen = min(viewLen, MAX_VIEW_DEPTH);
-
-        float sampleY = originY + viewDir.y * viewLen;
-        vec3 light = exp((sampleY - viewLen * DENSITY) * ABSORPTION) * _Light;
-
-        float spotLight = 0.0;
-        float spotLightDistance = 1.0;
-        if (_SpotLightDistance > 0.0)
-        {
-            spotLightDistance =  min(distance(_worldPos, cameraPosition) / _SpotLightDistance, 1.0);
-            spotLight = pow(max(dot(viewDir, _CameraForward), 0.0), _SpotLightSharpness) * (1.0 - spotLightDistance);
-        }
-        
-        light = min(light + spotLight, vec3(1.0));
-
-        gl_FragColor = vec4(mix(texture * light, light, min(viewLen / MAX_VIEW_DEPTH, 1.0 - spotLight)), 1.0);
-    }
-`;
-
-export const triplanarVertex =
-/*glsl*/`
-    varying vec3 _worldPos;
-    varying vec3 _normal;
-    
-    void main()
-    {
-        vec4 worldPos = modelMatrix * vec4(position, 1.0);
-        _worldPos = worldPos.xyz;
-        _normal = normal;
-        gl_Position = projectionMatrix * viewMatrix * worldPos;
-    }
-`;
-
-export const triplanarFragment =
-/*glsl*/`
-    // #include <ocean>
-
-    uniform vec3 _CameraForward;
-    uniform sampler2D _MainTexture;
-    uniform float _BlendSharpness;
-    uniform float _Scale;
-    uniform float _SpotLightSharpness;
-    uniform float _SpotLightDistance;
-
-    varying vec3 _worldPos;
-    varying vec3 _normal;
-
-    void main()
-    {
-        float dirLighting = max(0.4, dot(_normal, _DirToLight));
-
-        vec3 weights = abs(_normal);
-        weights = vec3(pow(weights.x, _BlendSharpness), pow(weights.y, _BlendSharpness), pow(weights.z, _BlendSharpness));
-        weights = weights / (weights.x + weights.y + weights.z);
-
-        vec3 textureX = texture2D(_MainTexture, _worldPos.yz * _Scale).xyz * weights.x;
-        vec3 textureY = texture2D(_MainTexture, _worldPos.xz * _Scale).xyz * weights.y;
-        vec3 textureZ = texture2D(_MainTexture, _worldPos.xy * _Scale).xyz * weights.z;
-
-        vec3 texture = (textureX + textureY + textureZ) * dirLighting;
-        
-        vec3 viewVec = _worldPos - cameraPosition;
-        float viewLen = length(viewVec);
-        vec3 viewDir = viewVec / viewLen;
-
-        if (_worldPos.y > 0.0)
-        {
-            if (cameraPosition.y < 0.0)
-            {
-                viewLen -= cameraPosition.y / -viewDir.y;
-            }
-
-            sampleDither(gl_FragCoord.xy);
-            vec3 fogColor = sampleFog(viewDir);
-            float fog = clamp(viewLen / FOG_DISTANCE + dither, 0.0, 1.0);
-            gl_FragColor = vec4(mix(texture, fogColor, fog), 1.0);
-            return;
-        }
-
-        float originY = cameraPosition.y;
-
-        if (cameraPosition.y > 0.0)
-        {
-            viewLen -= cameraPosition.y / -viewDir.y;
-            originY = 0.0;
-        }
-        viewLen = min(viewLen, MAX_VIEW_DEPTH);
-
-        float sampleY = originY + viewDir.y * viewLen;
-        vec3 light = exp((sampleY - viewLen * DENSITY) * ABSORPTION) * _Light;
-
-        float spotLight = 0.0;
-        float spotLightDistance = 1.0;
-        if (_SpotLightDistance > 0.0)
-        {
-            spotLightDistance =  min(distance(_worldPos, cameraPosition) / _SpotLightDistance, 1.0);
-            spotLight = pow(max(dot(viewDir, _CameraForward), 0.0), _SpotLightSharpness) * (1.0 - spotLightDistance);
-        }
-        
-        light = min(light + spotLight, vec3(1.0));
-
-        gl_FragColor = vec4(mix(texture * light, light, min(viewLen / MAX_VIEW_DEPTH, 1.0 - spotLight)), 1.0);
     }
 `;
