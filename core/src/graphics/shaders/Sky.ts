@@ -188,8 +188,11 @@ const fragmentShader = /* glsl */`
 
   vec3 getSun(vec3 dir, vec3 sunDir) {
     float sun = max(dot(dir, sunDir), 0.0);
-    float core = pow(sun, 200.0) * 10000000000000.0;
-    return vec3(1.0, 0.8, 0.2) * core;
+
+    float core = smoothstep(0.851, 1.0, sun);
+    core *= core;
+
+    return vec3(1.0, 0.8, 0.2) * (core * 5000.0);
   }
 
   void main() {
