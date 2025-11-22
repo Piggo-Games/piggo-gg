@@ -3,11 +3,20 @@ import { Clock, Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
 
+  let mesh: Mesh | undefined = undefined
+
   const sky = Entity<Three>({
     id: "sky",
     components: {
       position: Position(),
       three: Three({
+        onRender: ({ delta }) => {
+          if (mesh) {
+            const mat = mesh.material as ShaderMaterial
+
+            mat.uniforms.uTime.value += delta / 1000
+          }
+        },
         init: async (o, _, __, three) => {
           const geo = new SphereGeometry(500, 60, 40)
 
@@ -31,7 +40,7 @@ export const Sky = () => {
             toneMapped: true
           })
 
-          const mesh = new Mesh(geo, material)
+          mesh = new Mesh(geo, material)
           mesh.frustumCulled = false
 
           // const clock = new Clock()
@@ -125,7 +134,7 @@ const fragmentShader = /* glsl */`
   // -------------------- starfield --------------------
   mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
 
-  vec3 starLayers(vec3 dir, vec2 uv){
+  vec3 starLayers(vec3 dir, vec2 uv) {
     vec3 acc = vec3(0.0);
 
     const int R = 1;
@@ -160,8 +169,9 @@ const fragmentShader = /* glsl */`
                                   (centerUV * rot(-2.07));
 
           vec3 cDir = octaUnproject(fract(centerUV));
-          float r = radius * mix(0.7, 1.8, sizeSeed);
+          // if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
 
+          float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
         }
       }
@@ -186,37 +196,74 @@ const fragmentShader = /* glsl */`
           (d - b) * u.x * u.y;
   }
 
-  // Worley / cellular noise, returns distance to nearest random feature point
-  float worley(vec2 uv) {
-    vec2 i = floor(uv);
-    vec2 f = fract(uv);
-
-    float minDist = 1.0;
-    // check 3x3 neighborhood of cells
-    for (int y = -1; y <= 1; y++) {
-      for (int x = -1; x <= 1; x++) {
-        vec2 cell = i + vec2(x, y);
-        vec2 rand = hash22(cell);       // random feature point in cell
-        vec2 diff = (vec2(x, y) + rand) - f;
-        float d = length(diff);
-        minDist = min(minDist, d);
-      }
-    }
-    return minDist;
-  }
-
   vec3 getSun(vec3 dir, vec3 sunDir) {
     float sun = max(dot(dir, sunDir), 0.0);
 
-    float core = pow(sun, 200.0) * 10000000000000.0;
-    // float glow = pow(sun, 10.0);
+    float core = smoothstep(0.851, 1.0, sun);
+    core *= core;
 
-    float intensity = core;
-
-    return vec3(1.0, 0.8, 0.2) * intensity;
+    return vec3(1.0, 0.8, 0.2) * (core * 5000.0);
   }
 
-  void main(){
+  float hash(vec2 p) {
+    p = fract(p * 0.3183099 + vec2(0.1, 0.7));
+    p *= 17.0;
+    return fract(p.x * p.y * (p.x + p.y));
+  }
+
+float noise2(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+  }
+
+  float cloudNoise(vec2 p) {
+    float n = 0.0;
+
+    n += noise2(p * 1.0) * 0.6;
+    n += noise2(p * 2.0) * 0.3;
+    n += noise2(p * 4.0) * 0.1;
+
+    return n;
+  }
+
+  vec3 getClouds(vec3 dir) {
+    // no clouds below horizon
+    if (dir.y <= 0.0) return vec3(0.0);
+
+    // scale uv up
+    // vec2 p = uv * 3.0;
+    vec2 p = dir.xz * 3.0;
+    // p *= vec2(2.0, 1.0);
+
+    //  p += vec2(0.002, 0.005) * (uTime / 1000.0);
+
+    // vec2 p = vec2(atan(dir.x, dir.z), dir.y);  
+    // p *= 5.0;
+
+    // layered noise
+    // float n = cloudNoise(p);
+    float n = cloudNoise(p + (uTime / 10.0) * 0.3);
+
+    // soften into cloud shapes
+    float c = smoothstep(0.5, 0.75, n);
+
+    // fade near horizon
+    c *= pow(dir.y, 0.7);
+
+    // cloud color
+    return vec3(c);
+  }
+
+  void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
     // Horizon → Zenith gradient
@@ -226,30 +273,29 @@ const fragmentShader = /* glsl */`
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    vec3 daySky = vec3(0.5, 0.75, 1.0); // light blue
+    dayFactor = 0.0;
+
+    vec3 daySky = vec3(0.5, 0.75, 1.0);
 
     bg = mix(bg, daySky, dayFactor);
-    
-    // project dir onto XZ plane for clouds
-    vec2 cloudUV = normalize(dir).xz * 0.5;
-    cloudUV += uTime * uCloudSpeed;
-
-    // Smaller scale = bigger puffs, larger scale = smaller puffs
-    float w = worley(cloudUV * 3.0);
-
-    // blend clouds on top (white tinted)
-    vec3 cloudColor = mix(vec3(1.0), daySky, 0.2);
 
     vec2 uv = octaProject(dir);
-    vec3 stars = starLayers(dir, uv);
-    stars *= (1.0 - dayFactor);
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
-    // dither using hash12
-    // float dither = (hash12(uv + uTime*0.123) - 0.5) * 0.003;
-    vec3 color = bg + stars + sun;
+    vec3 clouds = getClouds(dir);
+
+    vec3 color = bg + sun;
+    if (dir.y > 0.01) {
+      vec3 stars = starLayers(dir, uv);
+      stars *= (1.0 - dayFactor);
+      color += stars;
+    } else {
+      color += vec3(0.0, 0.0, 0.1);
+    }
+
+    color += clouds * uCloudDensity;
 
     gl_FragColor = vec4(color, 1.0);
   }

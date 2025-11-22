@@ -12,6 +12,8 @@ lofi music | https://freemusicarchive.org/music/holiznacc0/
 
 ### assets
 
+water shader | https://github.com/Nugget8/Three.js-Ocean-Scene | license: MIT
+
 sci-fi guns | https://quaternius.com/packs/scifigun.html | license: CC0
 
 character mesh | https://opengameart.org/content/animated-characters-pack | license: CC0
