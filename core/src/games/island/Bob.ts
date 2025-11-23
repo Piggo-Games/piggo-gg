@@ -339,7 +339,10 @@ export const Bob = (player: Player): Character => {
       }),
       team: Team(player.components.team.data.team),
       three: Three({
-        onTick: ({ three, world }) => {
+        onTick: ({ three, world, client }) => {
+
+          if (block) block.visible = client.mobile?.horizontal() !== false
+
           if (!wipMesh) return
 
           if (!wipStart) {
