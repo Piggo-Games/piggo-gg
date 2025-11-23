@@ -1,4 +1,4 @@
-import { Entity, Position, Three } from "@piggo-gg/core"
+import { Entity, hour, Position, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
@@ -10,11 +10,12 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta }) => {
+        onRender: ({ delta, world }) => {
           if (mesh) {
             const mat = mesh.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 1000
+            mat.uniforms.uTime.value += delta / 2000
+            mat.uniforms.uHour.value = hour(world.tick, delta)
           }
         },
         init: async (o, _, __, three) => {
@@ -23,11 +24,11 @@ export const Sky = () => {
           const material = new ShaderMaterial({
             uniforms: {
               uTime: { value: 0.0 },
+              uHour: { value: 0.0 },
               uDensity: { value: 0.0015 },
               uBrightness: { value: 0.9 },
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
-              uCloudSpeed: { value: 0.05 },
               uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
             vertexShader,
@@ -64,11 +65,11 @@ const fragmentShader = /* glsl */`
   precision highp float;
 
   uniform float uTime;
-  uniform float uDensity;     // 0..1
-  uniform float uBrightness;  // overall star brightness
+  uniform float uHour;
+  uniform float uDensity;
+  uniform float uBrightness;
   uniform vec3  uHorizon;
   uniform vec3  uZenith;
-  uniform float uCloudSpeed;
   uniform vec2  uResolution;
 
   varying vec3 vWorldPosition;
@@ -258,13 +259,13 @@ const fragmentShader = /* glsl */`
     }
 
     // Horizon → Zenith gradient
-    float t = smoothstep(-0.1, 0.9, dir.y);
-    vec3 bg = mix(uHorizon, uZenith, t);
+    float horizon = smoothstep(-0.1, 0.9, dir.y);
+    vec3 bg = mix(uHorizon, uZenith, horizon);
 
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
-    float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    dayFactor = 1.0;
+    float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
+    // dayFactor = 1.0;
 
     vec3 daySky = vec3(0.5, 0.75, 1.0);
 

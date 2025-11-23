@@ -253,6 +253,11 @@ export const vectorExtend = (vec: XYZ, amount: number): XYZ => {
   }
 }
 
+export const hour = (tick: number, delta: number): number => {
+  const time = tick * 25 / 1000 + delta / 1000
+  return (time % 24)
+}
+
 export const rayCapsuleIntersect = (from: XYZ, dir: XYZ, capsule: Capsule): false | { sc: number, tc: number } => {
   const { A, B, radius } = capsule
 
