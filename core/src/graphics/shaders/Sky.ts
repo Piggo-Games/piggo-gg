@@ -264,7 +264,7 @@ const fragmentShader = /* glsl */`
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    dayFactor = 0.0;
+    dayFactor = 1.0;
 
     vec3 daySky = vec3(0.5, 0.75, 1.0);
 
@@ -277,7 +277,31 @@ const fragmentShader = /* glsl */`
 
     vec3 clouds = getClouds(dir);
 
-    vec3 color = bg + sun;
+    // vec3 color = bg + sun;
+    // make sure sun goes through the bg
+    float s = length(sun);            // how strong the sun is
+
+
+
+    vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
+    // vec3 color = mix(bg, sun, s);
+    // if (s > 0.95) {
+    //   color = mix(bg, sun, smoothstep(0.5, 1.0, s));
+    //   // color -= sun * s;  // remove sun influence when weak
+    // } else {
+    //   color = bg + sun;
+    // }
+
+    // detect "dark ring"
+      // float drop = max(0.0, dot(bg - color, vec3(0.133))); 
+      // drop > 0 where base is darker than bg
+
+      // create a corrective boost
+      // float fix = drop * 2.0;        // scale the halo brightness
+      // fix *= smoothstep(0.1, 0.8, s); // only affect the glow region
+
+      // color += vec3(fix);
+    
     if (dir.y > 0.01) {
       vec3 stars = starLayers(dir, uv);
       stars *= (1.0 - dayFactor);
