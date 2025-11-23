@@ -23,7 +23,7 @@ export const Water = () => {
 
             // adjust the water height
             if (z > 0) {
-              surface.position.y = -min(z / 4, 1)
+              surface.position.y = -min(z / 4, 0.7)
             } else if (z < -0.51) {
               z += 0.51
               surface.position.y = max(z / 4, -1)
@@ -151,10 +151,60 @@ export const surfaceFragment = /*glsl*/`
   uniform sampler2D directionalShadowMap[NUM_DIR_LIGHT_SHADOWS];
   varying vec4 vDirectionalShadowCoord[NUM_DIR_LIGHT_SHADOWS];
 
+  // float texture2DCompare(sampler2D depths,vec2 uv,float compare){
+  //   return step(compare,unpackRGBAToDepth(texture2D(depths,uv)));
+  // }
 
-  float texture2DCompare(sampler2D depths,vec2 uv,float compare){
-    return step(compare,unpackRGBAToDepth(texture2D(depths,uv)));
+  // float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
+  //   float s = 0.0;
+  //   float w = 0.0;
+
+  //   float t = 1.0 / 4096.0;
+
+  //   for (int x = -2; x <= 2; x++) {
+  //     for (int y = -2; y <= 2; y++) {
+  //       float weight = 3.0 - length(vec2(x, y));
+  //       if (weight > 0.0) {
+  //         vec2 offset = vec2(x, y) * t;
+  //         float depth = unpackRGBAToDepth(texture2D(depths, uv + offset));
+  //         s += step(compare, depth) * weight;
+  //         w += weight;
+  //       }
+  //     }
+  //   }
+
+  //   return s / w;
+  // }
+
+  float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
+
+    float texelSize = 1.0 / 4096.0;
+
+    const int dist = 2;
+
+    // 45° rotation matrix (breaks grid-aligned artifacts)
+    mat2 rot = mat2(
+        0.7071, -0.7071,
+        0.7071,  0.7071
+    );
+
+    float result = 0.0;
+    float count = 0.0;
+
+    for (int x = -dist; x <= dist; x++) {
+        for (int y = -dist; y <= dist; y++) {
+
+            vec2 offset = rot * vec2(x, y) * texelSize;
+
+            float depth = unpackRGBAToDepth(texture2D(depths, uv + offset));
+            result += step(compare, depth);
+            count += 1.0;
+        }
+    }
+
+    return result / count;
   }
+
 
   vec2 texture2DDistribution(sampler2D shadow,vec2 uv){
     return unpackRGBATo2Half(texture2D(shadow,uv));
@@ -232,7 +282,6 @@ export const surfaceFragment = /*glsl*/`
 
   // SHADOWMASK_PARS_FRAGMENT
 
-
   float getShadowMask() {
     float shadow = 1.0;
     DirectionalLightShadow directionalLight;
@@ -285,9 +334,12 @@ export const surfaceFragment = /*glsl*/`
     normal = normalize(normal).xzy;
 
     if (cameraPosition.y > 0.0) {
+      float shadow = getShadowMask();
+
       vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
+      specular *= max(shadow, 0.4);
 
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
@@ -300,8 +352,9 @@ export const surfaceFragment = /*glsl*/`
       // surface = min(surface, 0.8);
 
       vec4 final = vec4(surface, max(reflectivity, specular));
+
       gl_FragColor = final;
-      gl_FragColor.b *= getShadowMask();
+      gl_FragColor.rgb *= max(shadow, 0.4);
       return;
     }
 
