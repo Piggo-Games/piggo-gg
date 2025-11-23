@@ -265,9 +265,8 @@ const fragmentShader = /* glsl */`
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
-    // dayFactor = 1.0;
 
-    vec3 daySky = vec3(0.5, 0.75, 1.0);
+    vec3 daySky = vec3(0.5, 0.7, 1.0);
 
     bg = mix(bg, daySky, dayFactor);
 
