@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island
 } from "@piggo-gg/core"
 
 export type World = {
@@ -75,7 +75,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     entitiesAtTick: {},
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
     games: {
-      "island": Build,
+      "island": Island,
       "craft": Craft,
       "lobby": Lobby,
       "strike": Strike,
