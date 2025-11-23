@@ -298,12 +298,15 @@ const fragmentShader = /* glsl */`
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
+    float s = length(sun);
+
+    sun *= dayFactor;
+    sun += vec3(0.3, 0.3, 0.5) * s * (1.0 - dayFactor);
 
     vec3 clouds = getClouds(dir);
 
-    float s = length(sun);
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
-    
+
     if (dir.y > 0.01) {
       vec3 stars = starLayers(vdir, uv);
       stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
