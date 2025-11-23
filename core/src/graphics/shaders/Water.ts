@@ -275,7 +275,7 @@ export const surfaceFragment = /*glsl*/`
   const float NORMAL_MAP_STRENGTH = 1.0;
   const vec2 VELOCITY_1 = vec2(0.1, 0.0);
   const vec2 VELOCITY_2 = vec2(0.0, 0.1);
-  const float SPECULAR_SHARPNESS = 5.0;
+  const float SPECULAR_SHARPNESS = 3.0;
   const float MAX_VIEW_DEPTH = 100.0;
   const float DENSITY = 0.35;
   const float MAX_VIEW_DEPTH_DENSITY = MAX_VIEW_DEPTH * DENSITY;
@@ -300,7 +300,6 @@ export const surfaceFragment = /*glsl*/`
     float viewLen = length(viewVec) * 0.992;
     vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
 
-    // float dayFactor = 1.0;
     float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
 
     vec3 normal = texture2D(uNormalMap1, _uv + VELOCITY_1 * uTime).xyz * 2.0 - 1.0;
@@ -312,7 +311,7 @@ export const surfaceFragment = /*glsl*/`
     if (cameraPosition.y > 0.0) {
       float shadow = getShadowMask();
 
-      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.22, 0.0);
+      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.34, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
       specular *= max(shadow, 0.4);
@@ -323,8 +322,10 @@ export const surfaceFragment = /*glsl*/`
       vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.6) * dayFactor;
       vec3 surface = reflectivity * blue;
 
-      surface += vec3(0.8, 0.4, 0.1) * specular * specular;
-      surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
+      vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), dayFactor);
+
+      surface += sunColor * specular * specular;
+      surface -= vec3(0.05) * specular * specular;
 
       float dist = length(_worldPos - cameraPosition.xy);
       float fog = smoothstep(5.0, 50.0, dist);
