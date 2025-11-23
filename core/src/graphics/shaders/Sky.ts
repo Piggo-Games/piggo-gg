@@ -11,7 +11,7 @@ export const Sky = () => {
       position: Position(),
       three: Three({
         onRender: ({ delta, world }) => {
-          if (mesh) {
+          if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value += delta / 2000
@@ -241,7 +241,7 @@ const fragmentShader = /* glsl */`
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
     float v = fbm(vec3(
-      dir.x * 8.0 + uTime * 0.03, h * 20.0, dir.z * 2.0 + uTime * 0.05
+      dir.x * 8.0 + uTime * 0.05, h * 20.0, dir.z * 2.0 + uTime * 0.05
     ));
 
     float a = curtain * v;
@@ -250,8 +250,32 @@ const fragmentShader = /* glsl */`
     return vec3(a * 30.0);
   }
 
+  mat3 rotateX(float a) {
+    float s = sin(a), c = cos(a);
+    return mat3(
+        1.0, 0.0, 0.0,
+        0.0,  c,  -s,
+        0.0,  s,   c
+    );
+  }
+
+  mat3 rotateY(float a) {
+      float s = sin(a), c = cos(a);
+      return mat3(
+          c, 0.0, s,
+          0.0, 1.0, 0.0,
+          -s, 0.0, c
+      );
+  }
+
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
+
+    float tilt = (uHour / 24.0) * 2.0 * PI / 12.0;
+    float tiltAngle = radians(50.5); 
+    mat3 rotMat  = rotateY(tilt);
+    mat3 tiltMat = rotateX(tiltAngle);
+    vec3 vdir = (rotMat * tiltMat) * dir;
 
     if (cameraPosition.y < -0.1) {
       gl_FragColor = vec4(0.0, 0.0, 0.2 + dir.y * 0.3, 1.0);
@@ -266,11 +290,11 @@ const fragmentShader = /* glsl */`
     // Define "day" between 6h and 18h
     float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
 
-    vec3 daySky = vec3(0.4, 0.6, 1.0);
+    vec3 daySky = vec3(0.24, 0.6, 1.0);
 
     bg = mix(bg, daySky, dayFactor);
 
-    vec2 uv = octaProject(dir);
+    vec2 uv = octaProject(vdir);
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
@@ -281,8 +305,8 @@ const fragmentShader = /* glsl */`
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
     
     if (dir.y > 0.01) {
-      vec3 stars = starLayers(dir, uv);
-      stars *= (1.0 - dayFactor);
+      vec3 stars = starLayers(vdir, uv);
+      stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
       color += stars;
     }
 

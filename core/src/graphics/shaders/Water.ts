@@ -312,7 +312,7 @@ export const surfaceFragment = /*glsl*/`
     if (cameraPosition.y > 0.0) {
       float shadow = getShadowMask();
 
-      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
+      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.22, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
       specular *= max(shadow, 0.4);
@@ -320,7 +320,7 @@ export const surfaceFragment = /*glsl*/`
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
       // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-      vec3 blue = vec3(0.28, 0.28, 0.56) + vec3(0.1, 0.1, 0.2) * dayFactor;
+      vec3 blue = vec3(0.15, 0.15, 0.35) + vec3(0.2, 0.25, 0.5) * dayFactor;
       vec3 surface = reflectivity * blue;
 
       surface += vec3(0.8, 0.4, 0.1) * specular * specular;
