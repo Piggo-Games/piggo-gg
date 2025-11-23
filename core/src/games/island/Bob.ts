@@ -1,8 +1,8 @@
 import {
   Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem, hypot, Input,
   Inventory, max, Networked, PI, Place, Player, Point, Position, Team, Three, upAndDir,
-  XYZ, XZ, BuildSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
-  nextColor, MarbleTexture, BlockMaterial, BuildState, blockInLine, BlocksMesh, nextBlock
+  XYZ, XZ, IslandSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
+  nextColor, MarbleTexture, BlockMaterial, IslandState, blockInLine, BlocksMesh, nextBlock
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -93,7 +93,7 @@ export const Bob = (player: Player): Character => {
             const camera = world.three!.camera.pos()
             const pos = character.components.position.xyz()
 
-            const { blockColor } = world.settings<BuildSettings>()
+            const { blockColor } = world.settings<IslandSettings>()
 
             return { actionId: "place", params: { dir, camera, pos, type: 12, blockColor } }
           },
@@ -102,7 +102,7 @@ export const Bob = (player: Player): Character => {
             if (client.bufferScroll < 20) return
             client.bufferScroll = 0
 
-            const { blockColor } = world.settings<BuildSettings>()
+            const { blockColor } = world.settings<IslandSettings>()
 
             // @ts-expect-error
             world.game.settings.blockColor = nextColor(blockColor)
@@ -112,7 +112,7 @@ export const Bob = (player: Player): Character => {
             if (client.bufferScroll > -20) return
             client.bufferScroll = 0
 
-            const { blockColor } = world.settings<BuildSettings>()
+            const { blockColor } = world.settings<IslandSettings>()
 
             // @ts-expect-error
             world.game.settings.blockColor = nextColor(blockColor, true)
@@ -149,7 +149,7 @@ export const Bob = (player: Player): Character => {
           "n": ({ world, hold }) => {
             if (hold) return
 
-            const settings = world.settings<BuildSettings>()
+            const settings = world.settings<IslandSettings>()
             settings.showNametags = !settings.showNametags
 
             return
@@ -182,7 +182,7 @@ export const Bob = (player: Player): Character => {
                   const zDir = wipEnd.z >= wipStart.z ? 1 : -1
                   for (let z = wipStart.z; z !== wipEnd.z + zDir; z += zDir) {
                     world.blocks.add({ x, y, z, type: 12 })
-                    world.blocks.coloring[`${x},${y},${z}`] = world.settings<BuildSettings>().blockColor
+                    world.blocks.coloring[`${x},${y},${z}`] = world.settings<IslandSettings>().blockColor
                   }
                 }
               }
@@ -230,7 +230,7 @@ export const Bob = (player: Player): Character => {
           if (position.data.flying) return
           if (bob.components.health?.dead()) return
 
-          const state = world.state<BuildState>()
+          const state = world.state<IslandState>()
 
           if (!position.data.standing && state.doubleJumped.includes(bob.id)) return
           if (!position.data.standing && params.hold) return
@@ -479,7 +479,7 @@ export const Bob = (player: Player): Character => {
 
           // update block color
           if (block) {
-            const { blockColor } = world.settings<BuildSettings>()
+            const { blockColor } = world.settings<IslandSettings>()
             block.material.forEach((mat) => mat.color.set(blockColor))
           }
         },
