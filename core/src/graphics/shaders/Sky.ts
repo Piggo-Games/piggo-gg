@@ -1,5 +1,5 @@
 import { Entity, Position, Three } from "@piggo-gg/core"
-import { Clock, Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
+import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
 
@@ -42,11 +42,6 @@ export const Sky = () => {
           mesh = new Mesh(geo, material)
           mesh.frustumCulled = false
 
-          // const clock = new Clock()
-          // const update = () => {
-          //   material.uniforms.uTime.value = clock.getElapsedTime()
-          // }
-
           o.push(mesh)
         }
       })
@@ -85,11 +80,6 @@ const fragmentShader = /* glsl */`
     vec3 p3 = fract(vec3(p.xyx) * 0.1031);
     p3 += dot(p3, p3.yzx + 33.33);
     return fract((p3.x + p3.y) * p3.z);
-  }
-  vec2 hash22(vec2 p){
-    float n = hash12(p);
-    float m = hash12(p + 19.19);
-    return vec2(n, m);
   }
 
   // -------------------- octahedral mapping --------------------
@@ -160,14 +150,12 @@ const fragmentShader = /* glsl */`
           float colorSeed   = hash12(cell + 113.0 + float(layer)*7.0);
           float sizeSeed    = hash12(cell + 91.0  + float(layer)*5.0);
 
-          vec2 r2 = hash22(cell + 7.0);
-          vec2 centerUV = (cell + r2) / scale;
+          vec2 centerUV = (cell) / scale;
           centerUV = (layer==0) ? (centerUV * rot(-0.32)) :
                     (layer==1) ? (centerUV * rot(-1.13)) :
                                   (centerUV * rot(-2.07));
 
           vec3 cDir = octaUnproject(fract(centerUV));
-          // if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
 
           float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
@@ -175,23 +163,6 @@ const fragmentShader = /* glsl */`
       }
     }
     return acc;
-  }
-
-  // -------------------- simple noise from hash12 --------------------
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    // corners
-    float a = hash12(i);
-    float b = hash12(i + vec2(1.0, 0.0));
-    float c = hash12(i + vec2(0.0, 1.0));
-    float d = hash12(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) +
-          (c - a) * u.y * (1.0 - u.x) +
-          (d - b) * u.x * u.y;
   }
 
   vec3 getSun(vec3 dir, vec3 sunDir) {
@@ -221,16 +192,6 @@ const fragmentShader = /* glsl */`
     vec2 u = f * f * (3.0 - 2.0 * f);
 
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-  }
-
-  float cloudNoise(vec2 p) {
-    float n = 0.0;
-
-    n += noise2(p * 1.0) * 0.6;
-    n += noise2(p * 2.0) * 0.3;
-    n += noise2(p * 4.0) * 0.1;
-
-    return n;
   }
 
   float fractal(float n) {
@@ -273,63 +234,19 @@ const fragmentShader = /* glsl */`
       return f;
   }
 
-  // ---------- aurora color ramp ----------
-  vec3 auroraPalette(float t) {
-    t = clamp(t, 0.0, 1.0);
-
-    // shift each channel differently to create green→pink→blue→purple
-    float r = 0.5 + 0.5 * sin(6.2831 * (t + 0.00));
-    float g = 0.5 + 0.5 * sin(6.2831 * (t + 0.33));
-    float b = 0.5 + 0.5 * sin(6.2831 * (t + 0.66));
-
-    vec3 c = vec3(r, g, b);
-
-    // bias toward aurora-like hues
-    c = pow(c, vec3(1.8, 1.2, 1.0)); // makes green/pink more pronounced
-
-    return c;
-}
-
-
-  vec3 getAurora(vec3 dir) {
-    float h = clamp(dir.y / 1.2, 0.0, 1.0);
+  vec3 getClouds(vec3 dir) {
+    float h = clamp(dir.y / 1.3, 0.0, 1.0);
 
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
-    float v = fbm(vec3(dir.x * 8.0, h * 20.0, dir.z * 2.0));
+    float v = fbm(vec3(
+      dir.x * 8.0 + uTime * 0.03, h * 20.0, dir.z * 2.0 + uTime * 0.05
+    ));
 
     float a = curtain * v;
-    a = pow(a, 1.0);
     a = clamp(a, 0.0, 1.0);
 
     return vec3(a * 30.0);
-  }
-
-
-  vec3 getClouds(vec3 dir) {
-    // no clouds below horizon
-    if (dir.y <= 0.0) return vec3(0.0);
-
-    // scale uv up
-    // vec2 p = uv * 3.0;
-    vec2 p = dir.xz * 3.0;
-    // p *= vec2(2.0, 1.0);
-
-    //  p += vec2(0.002, 0.005) * (uTime / 1000.0);
-
-    // vec2 p = vec2(atan(dir.x, dir.z), dir.y);  
-    // p *= 5.0;
-
-    // layered noise
-    // float n = cloudNoise(p);
-    float n = cloudNoise(p + (uTime / 10.0) * 0.3);
-
-    // soften into cloud shapes
-    float c = smoothstep(0.5, 0.75, n);
-
-    // fade near horizon
-    c *= pow(dir.y, 0.7);
-    return vec3(1.0) * c;
   }
 
   void main() {
@@ -353,7 +270,7 @@ const fragmentShader = /* glsl */`
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
-    vec3 clouds = getAurora(dir);
+    vec3 clouds = getClouds(dir);
 
     vec3 color = bg + sun;
     if (dir.y > 0.01) {
