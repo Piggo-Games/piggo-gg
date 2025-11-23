@@ -268,7 +268,6 @@ export const dayness = (tick: number, delta: number): number => {
   } else if (h >= 1 && h < 12) {
     result = 1
   }
-  // console.log("dayness:", result, "hour:", h)
   return result
 }
 
