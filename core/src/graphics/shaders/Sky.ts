@@ -14,7 +14,7 @@ export const Sky = () => {
           if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 2000
+            mat.uniforms.uTime.value += delta / 200
             mat.uniforms.uHour.value = hour(world.tick, delta)
           }
         },
@@ -241,7 +241,7 @@ const fragmentShader = /* glsl */`
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
     float v = fbm(vec3(
-      dir.x * 8.0 + uTime * 0.05, h * 20.0, dir.z * 2.0 + uTime * 0.05
+      dir.x * 8.0 + uTime * 0.01, h * 20.0, dir.z * 2.0 + uTime * 0.01
     ));
 
     float a = curtain * v;
