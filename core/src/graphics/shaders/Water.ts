@@ -1,4 +1,4 @@
-import { Entity, max, min, Position, Three } from "@piggo-gg/core"
+import { Entity, hourness, max, min, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
@@ -10,11 +10,12 @@ export const Water = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta, client }) => {
+        onRender: ({ delta, client, world }) => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
-            mat.uniforms._Time.value += delta / 1000
+            mat.uniforms.uTime.value += delta / 2000
+            mat.uniforms.uHour.value = hourness(world.tick, delta)
 
             const pc = client.character()
             if (!pc) return
@@ -64,24 +65,25 @@ export const Water = () => {
             lights: true,
             uniforms: {
               ...UniformsLib.lights,
-              _NormalMap1: { value: null },
-              _NormalMap2: { value: null },
-              _DirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
-              _Time: { value: 0 },
-              _Light: { value: new Vector3(0.5, 0.5, 0.5) }
+              uNormalMap1: { value: null },
+              uNormalMap2: { value: null },
+              uDirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
+              uTime: { value: 0 },
+              uHour: { value: 0 },
+              uLight: { value: new Vector3(0.5, 0.5, 0.5) }
             }
           })
 
           three.tLoader.loadAsync("waterNormal1.png").then((t) => {
             t.wrapS = RepeatWrapping
             t.wrapT = RepeatWrapping
-            surfaceMat.uniforms._NormalMap1.value = t
+            surfaceMat.uniforms.uNormalMap1.value = t
           })
 
           three.tLoader.loadAsync("waterNormal2.png").then((t) => {
             t.wrapS = RepeatWrapping
             t.wrapT = RepeatWrapping
-            surfaceMat.uniforms._NormalMap2.value = t
+            surfaceMat.uniforms.uNormalMap2.value = t
           })
 
           surface.material = surfaceMat;
@@ -270,10 +272,10 @@ export const surfaceFragment = /*glsl*/`
   varying vec2 _uv;
 
   const float NORMAL_MAP_SCALE = 0.01;
-  const float NORMAL_MAP_STRENGTH = 0.2;
+  const float NORMAL_MAP_STRENGTH = 1.0;
   const vec2 VELOCITY_1 = vec2(0.1, 0.0);
   const vec2 VELOCITY_2 = vec2(0.0, 0.1);
-  const float SPECULAR_SHARPNESS = 5.0;
+  const float SPECULAR_SHARPNESS = 3.0;
   const float MAX_VIEW_DEPTH = 100.0;
   const float DENSITY = 0.35;
   const float MAX_VIEW_DEPTH_DENSITY = MAX_VIEW_DEPTH * DENSITY;
@@ -281,12 +283,13 @@ export const surfaceFragment = /*glsl*/`
   const float CRITICAL_ANGLE = asin(1.0 / 1.33) / 1.5708;
   const float FOG_DISTANCE = 1000.0;
 
-  uniform float _Time;
-  uniform sampler2D _NormalMap1;
-  uniform sampler2D _NormalMap2;
-  uniform vec3 _Light;
+  uniform float uTime;
+  uniform float uHour;
+  uniform sampler2D uNormalMap1;
+  uniform sampler2D uNormalMap2;
+  uniform vec3 uLight;
 
-  uniform vec3 _DirToLight;
+  uniform vec3 uDirToLight;
 
   float pow2(float v) {
     return v * v;
@@ -297,8 +300,10 @@ export const surfaceFragment = /*glsl*/`
     float viewLen = length(viewVec) * 0.992;
     vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
 
-    vec3 normal = texture2D(_NormalMap1, _uv + VELOCITY_1 * _Time).xyz * 2.0 - 1.0;
-    normal += texture2D(_NormalMap2, _uv + VELOCITY_2 * _Time).xyz * 2.0 - 1.0;
+    float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
+
+    vec3 normal = texture2D(uNormalMap1, _uv + VELOCITY_1 * uTime).xyz * 2.0 - 1.0;
+    normal += texture2D(uNormalMap2, _uv + VELOCITY_2 * uTime).xyz * 2.0 - 1.0;
     normal *= NORMAL_MAP_STRENGTH;
     normal += vec3(0.0, 0.0, 1.0);
     normal = normalize(normal).xzy;
@@ -306,7 +311,7 @@ export const surfaceFragment = /*glsl*/`
     if (cameraPosition.y > 0.0) {
       float shadow = getShadowMask();
 
-      vec3 halfWayDir = normalize(_DirToLight - viewDir) + vec3(0.0, 0.24, 0.0);
+      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.34, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
       specular *= max(shadow, 0.4);
@@ -314,11 +319,17 @@ export const surfaceFragment = /*glsl*/`
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
       // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-      vec3 blue = vec3(0.46, 0.46, 1.0);
+      vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.6) * dayFactor;
       vec3 surface = reflectivity * blue;
 
-      surface += vec3(0.8, 0.4, 0.1) * specular * specular;
-      surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
+      vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), dayFactor);
+
+      surface += sunColor * specular * specular;
+      surface -= vec3(0.05) * specular * specular;
+
+      float dist = length(_worldPos - cameraPosition.xy);
+      float fog = smoothstep(5.0, 50.0, dist);
+      surface *= mix(1.0, 0.8, fog);
 
       vec4 final = vec4(surface, max(reflectivity, specular));
 
@@ -331,7 +342,7 @@ export const surfaceFragment = /*glsl*/`
     viewLen = min(viewLen, MAX_VIEW_DEPTH);
     float sampleY = originY + viewDir.y * viewLen;
     vec3 light = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-    light *= _Light;
+    light *= uLight;
 
     float reflectivity = pow2(1.0 - max(0.0, dot(viewDir, normal)));
     float t = clamp(max(reflectivity, viewLen / MAX_VIEW_DEPTH), 0.0, 1.0);
@@ -341,7 +352,7 @@ export const surfaceFragment = /*glsl*/`
         vec3 r = reflect(viewDir, -normal);
         sampleY = r.y * (MAX_VIEW_DEPTH - viewLen);
         vec3 rColor = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-        rColor *= _Light;
+        rColor *= uLight;
 
         gl_FragColor = vec4(mix(rColor, light, t), 1.0);
         return;

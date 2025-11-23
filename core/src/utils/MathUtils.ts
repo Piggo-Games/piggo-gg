@@ -253,6 +253,16 @@ export const vectorExtend = (vec: XYZ, amount: number): XYZ => {
   }
 }
 
+export const hourness = (tick: number, delta: number): number => {
+  const time = tick * 25 / 1000 + delta / 1000
+  return (time % 24)
+}
+
+export const dayness = (tick: number, delta: number): number => {
+  const h = hourness(tick, delta)
+  return minmax(sin(((h - 6) / 12) * PI), 0, 1)
+}
+
 export const rayCapsuleIntersect = (from: XYZ, dir: XYZ, capsule: Capsule): false | { sc: number, tc: number } => {
   const { A, B, radius } = capsule
 

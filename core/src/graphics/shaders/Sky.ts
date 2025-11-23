@@ -1,4 +1,4 @@
-import { Entity, Position, Three } from "@piggo-gg/core"
+import { Entity, hourness, Position, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
@@ -10,11 +10,12 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta }) => {
-          if (mesh) {
+        onRender: ({ delta, world }) => {
+          if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 1000
+            mat.uniforms.uTime.value += delta / 200
+            mat.uniforms.uHour.value = hourness(world.tick, delta)
           }
         },
         init: async (o, _, __, three) => {
@@ -23,11 +24,11 @@ export const Sky = () => {
           const material = new ShaderMaterial({
             uniforms: {
               uTime: { value: 0.0 },
+              uHour: { value: 0.0 },
               uDensity: { value: 0.0015 },
               uBrightness: { value: 0.9 },
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
-              uCloudSpeed: { value: 0.05 },
               uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
             vertexShader,
@@ -64,11 +65,11 @@ const fragmentShader = /* glsl */`
   precision highp float;
 
   uniform float uTime;
-  uniform float uDensity;     // 0..1
-  uniform float uBrightness;  // overall star brightness
+  uniform float uHour;
+  uniform float uDensity;
+  uniform float uBrightness;
   uniform vec3  uHorizon;
   uniform vec3  uZenith;
-  uniform float uCloudSpeed;
   uniform vec2  uResolution;
 
   varying vec3 vWorldPosition;
@@ -235,12 +236,12 @@ const fragmentShader = /* glsl */`
   }
 
   vec3 getClouds(vec3 dir) {
-    float h = clamp(dir.y / 1.3, 0.0, 1.0);
+    float h = clamp(dir.y / 1.1, 0.0, 1.0);
 
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
     float v = fbm(vec3(
-      dir.x * 8.0 + uTime * 0.03, h * 20.0, dir.z * 2.0 + uTime * 0.05
+      dir.x * 8.0 + uTime * 0.01, h * 20.0, dir.z * 2.0 + uTime * 0.01
     ));
 
     float a = curtain * v;
@@ -249,36 +250,67 @@ const fragmentShader = /* glsl */`
     return vec3(a * 30.0);
   }
 
+  mat3 rotateX(float a) {
+    float s = sin(a), c = cos(a);
+    return mat3(
+        1.0, 0.0, 0.0,
+        0.0,  c,  -s,
+        0.0,  s,   c
+    );
+  }
+
+  mat3 rotateY(float a) {
+      float s = sin(a), c = cos(a);
+      return mat3(
+          c, 0.0, s,
+          0.0, 1.0, 0.0,
+          -s, 0.0, c
+      );
+  }
+
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
+    float tilt = uTime * 0.002;
+    float tiltAngle = radians(50.5); 
+    mat3 rotMat  = rotateY(tilt);
+    mat3 tiltMat = rotateX(tiltAngle);
+    vec3 vdir = (rotMat * tiltMat) * dir;
+
+    if (cameraPosition.y < -0.1) {
+      gl_FragColor = vec4(0.0, 0.0, 0.2 + dir.y * 0.3, 1.0);
+      return;
+    }
+
     // Horizon → Zenith gradient
-    float t = smoothstep(-0.1, 0.9, dir.y);
-    vec3 bg = mix(uHorizon, uZenith, t);
+    float horizon = smoothstep(-0.1, 0.9, dir.y);
+    vec3 bg = mix(uHorizon, uZenith, horizon);
 
     // ---------------- day/night blending ----------------
     // Define "day" between 6h and 18h
-    float dayFactor = smoothstep(5.0, 8.0, uTime) * (1.0 - smoothstep(17.0, 20.0, uTime));
-    dayFactor = 0.0;
+    float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
 
-    vec3 daySky = vec3(0.5, 0.75, 1.0);
+    vec3 daySky = vec3(0.24, 0.6, 1.0);
 
     bg = mix(bg, daySky, dayFactor);
 
-    vec2 uv = octaProject(dir);
+    vec2 uv = octaProject(vdir);
 
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
+    float s = length(sun);
+
+    sun *= dayFactor;
+    sun += vec3(0.3, 0.3, 0.5) * s * (1.0 - dayFactor);
 
     vec3 clouds = getClouds(dir);
 
-    vec3 color = bg + sun;
+    vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
+
     if (dir.y > 0.01) {
-      vec3 stars = starLayers(dir, uv);
-      stars *= (1.0 - dayFactor);
+      vec3 stars = starLayers(vdir, uv);
+      stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
       color += stars;
-    } else {
-      color += vec3(0.0, 0.0, 0.1);
     }
 
     color += clouds;

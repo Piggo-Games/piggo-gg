@@ -1,5 +1,5 @@
-import { Bounds, colors, Entity, Position, Three } from "@piggo-gg/core"
-import { CameraHelper, DirectionalLight, HemisphereLight, Mesh, MeshPhysicalMaterial, Scene, SphereGeometry } from "three"
+import { Bounds, colors, dayness, Entity, lerp, Position, Three } from "@piggo-gg/core"
+import { DirectionalLight, HemisphereLight, Scene } from "three"
 
 export type SunProps = {
   bounds?: Bounds
@@ -15,8 +15,12 @@ export const Sun = (props: SunProps = {}) => {
     components: {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
-        onTick: ({ client }) => {
+        onTick: ({ client, world }) => {
           if (!light) return
+
+          const dayFactor = dayness(world.tick, 0)
+
+          light.color.set(lerp(colors.threeNight, colors.threeEvening, dayFactor))
 
           const pc = client.character()
           if (!pc) return
@@ -39,16 +43,7 @@ export const Sun = (props: SunProps = {}) => {
           light.shadow.camera.top = props.bounds?.top ?? 14
           light.shadow.camera.bottom = props.bounds?.bottom ?? -14
 
-          const sphere = new Mesh(
-            new SphereGeometry(8, 32, 32),
-            new MeshPhysicalMaterial({
-              emissive: colors.night,
-              emissiveIntensity: 1
-            })
-          )
-
           light.position.set(200, 100, 200)
-          sphere.position.set(200, 100, 200)
           if (props.pos) light.position.set(props.pos.x, props.pos.y, props.pos.z)
 
           const hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)

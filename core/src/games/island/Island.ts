@@ -84,7 +84,7 @@ const BuildSystem = SystemBuilder({
           if (!character) continue
 
           const { position } = character.components
-          const { velocity, standing, z, flying } = position.data
+          const { standing, z, flying } = position.data
 
           // fell off the map
           if (z < -5 && !flying) {
