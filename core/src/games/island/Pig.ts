@@ -8,7 +8,7 @@ export const Pig = () => {
   const pig = Entity<Position>({
     id: "pig",
     components: {
-      position: Position({ x: 10, y: 10, z: 2, gravity: 0.003 }),
+      position: Position({ x: 8, y: 5, z: 2, gravity: 0.003 }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       three: Three({
         onRender: ({ delta, world }) => {
@@ -24,10 +24,8 @@ export const Pig = () => {
             mesh = gltf.scene
             mesh.animations = gltf.animations
             mesh.frustumCulled = false
-            const scale = 0.04
+            const scale = 0.02
             mesh.scale.set(scale, scale, scale)
-
-            mesh.rotation.y = Math.PI / 2
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
