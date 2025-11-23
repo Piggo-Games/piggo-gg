@@ -25,7 +25,7 @@ export type CSS = Partial<{
   flexShrink: number
   float: "left" | "right" | "none"
   fontFamily: "Courier New" | "Arial"
-  fontSize: `${number}px` | `${number}vw` | `${number}vh`
+  fontSize: `${number}px` | `${number}vw` | `${number}vh` | `min(${string})` | `max(${string})`
   fontWeight: "normal" | "bold" | "bolder" | "lighter" | number
   gap: `${number}px` | `${number}%`
   height: "inherit" | `${number}px` | `${number}%` | "auto" | `${number}vh` | `${number}dvh` | "fit-content"
@@ -68,7 +68,8 @@ export type CSS = Partial<{
   userSelect: "none" | "auto" | "text" | "all"
   visibility: "visible" | "hidden"
   whiteSpace: "normal" | "nowrap" | "pre" | "pre-wrap" | "pre-line"
-  width: `${number}px` | `${number}%` | "auto" | "inherit" | "fit-content" | `calc(${string})` | `${number}dvw` | `${number}vw` | `${number}vh`
+  width: `${number}px` | `${number}%` | "auto" | "inherit" | "fit-content" |
+         `calc(${string})` | `${number}dvw` | `${number}vw` | `${number}vh` | `min(${string})`
   wordBreak: "normal" | "break-word" | "break-all"
   zIndex: number
 }>

@@ -1,8 +1,8 @@
 import {
-  Actions, Background, Build, Entity, GameBuilder, getBrowser, HButton,
-  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
-  NPC, piggoVersion, pixiGraphics, PixiRenderSystem, pixiText,
-  Position, RefreshableDiv, Renderable, Strike, styleButton, Volley, World
+  Actions, Background, Build, Entity, GameBuilder, getBrowser,
+  HButton, HImg, HText, HtmlDiv, HtmlLagText, HtmlText,
+  LobbiesMenu, Networked, NPC, piggoVersion, PixiRenderSystem,
+  RefreshableDiv, Strike, styleButton, Volley, World
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -23,8 +23,6 @@ export const Lobby: GameBuilder<LobbyState> = {
       Background({ moving: true, rays: true }),
       GameLobby(),
       HtmlLagText()
-
-      // SignupCTA()
     ],
     netcode: "delay"
   })
@@ -107,7 +105,7 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "6vw",
+      width: "min(6vw, 100px)",
       borderRadius: "8px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
@@ -146,7 +144,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "13.4vw", aspectRatio: "20 / 17",
+        top: "16px", left: "16px", width: "min(13.4vw, 200px)", aspectRatio: "20 / 17",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -168,45 +166,12 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "2vw", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
+          fontSize: "min(2vw, 28px)", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
         }
       })
     )
   }
 }
-
-const SignupCTA = () => Entity<Position | Renderable>({
-  id: "signupCTA",
-  components: {
-    position: Position({ x: 0, y: 0, screenFixed: true }),
-    renderable: Renderable({
-      zIndex: 10,
-      interactiveChildren: true,
-      visible: false,
-      onTick: ({ world, renderable }) => {
-        if (!world.client) return
-        renderable.visible = !world.client.token
-      },
-      setup: async (r) => {
-        const text = pixiText({
-          text: "^\nSign In for\na cool skin!",
-          anchor: { x: 0.5, y: 0.9 },
-          style: { align: "center", fontSize: 18, fontWeight: "bold" },
-          pos: { x: 90, y: 65 }
-        })
-
-        const outline = pixiGraphics()
-          .roundRect(10, 10, 160, 70, 10)
-          .fill({ color: 0x000000, alpha: 0.9 })
-          .stroke({ color: 0x00ffff, alpha: 1, width: 2 })
-
-        r.c.addChild(outline, text)
-
-        r.setBevel({ rotation: 90, lightAlpha: 0.8, shadowAlpha: 0.4 })
-      }
-    })
-  }
-})
 
 const Version = () => HtmlText({
   text: `v${piggoVersion}`,
