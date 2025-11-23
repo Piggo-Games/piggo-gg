@@ -6,6 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
+import { MobileUI } from "../craft/MobileUI"
 
 export type IslandSettings = {
   showCrosshair: boolean
@@ -64,6 +65,8 @@ const IslandSystem = SystemBuilder({
   init: (world) => {
 
     spawnFlat(world, 11)
+    
+    const mobileUI = MobileUI(world)
 
     return {
       id: "IslandSystem",
@@ -76,6 +79,8 @@ const IslandSystem = SystemBuilder({
         if (world.client && !world.client.mobile) {
           world.client.menu = document.pointerLockElement === null
         }
+
+        mobileUI?.update()
 
         const players = world.players()
 
