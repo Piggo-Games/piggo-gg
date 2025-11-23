@@ -1,6 +1,6 @@
 import {
   Actions, Character, ClientSystemBuilder, Entity, Input, World,
-  XY, cos, isTypingEvent, max, min, round, screenWH, sin
+  XY, cos, isMobile, isTypingEvent, max, min, round, screenWH, sin
 } from "@piggo-gg/core"
 
 // handles keyboard/mouse/joystick inputs
@@ -69,13 +69,19 @@ export const InputSystem = ClientSystemBuilder({
       const target = event.target?.tagName
       if (!["CANVAS", "BODY"].includes(target)) return
 
-      const key = event.button === 0 ? "mb1" : "mb2"
+      let key = event.button === 0 ? "mb1" : "mb2"
+
+      // mobile mb2
+      if (world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
 
       client.bufferDown.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: performance.now() - world.time })
     })
 
     document.addEventListener("pointerup", (event) => {
-      const key = event.button === 0 ? "mb1" : "mb2"
+      let key = event.button === 0 ? "mb1" : "mb2"
+
+      // mobile mb2
+      if (world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
 
       if (key === "mb1") {
         const pc = client.character()
