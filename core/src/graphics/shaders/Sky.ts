@@ -1,5 +1,5 @@
 import { Entity, Position, Three } from "@piggo-gg/core"
-import { Clock, Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
+import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
 
@@ -27,7 +27,6 @@ export const Sky = () => {
               uBrightness: { value: 0.9 },
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
-              uCloudDensity: { value: 0.9 },
               uCloudSpeed: { value: 0.05 },
               uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
@@ -42,11 +41,6 @@ export const Sky = () => {
 
           mesh = new Mesh(geo, material)
           mesh.frustumCulled = false
-
-          // const clock = new Clock()
-          // const update = () => {
-          //   material.uniforms.uTime.value = clock.getElapsedTime()
-          // }
 
           o.push(mesh)
         }
@@ -74,7 +68,6 @@ const fragmentShader = /* glsl */`
   uniform float uBrightness;  // overall star brightness
   uniform vec3  uHorizon;
   uniform vec3  uZenith;
-  uniform float uCloudDensity;
   uniform float uCloudSpeed;
   uniform vec2  uResolution;
 
@@ -87,11 +80,6 @@ const fragmentShader = /* glsl */`
     vec3 p3 = fract(vec3(p.xyx) * 0.1031);
     p3 += dot(p3, p3.yzx + 33.33);
     return fract((p3.x + p3.y) * p3.z);
-  }
-  vec2 hash22(vec2 p){
-    float n = hash12(p);
-    float m = hash12(p + 19.19);
-    return vec2(n, m);
   }
 
   // -------------------- octahedral mapping --------------------
@@ -162,14 +150,12 @@ const fragmentShader = /* glsl */`
           float colorSeed   = hash12(cell + 113.0 + float(layer)*7.0);
           float sizeSeed    = hash12(cell + 91.0  + float(layer)*5.0);
 
-          vec2 r2 = hash22(cell + 7.0);
-          vec2 centerUV = (cell + r2) / scale;
+          vec2 centerUV = (cell) / scale;
           centerUV = (layer==0) ? (centerUV * rot(-0.32)) :
                     (layer==1) ? (centerUV * rot(-1.13)) :
                                   (centerUV * rot(-2.07));
 
           vec3 cDir = octaUnproject(fract(centerUV));
-          // if (dot(cDir, vec3(0.0, 1.0, 0.0)) <= 0.0) continue;
 
           float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
@@ -177,23 +163,6 @@ const fragmentShader = /* glsl */`
       }
     }
     return acc;
-  }
-
-  // -------------------- simple noise from hash12 --------------------
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    // corners
-    float a = hash12(i);
-    float b = hash12(i + vec2(1.0, 0.0));
-    float c = hash12(i + vec2(0.0, 1.0));
-    float d = hash12(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(a, b, u.x) +
-          (c - a) * u.y * (1.0 - u.x) +
-          (d - b) * u.x * u.y;
   }
 
   vec3 getSun(vec3 dir, vec3 sunDir) {
@@ -211,7 +180,7 @@ const fragmentShader = /* glsl */`
     return fract(p.x * p.y * (p.x + p.y));
   }
 
-float noise2(vec2 p) {
+  float noise2(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
 
@@ -225,42 +194,59 @@ float noise2(vec2 p) {
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
   }
 
-  float cloudNoise(vec2 p) {
-    float n = 0.0;
+  float fractal(float n) {
+    return fract(sin(n) * 43758.5453123);
+  }
 
-    n += noise2(p * 1.0) * 0.6;
-    n += noise2(p * 2.0) * 0.3;
-    n += noise2(p * 4.0) * 0.1;
+  float noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
 
-    return n;
+    f = f*f*(3.0 - 2.0*f);
+
+    float n = dot(i, vec3(1.0, 57.0, 113.0));
+
+    return mix(
+        mix(
+            mix(fractal(n + 0.0),   fractal(n + 1.0),   f.x),
+            mix(fractal(n + 57.0),  fractal(n + 58.0),  f.x),
+            f.y
+        ),
+        mix(
+            mix(fractal(n + 113.0), fractal(n + 114.0), f.x),
+            mix(fractal(n + 170.0), fractal(n + 171.0), f.x),
+            f.y
+        ),
+        f.z
+    );
+  }
+
+  float fbm(vec3 p) {
+      float f = 0.0;
+      float a = 0.5;
+
+      for (int i = 0; i < 5; i++) {
+          f += a * noise(p);
+          p = p * 2.0 + vec3(13.1, 7.2, 5.3);
+          a *= 0.5;
+      }
+
+      return f;
   }
 
   vec3 getClouds(vec3 dir) {
-    // no clouds below horizon
-    if (dir.y <= 0.0) return vec3(0.0);
+    float h = clamp(dir.y / 1.3, 0.0, 1.0);
 
-    // scale uv up
-    // vec2 p = uv * 3.0;
-    vec2 p = dir.xz * 3.0;
-    // p *= vec2(2.0, 1.0);
+    float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
-    //  p += vec2(0.002, 0.005) * (uTime / 1000.0);
+    float v = fbm(vec3(
+      dir.x * 8.0 + uTime * 0.03, h * 20.0, dir.z * 2.0 + uTime * 0.05
+    ));
 
-    // vec2 p = vec2(atan(dir.x, dir.z), dir.y);  
-    // p *= 5.0;
+    float a = curtain * v;
+    a = clamp(a, 0.0, 1.0);
 
-    // layered noise
-    // float n = cloudNoise(p);
-    float n = cloudNoise(p + (uTime / 10.0) * 0.3);
-
-    // soften into cloud shapes
-    float c = smoothstep(0.5, 0.75, n);
-
-    // fade near horizon
-    c *= pow(dir.y, 0.7);
-
-    // cloud color
-    return vec3(c);
+    return vec3(a * 30.0);
   }
 
   void main() {
@@ -295,7 +281,7 @@ float noise2(vec2 p) {
       color += vec3(0.0, 0.0, 0.1);
     }
 
-    color += clouds * uCloudDensity;
+    color += clouds;
 
     gl_FragColor = vec4(color, 1.0);
   }
