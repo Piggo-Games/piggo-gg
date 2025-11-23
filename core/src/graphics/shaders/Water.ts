@@ -14,7 +14,7 @@ export const Water = () => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
-            mat.uniforms._Time.value += delta / 1000
+            mat.uniforms._Time.value += delta / 2000
 
             const pc = client.character()
             if (!pc) return
@@ -270,7 +270,7 @@ export const surfaceFragment = /*glsl*/`
   varying vec2 _uv;
 
   const float NORMAL_MAP_SCALE = 0.01;
-  const float NORMAL_MAP_STRENGTH = 0.2;
+  const float NORMAL_MAP_STRENGTH = 0.9;
   const vec2 VELOCITY_1 = vec2(0.1, 0.0);
   const vec2 VELOCITY_2 = vec2(0.0, 0.1);
   const float SPECULAR_SHARPNESS = 5.0;
