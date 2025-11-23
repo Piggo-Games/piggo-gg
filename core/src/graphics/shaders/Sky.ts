@@ -294,18 +294,14 @@ const fragmentShader = /* glsl */`
   vec3 getAurora(vec3 dir) {
     float h = clamp(dir.y / 1.2, 0.0, 1.0);
 
-    // Much brighter base curtain
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
-    // Vertical streaks
     float v = fbm(vec3(dir.x * 8.0, h * 20.0, dir.z * 2.0));
 
-    // Softer shaping so it stays bright
     float a = curtain * v;
-    a = pow(a, 1.0);               // was 1.5 (too dark)
+    a = pow(a, 1.0);
     a = clamp(a, 0.0, 1.0);
 
-    // Global brightness lift
     return vec3(a * 30.0);
   }
 
