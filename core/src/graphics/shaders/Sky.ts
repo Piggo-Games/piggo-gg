@@ -271,7 +271,7 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    float tilt = (uHour / 24.0) * 2.0 * PI / 24.0;
+    float tilt = uTime * 0.002;
     float tiltAngle = radians(50.5); 
     mat3 rotMat  = rotateY(tilt);
     mat3 tiltMat = rotateX(tiltAngle);
