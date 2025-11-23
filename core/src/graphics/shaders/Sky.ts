@@ -236,7 +236,7 @@ const fragmentShader = /* glsl */`
   }
 
   vec3 getClouds(vec3 dir) {
-    float h = clamp(dir.y / 1.3, 0.0, 1.0);
+    float h = clamp(dir.y / 1.1, 0.0, 1.0);
 
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
@@ -271,7 +271,7 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    float tilt = (uHour / 24.0) * 2.0 * PI / 12.0;
+    float tilt = (uHour / 24.0) * 2.0 * PI / 24.0;
     float tiltAngle = radians(50.5); 
     mat3 rotMat  = rotateY(tilt);
     mat3 tiltMat = rotateX(tiltAngle);
