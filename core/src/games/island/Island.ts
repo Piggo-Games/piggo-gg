@@ -6,19 +6,20 @@ import {
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
+import { MobileUI } from "../craft/MobileUI"
 
-export type BuildSettings = {
+export type IslandSettings = {
   showCrosshair: boolean
   showControls: boolean
   showNametags: boolean
   blockColor: BlockColor
 }
 
-export type BuildState = {
+export type IslandState = {
   doubleJumped: string[]
 }
 
-export const Build: GameBuilder<BuildState, BuildSettings> = {
+export const Island: GameBuilder<IslandState, IslandSettings> = {
   id: "island",
   init: (world) => ({
     id: "island",
@@ -39,7 +40,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       HUDSystem(controls),
-      BuildSystem,
+      IslandSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
@@ -59,23 +60,27 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
   })
 }
 
-const BuildSystem = SystemBuilder({
-  id: "BuildSystem",
+const IslandSystem = SystemBuilder({
+  id: "IslandSystem",
   init: (world) => {
 
     spawnFlat(world, 11)
+    
+    const mobileUI = MobileUI(world)
 
     return {
-      id: "BuildSystem",
+      id: "IslandSystem",
       query: [],
       priority: 3,
       onTick: () => {
 
-        const state = world.game.state as BuildState
+        const state = world.game.state as IslandState
 
         if (world.client && !world.client.mobile) {
           world.client.menu = document.pointerLockElement === null
         }
+
+        mobileUI?.update()
 
         const players = world.players()
 

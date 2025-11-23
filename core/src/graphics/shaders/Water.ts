@@ -1,4 +1,4 @@
-import { Entity, hourness, max, min, Position, Three } from "@piggo-gg/core"
+import { dayness, Entity, max, min, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
@@ -15,7 +15,7 @@ export const Water = () => {
             const mat = surface.material as ShaderMaterial
 
             mat.uniforms.uTime.value += delta / 2000
-            mat.uniforms.uHour.value = hourness(world.tick, delta)
+            mat.uniforms.uDay.value = dayness(world.tick, delta)
 
             const pc = client.character()
             if (!pc) return
@@ -69,7 +69,7 @@ export const Water = () => {
               uNormalMap2: { value: null },
               uDirToLight: { value: new Vector3(1.0, 0.0, 1.0).normalize() },
               uTime: { value: 0 },
-              uHour: { value: 0 },
+              uDay: { value: 0 },
               uLight: { value: new Vector3(0.5, 0.5, 0.5) }
             }
           })
@@ -284,7 +284,7 @@ export const surfaceFragment = /*glsl*/`
   const float FOG_DISTANCE = 1000.0;
 
   uniform float uTime;
-  uniform float uHour;
+  uniform float uDay;
   uniform sampler2D uNormalMap1;
   uniform sampler2D uNormalMap2;
   uniform vec3 uLight;
@@ -299,8 +299,6 @@ export const surfaceFragment = /*glsl*/`
     vec3 viewVec = vec3(_worldPos.x, 0.0, _worldPos.y) - cameraPosition;
     float viewLen = length(viewVec) * 0.992;
     vec3 viewDir = viewVec / viewLen + vec3(0.0, -0.08, 0.0);
-
-    float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
 
     vec3 normal = texture2D(uNormalMap1, _uv + VELOCITY_1 * uTime).xyz * 2.0 - 1.0;
     normal += texture2D(uNormalMap2, _uv + VELOCITY_2 * uTime).xyz * 2.0 - 1.0;
@@ -319,10 +317,10 @@ export const surfaceFragment = /*glsl*/`
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
       // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-      vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.6) * dayFactor;
+      vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.6) * uDay;
       vec3 surface = reflectivity * blue;
 
-      vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), dayFactor);
+      vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), uDay);
 
       surface += sunColor * specular * specular;
       surface -= vec3(0.05) * specular * specular;

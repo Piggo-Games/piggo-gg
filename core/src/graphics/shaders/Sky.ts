@@ -1,4 +1,4 @@
-import { Entity, hourness, Position, Three } from "@piggo-gg/core"
+import { dayness, Entity, Position, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
@@ -15,7 +15,7 @@ export const Sky = () => {
             const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value += delta / 200
-            mat.uniforms.uHour.value = hourness(world.tick, delta)
+            mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },
         init: async (o, _, __, three) => {
@@ -24,7 +24,7 @@ export const Sky = () => {
           const material = new ShaderMaterial({
             uniforms: {
               uTime: { value: 0.0 },
-              uHour: { value: 0.0 },
+              uDay: { value: 0.0 },
               uDensity: { value: 0.0015 },
               uBrightness: { value: 0.9 },
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
@@ -65,7 +65,7 @@ const fragmentShader = /* glsl */`
   precision highp float;
 
   uniform float uTime;
-  uniform float uHour;
+  uniform float uDay;
   uniform float uDensity;
   uniform float uBrightness;
   uniform vec3  uHorizon;
@@ -286,9 +286,7 @@ const fragmentShader = /* glsl */`
     float horizon = smoothstep(-0.1, 0.9, dir.y);
     vec3 bg = mix(uHorizon, uZenith, horizon);
 
-    // ---------------- day/night blending ----------------
-    // Define "day" between 6h and 18h
-    float dayFactor = smoothstep(5.0, 8.0, uHour) * (1.0 - smoothstep(17.0, 20.0, uHour));
+    float dayFactor = uDay;
 
     vec3 daySky = vec3(0.24, 0.6, 1.0);
 
