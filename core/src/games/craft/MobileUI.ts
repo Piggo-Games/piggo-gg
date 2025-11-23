@@ -97,9 +97,10 @@ export const MobileUI = (world: World): MobileUI => {
 
       const { flying } = world.client.character()?.components.position.data ?? {}
 
-      jumpButton.style.visibility = (flying || world.client?.menu) ? "hidden" : "visible"
+      let hidden = (flying || world.client?.menu) || (world.settings<{ showControls: boolean }>().showControls === false)
 
-      const visibility = world.client!.menu ? "hidden" : "visible"
+      const visibility = hidden ? "hidden" : "visible"
+      jumpButton.style.visibility = visibility // was disable while flying
       povButton.style.visibility = visibility
       transformButton.style.visibility = visibility
       leftJoystick.style.visibility = visibility
