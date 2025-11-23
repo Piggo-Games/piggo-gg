@@ -137,44 +137,17 @@ export const surfaceFragment = /*glsl*/`
 
   // SHADOWMAP_PARS_FRAGMENT
 
-
   struct DirectionalLightShadow{
-  float shadowIntensity;
-  float shadowBias;
-  float shadowNormalBias;
-  float shadowRadius;
-  vec2 shadowMapSize;
+    float shadowIntensity;
+    float shadowBias;
+    float shadowNormalBias;
+    float shadowRadius;
+    vec2 shadowMapSize;
   };
-
 
   uniform DirectionalLightShadow directionalLightShadows[NUM_DIR_LIGHT_SHADOWS];
   uniform sampler2D directionalShadowMap[NUM_DIR_LIGHT_SHADOWS];
   varying vec4 vDirectionalShadowCoord[NUM_DIR_LIGHT_SHADOWS];
-
-  // float texture2DCompare(sampler2D depths,vec2 uv,float compare){
-  //   return step(compare,unpackRGBAToDepth(texture2D(depths,uv)));
-  // }
-
-  // float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
-  //   float s = 0.0;
-  //   float w = 0.0;
-
-  //   float t = 1.0 / 4096.0;
-
-  //   for (int x = -2; x <= 2; x++) {
-  //     for (int y = -2; y <= 2; y++) {
-  //       float weight = 3.0 - length(vec2(x, y));
-  //       if (weight > 0.0) {
-  //         vec2 offset = vec2(x, y) * t;
-  //         float depth = unpackRGBAToDepth(texture2D(depths, uv + offset));
-  //         s += step(compare, depth) * weight;
-  //         w += weight;
-  //       }
-  //     }
-  //   }
-
-  //   return s / w;
-  // }
 
   float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
 
@@ -182,11 +155,8 @@ export const surfaceFragment = /*glsl*/`
 
     const int dist = 2;
 
-    // 45° rotation matrix (breaks grid-aligned artifacts)
-    mat2 rot = mat2(
-        0.7071, -0.7071,
-        0.7071,  0.7071
-    );
+    // 45° rotation (texture-aligned)
+    mat2 rot = mat2(0.7071, -0.7071, 0.7071,  0.7071);
 
     float result = 0.0;
     float count = 0.0;
@@ -349,7 +319,6 @@ export const surfaceFragment = /*glsl*/`
 
       surface += vec3(0.8, 0.4, 0.1) * specular * specular;
       surface -= vec3(0.0, 0.0, 0.1) * specular * specular;
-      // surface = min(surface, 0.8);
 
       vec4 final = vec4(surface, max(reflectivity, specular));
 
