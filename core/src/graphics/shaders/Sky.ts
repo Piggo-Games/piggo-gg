@@ -1,4 +1,4 @@
-import { Entity, hour, Position, Three } from "@piggo-gg/core"
+import { Entity, hourness, Position, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
@@ -15,7 +15,7 @@ export const Sky = () => {
             const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value += delta / 200
-            mat.uniforms.uHour.value = hour(world.tick, delta)
+            mat.uniforms.uHour.value = hourness(world.tick, delta)
           }
         },
         init: async (o, _, __, three) => {

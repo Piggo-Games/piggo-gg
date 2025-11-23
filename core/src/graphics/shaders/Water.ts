@@ -1,4 +1,4 @@
-import { Entity, hour, max, min, Position, Three } from "@piggo-gg/core"
+import { Entity, hourness, max, min, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
@@ -15,7 +15,7 @@ export const Water = () => {
             const mat = surface.material as ShaderMaterial
 
             mat.uniforms.uTime.value += delta / 2000
-            mat.uniforms.uHour.value = hour(world.tick, delta)
+            mat.uniforms.uHour.value = hourness(world.tick, delta)
 
             const pc = client.character()
             if (!pc) return
