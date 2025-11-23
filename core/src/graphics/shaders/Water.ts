@@ -162,14 +162,13 @@ export const surfaceFragment = /*glsl*/`
     float count = 0.0;
 
     for (int x = -dist; x <= dist; x++) {
-        for (int y = -dist; y <= dist; y++) {
+      for (int y = -dist; y <= dist; y++) {
+        vec2 offset = rot * vec2(x, y) * texelSize;
 
-            vec2 offset = rot * vec2(x, y) * texelSize;
-
-            float depth = unpackRGBAToDepth(texture2D(depths, uv + offset));
-            result += step(compare, depth);
-            count += 1.0;
-        }
+        float depth = unpackRGBAToDepth(texture2D(depths, uv + offset));
+        result += step(compare, depth);
+        count += 1.0;
+      }
     }
 
     return result / count;

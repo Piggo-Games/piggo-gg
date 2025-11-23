@@ -27,7 +27,6 @@ export const Sky = () => {
               uBrightness: { value: 0.9 },
               uHorizon: { value: new Color(0x000044).toArray().slice(0, 3) },
               uZenith: { value: new Color(0x000000).toArray().slice(0, 3) },
-              uCloudDensity: { value: 0.9 },
               uCloudSpeed: { value: 0.05 },
               uResolution: { value: { x: three.canvas?.width, y: three.canvas?.height } }
             },
@@ -74,7 +73,6 @@ const fragmentShader = /* glsl */`
   uniform float uBrightness;  // overall star brightness
   uniform vec3  uHorizon;
   uniform vec3  uZenith;
-  uniform float uCloudDensity;
   uniform float uCloudSpeed;
   uniform vec2  uResolution;
 
@@ -211,7 +209,7 @@ const fragmentShader = /* glsl */`
     return fract(p.x * p.y * (p.x + p.y));
   }
 
-float noise2(vec2 p) {
+  float noise2(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
 
@@ -234,6 +232,83 @@ float noise2(vec2 p) {
 
     return n;
   }
+
+  float fractal(float n) {
+    return fract(sin(n) * 43758.5453123);
+  }
+
+  float noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+
+    f = f*f*(3.0 - 2.0*f);
+
+    float n = dot(i, vec3(1.0, 57.0, 113.0));
+
+    return mix(
+        mix(
+            mix(fractal(n + 0.0),   fractal(n + 1.0),   f.x),
+            mix(fractal(n + 57.0),  fractal(n + 58.0),  f.x),
+            f.y
+        ),
+        mix(
+            mix(fractal(n + 113.0), fractal(n + 114.0), f.x),
+            mix(fractal(n + 170.0), fractal(n + 171.0), f.x),
+            f.y
+        ),
+        f.z
+    );
+  }
+
+  float fbm(vec3 p) {
+      float f = 0.0;
+      float a = 0.5;
+
+      for (int i = 0; i < 5; i++) {
+          f += a * noise(p);
+          p = p * 2.0 + vec3(13.1, 7.2, 5.3);
+          a *= 0.5;
+      }
+
+      return f;
+  }
+
+  // ---------- aurora color ramp ----------
+  vec3 auroraPalette(float t) {
+    t = clamp(t, 0.0, 1.0);
+
+    // shift each channel differently to create green→pink→blue→purple
+    float r = 0.5 + 0.5 * sin(6.2831 * (t + 0.00));
+    float g = 0.5 + 0.5 * sin(6.2831 * (t + 0.33));
+    float b = 0.5 + 0.5 * sin(6.2831 * (t + 0.66));
+
+    vec3 c = vec3(r, g, b);
+
+    // bias toward aurora-like hues
+    c = pow(c, vec3(1.8, 1.2, 1.0)); // makes green/pink more pronounced
+
+    return c;
+}
+
+
+  vec3 getAurora(vec3 dir) {
+    float h = clamp(dir.y / 1.2, 0.0, 1.0);
+
+    // Much brighter base curtain
+    float curtain = pow(h, 1.2) * exp(-h * 20.0);
+
+    // Vertical streaks
+    float v = fbm(vec3(dir.x * 8.0, h * 20.0, dir.z * 2.0));
+
+    // Softer shaping so it stays bright
+    float a = curtain * v;
+    a = pow(a, 1.0);               // was 1.5 (too dark)
+    a = clamp(a, 0.0, 1.0);
+
+    // Global brightness lift
+    return vec3(a * 30.0);
+  }
+
 
   vec3 getClouds(vec3 dir) {
     // no clouds below horizon
@@ -258,9 +333,7 @@ float noise2(vec2 p) {
 
     // fade near horizon
     c *= pow(dir.y, 0.7);
-
-    // cloud color
-    return vec3(c);
+    return vec3(1.0) * c;
   }
 
   void main() {
@@ -284,7 +357,7 @@ float noise2(vec2 p) {
     vec3 sunDir = normalize(vWorldPosition - cameraPosition + vec3(0.0, 150, 0.0));
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
 
-    vec3 clouds = getClouds(dir);
+    vec3 clouds = getAurora(dir);
 
     vec3 color = bg + sun;
     if (dir.y > 0.01) {
@@ -295,7 +368,7 @@ float noise2(vec2 p) {
       color += vec3(0.0, 0.0, 0.1);
     }
 
-    color += clouds * uCloudDensity;
+    color += clouds;
 
     gl_FragColor = vec4(color, 1.0);
   }
