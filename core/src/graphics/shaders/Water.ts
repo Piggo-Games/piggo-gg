@@ -320,7 +320,7 @@ export const surfaceFragment = /*glsl*/`
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
       // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-      vec3 blue = vec3(0.28, 0.28, 0.6) + vec3(0.34, 0.34, 0.4) * dayFactor;
+      vec3 blue = vec3(0.28, 0.28, 0.56) + vec3(0.1, 0.1, 0.2) * dayFactor;
       vec3 surface = reflectivity * blue;
 
       surface += vec3(0.8, 0.4, 0.1) * specular * specular;
