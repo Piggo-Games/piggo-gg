@@ -53,8 +53,8 @@ export const Sun = (props: SunProps = {}) => {
 
           const hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)
 
-          const helper = new CameraHelper(light.shadow.camera)
-          o.push(helper)
+          // const helper = new CameraHelper(light.shadow.camera)
+          // o.push(helper)
 
           o.push(light, hemi)
         }
