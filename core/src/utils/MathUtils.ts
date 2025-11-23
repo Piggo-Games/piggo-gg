@@ -254,13 +254,22 @@ export const vectorExtend = (vec: XYZ, amount: number): XYZ => {
 }
 
 export const hourness = (tick: number, delta: number): number => {
-  const time = tick * 25 / 1000 + delta / 1000
+  const time = tick / 20 + delta / 25 / 20
   return (time % 24)
 }
 
 export const dayness = (tick: number, delta: number): number => {
   const h = hourness(tick, delta)
-  return minmax(sin(((h - 6) / 12) * PI), 0, 1)
+  let result = 0
+  if (h >= 0 && h < 3) {
+    result = h / 3
+  } else if (h >= 12 && h < 15) {
+    result = 1 - (h - 12) / 3
+  } else if (h >= 1 && h < 12) {
+    result = 1
+  }
+  // console.log("dayness:", result, "hour:", h)
+  return result
 }
 
 export const rayCapsuleIntersect = (from: XYZ, dir: XYZ, capsule: Capsule): false | { sc: number, tc: number } => {
