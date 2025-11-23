@@ -252,6 +252,11 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
+    if (cameraPosition.y < -0.1) {
+      gl_FragColor = vec4(0.0, 0.0, 0.2 + dir.y * 0.3, 1.0);
+      return;
+    }
+
     // Horizon → Zenith gradient
     float t = smoothstep(-0.1, 0.9, dir.y);
     vec3 bg = mix(uHorizon, uZenith, t);
@@ -277,8 +282,6 @@ const fragmentShader = /* glsl */`
       vec3 stars = starLayers(dir, uv);
       stars *= (1.0 - dayFactor);
       color += stars;
-    } else {
-      color += vec3(0.0, 0.0, 0.1);
     }
 
     color += clouds;
