@@ -270,7 +270,7 @@ export const surfaceFragment = /*glsl*/`
   varying vec2 _uv;
 
   const float NORMAL_MAP_SCALE = 0.01;
-  const float NORMAL_MAP_STRENGTH = 0.9;
+  const float NORMAL_MAP_STRENGTH = 1.0;
   const vec2 VELOCITY_1 = vec2(0.1, 0.0);
   const vec2 VELOCITY_2 = vec2(0.0, 0.1);
   const float SPECULAR_SHARPNESS = 5.0;
