@@ -51,7 +51,7 @@ export const ThreeRenderer = (): ThreeRenderer => {
       renderer.ready = false
     },
     activate: (world: World) => {
-      if (renderer.ready) return      
+      if (renderer.ready) return
       renderer.ready = true
 
       renderer.canvas = replaceCanvas()
@@ -60,8 +60,7 @@ export const ThreeRenderer = (): ThreeRenderer => {
         antialias: true,
         canvas: renderer.canvas,
         powerPreference: "high-performance",
-        precision: "highp",
-        // logarithmicDepthBuffer: true
+        precision: "highp"
       })
 
       webgl.setPixelRatio(window.devicePixelRatio)
