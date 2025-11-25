@@ -110,7 +110,7 @@ export const Carl = (player: Player): Character => {
             // })
           }
         },
-        init: async (o, entity, world, three) => {
+        init: async ({ o, world, three }) => {
           three.gLoader.load("cowboy.glb", (gltf) => {
 
             pig = cloneSkeleton(gltf.scene)

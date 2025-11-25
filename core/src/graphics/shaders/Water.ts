@@ -34,7 +34,7 @@ export const Water = () => {
             }
           }
         },
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
           surface = new Mesh()
 
           const halfSize = 1500
@@ -152,14 +152,18 @@ export const surfaceFragment = /*glsl*/`
   uniform sampler2D directionalShadowMap[NUM_DIR_LIGHT_SHADOWS];
   varying vec4 vDirectionalShadowCoord[NUM_DIR_LIGHT_SHADOWS];
 
+  float rand(vec2 co) {
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+  }
+
+
   float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
+    float texelSize = 1.0 / 4096.0 / 2.0;
 
-    float texelSize = 1.0 / 4096.0;
+    const int dist = 1;
 
-    const int dist = 2;
-
-    // 45° rotation (texture-aligned)
-    mat2 rot = mat2(0.7071, -0.7071, 0.7071,  0.7071);
+    float angle = rand(uv * 4096.0 * 2.0) * 6.283185;
+    mat2 rot = mat2(cos(angle), -sin(angle), sin(angle),  cos(angle));
 
     float result = 0.0;
     float count = 0.0;
@@ -309,7 +313,7 @@ export const surfaceFragment = /*glsl*/`
     if (cameraPosition.y > 0.0) {
       float shadow = getShadowMask();
 
-      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.34, 0.0);
+      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.32 - cameraPosition.y * 0.014, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
       specular *= max(shadow, 0.4);
@@ -323,7 +327,7 @@ export const surfaceFragment = /*glsl*/`
       vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), uDay);
 
       surface += sunColor * specular * specular;
-      surface -= vec3(0.05) * specular * specular;
+      surface -= vec3(0.07) * specular * specular;
 
       float dist = length(_worldPos - cameraPosition.xy);
       float fog = smoothstep(5.0, 50.0, dist);
@@ -332,7 +336,7 @@ export const surfaceFragment = /*glsl*/`
       vec4 final = vec4(surface, max(reflectivity, specular));
 
       gl_FragColor = final;
-      gl_FragColor.rgb *= max(shadow, 0.4);
+      gl_FragColor.rgb *= max(shadow, 0.5);
       return;
     }
 

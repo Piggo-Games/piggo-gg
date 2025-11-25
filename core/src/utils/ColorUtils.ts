@@ -1,4 +1,5 @@
 import { Color } from "three"
+import { randomInt } from "./MathUtils"
 
 export const colors = {
   piggo: 0xffc0cb,
@@ -12,4 +13,12 @@ export const colors = {
 
 export const lerp = (a: Color, b: Color, t: number) => {
   return a.clone().lerp(b, t)
+}
+
+export const randomColorBG = () => {
+  return new Color(`rgb(0, ${randomInt(256)}, 256)`)
+}
+
+export const randomColorRY = () => {
+  return new Color(`rgb(256, ${randomInt(256)}, 0)`)
 }

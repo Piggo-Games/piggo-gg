@@ -1,9 +1,10 @@
 import {
-  Action, Actions, blockInLine, Character, cos, Effects, Entity, Input, Item,
-  ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
-  randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
+  Action, Actions, blockInLine, Character, cos, Effects, Entity,
+  Input, Item, ItemComponents, max, min, modelOffset, Networked,
+  nextColor, NPC, Position, randomColorBG, randomColorRY,
+  randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
-import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
+import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
@@ -21,7 +22,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
   const recoilRate = 0.06
 
-  const spawnParticles = (pos: XYZ, world: World) => {
+  const spawnParticles = (pos: XYZ, world: World, water = false) => {
     const proto = particles[0]
     if (!proto) return
 
@@ -31,7 +32,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       mesh.position.set(pos.x, pos.z, pos.y)
 
       // vary the color
-      const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
+      const color = water ? randomColorBG() : randomColorRY()
       mesh.material = new MeshPhongMaterial({ color, emissive: color })
 
       particles.push({
@@ -39,8 +40,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         tick: world.tick,
         velocity: randomVector3(0.03),
         pos: { ...pos },
-        duration: 6,
-        gravity: 0
+        duration: water ? 9 : 6,
+        gravity: water ? 0.0024 : 0
       })
 
       world.three?.scene.add(mesh)
@@ -83,7 +84,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-          "mb1": ({ character, world, aim, client, delta }) => {
+          "mb1": ({ character, world, aim, client }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
@@ -103,7 +104,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           gun.data.reloading = params.value
         }),
-        shoot: Action<ShootParams>("shoot", ({ world, params, offline }) => {
+        shoot: Action<ShootParams>("shoot", ({ world, params }) => {
           const pc = world.client?.character()
           if (pc && character.id !== pc.id) {
 
@@ -158,7 +159,18 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           // raycast against blocks
           const hit = blockInLine({ from: eyePos, dir, world, cap: 60, maxDist: 30 })
-          if (!hit) return
+          if (!hit) {
+            if (dir.y >= 0) return
+
+            const t = -(eyePos.z + 0.06) / dir.y
+            if (t < 0 || t > 50) return
+
+            const x = eyePos.x + dir.x * t
+            const y = eyePos.y + dir.z * t
+
+            spawnParticles({ x, y, z: -0.06 }, world, true)
+            return
+          }
 
           spawnParticles(hit.edge, world)
 
@@ -182,7 +194,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         }),
       }),
       three: Three({
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
 
           // tracer
           const tracerGeometry = new CylinderGeometry(0.004, 0.004, 0.1, 8)

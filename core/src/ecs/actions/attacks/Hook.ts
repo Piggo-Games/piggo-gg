@@ -47,7 +47,7 @@ export const HookItem = ({ character }: { character: Character }) => {
         }
       }),
       three: Three({
-        init: async (o) => {
+        init: async ({ o }) => {
           o.push(mesh)
         },
         onRender: ({ world, delta }) => {

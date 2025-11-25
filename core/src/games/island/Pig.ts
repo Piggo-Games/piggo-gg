@@ -18,7 +18,7 @@ export const Pig = () => {
             mesh.position.set(pos.x, pos.z, pos.y)
           }
         },
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
           three.gLoader.load("pig.gltf", (gltf) => {
 
             mesh = gltf.scene

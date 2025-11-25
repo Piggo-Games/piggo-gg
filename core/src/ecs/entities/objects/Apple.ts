@@ -35,8 +35,8 @@ export const Apple = ({ id }: { id: string }): Entity<Position> => {
       position: Position(),
       networked: Networked(),
       three: Three({
-        init: async (o, entity, __, renderer) => {
-          renderer.gLoader.load("apple.glb", (glb) => {
+        init: async ({ o, three }) => {
+          three.gLoader.load("apple.glb", (glb) => {
             glb.scene.scale.set(0.16, 0.16, 0.16)
             glb.scene.position.set(apple.components.position.data.x, apple.components.position.data.z, apple.components.position.data.y)
 

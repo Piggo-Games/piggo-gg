@@ -80,7 +80,7 @@ export const Sound = (world: World): Sound => {
       deagle: load("deagle.mp3", -10),
       ak: load("ak.mp3", -25),
       awp: load("awp.mp3", -30),
-      reload: load("reload.mp3", -5),
+      reload: load("reload.mp3", -10),
       clink: load("clink.mp3", -10),
       eat: load("eat.mp3", -10),
       eat2: load("eat2.mp3", -10),

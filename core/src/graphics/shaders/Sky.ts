@@ -18,7 +18,7 @@ export const Sky = () => {
             mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
           const geo = new SphereGeometry(500, 60, 40)
 
           const material = new ShaderMaterial({
