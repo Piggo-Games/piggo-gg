@@ -1,9 +1,9 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Input, Item,
   ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
-  randomInt, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
+  randomColorBG, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
-import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
+import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
@@ -21,7 +21,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
   const recoilRate = 0.06
 
-  const spawnParticles = (pos: XYZ, world: World) => {
+  const spawnParticles = (pos: XYZ, world: World, water = false) => {
     const proto = particles[0]
     if (!proto) return
 
@@ -31,7 +31,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       mesh.position.set(pos.x, pos.z, pos.y)
 
       // vary the color
-      const color = new Color(`rgb(255, ${randomInt(256)}, 0)`)
+      const color = randomColorBG()
       mesh.material = new MeshPhongMaterial({ color, emissive: color })
 
       particles.push({
@@ -158,7 +158,18 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           // raycast against blocks
           const hit = blockInLine({ from: eyePos, dir, world, cap: 60, maxDist: 30 })
-          if (!hit) return
+          if (!hit) {
+            if (dir.y >= 0) return
+
+            const t = -eyePos.z / dir.y
+            if (t < 0 || t > 50) return
+
+            const x = eyePos.x + dir.x * t
+            const y = eyePos.y + dir.z * t
+
+            spawnParticles({ x, y, z: -0.06 }, world, true)
+            return
+          }
 
           spawnParticles(hit.edge, world)
 
