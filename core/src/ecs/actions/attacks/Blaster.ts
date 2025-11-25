@@ -40,8 +40,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         tick: world.tick,
         velocity: randomVector3(0.03),
         pos: { ...pos },
-        duration: water ? 8 : 6,
-        gravity: 0
+        duration: water ? 9 : 6,
+        gravity: water ? 0.0024 : 0
       })
 
       world.three?.scene.add(mesh)

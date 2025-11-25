@@ -152,11 +152,16 @@ export const surfaceFragment = /*glsl*/`
   uniform sampler2D directionalShadowMap[NUM_DIR_LIGHT_SHADOWS];
   varying vec4 vDirectionalShadowCoord[NUM_DIR_LIGHT_SHADOWS];
 
+  float rand(vec2 co) {
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+  }
+
+
   float texture2DCompare(sampler2D depths, vec2 uv, float compare) {
 
-    float texelSize = 1.0 / 4096.0;
+    float texelSize = 1.0 / 4096.0 / 2.0;
 
-    const int dist = 2;
+    const int dist = 1;
 
     // 45° rotation (texture-aligned)
     mat2 rot = mat2(0.7071, -0.7071, 0.7071,  0.7071);
@@ -332,7 +337,7 @@ export const surfaceFragment = /*glsl*/`
       vec4 final = vec4(surface, max(reflectivity, specular));
 
       gl_FragColor = final;
-      gl_FragColor.rgb *= max(shadow, 0.4);
+      gl_FragColor.rgb *= max(shadow, 0.5);
       return;
     }
 

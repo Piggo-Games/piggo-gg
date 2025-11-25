@@ -34,7 +34,7 @@ export const Sun = (props: SunProps = {}) => {
           light = new DirectionalLight(colors.evening, 7)
 
           light.shadow.normalBias = 0.02
-          light.shadow.mapSize.set(2048 * 2, 2048 * 2)
+          light.shadow.mapSize.set(2048 * 4, 2048 * 4)
           light.castShadow = true
 
           // widen the shadow
