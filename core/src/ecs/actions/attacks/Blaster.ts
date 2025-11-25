@@ -83,7 +83,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-          "mb1": ({ character, world, aim, client, delta }) => {
+          "mb1": ({ character, world, aim, client }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
@@ -103,7 +103,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           gun.data.reloading = params.value
         }),
-        shoot: Action<ShootParams>("shoot", ({ world, params, offline }) => {
+        shoot: Action<ShootParams>("shoot", ({ world, params }) => {
           const pc = world.client?.character()
           if (pc && character.id !== pc.id) {
 
