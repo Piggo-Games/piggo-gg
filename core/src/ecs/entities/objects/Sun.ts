@@ -30,7 +30,7 @@ export const Sun = (props: SunProps = {}) => {
 
           light.target = target
         },
-        init: async (o) => {
+        init: async ({ o }) => {
           light = new DirectionalLight(colors.evening, 7)
 
           light.shadow.normalBias = 0.02

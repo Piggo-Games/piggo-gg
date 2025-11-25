@@ -182,7 +182,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         }),
       }),
       three: Three({
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
 
           // tracer
           const tracerGeometry = new CylinderGeometry(0.004, 0.004, 0.1, 8)

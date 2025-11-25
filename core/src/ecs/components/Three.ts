@@ -1,7 +1,7 @@
 import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World } from "@piggo-gg/core"
 import { Object3D, Object3DEventMap } from "three"
 
-type ThreeInit = (o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer) => Promise<void>
+type ThreeInit = (_: {o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer}) => Promise<void>
 
 type OnRenderProps = {
   entity: Entity<Three | Position>
@@ -65,7 +65,7 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
               world.three?.scene.remove(...three.o)
               rendered[entity.id] = []
             }
-            three.init(entity.components.three.o, entity, world, world.three)
+            three.init({ o: three.o, entity, world, three: world.three })
             three.initialized = true
             continue
           }

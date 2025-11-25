@@ -1,4 +1,4 @@
-import { Action, Actions, Character, Effects, Entity, Input, Item, ItemComponents, Networked, Position } from "@piggo-gg/core"
+import { Action, Actions, Character, Effects, Entity, Input, Item, ItemComponents, Networked, Position, Three } from "@piggo-gg/core"
 
 export const DaggerItem = ({ character }: { character: Character }) => {
 
@@ -21,6 +21,11 @@ export const DaggerItem = ({ character }: { character: Character }) => {
         swing: Action("swing", ({ world, params }) => {
 
         })
+      }),
+      three: Three({
+        init: async ({ o, three }) => {
+
+        }
       })
     }
   })

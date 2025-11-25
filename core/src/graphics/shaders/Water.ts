@@ -34,7 +34,7 @@ export const Water = () => {
             }
           }
         },
-        init: async (o, _, __, three) => {
+        init: async ({ o, three }) => {
           surface = new Mesh()
 
           const halfSize = 1500
