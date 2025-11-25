@@ -18,3 +18,7 @@ export const lerp = (a: Color, b: Color, t: number) => {
 export const randomColorBG = () => {
   return new Color(`rgb(0, ${randomInt(256)}, 256)`)
 }
+
+export const randomColorRY = () => {
+  return new Color(`rgb(256, ${randomInt(256)}, 0)`)
+}

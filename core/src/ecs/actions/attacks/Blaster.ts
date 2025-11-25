@@ -1,7 +1,8 @@
 import {
-  Action, Actions, blockInLine, Character, cos, Effects, Entity, Input, Item,
-  ItemComponents, max, min, modelOffset, Networked, nextColor, NPC, Position,
-  randomColorBG, randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
+  Action, Actions, blockInLine, Character, cos, Effects, Entity,
+  Input, Item, ItemComponents, max, min, modelOffset, Networked,
+  nextColor, NPC, Position, randomColorBG, randomColorRY,
+  randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
@@ -31,7 +32,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       mesh.position.set(pos.x, pos.z, pos.y)
 
       // vary the color
-      const color = randomColorBG()
+      const color = water ? randomColorBG() : randomColorRY()
       mesh.material = new MeshPhongMaterial({ color, emissive: color })
 
       particles.push({
