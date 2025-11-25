@@ -164,7 +164,10 @@ export const surfaceFragment = /*glsl*/`
     const int dist = 1;
 
     // 45° rotation (texture-aligned)
-    mat2 rot = mat2(0.7071, -0.7071, 0.7071,  0.7071);
+    // mat2 rot = mat2(0.7071, -0.7071, 0.7071,  0.7071);
+    float angle = rand(uv * 4096.0 * 2.0) * 6.283185; // per-frag random
+    mat2 rot = mat2(cos(angle), -sin(angle),
+                    sin(angle),  cos(angle));
 
     float result = 0.0;
     float count = 0.0;
