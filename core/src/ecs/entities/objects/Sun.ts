@@ -1,5 +1,5 @@
 import { Bounds, colors, dayness, Entity, lerp, Position, Three } from "@piggo-gg/core"
-import { DirectionalLight, HemisphereLight, Scene } from "three"
+import { CameraHelper, DirectionalLight, HemisphereLight, Object3D, Scene } from "three"
 
 export type SunProps = {
   bounds?: Bounds
@@ -9,6 +9,7 @@ export type SunProps = {
 export const Sun = (props: SunProps = {}) => {
 
   let light: DirectionalLight | undefined = undefined
+  let target: Object3D | undefined = undefined
 
   const sun = Entity<Three>({
     id: "sun",
@@ -16,7 +17,7 @@ export const Sun = (props: SunProps = {}) => {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
         onTick: ({ client, world }) => {
-          if (!light) return
+          if (!light || !target) return
 
           const dayFactor = dayness(world.tick, 0)
 
@@ -25,13 +26,19 @@ export const Sun = (props: SunProps = {}) => {
           const pc = client.character()
           if (!pc) return
 
-          const target = pc.components.three?.o[1] as Scene
-          if (!target) return
+          const pcMesh = pc.components.three?.o[1] as Scene
+          if (!pcMesh) return
 
-          light.target = target
+          const dist = light.target.position.distanceTo(pcMesh.position)
+          if (dist > 5) {
+            target.position.copy(pcMesh.position)
+            target.updateMatrixWorld()
+          }
         },
         init: async ({ o }) => {
           light = new DirectionalLight(colors.evening, 7)
+          target = new Object3D()
+          light.target = target
 
           light.shadow.normalBias = 0.02
           light.shadow.mapSize.set(2048 * 4, 2048 * 4)
@@ -48,8 +55,8 @@ export const Sun = (props: SunProps = {}) => {
 
           const hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)
 
-          // const helper = new CameraHelper(light.shadow.camera)
-          // o.push(helper)
+          const helper = new CameraHelper(light.shadow.camera)
+          o.push(helper)
 
           o.push(light, hemi)
         }
