@@ -309,7 +309,7 @@ export const surfaceFragment = /*glsl*/`
     if (cameraPosition.y > 0.0) {
       float shadow = getShadowMask();
 
-      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.34, 0.0);
+      vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.32 - cameraPosition.y * 0.014, 0.0);
       float specular = max(0.0, dot(normal, halfWayDir));
       specular = pow(specular, SPECULAR_SHARPNESS);
       specular *= max(shadow, 0.4);
@@ -323,7 +323,7 @@ export const surfaceFragment = /*glsl*/`
       vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), uDay);
 
       surface += sunColor * specular * specular;
-      surface -= vec3(0.05) * specular * specular;
+      surface -= vec3(0.07) * specular * specular;
 
       float dist = length(_worldPos - cameraPosition.xy);
       float fog = smoothstep(5.0, 50.0, dist);
