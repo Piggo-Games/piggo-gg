@@ -40,7 +40,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
         tick: world.tick,
         velocity: randomVector3(0.03),
         pos: { ...pos },
-        duration: 6,
+        duration: water ? 8 : 6,
         gravity: 0
       })
 
@@ -162,7 +162,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           if (!hit) {
             if (dir.y >= 0) return
 
-            const t = -eyePos.z / dir.y
+            const t = -(eyePos.z + 0.06) / dir.y
             if (t < 0 || t > 50) return
 
             const x = eyePos.x + dir.x * t
