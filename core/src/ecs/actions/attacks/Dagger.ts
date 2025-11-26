@@ -33,10 +33,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
-            if (cd + 26 > world.tick) return
+            if (cd + 14 > world.tick) return
             cd = world.tick
-
-            // console.log(character.components.inventory?.activeItem(world))
 
             return { actionId: "swing", params: {} }
           }
@@ -45,6 +43,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       actions: Actions({
         swing: Action("swing", ({ world, params }) => {
           character.components.position.data.recoil = 1.5
+
+          world.client?.sound.play({ name: "whiff" })
         })
       }),
       three: Three({
@@ -93,7 +93,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           const offset = modelOffset(aim)
           mesh.position.set(
             pos.x + offset.x,
-            pos.z + 0.45,
+            pos.z + 0.45 + offset.y,
             pos.y + offset.z
           )
 
