@@ -1,5 +1,5 @@
 import { Collider, Entity, NPC, Position, Three } from "@piggo-gg/core"
-import { BoxGeometry, CapsuleGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
+import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Pig = () => {
 
@@ -29,7 +29,6 @@ export const Pig = () => {
           if (hitboxes.body) {
             const pos = pig.components.position.data
             hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
-            // hitboxes.body.quaternion.copy(mesh.quaternion)
             hitboxes.body.rotation.y = mesh.rotation.y
           }
         }
@@ -43,11 +42,10 @@ export const Pig = () => {
           }
         },
         init: async ({ o, three }) => {
-          // const bodyGeo = new CapsuleGeometry(0.2, 0.01)
           const bodyGeo = new BoxGeometry(0.28, 0.18, 0.34)
           const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, wireframe: true })
           hitboxes.body = new Mesh(bodyGeo, bodyMat)
-          hitboxes.body.rotation.order = "YXZ"
+
           o.push(hitboxes.body)
 
           three.gLoader.load("pig.gltf", (gltf) => {
@@ -56,12 +54,10 @@ export const Pig = () => {
             mesh.animations = gltf.animations
             mesh.frustumCulled = false
 
-            const scale = 0.02
-            mesh.scale.set(scale, scale, scale)
+            mesh.scale.set(0.02, 0.02, 0.02)
 
             mesh.rotation.order = "YXZ"
             mesh.rotation.y = Math.PI / 3 * 2
-            // mesh.rotation.x = -Math.PI / 2
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
