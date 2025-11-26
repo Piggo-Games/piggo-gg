@@ -60,8 +60,6 @@ export const DaggerItem = ({ character }: { character: Character }) => {
               }
             })
 
-            mesh.rotation.order = "YXZ"
-
             o.push(mesh)
           })
         },
@@ -69,11 +67,6 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           const ratio = delta / 25
 
           const pos = character.components.position.interpolate(world, delta)
-
-          let { aim } = character.components.position.data
-          if (character.id === world.client?.character()?.id) {
-            aim = client.controls.localAim
-          }
 
           if (!mesh) return
 
@@ -89,7 +82,12 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             return
           }
 
-          // gun
+          let { aim } = character.components.position.data
+          if (character.id === world.client?.character()?.id) {
+            aim = client.controls.localAim
+          }
+
+          // position
           const offset = modelOffset(aim)
           mesh.position.set(
             pos.x + offset.x,
@@ -100,6 +98,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           const { recoil } = character.components.position.data
           const localRecoil = recoil ? recoil - recoilRate * ratio : 0
 
+          // rotation
           mesh.rotation.y = aim.x + PI / 2 + localRecoil * 0.5
           mesh.rotation.z = aim.y - localRecoil * 0.5
         }
