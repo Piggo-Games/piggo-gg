@@ -1,9 +1,10 @@
 import {
-  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
-  Inventory, max, Networked, PI, Place, Player, Point, Position, Team,
-  XYZ, XZ, IslandSettings, cloneSkeleton, Ready, ColorMapping, nextColor,
-  MarbleTexture, BlockMaterial, IslandState, blockInLine, hypot, Input,
-  Three, upAndDir, colorMaterials, cos, sin, BlocksMesh, nextBlock, DaggerItem
+  Action, Actions, Character, Collider, copyMaterials, Health,
+  BlasterItem, Inventory, max, Networked, PI, Place, Player,
+  Point, Position, Team, XYZ, XZ, IslandSettings, cloneSkeleton,
+  Ready, ColorMapping, nextColor, MarbleTexture, BlockMaterial,
+  IslandState, blockInLine, hypot, Input, Three, upAndDir, colorMaterials,
+  cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -47,7 +48,7 @@ export const Bob = (player: Player): Character => {
         aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([DaggerItem, BlasterItem]),
+      inventory: Inventory([BlasterItem, DaggerItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
@@ -84,6 +85,14 @@ export const Bob = (player: Player): Character => {
           }
         },
         press: {
+          "1": ({ hold }) => {
+            if (hold) return
+            return { actionId: "setActiveItemIndex", params: { index: 0 } }
+          },
+          "2": ({ hold }) => {
+            if (hold) return
+            return { actionId: "setActiveItemIndex", params: { index: 1 } }
+          },
           "mb2": ({ hold, world, character }) => {
             if (hold && placeCD + 6 > world.tick) return
             if (!character) return
@@ -213,6 +222,7 @@ export const Bob = (player: Player): Character => {
         place: Place,
         point: Point,
         ready: Ready,
+        setActiveItemIndex,
         up: Action("up", () => {
           const { position } = bob.components
 
