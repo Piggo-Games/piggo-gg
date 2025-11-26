@@ -7,6 +7,7 @@ export const Pig = () => {
 
   let pinatas: Mesh[] | undefined = undefined
   let particles: Particle[] = []
+  let exploded = false
 
   const pig = Entity<Position>({
     id: "pig",
@@ -15,12 +16,16 @@ export const Pig = () => {
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {
+          if (!mesh) return
+
           const pc = world.client?.character()
-          if (pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
+          if (!exploded && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
+            exploded = true
+            mesh.visible = false
+
             if (pinatas?.length) {
-              pinatas.forEach(p => {
-                p.visible = false
-                const voxels = destroyIntoVoxels(p, 0.005)
+              for (const pinata of pinatas) {
+                const voxels = destroyIntoVoxels(pinata)
                 for (const voxel of voxels) {
                   particles.push({
                     mesh: voxel, tick: world.tick, velocity: randomVector3(0.005), duration: 26, gravity: 0.0003,
@@ -28,7 +33,7 @@ export const Pig = () => {
                   })
                   world.three?.scene.add(voxel)
                 }
-              })
+              }
             }
           }
         }
@@ -39,6 +44,27 @@ export const Pig = () => {
 
           if (mesh) {
             mesh.position.set(pos.x, pos.z, pos.y)
+          }
+
+          const ratio = delta / 25
+
+          // particles
+          for (let i = 1; i < particles.length; i++) {
+            const p = particles[i]
+
+            if (world.tick - p.tick >= p.duration) {
+              if (p.mesh.parent) {
+                world.three?.scene.remove(p.mesh)
+              }
+              particles.splice(i, 1)
+              i--
+            } else {
+              p.mesh.position.set(
+                p.pos.x + p.velocity.x * ratio,
+                p.pos.z + p.velocity.z * ratio,
+                p.pos.y + p.velocity.y * ratio
+              )
+            }
           }
         },
         init: async ({ o, three }) => {
