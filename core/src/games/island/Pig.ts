@@ -14,12 +14,13 @@ export const Pig = () => {
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {
-          if (!mesh) return
+          if (!mesh || died) return
 
           const pc = world.client?.character()
           if (!died && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
             died = true
             mesh.rotation.x = Math.PI / 2
+            hitboxes.body!.visible = false
           }
 
           mesh.rotation.y += 0.01
@@ -44,7 +45,7 @@ export const Pig = () => {
         init: async ({ o, three }) => {
           // const bodyGeo = new CapsuleGeometry(0.2, 0.01)
           const bodyGeo = new BoxGeometry(0.28, 0.18, 0.34)
-          const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, transparent: true, opacity: 0.5 })
+          const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, wireframe: true })
           hitboxes.body = new Mesh(bodyGeo, bodyMat)
           hitboxes.body.rotation.order = "YXZ"
           o.push(hitboxes.body)
