@@ -1,8 +1,9 @@
 import {
-  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem, hypot, Input,
-  Inventory, max, Networked, PI, Place, Player, Point, Position, Team, Three, upAndDir,
-  XYZ, XZ, IslandSettings, cloneSkeleton, Ready, ColorMapping, colorMaterials, cos, sin,
-  nextColor, MarbleTexture, BlockMaterial, IslandState, blockInLine, BlocksMesh, nextBlock
+  Action, Actions, Character, Collider, copyMaterials, Health, BlasterItem,
+  Inventory, max, Networked, PI, Place, Player, Point, Position, Team,
+  XYZ, XZ, IslandSettings, cloneSkeleton, Ready, ColorMapping, nextColor,
+  MarbleTexture, BlockMaterial, IslandState, blockInLine, hypot, Input,
+  Three, upAndDir, colorMaterials, cos, sin, BlocksMesh, nextBlock, DaggerItem
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
@@ -46,7 +47,7 @@ export const Bob = (player: Player): Character => {
         aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([BlasterItem]),
+      inventory: Inventory([DaggerItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({
