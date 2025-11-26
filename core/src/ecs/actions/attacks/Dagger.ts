@@ -1,4 +1,7 @@
-import { Action, Actions, Character, Effects, Entity, Input, Item, ItemComponents, max, modelOffset, Networked, NPC, PI, Position, Three } from "@piggo-gg/core"
+import {
+  Action, Actions, Character, Effects, Entity, Input, Item,
+  ItemComponents, max, modelOffset, Networked, NPC, PI, Position, Three
+} from "@piggo-gg/core"
 import { Mesh, Object3D } from "three"
 
 export const DaggerItem = ({ character }: { character: Character }) => {
@@ -99,7 +102,6 @@ export const DaggerItem = ({ character }: { character: Character }) => {
 
           mesh.rotation.y = aim.x + PI / 2 + localRecoil * 0.5
           mesh.rotation.z = aim.y - localRecoil * 0.5
-          // mesh.rotation.x = localRecoil * 0.5
         }
       })
     }
