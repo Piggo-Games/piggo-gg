@@ -47,7 +47,7 @@ export const Bob = (player: Player): Character => {
         aim: { x: 0, y: 0 }
       }),
       networked: Networked(),
-      inventory: Inventory([DaggerItem]),
+      inventory: Inventory([DaggerItem, BlasterItem]),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       health: Health(),
       input: Input({

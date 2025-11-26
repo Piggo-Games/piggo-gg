@@ -276,7 +276,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             mesh.visible = true
           }
 
-          if (character.components.health?.dead()) {
+          if (character.components.health?.dead() || character.components.inventory?.activeItem(world)?.id !== item.id) {
             mesh.visible = false
             return
           }
