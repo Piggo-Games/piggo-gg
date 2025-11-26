@@ -21,20 +21,25 @@ export const Pig = () => {
           const pc = world.client?.character()
           if (!exploded && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
             exploded = true
-            mesh.visible = false
 
-            if (pinatas?.length) {
-              for (const pinata of pinatas) {
-                const voxels = destroyIntoVoxels(pinata)
-                for (const voxel of voxels) {
-                  particles.push({
-                    mesh: voxel, tick: world.tick, velocity: randomVector3(0.005), duration: 26, gravity: 0.0003,
-                    pos: { x: voxel.position.x, y: voxel.position.z, z: voxel.position.y }
-                  })
-                  world.three?.scene.add(voxel)
-                }
-              }
-            }
+            mesh.rotation.x = Math.PI / 2
+
+            // mesh.visible = false
+
+            // if (pinatas?.length) {
+            //   for (const pinata of pinatas) {
+            //     const voxels = destroyIntoVoxels(pinata, 0.04)
+            //     console.log("destroyed pinata into", voxels.length, "voxels")
+            //     for (const voxel of voxels) {
+            //       voxel.frustumCulled = false
+            //       particles.push({
+            //         mesh: voxel, tick: world.tick, velocity: randomVector3(0), duration: 260, gravity: 0,
+            //         pos: { x: voxel.position.x, y: voxel.position.z, z: voxel.position.y }
+            //       })
+            //       world.three?.scene.add(voxel)
+            //     }
+            //   }
+            // }
           }
         }
       }),
@@ -49,7 +54,7 @@ export const Pig = () => {
           const ratio = delta / 25
 
           // particles
-          for (let i = 1; i < particles.length; i++) {
+          for (let i = 0; i < particles.length; i++) {
             const p = particles[i]
 
             if (world.tick - p.tick >= p.duration) {
@@ -76,20 +81,28 @@ export const Pig = () => {
             const scale = 0.02
             mesh.scale.set(scale, scale, scale)
 
+            mesh.rotation.order = "YXZ"
+
             mesh.rotation.y = Math.PI / 3 * 2
+
+
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
                 child.castShadow = true
                 child.receiveShadow = true
 
-                const destr = child.clone() as Mesh
-                destr.scale.set(0.005, 0.005, 0.005)
-                destr.position.set(5, 1, 5)
-
                 if (!pinatas) pinatas = []
-                pinatas.push(destr)
-                o.push(destr)
+                pinatas.push(child)
+
+                // const destr = child.clone() as Mesh
+                // destr.scale.set(scale, scale, scale)
+                // destr.position.set(5, 2, 5)
+                // determineCrossOrigin.
+                // destr.position
+                // destr.visible = false
+                // destr.scale.set(0.02, 0.02, 0.02)
+                // destr.position.set(5, 1, 5)
               }
             })
 
