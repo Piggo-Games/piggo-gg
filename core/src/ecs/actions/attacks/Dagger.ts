@@ -26,11 +26,11 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-          "mb1": ({ character, world, aim, client }) => {
+          "mb1": ({ character, world, client }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
-            if (cd + 14 > world.tick) return
+            if (cd + 26 > world.tick) return
             cd = world.tick
 
             return { actionId: "swing", params: {} }
@@ -39,7 +39,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       }),
       actions: Actions({
         swing: Action("swing", ({ world, params }) => {
-          character.components.position.data.recoil = 0.5
+          character.components.position.data.recoil = 1.5
         })
       }),
       three: Three({
@@ -97,8 +97,9 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           const { recoil } = character.components.position.data
           const localRecoil = recoil ? recoil - recoilRate * ratio : 0
 
-          mesh.rotation.y = aim.x + PI / 2
+          mesh.rotation.y = aim.x + PI / 2 + localRecoil * 0.5
           mesh.rotation.z = aim.y - localRecoil * 0.5
+          // mesh.rotation.x = localRecoil * 0.5
         }
       })
     }
