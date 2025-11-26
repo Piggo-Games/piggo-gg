@@ -344,7 +344,6 @@ export const InputSystem = ClientSystemBuilder({
           const keyMouse = buffer.get(keyPress)
 
           if (keyMouse) {
-            console.log("active item input:", keyPress, keyMouse, activeItem.id)
             const invocation = activeItem.components.input?.inputMap.press[keyMouse.key]?.({
               aim: localAim(),
               character,
