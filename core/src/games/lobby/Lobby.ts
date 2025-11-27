@@ -105,7 +105,7 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "min(6vw, 100px)",
+      width: "min(6.6vw, 110px)",
       borderRadius: "8px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
