@@ -254,19 +254,19 @@ export const vectorExtend = (vec: XYZ, amount: number): XYZ => {
 }
 
 export const hourness = (tick: number, delta: number): number => {
-  const time = tick / 20 + delta / 25 / 20
+  const time = (tick + delta / 25) / 24
   return (time % 24)
 }
 
 export const dayness = (tick: number, delta: number): number => {
   const h = hourness(tick, delta)
   let result = 0
-  if (h >= 0 && h < 3) {
-    result = h / 3
-  } else if (h >= 12 && h < 15) {
-    result = 1 - (h - 12) / 3
-  } else if (h >= 1 && h < 12) {
+  if (h >= 0 && h <= 9) {
     result = 1
+  } else if (h >= 9 && h < 12) {
+    result = 1 - (h - 9) / 3
+  } else if (h >= 21 && h < 24) {
+    result = (h - 21) / 3
   }
   return result
 }

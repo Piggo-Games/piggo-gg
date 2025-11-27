@@ -14,7 +14,7 @@ export const Sky = () => {
           if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 200
+            mat.uniforms.uTime.value = world.tick + delta / 25
             mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },
@@ -241,7 +241,7 @@ const fragmentShader = /* glsl */`
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
     float v = fbm(vec3(
-      dir.x * 8.0 + uTime * 0.01, h * 20.0, dir.z * 2.0 + uTime * 0.01
+      dir.x * 8.0 + uTime * 0.003, h * 20.0, dir.z * 2.0 + uTime * 0.003
     ));
 
     float a = curtain * v;
@@ -271,7 +271,7 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    float tilt = uTime * 0.002;
+    float tilt = uTime * 0.0004;
     float tiltAngle = radians(50.5); 
     mat3 rotMat  = rotateY(tilt);
     mat3 tiltMat = rotateX(tiltAngle);
