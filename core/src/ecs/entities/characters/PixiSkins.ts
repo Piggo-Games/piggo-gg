@@ -17,7 +17,7 @@ export const DudeSkin = (color: "red" | "blue" | "white"): PixiSkin => async (r)
   const t = await loadTexture(`dude-${color}.json`)
 
   r.animations = {
-    run: pixiAnimation([t["run1"], t["run2"], t["run4"], t["run5"]]),
+    run: pixiAnimation([t["run1"], t["run2"], t["run4"], t["run3"]]),
     idle: pixiAnimation([t["idle1"], t["idle2"], t["idle3"], t["idle4"]]),
     spike: pixiAnimation([t["spike1"], t["spike1"]])
   }
