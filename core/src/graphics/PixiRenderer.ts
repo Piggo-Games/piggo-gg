@@ -313,6 +313,15 @@ export const PixiRenderSystem = ClientSystemBuilder({
   }
 })
 
+const debugText = (p: Position) => {
+  const { x, y, z, velocity } = p.data
+  if (velocity.x || velocity.y) {
+    return `x:${x.toFixed(0)} y:${y.toFixed(0)} z:${z.toFixed(0)}\nvx:${velocity.x.toFixed(0)} vy:${velocity.y.toFixed(0)}`
+  } else {
+    return `x:${x.toFixed(0)} y:${y.toFixed(0)} z:${z.toFixed(0)}\n`
+  }
+}
+
 // adds visual debug information to renderered entities
 export const PixiDebugSystem = ClientSystemBuilder({
   id: "PixiDebugSystem",
@@ -337,8 +346,9 @@ export const PixiDebugSystem = ClientSystemBuilder({
           const c = container as Text
           if (renderable && position) {
             const bounds = renderable.c.getLocalBounds()
-            c.position.set(bounds.x, bounds.top - 25)
+            c.position.set(bounds.x + bounds.width / 2, bounds.top + 5)
             c.text = debugText(position)
+            c.anchor.set(0.5, 0)
             renderable.visible = renderable.visible
           }
         },
@@ -415,10 +425,6 @@ export const PixiDebugSystem = ClientSystemBuilder({
       world.addEntity(debugEntity)
       debugRenderables.push(r)
       debugEntitiesPerEntity["collider-debug"] = [debugEntity]
-    }
-
-    const debugText = (p: Position) => {
-      return `x:${p.data.x.toFixed(0)} y:${p.data.y.toFixed(0)} z:${p.data.z.toFixed(0)} | vx:${p.data.velocity.x.toFixed(0)} vy:${p.data.velocity.y.toFixed(0)}`
     }
 
     return {

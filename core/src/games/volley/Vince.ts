@@ -48,7 +48,13 @@ export const Vince = (player: Player) => Character({
         "t": ({ hold, world }) => {
           if (hold) return
           world.actions.push(world.tick + 2, player.id, { actionId: "SwitchTeam" })
-        }
+        },
+        // debug
+        "g": ({ world, hold }) => {
+          if (hold === 5) {
+            world.debug = !world.debug
+          }
+        },
       }
     }),
     actions: Actions({
