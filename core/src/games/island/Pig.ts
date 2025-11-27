@@ -23,13 +23,15 @@ export const Pig = () => {
             hitboxes.body!.visible = false
           }
 
-          mesh.rotation.y += 0.01
+          mesh.rotation.y += world.debug ? 0.01 : 0
 
           // move hitbox
           if (hitboxes.body) {
             const pos = pig.components.position.data
             hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
             hitboxes.body.rotation.y = mesh.rotation.y
+
+            hitboxes.body.visible = world.debug
           }
         }
       }),

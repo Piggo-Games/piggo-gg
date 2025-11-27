@@ -1,6 +1,6 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
-  HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat, HtmlFpsText,
+  HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
   Renderable, ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, screenWH, values
 } from "@piggo-gg/core"
 import { Bot } from "./Bot"
@@ -60,7 +60,8 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       PixiRenderSystem,
       NametagSystem,
       HUDSystem(controls),
-      PixiCameraSystem(() => ({ x: 225, y: 0, z: 0 }))
+      PixiCameraSystem(() => ({ x: 225, y: 0, z: 0 })),
+      PixiDebugSystem
     ],
     entities: [
       Background({ rays: true }),
@@ -78,7 +79,8 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       ScorePanel(),
       HtmlChat(),
       EscapeMenu(world),
-      HtmlLagText()
+      HtmlLagText(),
+      HtmlFpsText()
     ]
   })
 }

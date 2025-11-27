@@ -1,6 +1,6 @@
 import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
-  GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
+  GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
   InventorySystem, PI, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
@@ -55,6 +55,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       Water(),
       Sun(),
       HtmlLagText(),
+      HtmlFpsText(),
       Pig()
     ]
   })

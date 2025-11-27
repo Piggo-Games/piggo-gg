@@ -84,7 +84,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             return
           }
 
-          let { aim } = character.components.position.data
+          let { aim, recoil } = character.components.position.data
           if (character.id === world.client?.character()?.id) {
             aim = client.controls.localAim
           }
@@ -97,7 +97,6 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             pos.y + offset.z
           )
 
-          const { recoil } = character.components.position.data
           const localRecoil = recoil ? recoil - recoilRate * ratio : 0
 
           // rotation

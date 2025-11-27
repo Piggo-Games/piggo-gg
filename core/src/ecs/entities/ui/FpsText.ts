@@ -1,32 +1,45 @@
-import { Entity, HText, NPC, Position, Renderable, pixiText, round } from "@piggo-gg/core"
-import { Text } from "pixi.js"
+import { Entity, HText, NPC, Position, round } from "@piggo-gg/core"
 
-export type FpsTextProps = {
-  x?: number
-  y?: number
-}
+export const HtmlFpsText = () => {
+  let init = false
 
-export const FpsText = ({ x, y }: FpsTextProps = {}) => Entity<Position | Renderable>({
-  id: "fpsText",
-  persists: true,
-  components: {
-    position: Position({ x: x ?? 5, y: y ?? 25, screenFixed: true }),
-    renderable: Renderable({
-      zIndex: 3,
-      setContainer: async () => pixiText({ text: "", style: { fontSize: 16, fill: 0xffffff } }),
-      onTick: ({ container, world }) => {
-        if (world.tick % 5 !== 0) return
+  const div = HText({
+    style: {
+      right: "16px",
+      top: "16px",
+      color: "#dddd00",
+      textShadow: "none",
+      visibility: "hidden",
+      fontSize: "16px"
+    },
+    text: "fps: 0"
+  })
 
-        const t = container as Text
-        if (t) {
-          const fps = round(world.pixi?.app.ticker.FPS ?? 0)
-          // if (t.style) t.style.fill = fps > 100 ? "#00ff00" : fps > 60 ? "yellow" : "red"
-          t.text = `fps: ${fps}`
+  return Entity({
+    id: "htmlFpsText",
+    components: {
+      position: Position(),
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!init) {
+            document.getElementById("canvas-parent")?.appendChild(div)
+            init = true
+          }
+
+          if (!world.debug) {
+            div.style.visibility = "hidden"
+            return
+          }
+
+          div.style.visibility = "visible"
+
+          const fps = round(world.client?.fps ?? 0)
+          div.textContent = `fps: ${fps}`
         }
-      }
-    })
-  }
-})
+      })
+    }
+  })
+}
 
 export const HtmlLagText = () => {
 
