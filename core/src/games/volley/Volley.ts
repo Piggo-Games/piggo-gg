@@ -1,7 +1,8 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat, HtmlFpsText,
-  HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
-  Renderable, ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, screenWH, values
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  HtmlFpsText, HtmlLagText, NametagSystem, PhysicsSystem, PixiCameraSystem,
+  PixiDebugSystem, PixiRenderSystem, Position, Renderable, ScorePanel,
+  SpawnSystem, SystemBuilder, Team, screenWH, values, HtmlChat, ShadowSystem
 } from "@piggo-gg/core"
 import { Bot } from "./Bot"
 import { Ball, Bounds, Centerline, Court, Net, PostBottom, PostTop } from "./entities"
