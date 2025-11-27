@@ -181,20 +181,6 @@ const fragmentShader = /* glsl */`
     return fract(p.x * p.y * (p.x + p.y));
   }
 
-  float noise2(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-  }
-
   float fractal(float n) {
     return fract(sin(n) * 43758.5453123);
   }
@@ -305,7 +291,7 @@ const fragmentShader = /* glsl */`
 
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
 
-    if (dir.y > 0.01) {
+    if (dir.y > 0.01 && dayFactor < 0.95) {
       vec3 stars = starLayers(vdir, uv);
       stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
       color += stars;
