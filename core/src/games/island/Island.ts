@@ -1,7 +1,7 @@
 import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
-  GameBuilder, HtmlChat, HtmlLagText, HUDSystem, HUDSystemProps,
-  InventorySystem, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
+  GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
+  InventorySystem, PI, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
@@ -55,6 +55,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       Water(),
       Sun(),
       HtmlLagText(),
+      HtmlFpsText(),
       Pig()
     ]
   })
@@ -67,6 +68,8 @@ const IslandSystem = SystemBuilder({
     spawnFlat(world, 11)
     
     const mobileUI = MobileUI(world)
+
+    if (world.client) world.client.controls.localAim.x = PI / 2 * 2.5
 
     return {
       id: "IslandSystem",

@@ -63,6 +63,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
   const scheduleOnTick = () => setTimeout(() => world.onTick({ isRollback: false }), 3)
 
   let lastRender = 0
+  let framesThisSecond = 0
 
   const world: World = {
     actions: TickBuffer(),
@@ -220,6 +221,13 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
           system.onRender?.(filterEntities(system.query, values(world.entities)), now - world.time, now - lastRender)
         })
         lastRender = now
+
+        // update fps
+        if (world.tick % 40 === 0 && framesThisSecond > 10) {
+          world.client!.fps = framesThisSecond
+          framesThisSecond = 0
+        }
+        framesThisSecond += 1
       }
     },
     players: () => {

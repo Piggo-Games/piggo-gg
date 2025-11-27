@@ -50,6 +50,7 @@ export type Client = {
   }
   discord: Discord | undefined
   env: ENV
+  fps: number
   lastMessageTick: number
   lobbyId: string | undefined
   net: {
@@ -160,6 +161,7 @@ export const Client = ({ world }: ClientProps): Client => {
     },
     discord: Discord(),
     env,
+    fps: 0,
     lastMessageTick: 0,
     lobbyId: undefined,
     net: {

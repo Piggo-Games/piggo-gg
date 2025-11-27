@@ -1,15 +1,40 @@
-import { Collider, Entity, Position, Three } from "@piggo-gg/core"
-import { Group, Mesh, Object3DEventMap } from "three"
+import { Collider, Entity, NPC, Position, Three } from "@piggo-gg/core"
+import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Pig = () => {
 
   let mesh: Group<Object3DEventMap> | undefined = undefined
+  let died = false
+  let hitboxes: { body?: Mesh } = {}
 
   const pig = Entity<Position>({
     id: "pig",
     components: {
-      position: Position({ x: 12, y: 12, z: 2, gravity: 0.003 }),
+      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003 }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!mesh || died) return
+
+          const pc = world.client?.character()
+          if (!died && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
+            died = true
+            mesh.rotation.x = Math.PI / 2
+            hitboxes.body!.visible = false
+          }
+
+          mesh.rotation.y += world.debug ? 0.01 : 0
+
+          // move hitbox
+          if (hitboxes.body) {
+            const pos = pig.components.position.data
+            hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
+            hitboxes.body.rotation.y = mesh.rotation.y
+
+            hitboxes.body.visible = world.debug
+          }
+        }
+      }),
       three: Three({
         onRender: ({ delta, world }) => {
           const pos = pig.components.position.interpolate(world, delta)
@@ -19,14 +44,21 @@ export const Pig = () => {
           }
         },
         init: async ({ o, three }) => {
-          three.gLoader.load("pig.gltf", (gltf) => {
+          const bodyGeo = new BoxGeometry(0.28, 0.18, 0.34)
+          const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, wireframe: true })
+          hitboxes.body = new Mesh(bodyGeo, bodyMat)
 
+          o.push(hitboxes.body)
+
+          three.gLoader.load("pig.gltf", (gltf) => {
             mesh = gltf.scene
+
             mesh.animations = gltf.animations
             mesh.frustumCulled = false
-            const scale = 0.02
-            mesh.scale.set(scale, scale, scale)
 
+            mesh.scale.set(0.02, 0.02, 0.02)
+
+            mesh.rotation.order = "YXZ"
             mesh.rotation.y = Math.PI / 3 * 2
 
             mesh.traverse((child) => {

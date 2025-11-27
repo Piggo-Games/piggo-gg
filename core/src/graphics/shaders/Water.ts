@@ -14,7 +14,7 @@ export const Water = () => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 2000
+            mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.016
             mat.uniforms.uDay.value = dayness(world.tick, delta)
 
             const pc = client.character()
@@ -321,7 +321,7 @@ export const surfaceFragment = /*glsl*/`
       float reflectivity = pow2(1.0 - max(0.0, dot(-viewDir, normal)));
 
       // vec3 reflection = sampleSkybox(reflect(viewDir, normal));
-      vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.6) * uDay;
+      vec3 blue = vec3(0.1, 0.2, 0.45) + vec3(0.2, 0.25, 0.5) * uDay;
       vec3 surface = reflectivity * blue;
 
       vec3 sunColor = mix(vec3(0.3, 0.3, 0.5), vec3(0.7, 0.4, 0.1), uDay);

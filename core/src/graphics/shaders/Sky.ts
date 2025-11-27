@@ -10,12 +10,16 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta, world }) => {
+        onRender: ({ delta, world, three }) => {
           if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
-            mat.uniforms.uTime.value += delta / 200
+            mat.uniforms.uTime.value = world.tick + delta / 25
             mat.uniforms.uDay.value = dayness(world.tick, delta)
+
+            mat.uniforms.uResolution.value = {
+              x: three.canvas?.clientWidth || 1, y: three.canvas?.clientHeight || 1
+            }
           }
         },
         init: async ({ o, three }) => {
@@ -121,24 +125,28 @@ const fragmentShader = /* glsl */`
   }
 
   // -------------------- starfield --------------------
-  mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+
+  mat2 R0 = mat2(0.949235, -0.314520, 0.314520,  0.949235);
+  mat2 R1 = mat2(0.424864, -0.905261, 0.905261,  0.424864);
+  mat2 R2 = mat2(-0.481558, -0.876414, 0.876414, -0.481558);
+  mat2 RN0 = mat2(0.949235,  0.314520, -0.314520,  0.949235);
+  mat2 RN1 = mat2(0.424864,  0.905261, -0.905261,  0.424864);
+  mat2 RN2 = mat2(-0.481558,  0.876414, -0.876414, -0.481558);
 
   vec3 starLayers(vec3 dir, vec2 uv) {
     vec3 acc = vec3(0.0);
 
-    const int R = 1;
     for (int layer = 0; layer < 3; ++layer){
       float scale   = (layer==0) ? 420.0 : (layer==1) ? 1111.0 : 2777.0;
       float densMul = (layer==0) ? 0.55 : (layer==1) ? 0.35   : 0.18;
       float radius  = (layer==0) ? 0.0040: (layer==1)? 0.0024 : 0.0016;
 
-      vec2 uvr = (layer==0) ? (uv * rot(0.32)) :
-                (layer==1) ? (uv * rot(1.13)) :
-                              (uv * rot(2.07));
+      vec2 uvr = (layer==0) ? (uv * R0) : (layer==1) ? (uv * R1) : (uv * R2);
 
       vec2 g = uvr * scale;
       vec2 c0 = floor(g);
 
+      int R = (layer == 0) ? 1 : 0;
       for (int j = -R; j <= R; ++j){
         for (int i = -R; i <= R; ++i){
           vec2 cell = c0 + vec2(float(i), float(j));
@@ -149,14 +157,11 @@ const fragmentShader = /* glsl */`
 
           // independent seeds
           float colorSeed   = hash12(cell + 113.0 + float(layer)*7.0);
-          float sizeSeed    = hash12(cell + 91.0  + float(layer)*5.0);
+          float sizeSeed    = hash12(cell + 91.0  + float(layer)*7.0);
 
-          vec2 centerUV = (cell) / scale;
-          centerUV = (layer==0) ? (centerUV * rot(-0.32)) :
-                    (layer==1) ? (centerUV * rot(-1.13)) :
-                                  (centerUV * rot(-2.07));
+          vec2 centerUV = (cell * (layer==0 ? RN0 : layer==1 ? RN1 : RN2)) / scale;
 
-          vec3 cDir = octaUnproject(fract(centerUV));
+          vec3 cDir = octaUnproject(centerUV);
 
           float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
@@ -179,20 +184,6 @@ const fragmentShader = /* glsl */`
     p = fract(p * 0.3183099 + vec2(0.1, 0.7));
     p *= 17.0;
     return fract(p.x * p.y * (p.x + p.y));
-  }
-
-  float noise2(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
   }
 
   float fractal(float n) {
@@ -241,7 +232,7 @@ const fragmentShader = /* glsl */`
     float curtain = pow(h, 1.2) * exp(-h * 20.0);
 
     float v = fbm(vec3(
-      dir.x * 8.0 + uTime * 0.01, h * 20.0, dir.z * 2.0 + uTime * 0.01
+      dir.x * 8.0 + uTime * 0.003, h * 20.0, dir.z * 2.0 + uTime * 0.003
     ));
 
     float a = curtain * v;
@@ -271,7 +262,7 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    float tilt = uTime * 0.002;
+    float tilt = uTime * 0.0004;
     float tiltAngle = radians(50.5); 
     mat3 rotMat  = rotateY(tilt);
     mat3 tiltMat = rotateX(tiltAngle);
@@ -305,7 +296,7 @@ const fragmentShader = /* glsl */`
 
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
 
-    if (dir.y > 0.01) {
+    if (dir.y > 0.01 && dayFactor < 0.95) {
       vec3 stars = starLayers(vdir, uv);
       stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
       color += stars;

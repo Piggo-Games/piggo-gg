@@ -1,8 +1,9 @@
 import { cos, randomInt, randomLR, sin, TeamNumber, XY, XYZ } from "@piggo-gg/core"
-import { Box3, BoxGeometry, Color, Matrix4, Mesh, MeshBasicMaterial, Object3D, Ray, Raycaster, Scene, Vector3 } from "three"
+import { Box3, BoxGeometry, Color, Mesh, MeshBasicMaterial, Object3D, Raycaster, Vector3 } from "three"
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 export type ColorMapping = Record<string, Record<TeamNumber, `#${string}`>>
+export type Particle = { mesh: Mesh, velocity: XYZ, pos: XYZ, duration: number, tick: number, gravity: number }
 
 export const colorMaterials = (obj: Object3D, mapping: ColorMapping, team: TeamNumber) => {
   obj.traverse((child) => {

@@ -10,7 +10,7 @@ export type VolleySounds = "spike"
 export type LaserSounds = "laser1"
 
 export type ValidSounds =
-  BubbleSounds | ClickSounds | MusicSounds |
+  BubbleSounds | ClickSounds | MusicSounds | ToolSounds |
   GunNames | EatSounds | VolleySounds | LaserSounds
 
 const load = (url: string, volume: number): Tone => {
@@ -85,11 +85,11 @@ export const Sound = (world: World): Sound => {
       eat: load("eat.mp3", -10),
       eat2: load("eat2.mp3", -10),
       spike: load("spike.mp3", 5),
-      laser1: load("laser1.mp3", -15)
+      laser1: load("laser1.mp3", -15),
 
-      // thud: load("thud.mp3", -15),
-      // whiff: load("whiff.wav", -15),
-      // slash: load("slash.mp3", -20),
+      thud: load("thud.mp3", -15),
+      whiff: load("whiff.wav", -15),
+      slash: load("slash.mp3", -17),
       // steps: load("steps.mp3", 0),
       // piano1: load("piano1.mp3", 5),
       // whoosh: load("whoosh.mp3", 0),
