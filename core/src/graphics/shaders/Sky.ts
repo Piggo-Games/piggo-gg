@@ -121,24 +121,28 @@ const fragmentShader = /* glsl */`
   }
 
   // -------------------- starfield --------------------
-  mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+
+  mat2 R0 = mat2(0.949235, -0.314520, 0.314520,  0.949235);
+  mat2 R1 = mat2(0.424864, -0.905261, 0.905261,  0.424864);
+  mat2 R2 = mat2(-0.481558, -0.876414, 0.876414, -0.481558);
+  mat2 RN0 = mat2(0.949235,  0.314520, -0.314520,  0.949235);
+  mat2 RN1 = mat2(0.424864,  0.905261, -0.905261,  0.424864);
+  mat2 RN2 = mat2(-0.481558,  0.876414, -0.876414, -0.481558);
 
   vec3 starLayers(vec3 dir, vec2 uv) {
     vec3 acc = vec3(0.0);
 
-    const int R = 1;
     for (int layer = 0; layer < 3; ++layer){
       float scale   = (layer==0) ? 420.0 : (layer==1) ? 1111.0 : 2777.0;
       float densMul = (layer==0) ? 0.55 : (layer==1) ? 0.35   : 0.18;
       float radius  = (layer==0) ? 0.0040: (layer==1)? 0.0024 : 0.0016;
 
-      vec2 uvr = (layer==0) ? (uv * rot(0.32)) :
-                (layer==1) ? (uv * rot(1.13)) :
-                              (uv * rot(2.07));
+      vec2 uvr = (layer==0) ? (uv * R0) : (layer==1) ? (uv * R1) : (uv * R2);
 
       vec2 g = uvr * scale;
       vec2 c0 = floor(g);
 
+      int R = (layer == 0) ? 1 : 0;
       for (int j = -R; j <= R; ++j){
         for (int i = -R; i <= R; ++i){
           vec2 cell = c0 + vec2(float(i), float(j));
@@ -149,12 +153,10 @@ const fragmentShader = /* glsl */`
 
           // independent seeds
           float colorSeed   = hash12(cell + 113.0 + float(layer)*7.0);
-          float sizeSeed    = hash12(cell + 91.0  + float(layer)*5.0);
+          float sizeSeed    = hash12(cell + 91.0  + float(layer)*7.0);
 
           vec2 centerUV = (cell) / scale;
-          centerUV = (layer==0) ? (centerUV * rot(-0.32)) :
-                    (layer==1) ? (centerUV * rot(-1.13)) :
-                                  (centerUV * rot(-2.07));
+          centerUV = (layer==0) ? (centerUV * RN0) : (layer==1) ? (centerUV * RN1) : (centerUV * RN2);
 
           vec3 cDir = octaUnproject(fract(centerUV));
 
