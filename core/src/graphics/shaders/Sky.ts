@@ -1,4 +1,4 @@
-import { dayness, Entity, Position, Three } from "@piggo-gg/core"
+import { dayness, Entity, Position, screenWH, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
@@ -10,12 +10,16 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta, world }) => {
+        onRender: ({ delta, world, three }) => {
           if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value = world.tick + delta / 25
             mat.uniforms.uDay.value = dayness(world.tick, delta)
+
+            mat.uniforms.uResolution.value = {
+              x: three.canvas?.clientWidth || 1, y: three.canvas?.clientHeight || 1
+            }
           }
         },
         init: async ({ o, three }) => {
@@ -155,10 +159,9 @@ const fragmentShader = /* glsl */`
           float colorSeed   = hash12(cell + 113.0 + float(layer)*7.0);
           float sizeSeed    = hash12(cell + 91.0  + float(layer)*7.0);
 
-          vec2 centerUV = (cell) / scale;
-          centerUV = (layer==0) ? (centerUV * RN0) : (layer==1) ? (centerUV * RN1) : (centerUV * RN2);
+          vec2 centerUV = (cell * (layer==0 ? RN0 : layer==1 ? RN1 : RN2)) / scale;
 
-          vec3 cDir = octaUnproject(fract(centerUV));
+          vec3 cDir = octaUnproject(centerUV);
 
           float r = radius * mix(0.7, 1.8, sizeSeed);
           acc += stampStar(dir, cDir, r, colorSeed);
