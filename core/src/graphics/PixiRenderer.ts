@@ -1,7 +1,6 @@
 import {
-  ClientSystemBuilder, DebugBounds, Entity, PixiCamera, Position,
-  Renderable, TextBox, World, logPerf, pixiGraphics, replaceCanvas, screenWH,
-  values
+  ClientSystemBuilder, DebugBounds, Entity, PixiCamera, Position, Renderable,
+  TextBox, World, logPerf, pixiGraphics, replaceCanvas, screenWH, values
 } from "@piggo-gg/core"
 import { Application, Graphics, Text } from "pixi.js"
 
@@ -359,7 +358,7 @@ export const PixiDebugSystem = ClientSystemBuilder({
         onTick: ({ container }) => {
           const c = container as Graphics
           if (position.data.heading.x || position.data.heading.y) {
-            c.clear().setStrokeStyle({ width: 1, color: 0x00ffff })
+            c.clear().setStrokeStyle({ width: 1, color: 0x9999ff })
             c.moveTo(0, 0).lineTo(position.data.heading.x - position.data.x, position.data.heading.y - position.data.y)
             c.stroke()
           } else {
