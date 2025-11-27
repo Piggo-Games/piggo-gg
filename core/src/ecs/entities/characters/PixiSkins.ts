@@ -18,7 +18,6 @@ export const DudeSkin = (color: "red" | "blue" | "white"): PixiSkin => async (r)
 
   r.animations = {
     run: pixiAnimation([t["run1"], t["run2"], t["run4"], t["run5"]]),
-    jump: pixiAnimation([t["jump3"], t["jump1"]]),
     idle: pixiAnimation([t["idle1"], t["idle2"], t["idle3"], t["idle4"]]),
     spike: pixiAnimation([t["spike1"], t["spike1"]])
   }
@@ -52,7 +51,6 @@ export const Ghost: PixiSkin = async (r) => {
 
   r.animations = {
     run: pixiAnimation([t["run1"], t["run2"], t["run4"], t["run5"]]),
-    jump: pixiAnimation([t["jump3"], t["jump1"]]),
     idle: pixiAnimation([t["idle1"], t["idle2"], t["idle3"], t["idle4"]]),
     spike: pixiAnimation([t["spike3"], t["spike3"]])
   }
