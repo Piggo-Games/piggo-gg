@@ -1,4 +1,4 @@
-import { dayness, Entity, Position, screenWH, Three } from "@piggo-gg/core"
+import { dayness, Entity, Position, Three } from "@piggo-gg/core"
 import { Color, Mesh, ShaderMaterial, SphereGeometry } from "three"
 
 export const Sky = () => {
