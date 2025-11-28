@@ -268,7 +268,7 @@ const fragmentShader = /* glsl */`
     mat3 tiltMat = rotateX(tiltAngle);
     vec3 vdir = (rotMat * tiltMat) * dir;
 
-    if (cameraPosition.y < -0.1) {
+    if (cameraPosition.y < 0.0 && dir.y < 0.0) {
       gl_FragColor = vec4(0.0, 0.0, 0.2 + dir.y * 0.3, 1.0);
       return;
     }
@@ -296,7 +296,7 @@ const fragmentShader = /* glsl */`
 
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
 
-    if (dir.y > 0.01 && dayFactor < 0.95) {
+    if (dir.y > 0.002 && dayFactor < 0.95) {
       vec3 stars = starLayers(vdir, uv);
       stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
       color += stars;
