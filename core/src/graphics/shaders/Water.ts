@@ -10,28 +10,31 @@ export const Water = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta, client, world }) => {
+        onTick: ({ client }) => {
+          if (!surface) return
+
+          const pc = client.character()
+          if (!pc) return
+
+          let z = pc.components.position.data.z + 0.0
+
+          // adjust the water height
+          if (z > 0.3) {
+            z -= 0.3
+            surface.position.y = -min(z / 4, 0.7)
+          } else if (z < -0.51) {
+            z += 0.51
+            surface.position.y = max(z / 4, -1)
+          } else {
+            surface.position.y = 0
+          }
+        },
+        onRender: ({ delta, world }) => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
             mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.016
             mat.uniforms.uDay.value = dayness(world.tick, delta)
-
-            const pc = client.character()
-            if (!pc) return
-
-            let z = pc.components.position.data.z + 0.0
-
-            // adjust the water height
-            if (z > 0.3) {
-              z -= 0.3
-              surface.position.y = -min(z / 4, 0.7)
-            } else if (z < -0.51) {
-              z += 0.51
-              surface.position.y = max(z / 4, -1)
-            } else {
-              surface.position.y = 0
-            }
           }
         },
         init: async ({ o, three }) => {
@@ -310,7 +313,8 @@ export const surfaceFragment = /*glsl*/`
     normal += vec3(0.0, 0.0, 1.0);
     normal = normalize(normal).xzy;
 
-    if (cameraPosition.y > 0.0) {
+    // above the surface
+    if (cameraPosition.y > -0.08) {
       float shadow = getShadowMask();
 
       vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.32 - cameraPosition.y * 0.014, 0.0);
@@ -340,11 +344,13 @@ export const surfaceFragment = /*glsl*/`
       return;
     }
 
+    vec3 factor = uLight + vec3(0.3, 0.2, 0.2) * uDay;
+
     float originY = cameraPosition.y;
     viewLen = min(viewLen, MAX_VIEW_DEPTH);
     float sampleY = originY + viewDir.y * viewLen;
     vec3 light = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-    light *= uLight;
+    light *= factor;
 
     float reflectivity = pow2(1.0 - max(0.0, dot(viewDir, normal)));
     float t = clamp(max(reflectivity, viewLen / MAX_VIEW_DEPTH), 0.0, 1.0);
@@ -354,7 +360,7 @@ export const surfaceFragment = /*glsl*/`
         vec3 r = reflect(viewDir, -normal);
         sampleY = r.y * (MAX_VIEW_DEPTH - viewLen);
         vec3 rColor = exp((sampleY - MAX_VIEW_DEPTH_DENSITY) * ABSORPTION);
-        rColor *= uLight;
+        rColor *= factor;
 
         gl_FragColor = vec4(mix(rColor, light, t), 1.0);
         return;

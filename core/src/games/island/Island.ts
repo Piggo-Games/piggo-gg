@@ -66,7 +66,7 @@ const IslandSystem = SystemBuilder({
   init: (world) => {
 
     spawnFlat(world, 11)
-    
+
     const mobileUI = MobileUI(world)
 
     if (world.client) world.client.controls.localAim.x = PI / 2 * 2.5
@@ -94,9 +94,16 @@ const IslandSystem = SystemBuilder({
           const { position } = character.components
           const { standing, z, flying } = position.data
 
-          // fell off the map
-          if (z < -5 && !flying) {
-            position.setPosition({ x: 6, y: 6, z: 8 })
+          // handle swimming
+          if (flying) {
+            position.data.swimming = false
+          } else if (z < -0.2) {
+            position.data.swimming = true
+
+            // can't double-jump
+            if (!state.doubleJumped.includes(character.id)) state.doubleJumped.push(character.id)
+          } else if (z >= 0) {
+            position.data.swimming = false
           }
 
           // double-jump state cleanup

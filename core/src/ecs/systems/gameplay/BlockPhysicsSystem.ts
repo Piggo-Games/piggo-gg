@@ -366,15 +366,21 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           if (applyZ) position.data.z += position.data.velocity.z
 
+          const sub = position.submerged()
+
           if (position.data.flying) {
             position.data.velocity.z *= 0.8
             if (abs(position.data.velocity.z) < 0.01) {
               position.data.velocity.z = 0
             }
-            // position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
           } else {
-            position.data.velocity.z -= position.data.gravity
+            position.data.velocity.z -= position.data.gravity * (1 - sub * sub)
             position.data.velocity.z = max(position.data.velocity.z, -0.2)
+
+            // buoyancy
+            if (sub > 0) {
+              position.data.velocity.z += position.submerged(false) * 0.0016
+            }
           }
 
           // x/y movement
@@ -383,11 +389,19 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           // friction
           if (position.data.friction && !position.data.tether) {
-            const { flying, standing } = position.data
+            const { flying, standing, swimming, z } = position.data
 
             const scale = flying ? 0.9 : (standing ? 0.82 : 0.94)
             entity.components.position.scaleVelocity(scale)
+            if (swimming && sub > 0) {
+              position.data.velocity.z *= (0.84 + 0.1 * (1 - sub))
+              if (abs(position.data.velocity.z) < 0.001) {
+                position.data.velocity.z = 0
+              }
+            }
           }
+
+          // if (entity.id.startsWith("bob")) console.log("sub", sub, "z", position.data.velocity.z)
         }
       }
     }

@@ -7,8 +7,8 @@ import {
   cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
 } from "@piggo-gg/core"
 import {
-  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
-  MeshPhongMaterial, MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
+  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh, MeshPhongMaterial,
+  MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
 } from "three"
 
 const walk = 0.42
@@ -136,13 +136,15 @@ export const Bob = (player: Player): Character => {
 
           // down
           "shift": () => {
-            if (!bob.components.position.data.flying) return
+            const { flying, swimming } = bob.components.position.data
+            if (!flying && !swimming) return
             return { actionId: "down" }
           },
 
           // jump/up
           " ": ({ hold }) => {
-            if (bob.components.position.data.flying) {
+            const { flying, swimming } = bob.components.position.data
+            if (flying || swimming) {
               return { actionId: "up" }
             } else {
               return { actionId: "jump", params: { hold } }
@@ -226,14 +228,16 @@ export const Bob = (player: Player): Character => {
         up: Action("up", () => {
           const { position } = bob.components
 
-          // position.data.velocity.z = 1
-          position.impulse({ z: 0.015 })
+          let factor = 0.015
+          if (position.data.swimming) factor = 0.01 * (0.3 + position.submerged())
+          position.impulse({ z: factor })
         }),
         down: Action("down", () => {
           const { position } = bob.components
 
-          // position.data.velocity.z = -1
-          position.impulse({ z: -0.015 })
+          let factor = 0.015
+          if (position.data.swimming) factor = 0.01 * (1.3 - position.submerged())
+          position.impulse({ z: -factor })
         }),
         jump: Action("jump", ({ world, params }) => {
           const { position } = bob.components
@@ -265,6 +269,8 @@ export const Bob = (player: Player): Character => {
 
           if (position.data.standing) {
             factor = params.sprint ? run : walk
+          } else if (position.data.swimming) {
+            factor = 0.1
           } else {
             factor = params.sprint ? leap : hop
           }
@@ -337,6 +343,8 @@ export const Bob = (player: Player): Character => {
             factor = 0.36
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
+          } else if (position.data.swimming) {
+            factor = 0.1
           } else {
             factor = params.sprint ? leap : hop
           }
