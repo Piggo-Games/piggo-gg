@@ -268,8 +268,8 @@ const fragmentShader = /* glsl */`
     mat3 tiltMat = rotateX(tiltAngle);
     vec3 vdir = (rotMat * tiltMat) * dir;
 
-    if (cameraPosition.y < 0.0 && dir.y < 0.0) {
-      gl_FragColor = vec4(0.0, 0.0, 0.2 + dir.y * 0.3, 1.0);
+    if (cameraPosition.y <= -0.08 && dir.y < 0.1) {
+      gl_FragColor = vec4(0.0, 0.0, 0.25 + dir.y * 0.1, 1.0);
       return;
     }
 
@@ -277,11 +277,9 @@ const fragmentShader = /* glsl */`
     float horizon = smoothstep(-0.1, 0.9, dir.y);
     vec3 bg = mix(uHorizon, uZenith, horizon);
 
-    float dayFactor = uDay;
-
     vec3 daySky = vec3(0.24, 0.6, 1.0);
 
-    bg = mix(bg, daySky, dayFactor);
+    bg = mix(bg, daySky, uDay);
 
     vec2 uv = octaProject(vdir);
 
@@ -289,16 +287,16 @@ const fragmentShader = /* glsl */`
     vec3 sun = getSun(dir, vec3(0.5, 0.5, 0.5));
     float s = length(sun);
 
-    sun *= dayFactor;
-    sun += vec3(0.3, 0.3, 0.5) * s * (1.0 - dayFactor);
+    sun *= uDay;
+    sun += vec3(0.3, 0.3, 0.5) * s * (1.0 - uDay);
 
     vec3 clouds = getClouds(dir);
 
     vec3 color = clamp(bg * (1.0 - s / 1.5), 0.0, 1.0) + sun;
 
-    if (dir.y > 0.002 && dayFactor < 0.95) {
+    if (dir.y > 0.002 && uDay < 0.95) {
       vec3 stars = starLayers(vdir, uv);
-      stars *= clamp(0.9 - dayFactor - s, 0.0, 1.0);
+      stars *= clamp(0.9 - uDay - s, 0.0, 1.0);
       color += stars;
     }
 

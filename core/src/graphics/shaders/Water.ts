@@ -310,7 +310,7 @@ export const surfaceFragment = /*glsl*/`
     normal += vec3(0.0, 0.0, 1.0);
     normal = normalize(normal).xzy;
 
-    if (cameraPosition.y > 0.0) {
+    if (cameraPosition.y > -0.08) {
       float shadow = getShadowMask();
 
       vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.32 - cameraPosition.y * 0.014, 0.0);
