@@ -378,8 +378,9 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             position.data.velocity.z = max(position.data.velocity.z, -0.2)
 
             // buoyancy
-            const uncapped = position.submerged(false)
-            position.data.velocity.z += uncapped * 0.0016
+            if (sub > 0) {
+              position.data.velocity.z += position.submerged(false) * 0.0016
+            }
           }
 
           // x/y movement
