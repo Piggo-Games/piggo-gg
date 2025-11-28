@@ -18,11 +18,12 @@ export type Position = Component<"position", {
   pointing: Oct
   pointingDelta: XY
   recoil: number
-  rotation: number
   rotating: number
+  rotation: number
   speed: number
   standing: boolean
   stop: number
+  swimming: boolean
   tether: null | XYZ & { dist: number }
   velocity: XYZ
   velocityResets: number
@@ -97,6 +98,7 @@ export const Position = (props: PositionProps = {}): Position => {
       speed: props.speed ?? 0,
       standing: true,
       stop: props.stop ?? 0,
+      swimming: false,
       tether: null,
       velocity: props.velocity ? { ...props.velocity, z: 0 } : { x: 0, y: 0, z: 0 },
       velocityResets: props.velocityResets ?? 0
