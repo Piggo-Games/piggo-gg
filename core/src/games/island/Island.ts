@@ -95,7 +95,7 @@ const IslandSystem = SystemBuilder({
           const { standing, z, flying } = position.data
 
           // handle swimming
-          if (z < -5 && !flying) {
+          if (z < -0.2 && !flying) {
             position.data.swimming = true
           } else if (z >= 0 && !flying) {
             position.data.swimming = false

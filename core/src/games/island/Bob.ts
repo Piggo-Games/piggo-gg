@@ -142,7 +142,8 @@ export const Bob = (player: Player): Character => {
 
           // jump/up
           " ": ({ hold }) => {
-            if (bob.components.position.data.flying) {
+            const { flying, swimming } = bob.components.position.data
+            if (flying || swimming) {
               return { actionId: "up" }
             } else {
               return { actionId: "jump", params: { hold } }
@@ -265,6 +266,8 @@ export const Bob = (player: Player): Character => {
 
           if (position.data.standing) {
             factor = params.sprint ? run : walk
+          } else if (position.data.swimming) {
+            // factor = 0.2
           } else {
             factor = params.sprint ? leap : hop
           }
@@ -337,6 +340,8 @@ export const Bob = (player: Player): Character => {
             factor = 0.36
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
+          } else if (position.data.swimming) {
+            factor = 0.2
           } else {
             factor = params.sprint ? leap : hop
           }

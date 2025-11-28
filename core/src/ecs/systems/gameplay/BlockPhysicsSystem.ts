@@ -383,10 +383,15 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           // friction
           if (position.data.friction && !position.data.tether) {
-            const { flying, standing } = position.data
+            const { flying, standing, swimming, z } = position.data
 
             const scale = flying ? 0.9 : (standing ? 0.82 : 0.94)
             entity.components.position.scaleVelocity(scale)
+            if (swimming && z > -0.3) {
+              position.data.velocity.z *= 0.74
+              if (abs(position.data.velocity.z) < 0.01) position.data.velocity.z = 0
+              console.log("swimming", position.data.velocity.z)
+            }
           }
         }
       }
