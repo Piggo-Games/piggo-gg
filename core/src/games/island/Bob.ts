@@ -7,8 +7,8 @@ import {
   cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
 } from "@piggo-gg/core"
 import {
-  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Material, Mesh,
-  MeshPhongMaterial, MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
+  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh, MeshPhongMaterial,
+  MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
 } from "three"
 
 const walk = 0.42
@@ -270,7 +270,7 @@ export const Bob = (player: Player): Character => {
           if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else if (position.data.swimming) {
-            factor = 0.2
+            factor = 0.1
           } else {
             factor = params.sprint ? leap : hop
           }
@@ -344,7 +344,7 @@ export const Bob = (player: Player): Character => {
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else if (position.data.swimming) {
-            factor = 0.2
+            factor = 0.1
           } else {
             factor = params.sprint ? leap : hop
           }
