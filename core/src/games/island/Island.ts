@@ -97,6 +97,8 @@ const IslandSystem = SystemBuilder({
           // handle swimming
           if (z < -0.2 && !flying) {
             position.data.swimming = true
+            // insert double jump
+            if (!state.doubleJumped.includes(character.id)) state.doubleJumped.push(character.id)
           } else if (z >= 0 && !flying) {
             position.data.swimming = false
           }

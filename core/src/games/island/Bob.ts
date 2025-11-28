@@ -136,7 +136,8 @@ export const Bob = (player: Player): Character => {
 
           // down
           "shift": () => {
-            if (!bob.components.position.data.flying) return
+            const { flying, swimming } = bob.components.position.data
+            if (!flying && !swimming) return
             return { actionId: "down" }
           },
 
@@ -228,14 +229,15 @@ export const Bob = (player: Player): Character => {
           const { position } = bob.components
 
           let factor = 0.015
-          if (position.data.swimming) factor = 0.01 * position.submerged()
+          if (position.data.swimming) factor = 0.01 * (0.3 + position.submerged())
           position.impulse({ z: factor })
         }),
         down: Action("down", () => {
           const { position } = bob.components
 
-          // position.data.velocity.z = -1
-          position.impulse({ z: -0.015 })
+          let factor = 0.015
+          if (position.data.swimming) factor = 0.01 * (1.3 - position.submerged())
+          position.impulse({ z: -factor })
         }),
         jump: Action("jump", ({ world, params }) => {
           const { position } = bob.components
