@@ -268,8 +268,8 @@ const fragmentShader = /* glsl */`
     mat3 tiltMat = rotateX(tiltAngle);
     vec3 vdir = (rotMat * tiltMat) * dir;
 
-    if (cameraPosition.y <= -0.08 && dir.y < 0.1) {
-      gl_FragColor = vec4(0.0, 0.0, 0.25 + dir.y * 0.1, 1.0);
+    if (cameraPosition.y <= -0.07 && dir.y <= 0.0) {
+      gl_FragColor = vec4(0.06, 0.06, 0.06, 1.0) * uDay + vec4(0.0, 0.0, 0.24 + dir.y * 0.2, 1.0);
       return;
     }
 
