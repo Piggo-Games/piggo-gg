@@ -10,28 +10,31 @@ export const Water = () => {
     components: {
       position: Position(),
       three: Three({
-        onRender: ({ delta, client, world }) => {
+        onTick: ({ client }) => {
+          if (!surface) return
+
+          const pc = client.character()
+          if (!pc) return
+
+          let z = pc.components.position.data.z + 0.0
+
+          // adjust the water height
+          if (z > 0.3) {
+            z -= 0.3
+            surface.position.y = -min(z / 4, 0.7)
+          } else if (z < -0.51) {
+            z += 0.51
+            surface.position.y = max(z / 4, -1)
+          } else {
+            surface.position.y = 0
+          }
+        },
+        onRender: ({ delta, world }) => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
             mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.016
             mat.uniforms.uDay.value = dayness(world.tick, delta)
-
-            const pc = client.character()
-            if (!pc) return
-
-            let z = pc.components.position.data.z + 0.0
-
-            // adjust the water height
-            if (z > 0.3) {
-              z -= 0.3
-              surface.position.y = -min(z / 4, 0.7)
-            } else if (z < -0.51) {
-              z += 0.51
-              surface.position.y = max(z / 4, -1)
-            } else {
-              surface.position.y = 0
-            }
           }
         },
         init: async ({ o, three }) => {

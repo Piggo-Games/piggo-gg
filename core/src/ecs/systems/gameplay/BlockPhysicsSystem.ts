@@ -394,6 +394,9 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             entity.components.position.scaleVelocity(scale)
             if (swimming && sub > 0) {
               position.data.velocity.z *= (0.84 + 0.1 * (1 - sub))
+              if (abs(position.data.velocity.z) < 0.001) {
+                position.data.velocity.z = 0
+              }
             }
           }
 

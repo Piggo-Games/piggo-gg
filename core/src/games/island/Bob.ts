@@ -7,7 +7,7 @@ import {
   cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
 } from "@piggo-gg/core"
 import {
-  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh,
+  AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Material, Mesh,
   MeshPhongMaterial, MeshPhysicalMaterial, Object3D, Object3DEventMap, SkeletonHelper, Vector3
 } from "three"
 
