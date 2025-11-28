@@ -366,6 +366,8 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           if (applyZ) position.data.z += position.data.velocity.z
 
+          const sub = position.submerged()
+
           if (position.data.flying) {
             position.data.velocity.z *= 0.8
             if (abs(position.data.velocity.z) < 0.01) {
@@ -373,8 +375,11 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             }
             // position.data.velocity.z = (position.data.aim.y + 0.2) * 0.07
           } else {
-            position.data.velocity.z -= position.data.gravity
+            position.data.velocity.z -= position.data.gravity * (1 - sub)
             position.data.velocity.z = max(position.data.velocity.z, -0.2)
+
+            // buoyancy effect
+            position.data.velocity.z += sub * 0.001
           }
 
           // x/y movement
@@ -387,12 +392,14 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             const scale = flying ? 0.9 : (standing ? 0.82 : 0.94)
             entity.components.position.scaleVelocity(scale)
-            if (swimming && z > -0.3) {
-              position.data.velocity.z *= 0.74
-              if (abs(position.data.velocity.z) < 0.01) position.data.velocity.z = 0
-              console.log("swimming", position.data.velocity.z)
+            if (swimming && sub > 0) {
+              position.data.velocity.z *= (0.9 + 0.1 * (1 - sub))
+              // if (abs(position.data.velocity.z) < 0.01) position.data.velocity.z = 0
+              // console.log("swimming", position.data.velocity.z)
             }
           }
+
+          if (entity.id.startsWith("bob")) console.log("sub", sub, "z", position.data.velocity.z)
         }
       }
     }

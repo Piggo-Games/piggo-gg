@@ -227,8 +227,9 @@ export const Bob = (player: Player): Character => {
         up: Action("up", () => {
           const { position } = bob.components
 
-          // position.data.velocity.z = 1
-          position.impulse({ z: 0.015 })
+          let factor = 0.015
+          if (position.data.swimming) factor = 0.01 * position.submerged()
+          position.impulse({ z: factor })
         }),
         down: Action("down", () => {
           const { position } = bob.components

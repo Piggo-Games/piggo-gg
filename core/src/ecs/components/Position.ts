@@ -38,6 +38,7 @@ export type Position = Component<"position", {
   setRotation: (_: number) => Position
   setVelocity: (_: { x?: number, y?: number, z?: number }) => Position
   scaleVelocity: (factor: number) => Position
+  submerged: () => number
   impulse: (_: { x?: number, y?: number, z?: number }) => Position
   interpolate: (world: World, delta: number) => XYZ
   setSpeed: (_: number) => void
@@ -138,6 +139,17 @@ export const Position = (props: PositionProps = {}): Position => {
       if (abs(position.data.velocity.y) < 0.02) position.data.velocity.y = 0
 
       return position
+    },
+    submerged: (): number => {
+      if (!position.data.swimming) return 0
+
+      // below, -0.5, fully submerged
+      if (position.data.z < -0.5) return 1
+
+      // above, 0, not submerged
+      if (position.data.z >= 0) return 0
+
+      return round(abs(position.data.z) / 0.5, 2)
     },
     impulse: ({ x, y, z }: XYZ) => {
       if (x !== undefined) position.data.velocity.x = round(position.data.velocity.x + x, 5)
