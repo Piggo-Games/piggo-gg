@@ -95,11 +95,14 @@ const IslandSystem = SystemBuilder({
           const { standing, z, flying } = position.data
 
           // handle swimming
-          if (z < -0.2 && !flying) {
+          if (flying) {
+            position.data.swimming = false
+          } else if (z < -0.2) {
             position.data.swimming = true
-            // insert double jump
+
+            // can't double-jump
             if (!state.doubleJumped.includes(character.id)) state.doubleJumped.push(character.id)
-          } else if (z >= 0 && !flying) {
+          } else if (z >= 0) {
             position.data.swimming = false
           }
 

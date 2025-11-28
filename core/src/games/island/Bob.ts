@@ -270,7 +270,7 @@ export const Bob = (player: Player): Character => {
           if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else if (position.data.swimming) {
-            // factor = 0.2
+            factor = 0.2
           } else {
             factor = params.sprint ? leap : hop
           }
