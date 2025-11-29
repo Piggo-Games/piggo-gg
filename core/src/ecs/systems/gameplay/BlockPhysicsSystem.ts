@@ -340,6 +340,8 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           }
 
           run()
+
+          // re-run for tall characters
           if (!xSwept || !ySwept || !zSwept) {
             z += 0.39
             run()
