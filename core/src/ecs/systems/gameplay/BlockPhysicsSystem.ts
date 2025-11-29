@@ -27,6 +27,8 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           let zSwept = false
           let applyZ = false
 
+          let run2: 0 | 1 = 0
+
           let { velocity, x, y, z } = position.data
 
           position.localVelocity = { ...position.data.velocity }
@@ -252,9 +254,11 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             }
 
             const zSweep = world.blocks.atIJK(ijk) && !zSwept
+            // console.log("zSweep", zSweep, zSwept, world.tick)
 
             if (zSweep) {
               zSwept = true
+              console.log("zSweep!!", world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
@@ -269,10 +273,11 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
               }
 
               if (velocity.z > 0 && wouldGo.z > blockMin.z) {
+                const cap = round(blockMin.z - 0.1, 5) - 0.41 * run2
                 if (mode === "local") {
-                  position.localVelocity.z = round(blockMin.z - 0.1 - position.data.z, 5)
+                  position.localVelocity.z = cap - position.data.z
                 } else {
-                  position.data.z = round(blockMin.z - 0.1, 5)
+                  position.data.z = cap
                   position.data.velocity.z = 0
                   position.data.standing = false
                 }
@@ -295,7 +300,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             // enhanced zSweep
 
-            if (!xSwept && !ySwept && !zSwept) {
+            if (!xSwept && !ySwept && !zSwept && !run2) {
 
               wouldGo = {
                 x: x + velocity.x / 40 + 0.05 * sign(velocity.x),
@@ -343,7 +348,8 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           // re-run for tall characters
           if (!xSwept || !ySwept || !zSwept) {
-            z += 0.39
+            z += 0.41
+            run2 = 1
             run()
           }
 
