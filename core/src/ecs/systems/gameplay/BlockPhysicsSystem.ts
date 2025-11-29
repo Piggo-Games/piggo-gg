@@ -46,7 +46,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
               z: floor((0.01 + wouldGo.z) / 0.3)
             }
 
-            const ySweep = world.blocks.atIJK(ijk)
+            const ySweep = world.blocks.atIJK(ijk) && !ySwept
 
             if (ySweep) {
               ySwept = true
@@ -94,7 +94,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
               z: floor((0.01 + wouldGo.z) / 0.3)
             }
 
-            const xSweep = world.blocks.atIJK(ijk)
+            const xSweep = world.blocks.atIJK(ijk) && !xSwept
 
             if (xSweep) {
               xSwept = true
@@ -143,7 +143,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
                 z: floor((0.01 + wouldGo.z) / 0.3)
               }
 
-              const cornerSweep = world.blocks.atIJK(ijk)
+              const cornerSweep = world.blocks.atIJK(ijk) && !xSwept && !ySwept
 
               if (cornerSweep) {
                 // if (mode === "global") console.log("cornerSweep", world.tick)
@@ -251,7 +251,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
               z: floor((0.01 + wouldGo.z) / 0.3)
             }
 
-            const zSweep = world.blocks.atIJK(ijk)
+            const zSweep = world.blocks.atIJK(ijk) && !zSwept
 
             if (zSweep) {
               zSwept = true
@@ -288,7 +288,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
                 position.data.standing = false
                 applyZ = true
               }
-            } else if (mode !== "local") {
+            } else if (mode !== "local" && !zSwept) {
               position.data.standing = false
               applyZ = true
             }
@@ -340,7 +340,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           }
 
           run()
-          if (!xSwept && !ySwept && !zSwept) {
+          if (!xSwept || !ySwept || !zSwept) {
             z += 0.3
             run()
             console.log("run again", xSwept, ySwept, zSwept)
