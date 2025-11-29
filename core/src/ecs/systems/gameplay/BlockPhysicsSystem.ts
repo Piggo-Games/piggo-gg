@@ -341,9 +341,8 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           run()
           if (!xSwept || !ySwept || !zSwept) {
-            z += 0.3
+            z += 0.39
             run()
-            console.log("run again", xSwept, ySwept, zSwept)
           }
 
           if (position.data.tether) {
