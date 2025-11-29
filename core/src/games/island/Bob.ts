@@ -505,7 +505,7 @@ export const Bob = (player: Player): Character => {
             block.material.forEach((mat) => mat.color.set(blockColor))
           }
         },
-        init: async ({ o, entity, world, three }) => {
+        init: async ({ o, world, three }) => {
 
           // body
           const bodyGeo = new CapsuleGeometry(0.064, 0.34)
