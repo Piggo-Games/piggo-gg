@@ -66,6 +66,7 @@ export const Water = () => {
             fragmentShader: surfaceFragment,
             side: 2,
             lights: true,
+            forceSinglePass: true,
             uniforms: {
               ...UniformsLib.lights,
               uNormalMap1: { value: null },
