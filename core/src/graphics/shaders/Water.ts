@@ -41,7 +41,7 @@ export const Water = () => {
           surface = new Mesh()
 
           const halfSize = 1500
-          const surfaceY = -0.06
+          const surfaceY = -0.02
 
           const surfaceVertices = new Float32Array([
             -halfSize, surfaceY, -halfSize,
