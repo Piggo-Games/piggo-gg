@@ -1,5 +1,5 @@
-import { ClientSystemBuilder, replaceCanvas, screenWH, ThreeCamera, World } from "@piggo-gg/core"
-import { Scene, TextureLoader, WebGLRenderer } from "three"
+import { ClientSystemBuilder, Entity, Position, replaceCanvas, screenWH, Three, ThreeCamera, values, World } from "@piggo-gg/core"
+import { Mesh, Scene, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
@@ -92,13 +92,17 @@ export const ThreeDebugSystem = ClientSystemBuilder({
   id: "ThreeDebugSystem",
   init: (world) => {
 
+    const meshes: Mesh[] = []
+
     return {
       id: "ThreeDebugSystem",
       priority: 5,
       skipOnRollback: true,
       query: ["debug", "three", "position"],
-      onTick: () => {
-
+      onTick: (entities: Entity<Three | Position>[]) => {
+        for (const entity of entities) {
+          const { three, position } = entity.components
+        }
       }
     }
   }
