@@ -53,7 +53,6 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             if (ySweep) {
               ySwept = true
-              console.log("ySweep", run2, world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
@@ -102,7 +101,6 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             if (xSweep) {
               xSwept = true
-              console.log("xSweep", run2, world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
@@ -257,7 +255,6 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
             }
 
             const zSweep = world.blocks.atIJK(ijk) && !zSwept
-            // console.log("zSweep", zSweep, zSwept, world.tick)
 
             if (zSweep) {
               zSwept = true
