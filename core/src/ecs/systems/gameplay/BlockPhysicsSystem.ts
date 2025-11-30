@@ -28,6 +28,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           let applyZ = false
 
           let run2: 0 | 1 = 0
+          let runHeight = 0
 
           let { velocity, x, y, z } = position.data
 
@@ -274,7 +275,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
               }
 
               if (velocity.z > 0 && wouldGo.z > blockMin.z) {
-                const cap = round(blockMin.z - 0.1, 5) - 0.41 * run2
+                const cap = round(blockMin.z - 0.1, 5) - runHeight * run2
                 if (mode === "local") {
                   position.localVelocity.z = cap - position.data.z
                 } else {
@@ -349,8 +350,15 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
           // re-run for tall characters
           if (!xSwept || !ySwept || !zSwept) {
-            z += 0.41
+            runHeight = 0.29
+            z += runHeight
             run2 = 1
+            run()
+          }
+
+          if (!xSwept || !ySwept || !zSwept) {
+            runHeight = 0.41
+            z += 0.12
             run()
           }
 
