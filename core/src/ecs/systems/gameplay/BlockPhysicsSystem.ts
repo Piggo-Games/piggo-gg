@@ -258,7 +258,6 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             if (zSweep) {
               zSwept = true
-              console.log("zSweep!!", world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
