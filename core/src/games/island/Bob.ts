@@ -4,7 +4,8 @@ import {
   Point, Position, Team, XYZ, XZ, IslandSettings, cloneSkeleton,
   Ready, ColorMapping, nextColor, MarbleTexture, BlockMaterial,
   IslandState, blockInLine, hypot, Input, Three, upAndDir, colorMaterials,
-  cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
+  cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex,
+  Debug
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh, MeshPhongMaterial,

@@ -1,5 +1,5 @@
-import { ClientSystemBuilder, Entity, Position, replaceCanvas, screenWH, Three, ThreeCamera, values, World } from "@piggo-gg/core"
-import { Mesh, Scene, TextureLoader, WebGLRenderer } from "three"
+import { ClientSystemBuilder, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
+import { Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
@@ -92,16 +92,49 @@ export const ThreeDebugSystem = ClientSystemBuilder({
   id: "ThreeDebugSystem",
   init: (world) => {
 
-    const meshes: Mesh[] = []
+    let meshes: Record<string, Mesh> = {}
 
     return {
       id: "ThreeDebugSystem",
       priority: 5,
       skipOnRollback: true,
       query: ["debug", "three", "position"],
-      onTick: (entities: Entity<Three | Position>[]) => {
-        for (const entity of entities) {
-          const { three, position } = entity.components
+      onRender: (_, delta) => {
+        if (!world.debug) return
+
+        // character mesh
+        const pc = world.client?.character()
+        if (pc) {
+          if (!meshes["debug_sphere1"]) {
+            const sphere1 = new Mesh(
+              new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0xff0000, wireframe: true })
+            )
+            meshes["debug_sphere1"] = sphere1
+            world.three?.scene.add(sphere1)
+          }
+
+          if (!meshes["debug_sphere2"]) {
+            const sphere2 = new Mesh(
+              new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0x00ff00, wireframe: true })
+            )
+            meshes["debug_sphere2"] = sphere2
+            world.three?.scene.add(sphere2)
+          }
+
+          const mesh1 = meshes["debug_sphere1"]
+          const mesh2 = meshes["debug_sphere2"]
+          const { x, y, z } = pc.components.position.interpolate(world, delta)
+
+          mesh1.position.set(x, z, y)
+          mesh2.position.set(x, z + 0.41, y)
+        }
+      },
+      onTick: () => {
+        if (!world.debug) {
+          for (const mesh of values(meshes)) {
+            world.three?.scene.remove(mesh)
+          }
+          meshes = {}
         }
       }
     }
