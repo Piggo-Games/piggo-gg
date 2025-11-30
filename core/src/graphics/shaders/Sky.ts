@@ -32,7 +32,7 @@ export const Sky = () => {
           }
         },
         init: async ({ o, three }) => {
-          const geo = new SphereGeometry(480, 60, 40)
+          const geo = new SphereGeometry(250, 60, 40)
 
           const material = new ShaderMaterial({
             uniforms: {

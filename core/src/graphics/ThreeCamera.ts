@@ -14,7 +14,7 @@ export type ThreeCamera = {
 
 export const ThreeCamera = (): ThreeCamera => {
 
-  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 500)
+  const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 300)
   camera.rotation.order = "YXZ"
 
   const ThreeCamera: ThreeCamera = {
