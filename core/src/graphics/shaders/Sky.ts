@@ -10,6 +10,15 @@ export const Sky = () => {
     components: {
       position: Position(),
       three: Three({
+        onTick: ({ client }) => {
+          if (!mesh) return
+
+          const pc = client.character()
+          if (!pc) return
+
+          mesh.position.x = pc.components.position.data.x
+          mesh.position.z = pc.components.position.data.y
+        },
         onRender: ({ delta, world, three }) => {
           if (mesh && world.game.id === "island") {
             const mat = mesh.material as ShaderMaterial
@@ -23,7 +32,7 @@ export const Sky = () => {
           }
         },
         init: async ({ o, three }) => {
-          const geo = new SphereGeometry(500, 60, 40)
+          const geo = new SphereGeometry(480, 60, 40)
 
           const material = new ShaderMaterial({
             uniforms: {

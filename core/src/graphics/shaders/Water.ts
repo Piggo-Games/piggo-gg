@@ -40,8 +40,8 @@ export const Water = () => {
         init: async ({ o, three }) => {
           surface = new Mesh()
 
-          const halfSize = 1500
-          const surfaceY = -0.02
+          const halfSize = 200
+          const surfaceY = -0.04
 
           const surfaceVertices = new Float32Array([
             -halfSize, surfaceY, -halfSize,

@@ -52,6 +52,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             if (ySweep) {
               ySwept = true
+              console.log("ySweep", run2, world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
@@ -100,6 +101,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
 
             if (xSweep) {
               xSwept = true
+              console.log("xSweep", run2, world.tick)
 
               const blockMin = {
                 x: ijk.x * blockSize - 0.15,
@@ -280,7 +282,7 @@ export const BlockPhysicsSystem = (mode: "global" | "local") => SystemBuilder({
                   position.data.velocity.z = 0
                   position.data.standing = false
                 }
-              } else if (velocity.z < 0 && wouldGo.z + 0.1 < blockMax.z) {
+              } else if (!run2 && velocity.z < 0 && wouldGo.z + 0.1 < blockMax.z) {
                 if (mode === "local") {
                   position.localVelocity.z = round(blockMax.z - position.data.z, 5)
                 } else {
