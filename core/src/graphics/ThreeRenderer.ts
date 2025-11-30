@@ -1,4 +1,4 @@
-import { replaceCanvas, screenWH, ThreeCamera, World } from "@piggo-gg/core"
+import { ClientSystemBuilder, replaceCanvas, screenWH, ThreeCamera, World } from "@piggo-gg/core"
 import { Scene, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
@@ -87,3 +87,19 @@ export const ThreeRenderer = (): ThreeRenderer => {
   }
   return renderer
 }
+
+export const ThreeDebugSystem = ClientSystemBuilder({
+  id: "ThreeDebugSystem",
+  init: (world) => {
+
+    return {
+      id: "ThreeDebugSystem",
+      priority: 5,
+      skipOnRollback: true,
+      query: ["debug", "three", "position"],
+      onTick: () => {
+
+      }
+    }
+  }
+})
