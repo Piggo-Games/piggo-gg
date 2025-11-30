@@ -176,21 +176,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
-          if (!world.debug) {
-            world.blocks.remove(hit.inside)
-          } else if (hit.inside.type !== 12) {
-            // world.blocks.setType(hit.inside, 12)
-          } else {
-            const xyzstr: XYZstring = `${hit.inside.x},${hit.inside.y},${hit.inside.z}`
-            if (world.blocks.coloring[xyzstr]) {
-              const color = nextColor(world.blocks.coloring[xyzstr])
-              world.blocks.coloring[xyzstr] = color
-            } else {
-              world.blocks.coloring[xyzstr] = `slategray`
-            }
-
-            world.blocks.invalidate()
-          }
+          world.blocks.remove(hit.inside)
         }),
       }),
       three: Three({

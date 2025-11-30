@@ -49,9 +49,7 @@ export const BlockData = (): BlockData => {
   }
 
   const blocks: BlockData = {
-    coloring: {
-      // "34,49,3": "mediumseagreen"
-    },
+    coloring: {},
     clear: () => {
       data = []
       visibleCache = {}

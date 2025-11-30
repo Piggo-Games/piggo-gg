@@ -40,8 +40,8 @@ export const Water = () => {
         init: async ({ o, three }) => {
           surface = new Mesh()
 
-          const halfSize = 1500
-          const surfaceY = -0.06
+          const halfSize = 200
+          const surfaceY = -0.04
 
           const surfaceVertices = new Float32Array([
             -halfSize, surfaceY, -halfSize,
@@ -315,7 +315,7 @@ export const surfaceFragment = /*glsl*/`
     normal = normalize(normal).xzy;
 
     // above the surface
-    if (cameraPosition.y > -0.08) {
+    if (cameraPosition.y > -0.05) {
       float shadow = getShadowMask();
 
       vec3 halfWayDir = normalize(uDirToLight - viewDir) + vec3(0.0, 0.32 - cameraPosition.y * 0.014, 0.0);
