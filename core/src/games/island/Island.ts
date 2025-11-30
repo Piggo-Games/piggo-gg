@@ -1,12 +1,13 @@
 import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
-  InventorySystem, PI, Sky, spawnFlat, SpawnSystem, Sun, SystemBuilder,
+  InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder,
   ThreeCameraSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
 import { MobileUI } from "../craft/MobileUI"
+import { IslandMap, IslandMapColoring } from "./IslandMap"
 
 export type IslandSettings = {
   showCrosshair: boolean
@@ -65,7 +66,8 @@ const IslandSystem = SystemBuilder({
   id: "IslandSystem",
   init: (world) => {
 
-    spawnFlat(world, 11)
+    world.blocks.loadMap(IslandMap)
+    world.blocks.coloring = IslandMapColoring
 
     const mobileUI = MobileUI(world)
 
