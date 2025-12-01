@@ -18,6 +18,8 @@ export const GameCommand: Command<GameCommandParams> = {
     const gameId = params.game as GameTitle
     if (world.games[gameId] && world.game.id !== gameId) {
       world.setGame(gameId)
+
+      if (["craft", "strike", "island"].includes(gameId)) world.client?.pointerLock()
     }
   },
   cooldown: 0

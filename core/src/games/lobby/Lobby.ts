@@ -44,11 +44,13 @@ const GameButton = (game: GameBuilder, world: World) => {
 
       if (!world.client?.isLeader()) return
 
-      world.actions.push(world.tick + 2, "gameLobby", { actionId: "selectGame", params: { gameId: game.id } })
       world.client?.sound.play({ name: "bubble" })
+      world.actions.push(world.tick + 30, "world", { actionId: "game", params: { game: game.id } })
     },
     onHover: (button) => {
       button.style.boxShadow = "0 0 10px 4px white"
+
+
     },
     onHoverOut: (button) => {
       button.style.boxShadow = "none"
@@ -73,7 +75,7 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "min(6.6vw, 110px)",
+      width: "min(6.6vw, 100px)",
       borderRadius: "8px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
@@ -264,11 +266,11 @@ const GameLobby = (): Entity => {
           }
 
           // make border green for selected game
-          const state = world.game.state as LobbyState
-          for (const button of gameButtons) {
-            const selected = button.innerText === state.gameId
-            button.style.outline = selected ? "2px solid #00dd88" : "none"
-          }
+          // const state = world.game.state as LobbyState
+          // for (const button of gameButtons) {
+          //   const selected = button.innerText === state.gameId
+          //   button.style.outline = selected ? "2px solid #00dd88" : "none"
+          // }
         }
       })
     }
