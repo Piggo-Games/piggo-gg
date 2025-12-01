@@ -8,6 +8,7 @@ import { Bob } from "./Bob"
 import { Pig } from "./Pig"
 import { MobileUI } from "../craft/MobileUI"
 import { IslandMap, IslandMapColoring } from "./IslandMap"
+import { Shork } from "./Shork"
 
 export type IslandSettings = {
   showCrosshair: boolean
@@ -58,7 +59,8 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       Sun(),
       HtmlLagText(),
       HtmlFpsText(),
-      Pig()
+      Pig(),
+      Shork()
     ]
   })
 }
