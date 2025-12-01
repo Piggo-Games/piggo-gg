@@ -87,6 +87,8 @@ const StrikeSystem = SystemBuilder({
 
     const mobileUI = MobileUI(world)
 
+    if (world.client) world.client.controls.localAim.x = 0
+
     return {
       id: "StrikeSystem",
       query: [],
