@@ -254,7 +254,7 @@ export const vectorExtend = (vec: XYZ, amount: number): XYZ => {
 }
 
 export const hourness = (tick: number, delta: number): number => {
-  const time = (tick + delta / 25) / 12
+  const time = (tick + delta / 25) / 24
   return (time % 24)
 }
 
