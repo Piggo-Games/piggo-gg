@@ -1,4 +1,4 @@
-import { Entity, NPC, Position, Three } from "@piggo-gg/core"
+import { Collider, Entity, NPC, Position, Three } from "@piggo-gg/core"
 import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Shork = () => {
@@ -11,27 +11,53 @@ export const Shork = () => {
     id: "shork",
     components: {
       position: Position({ x: 15, y: 15, z: -0.25 }),
-      // collider: Collider({ shape: "ball", radius: 0.1 }),
+      collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {
           if (!mesh || died) return
 
           const pc = world.client?.character()
-          if (!died && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
-            died = true
-            mesh.rotation.x = Math.PI / 2
-            hitboxes.body!.visible = false
-          }
+          // if (!died && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
+          //   died = true
+          //   mesh.rotation.x = Math.PI / 2
+          //   hitboxes.body!.visible = false
+          // }
 
-          mesh.rotation.y += world.debug ? 0.01 : 0
+          // mesh.rotation.y += world.debug ? 0.01 : 0
 
           // move hitbox
-          if (hitboxes.body) {
-            const pos = shork.components.position.data
-            hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
-            hitboxes.body.rotation.y = mesh.rotation.y
+          // if (hitboxes.body) {
+          //   const pos = shork.components.position.data
+          //   hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
+          //   hitboxes.body.rotation.y = mesh.rotation.y
 
-            hitboxes.body.visible = world.debug
+          //   hitboxes.body.visible = world.debug
+          // }
+
+
+          // if swimming, move toward player
+          if (pc?.components.position.data.swimming) {
+            const shorkPos = shork.components.position.data
+            const pcPos = pc.components.position.data
+
+            const dirX = pcPos.x - shorkPos.x
+            const dirY = pcPos.y - shorkPos.y
+            const length = Math.sqrt(dirX * dirX + dirY * dirY)
+
+            if (length < 0.3) {
+              shork.components.position.setVelocity({ x: 0, y: 0 })
+              return
+            }
+
+            shork.components.position.setVelocity({
+              x: dirX / length * 1,
+              y: dirY / length * 1
+            })
+
+            // orient toward player
+            mesh.rotation.y = Math.atan2(dirX, dirY)
+          } else {
+            shork.components.position.setVelocity({ x: 0, y: 0 })
           }
         }
       }),
