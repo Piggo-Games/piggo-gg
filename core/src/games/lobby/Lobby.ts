@@ -65,38 +65,6 @@ const GameButton = (game: GameBuilder, world: World) => {
   )
 }
 
-const PlayButton = (world: World) => {
-  const button = HButton({
-    text: "Play",
-    style: {
-      position: "relative", left: "50%", width: "300px", height: "42px", transform: "translate(-50%)",
-
-      marginTop: "80px",
-      fontSize: "26px",
-      textShadow: "none",
-
-      border: "2px solid transparent",
-      borderRadius: "6px",
-      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #999999)",
-      backgroundOrigin: "border-box",
-      backgroundClip: "content-box, border-box"
-    },
-    onClick: () => {
-      if (!world.client?.isLeader()) return
-
-      const state = world.state<LobbyState>()
-      if (["craft", "strike", "island"].includes(state.gameId)) world.client?.pointerLock()
-
-      world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: state.gameId } })
-      world.actions.push(world.tick + 2, "world", { actionId: "game", params: { game: state.gameId } })
-
-      world.client?.sound.play({ name: "bubble" })
-    }
-  })
-
-  return button
-}
-
 const Profile = (world: World): RefreshableDiv => {
 
   let tick = 0
@@ -205,7 +173,6 @@ const GameLobby = (): Entity => {
 
   let gameButtons: HTMLButtonElement[] = []
 
-  let playButton: HTMLButtonElement | undefined = undefined
   let lobbiesMenu: RefreshableDiv | undefined = undefined
   let profile: RefreshableDiv | undefined = undefined
   let playersOnline: RefreshableDiv | undefined = undefined
@@ -270,9 +237,6 @@ const GameLobby = (): Entity => {
 
             document.body.appendChild(shell)
 
-            playButton = PlayButton(world)
-            shell.appendChild(playButton)
-
             const lobbiesShell = HtmlDiv({
               transform: "translate(-50%)",
               left: "50%",
@@ -298,8 +262,6 @@ const GameLobby = (): Entity => {
             profile?.update()
             playersOnline?.update()
           }
-
-          if (playButton) styleButton(playButton, world.client?.isLeader() ?? false, playButton.matches(":hover"))
 
           // make border green for selected game
           const state = world.game.state as LobbyState
