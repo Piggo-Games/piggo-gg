@@ -1,13 +1,11 @@
 import {
-  Actions, Background, Island, Entity, GameBuilder, getBrowser,
-  HButton, HImg, HText, HtmlDiv, HtmlLagText, HtmlText,
-  LobbiesMenu, Networked, NPC, piggoVersion, PixiRenderSystem,
-  RefreshableDiv, Strike, Volley, World, canvasAppend
+  Background, Island, Entity, GameBuilder, getBrowser, HButton, HImg, HText,
+  HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC, piggoVersion,
+  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend
 } from "@piggo-gg/core"
 
 type LobbyState = {
   starting: boolean
-  // gameId: "volley" | "craft" | "strike" | "island"
 }
 
 export const Lobby: GameBuilder<LobbyState> = {
@@ -38,27 +36,34 @@ const GameButton = (game: GameBuilder, world: World) => {
   return HButton({
     style: {
       width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
-      transition: "transform 0.8s ease, box-shadow 0.2s ease",
+      transition: "transform 0.5s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
     },
     onClick: (button) => {
-      button.style.transform = `translate(0%, 0%) rotateY(${rotation += 360}deg)`
+      button.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
 
       if (!world.client?.isLeader()) return
       if (state.starting) return
 
       world.client?.sound.play({ name: "bubble" })
-      world.actions.push(world.tick + 30, "world", { actionId: "game", params: { game: game.id } })
+      world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
       state.starting = true
     },
     onHover: (button) => {
       if (state.starting) return
+
+      button.style.transform = "translate(0%, -16px)"
       button.style.boxShadow = "0 0 10px 4px white"
     },
     onHoverOut: (button) => {
       if (state.starting) return
       button.style.boxShadow = "none"
+
+      button.style.transform = "translate(0%, 0%)"
+
+      button.style.width = "180px"
+      button.style.height = "170px"
     }
   },
     HImg({
