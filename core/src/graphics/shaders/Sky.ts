@@ -278,7 +278,7 @@ const fragmentShader = /* glsl */`
     vec3 vdir = (rotMat * tiltMat) * dir;
 
     // underwater
-    if (cameraPosition.y <= -0.05 && dir.y <= 0.01) {
+    if (cameraPosition.y <= -0.04 && dir.y <= 0.005) {
       gl_FragColor = vec4(0.06, 0.06, 0.06, 1.0) * uDay + vec4(0.0, 0.0, 0.24 + dir.y * 0.2, 1.0);
       return;
     }
