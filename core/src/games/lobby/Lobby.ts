@@ -2,11 +2,12 @@ import {
   Actions, Background, Island, Entity, GameBuilder, getBrowser,
   HButton, HImg, HText, HtmlDiv, HtmlLagText, HtmlText,
   LobbiesMenu, Networked, NPC, piggoVersion, PixiRenderSystem,
-  RefreshableDiv, Strike, styleButton, Volley, World
+  RefreshableDiv, Strike, Volley, World, canvasAppend
 } from "@piggo-gg/core"
 
 type LobbyState = {
-  gameId: "volley" | "craft" | "strike" | "island"
+  starting: boolean
+  // gameId: "volley" | "craft" | "strike" | "island"
 }
 
 export const Lobby: GameBuilder<LobbyState> = {
@@ -16,7 +17,7 @@ export const Lobby: GameBuilder<LobbyState> = {
     renderer: "pixi",
     settings: {},
     state: {
-      gameId: "island"
+      starting: false
     },
     systems: [PixiRenderSystem],
     entities: [
@@ -32,6 +33,8 @@ const GameButton = (game: GameBuilder, world: World) => {
 
   let rotation = 0
 
+  const state = world.game.state as LobbyState
+
   return HButton({
     style: {
       width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
@@ -43,16 +46,18 @@ const GameButton = (game: GameBuilder, world: World) => {
       button.style.transform = `translate(0%, 0%) rotateY(${rotation += 360}deg)`
 
       if (!world.client?.isLeader()) return
+      if (state.starting) return
 
       world.client?.sound.play({ name: "bubble" })
       world.actions.push(world.tick + 30, "world", { actionId: "game", params: { game: game.id } })
+      state.starting = true
     },
     onHover: (button) => {
+      if (state.starting) return
       button.style.boxShadow = "0 0 10px 4px white"
-
-
     },
     onHoverOut: (button) => {
+      if (state.starting) return
       button.style.boxShadow = "none"
     }
   },
@@ -180,7 +185,7 @@ const GameLobby = (): Entity => {
   let playersOnline: RefreshableDiv | undefined = undefined
 
   if (getBrowser() === "safari") {
-    document.body.appendChild(HText({
+    canvasAppend(HText({
       text: "please use Chrome or Firefox",
       style: {
         color: "red", bottom: "4%", left: "50%", transform: "translate(-50%)", fontSize: "24px"
@@ -192,13 +197,6 @@ const GameLobby = (): Entity => {
     id: "gameLobby",
     components: {
       networked: Networked(),
-      actions: Actions({
-        "selectGame": ({ world, params }) => {
-          if (!params) return
-          const state = world.game.state as LobbyState
-          state.gameId = params.gameId
-        }
-      }),
       npc: NPC({
         behavior: (_, world) => {
 
@@ -206,11 +204,11 @@ const GameLobby = (): Entity => {
 
             playersOnline = PlayersOnline(world)
 
-            document.body.appendChild(Version())
-            document.body.appendChild(playersOnline.div)
+            canvasAppend(Version())
+            canvasAppend(playersOnline.div)
 
             profile = Profile(world)
-            document.body.appendChild(profile.div)
+            canvasAppend(profile.div)
 
             const shell = HtmlDiv({
               left: "50%",
@@ -237,7 +235,7 @@ const GameLobby = (): Entity => {
               gameButtons.push(gameButton)
             }
 
-            document.body.appendChild(shell)
+            canvasAppend(shell)
 
             const lobbiesShell = HtmlDiv({
               transform: "translate(-50%)",
@@ -251,7 +249,6 @@ const GameLobby = (): Entity => {
 
             lobbiesMenu = LobbiesMenu(world)
             lobbiesShell.appendChild(lobbiesMenu.div)
-            // shell.appendChild(lobbiesShell)
           }
 
 
@@ -264,13 +261,6 @@ const GameLobby = (): Entity => {
             profile?.update()
             playersOnline?.update()
           }
-
-          // make border green for selected game
-          // const state = world.game.state as LobbyState
-          // for (const button of gameButtons) {
-          //   const selected = button.innerText === state.gameId
-          //   button.style.outline = selected ? "2px solid #00dd88" : "none"
-          // }
         }
       })
     }

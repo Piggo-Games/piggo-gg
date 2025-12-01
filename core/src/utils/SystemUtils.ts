@@ -60,3 +60,10 @@ export const replaceCanvas = () => {
 
   return newCanvas
 }
+
+export const canvasAppend = (element: HTMLElement) => {
+  const canvasParent = document.getElementById("canvas-parent") as HTMLCanvasElement | undefined
+  if (canvasParent) {
+    canvasParent.appendChild(element)
+  }
+}
