@@ -3,7 +3,8 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island,
+  HDiv
 } from "@piggo-gg/core"
 
 export type World = {
@@ -64,6 +65,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   let lastRender = 0
   let framesThisSecond = 0
+
+  let opacity = 1
 
   const world: World = {
     actions: TickBuffer(),
@@ -215,10 +218,13 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       })
     },
     onRender: () => {
+      const now = performance.now()
+      const delta = now - world.time
+      const since = now - lastRender
+
       if (world.pixi || world.three) {
-        const now = performance.now()
         values(world.systems).forEach((system) => {
-          system.onRender?.(filterEntities(system.query, values(world.entities)), now - world.time, now - lastRender)
+          system.onRender?.(filterEntities(system.query, values(world.entities)), delta, since)
         })
         lastRender = now
 
@@ -228,6 +234,16 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
           framesThisSecond = 0
         }
         framesThisSecond += 1
+      }
+
+      // fade in
+      const bigdiv = document.getElementById("bigdiv")
+      if (bigdiv) {
+        opacity -= since * 0.001
+        bigdiv.style.opacity = opacity.toString()
+        if (opacity <= 0) {
+          bigdiv.remove()
+        }
       }
     },
     players: () => {
@@ -309,6 +325,23 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       } else if (world.game.renderer === "three" && !world.three?.ready) {
         world.pixi?.deactivate()
         world.three?.activate(world)
+      }
+
+      // black out the scene
+      if (world.client) {
+        const div = HDiv({
+          id: "bigdiv",
+          style: {
+            left: "0px",
+            top: "0px",
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            backgroundColor: "black"
+          }
+        })
+        opacity = 1
+        document.body.appendChild(div)
       }
     },
     settings: <S extends {}>(): S => {
