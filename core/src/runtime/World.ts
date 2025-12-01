@@ -327,6 +327,9 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         world.three?.activate(world)
       }
 
+      // pointer lock for certain games
+      if (["craft", "strike", "island"].includes(game.id)) world.client?.pointerLock()
+
       // black out the scene
       if (world.client) {
         const div = HDiv({
