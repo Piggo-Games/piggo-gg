@@ -3,8 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island,
-  HDiv
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island, HDiv
 } from "@piggo-gg/core"
 
 export type World = {
