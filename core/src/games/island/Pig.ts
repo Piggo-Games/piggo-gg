@@ -1,5 +1,5 @@
 import { Collider, Entity, Health, Hitbox, HitboxShape, NPC, Position, Three } from "@piggo-gg/core"
-import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
+import { BoxGeometry, Color, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Pig = () => {
 
@@ -12,7 +12,7 @@ export const Pig = () => {
     offset: { x: 0, y: 0, z: 0.17 }
   }
 
-  const pig = Entity<Position | Health>({
+  const pig = Entity<Position | Health | Three>({
     id: "pig",
     components: {
       position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI }),
@@ -26,6 +26,10 @@ export const Pig = () => {
             mesh.rotation.x = Math.PI / 2
             hitboxes.body!.visible = false
             return
+          }
+
+          if (world.tick % 40 === 0) {
+            pig.components.three.flash(0.5)
           }
 
           // pig.components.position.data.rotation += 0.01
@@ -71,6 +75,10 @@ export const Pig = () => {
               if (child instanceof Mesh) {
                 child.castShadow = true
                 child.receiveShadow = true
+
+                // const mat = child.material as MeshPhongMaterial
+                // mat.emissiveIntensity = 1
+                // mat.emissive = new Color(0xffffff)
               }
             })
 

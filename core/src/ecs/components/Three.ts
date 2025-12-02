@@ -1,7 +1,7 @@
-import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World } from "@piggo-gg/core"
-import { Object3D, Object3DEventMap } from "three"
+import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World, max } from "@piggo-gg/core"
+import { Color, Mesh, Object3D, Object3DEventMap } from "three"
 
-type ThreeInit = (_: {o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer}) => Promise<void>
+type ThreeInit = (_: { o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer }) => Promise<void>
 
 type OnRenderProps = {
   entity: Entity<Three | Position>
@@ -14,11 +14,13 @@ type OnRenderProps = {
 
 export type Three = Component<"three", {}> & {
   initialized: boolean
+  emission: number
   o: Object3D[]
   init: undefined | ThreeInit
   onRender: undefined | ((_: OnRenderProps) => void)
   onTick: undefined | ((_: Omit<OnRenderProps, "delta" | "since">) => void)
   cleanup: (world: World) => void
+  flash: (intensity: number) => void
 }
 
 export type ThreeProps = {
@@ -32,12 +34,32 @@ export const Three = (props: ThreeProps = {}): Three => {
     type: "three",
     data: {},
     initialized: false,
+    emission: 0,
     o: [],
     init: props.init,
     onRender: props.onRender,
     onTick: props.onTick,
     cleanup: (world) => {
       world.three?.scene.remove(...three.o)
+    },
+    flash: (intensity: number) => {
+      three.emission = max(1, three.emission + intensity)
+
+      console.log("FLASH", three.emission)
+      for (const o of three.o) {
+        o.traverse((child) => {
+          if (child instanceof Mesh) {
+            const mat = (child as any).material
+            console.log("MAT", mat)
+            if (mat) {
+              if (mat.emissive) {
+                mat.emissiveIntensity = three.emission
+                mat.emissive = new Color(0xffffff)
+              }
+            }
+          }
+        })
+      }
     }
   }
 
@@ -87,6 +109,15 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
           const { three } = entity.components
           three.onRender?.({ entity, world, client: world.client!, delta, since, three: world.three! })
         }
+
+        // handle emission decay
+        // for (const entity of entities) {
+        //   const { three } = entity.components
+        //   if (three.emission > 0) {
+        //     three.emission -= since * 2
+        //     three.emission = Math.max(0, three.emission)
+        //   }
+        // }
       }
     }
   }
