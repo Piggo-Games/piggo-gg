@@ -29,7 +29,7 @@ export const Pig = () => {
             hitboxes.body!.visible = false
           }
 
-          pig.components.position.data.rotation += 0.01
+          // pig.components.position.data.rotation += 0.01
 
           // move hitbox
           if (hitboxes.body) {

@@ -254,7 +254,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
             console.log("hit")
-            spawnParticles(hitboxHit.point, world)
+            spawnParticles(hitboxHit.point, world, true)
             return
           }
 
