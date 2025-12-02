@@ -171,7 +171,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           const blockDistance = hit ? XYZdistance(eyePos, hit.edge) : Infinity
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
-            console.log("hit")
             hitboxHit.entity.components.health?.damage(1, world)
             world.three?.spawnParticles(hitboxHit.point, world, "blood")
             return
@@ -245,25 +244,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
               tracer.visible = false
             }
           }
-
-          // // particles
-          // for (let i = 1; i < particles.length; i++) {
-          //   const p = particles[i]
-
-          //   if (world.tick - p.tick >= p.duration) {
-          //     if (p.mesh.parent) {
-          //       world.three?.scene.remove(p.mesh)
-          //     }
-          //     particles.splice(i, 1)
-          //     i--
-          //   } else {
-          //     p.mesh.position.set(
-          //       p.pos.x + p.velocity.x * ratio,
-          //       p.pos.z + p.velocity.z * ratio,
-          //       p.pos.y + p.velocity.y * ratio
-          //     )
-          //   }
-          // }
 
           if (!mesh) return
 
