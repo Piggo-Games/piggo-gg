@@ -1,4 +1,4 @@
-import { Collider, Entity, NPC, Position, Three } from "@piggo-gg/core"
+import { Collider, cos, Entity, NPC, PI, Position, sin, Three } from "@piggo-gg/core"
 import { Group, Mesh, Object3DEventMap } from "three"
 
 export const Shork = () => {
@@ -14,6 +14,7 @@ export const Shork = () => {
         behavior: (_, world) => {
           if (!mesh) return
 
+          const { position }  = shork.components
           const pc = world.client?.character()
 
           // if swimming, move toward player
@@ -26,19 +27,21 @@ export const Shork = () => {
             const length = Math.sqrt(dirX * dirX + dirY * dirY)
 
             if (length < 0.3) {
-              shork.components.position.setVelocity({ x: 0, y: 0 })
+              position.setVelocity({ x: 0, y: 0 })
               return
             }
 
-            shork.components.position.setVelocity({
-              x: dirX / length * 1,
-              y: dirY / length * 1
-            })
+            position.setVelocity({ x: dirX / length * 1, y: dirY / length * 1 })
 
             // orient toward player
-            mesh.rotation.y = Math.atan2(dirX, dirY)
+            position.data.rotation = Math.atan2(dirX, dirY)
           } else {
-            shork.components.position.setVelocity({ x: 0, y: 0 })
+
+            const { rotation } = position.data
+            position.setVelocity({
+              x: cos(rotation),
+              y: sin(rotation)
+            })
           }
         }
       }),
@@ -48,6 +51,7 @@ export const Shork = () => {
 
           if (mesh) {
             mesh.position.set(pos.x, pos.z, pos.y)
+            mesh.rotation.y = shork.components.position.data.rotation
           }
         },
         init: async ({ o, three }) => {
@@ -60,7 +64,6 @@ export const Shork = () => {
             mesh.scale.set(0.06, 0.06, 0.06)
 
             mesh.rotation.order = "YXZ"
-            mesh.rotation.y = Math.PI / 3 * 2
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
