@@ -107,14 +107,14 @@ const CraftSystem = SystemBuilder({
         if (pc && preview) preview.update(world.three!.camera.pos(), world.three!.camera.dir(world))
 
         // ambient sound
-        if (!ambient && sound?.ready && settings.ambientSound) {
-          ambient = sound.play({ name: "birdsong1" })
-        } else if (sound?.tones.birdsong1.state === "stopped") {
-          ambient = false
-        } else if (ambient && !settings.ambientSound) {
-          sound?.stop("birdsong1")
-          ambient = false
-        }
+        // if (!ambient && sound?.ready && settings.ambientSound) {
+        //   ambient = sound.play({ name: "birdsong1" })
+        // } else if (sound?.tones.birdsong1.state === "stopped") {
+        //   ambient = false
+        // } else if (ambient && !settings.ambientSound) {
+        //   sound?.stop("birdsong1")
+        //   ambient = false
+        // }
 
         const players = world.players()
         const characters = world.characters()

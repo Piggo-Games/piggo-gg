@@ -206,7 +206,7 @@ const MusicToggle = (world: World): RefreshableDiv => {
       style: {
         width: "22px",
         height: "22px",
-        left: "50%",
+        left: "48%",
         top: "50%",
         transform: "translate(-50%, -50%)",
         transition: "transform 0.5s ease, box-shadow 0.2s ease"

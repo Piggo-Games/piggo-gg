@@ -1,12 +1,11 @@
 import {
-  Entity, GameData, Hitbox, Player, SerializedEntity,
+  Entity, GameData, Player, SerializedEntity,
   Syncer, Apple, entries, keys, stringify, logDiff
 } from "@piggo-gg/core"
 import { Bot } from "../games/volley/Bot"
 
 export const entityConstructors: Record<string, (_: { id?: string }) => Entity> = {
   "player": Player,
-  "hitbox": Hitbox,
   "d3apple": Apple,
   "bot": ({ id }: { id: string }) => {
     const x = Number(id.split("|")[1])

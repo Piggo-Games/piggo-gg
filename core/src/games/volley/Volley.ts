@@ -137,7 +137,7 @@ const VolleySystem = SystemBuilder({
         const characters = world.queryEntities<Position | Team | Renderable>(["position", "team", "actions"])
 
         // reset jump hits
-        const newJumpHits = []
+        const newJumpHits: string[] = []
         if (state.jumpHits && state.jumpHits.length > 0) {
           for (const jumpHitter of state.jumpHits) {
             const character = world.entity<Position | Team | Renderable>(jumpHitter)

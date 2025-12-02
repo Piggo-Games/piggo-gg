@@ -1,5 +1,8 @@
-import { ClientSystemBuilder, dummyPromise, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
-import { Mesh, Scene, TextureLoader, WebGLRenderer } from "three"
+import {
+  ClientSystemBuilder, dummyPromise, Particle, randomColorBG, randomColorRY,
+  randomVector3, replaceCanvas, screenWH, ThreeCamera, World, XYZ
+} from "@piggo-gg/core"
+import { Color, Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
@@ -11,10 +14,20 @@ export type ThreeRenderer = {
   ready: boolean
   scene: Scene
   tLoader: TextureLoader
+  particles: Particle[]
   append: (...elements: HTMLElement[]) => void
   activate: (world: World) => Promise<void>
+  spawnParticles: (pos: XYZ, world: World, type?: ParticleType) => void
   deactivate: () => void
   resize: () => void
+}
+
+export type ParticleType = "water" | "blast" | "blood"
+
+const ParticleMap: Record<ParticleType, { colorFunction: () => Color, duration: number, gravity: number, velocity: number }> = {
+  water: { colorFunction: randomColorBG, duration: 9, gravity: 0.0024, velocity: 0.03 },
+  blast: { colorFunction: randomColorRY, duration: 6, gravity: 0, velocity: 0.03 },
+  blood: { colorFunction: () => new Color(0xff0000), duration: 9, gravity: 0.0028, velocity: 0.015 }
 }
 
 export const ThreeRenderer = (): ThreeRenderer => {
@@ -29,6 +42,7 @@ export const ThreeRenderer = (): ThreeRenderer => {
     fLoader: new FBXLoader(),
     gLoader: new GLTFLoader(),
     tLoader: new TextureLoader(),
+    particles: [],
     append: (...elements: HTMLElement[]) => {
       const parent = document.getElementById("canvas-parent")
       if (parent) parent.append(...elements)
@@ -41,6 +55,31 @@ export const ThreeRenderer = (): ThreeRenderer => {
       renderer.camera.c.aspect = w / h
 
       renderer.camera.c.updateProjectionMatrix()
+    },
+    spawnParticles: (pos: XYZ, world: World, type: ParticleType = "blast") => {
+      const proto = renderer.particles[0]
+      if (!proto) return
+
+      // explosion particles
+      for (let i = 0; i < 20; i++) {
+        const mesh = proto.mesh.clone()
+        mesh.position.set(pos.x, pos.z, pos.y)
+
+        // vary the color
+        const color = ParticleMap[type].colorFunction()
+        mesh.material = new MeshPhongMaterial({ color, emissive: color })
+
+        renderer.particles.push({
+          mesh,
+          tick: world.tick,
+          velocity: randomVector3(ParticleMap[type].velocity),
+          pos: { ...pos },
+          duration: ParticleMap[type].duration,
+          gravity: ParticleMap[type].gravity
+        })
+
+        world.three?.scene.add(mesh)
+      }
     },
     deactivate: () => {
       renderer.scene.clear()
@@ -94,53 +133,60 @@ export const ThreeRenderer = (): ThreeRenderer => {
   return renderer
 }
 
-export const ThreeDebugSystem = ClientSystemBuilder({
-  id: "ThreeDebugSystem",
+export const ParticleSystem = ClientSystemBuilder({
+  id: "ParticleSystem",
   init: (world) => {
 
-    let meshes: Record<string, Mesh> = {}
+    const particleMesh = new Mesh(new SphereGeometry(0.008, 6, 6))
+    particleMesh.castShadow = true
+
+    world.three!.particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
 
     return {
-      id: "ThreeDebugSystem",
+      id: "ParticleSystem",
       priority: 5,
       skipOnRollback: true,
       query: ["debug", "three", "position"],
       onRender: (_, delta) => {
-        if (!world.debug) return
+        if (!world.three) return
 
-        // character mesh
-        // const pc = world.client?.character()
-        // if (pc) {
-        //   if (!meshes["debug_sphere1"]) {
-        //     const sphere1 = new Mesh(
-        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0xff0000, wireframe: true })
-        //     )
-        //     meshes["debug_sphere1"] = sphere1
-        //     world.three?.scene.add(sphere1)
-        //   }
+        const ratio = delta / 25
+        const { particles } = world.three
 
-        //   if (!meshes["debug_sphere2"]) {
-        //     const sphere2 = new Mesh(
-        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0x00ff00, wireframe: true })
-        //     )
-        //     meshes["debug_sphere2"] = sphere2
-        //     world.three?.scene.add(sphere2)
-        //   }
+        // particles
+        for (let i = 1; i < particles.length; i++) {
+          const p = particles[i]
 
-        //   const mesh1 = meshes["debug_sphere1"]
-        //   const mesh2 = meshes["debug_sphere2"]
-        //   const { x, y, z } = pc.components.position.interpolate(world, delta)
-
-          // mesh1.position.set(x, z, y)
-          // mesh2.position.set(x, z + 0.41, y)
-        // }
+          if (world.tick - p.tick >= p.duration) {
+            if (p.mesh.parent) {
+              world.three?.scene.remove(p.mesh)
+            }
+            particles.splice(i, 1)
+            i--
+          } else {
+            p.mesh.position.set(
+              p.pos.x + p.velocity.x * ratio,
+              p.pos.z + p.velocity.z * ratio,
+              p.pos.y + p.velocity.y * ratio
+            )
+          }
+        }
       },
       onTick: () => {
-        if (!world.debug) {
-          for (const mesh of values(meshes)) {
-            world.three?.scene.remove(mesh)
+        if (!world.three) return
+
+        const { particles } = world.three
+
+        for (let i = 1; i < particles.length; i++) {
+          const p = particles[i]
+
+          p.pos = {
+            x: p.pos.x + p.velocity.x,
+            y: p.pos.y + p.velocity.y,
+            z: p.pos.z + p.velocity.z
           }
-          meshes = {}
+
+          p.velocity.z -= p.gravity
         }
       }
     }
