@@ -41,6 +41,12 @@ const rayBoxIntersect = (origin: XYZ, dir: XYZ, min: XYZ, max: XYZ): number | nu
   return tmin >= 0 ? tmin : tmax
 }
 
+const rotateAroundZ = (v: XYZ, sinR: number, cosR: number): XYZ => ({
+  x: v.x * cosR - v.y * sinR,
+  y: v.x * sinR + v.y * cosR,
+  z: v.z
+})
+
 export const BlasterItem = ({ character }: { character: Character }) => {
 
   let mesh: Object3D | undefined = undefined
@@ -199,19 +205,33 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           let hitboxHit: { entity: Entity<Position | Hitbox>, distance: number, point: XYZ } | undefined
 
           for (const target of hitboxEntities) {
-            const pos = target.components.position.data
+            const tpos = target.components.position.data
+            const sinR = sin(tpos.rotation)
+            const cosR = cos(tpos.rotation)
+            const sinNeg = -sinR
+
             for (const shape of target.components.hitbox.shapes) {
+              const rotatedOffset = rotateAroundZ(shape.offset, sinR, cosR)
+
               const center = {
-                x: pos.x + shape.offset.x,
-                y: pos.y + shape.offset.y,
-                z: pos.z + shape.offset.z
+                x: tpos.x + rotatedOffset.x,
+                y: tpos.y + rotatedOffset.y,
+                z: tpos.z + rotatedOffset.z
               }
 
               const half = { x: shape.width / 2, y: shape.depth / 2, z: shape.height / 2 }
-              const min = { x: center.x - half.x, y: center.y - half.y, z: center.z - half.z }
-              const max = { x: center.x + half.x, y: center.y + half.y, z: center.z + half.z }
+              const min = { x: -half.x, y: -half.y, z: -half.z }
+              const max = { x: half.x, y: half.y, z: half.z }
 
-              const t = rayBoxIntersect(eyePos, worldDir, min, max)
+              const localOrigin = rotateAroundZ({
+                x: eyePos.x - center.x,
+                y: eyePos.y - center.y,
+                z: eyePos.z - center.z
+              }, sinNeg, cosR)
+
+              const localDir = rotateAroundZ(worldDir, sinNeg, cosR)
+
+              const t = rayBoxIntersect(localOrigin, localDir, min, max)
               if (t === null || t > maxRayDistance) continue
 
               if (!hitboxHit || t < hitboxHit.distance) {
@@ -233,7 +253,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           const blockDistance = hit ? XYZdistance(eyePos, hit.edge) : Infinity
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
-            console.log("Hitbox hit", hitboxHit.entity)
+            console.log("hit")
             spawnParticles(hitboxHit.point, world)
             return
           }
