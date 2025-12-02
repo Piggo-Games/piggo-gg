@@ -1,7 +1,6 @@
 import {
-  ClientSystemBuilder, dummyPromise, Particle, randomColorBG,
-  randomColorRY, randomVector3, replaceCanvas, screenWH,
-  ThreeCamera, values, World, XYZ
+  ClientSystemBuilder, dummyPromise, Particle, randomColorBG, randomColorRY,
+  randomVector3, replaceCanvas, screenWH, ThreeCamera, World, XYZ
 } from "@piggo-gg/core"
 import { Color, Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
@@ -25,10 +24,10 @@ export type ThreeRenderer = {
 
 export type ParticleType = "water" | "blast" | "blood"
 
-const ParticleMap: Record<ParticleType, { colorFunction: () => Color, duration: number, gravity: number }> = {
-  water: { colorFunction: randomColorBG, duration: 9, gravity: 0.0024 },
-  blast: { colorFunction: randomColorRY, duration: 6, gravity: 0 },
-  blood: { colorFunction: () => new Color(0xff0000), duration: 12, gravity: 0.003 }
+const ParticleMap: Record<ParticleType, { colorFunction: () => Color, duration: number, gravity: number, velocity: number }> = {
+  water: { colorFunction: randomColorBG, duration: 9, gravity: 0.0024, velocity: 0.03 },
+  blast: { colorFunction: randomColorRY, duration: 6, gravity: 0, velocity: 0.03 },
+  blood: { colorFunction: () => new Color(0xff0000), duration: 9, gravity: 0.0028, velocity: 0.015 }
 }
 
 export const ThreeRenderer = (): ThreeRenderer => {
@@ -67,14 +66,13 @@ export const ThreeRenderer = (): ThreeRenderer => {
         mesh.position.set(pos.x, pos.z, pos.y)
 
         // vary the color
-        console.log("spawning particle", type, ParticleMap[type])
         const color = ParticleMap[type].colorFunction()
         mesh.material = new MeshPhongMaterial({ color, emissive: color })
 
         renderer.particles.push({
           mesh,
           tick: world.tick,
-          velocity: randomVector3(0.03),
+          velocity: randomVector3(ParticleMap[type].velocity),
           pos: { ...pos },
           duration: ParticleMap[type].duration,
           gravity: ParticleMap[type].gravity

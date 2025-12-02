@@ -1,10 +1,9 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
   Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC,
-  Particle, Position, randomColorBG, randomColorRY, randomVector3,
-  rayBoxIntersect, rotateAroundZ, sin, Three, World, XY, XYZ, XYZdistance
+  Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
-import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
+import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
@@ -15,8 +14,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let mesh: Object3D | undefined = undefined
   let tracer: Object3D | undefined = undefined
   let tracerState = { tick: 0, velocity: { x: 0, y: 0, z: 0 }, pos: { x: 0, y: 0, z: 0 } }
-
-  // const particles: Particle[] = []
 
   let cd = -100
 
@@ -41,19 +38,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           if (character.id.includes("dummy") && world.tick % 120 === 0) {
             world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
           }
-
-          // particles
-          // for (let i = 1; i < particles.length; i++) {
-          //   const p = particles[i]
-
-          //   p.pos = {
-          //     x: p.pos.x + p.velocity.x,
-          //     y: p.pos.y + p.velocity.y,
-          //     z: p.pos.z + p.velocity.z
-          //   }
-
-          //   p.velocity.z -= p.gravity
-          // }
         }
       }),
       input: Input({
