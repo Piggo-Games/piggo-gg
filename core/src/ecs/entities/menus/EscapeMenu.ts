@@ -111,8 +111,6 @@ export const EscapeMenu = (world: World): Entity => {
   const skins = SkinsMenu()
   const settings = SettingsMenu(world)
 
-  // let musicEnabled = false
-
   const setMusicVisual = (button: HTMLButtonElement, world: World) => {
     const musicEnabled = world.client?.sound.music.state === "play"
     button.style.boxShadow = musicEnabled ? "0 0 8px 3px #6cf" : "none"
@@ -137,7 +135,7 @@ export const EscapeMenu = (world: World): Entity => {
       const musicEnabled = world.client?.sound.music.state !== "play"
       if (musicEnabled) {
         world.client?.sound.stopMusic()
-        const played = world.client?.sound.play({ name: "cafe", fadeIn: 0 })
+        const played = world.client?.sound.play({ name: "track1", fadeIn: 0 })
         if (played) world.client!.sound.music.state = "play"
       } else {
         world.client?.sound.stopMusic()
