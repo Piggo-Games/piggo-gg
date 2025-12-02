@@ -1,5 +1,5 @@
-import { ClientSystemBuilder, dummyPromise, logPerf, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
-import { Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
+import { ClientSystemBuilder, dummyPromise, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
+import { Mesh, Scene, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
@@ -88,7 +88,7 @@ export const ThreeRenderer = (): ThreeRenderer => {
 
       renderer.resize()
 
-      logPerf("ThreeRenderer.activate", t1)
+      // logPerf("ThreeRenderer.activate", t1)
     }
   }
   return renderer
