@@ -145,7 +145,7 @@ const fragmentShader = /* glsl */`
   vec3 starLayers(vec3 dir, vec2 uv) {
     vec3 acc = vec3(0.0);
 
-    for (int layer = 0; layer < 3; ++layer){
+    for (int layer = 0; layer < 2; ++layer){
       float scale   = (layer==0) ? 420.0 : (layer==1) ? 1111.0 : 2777.0;
       float densMul = (layer==0) ? 0.55 : (layer==1) ? 0.35   : 0.18;
       float radius  = (layer==0) ? 0.0040: (layer==1)? 0.0024 : 0.0016;
@@ -271,7 +271,7 @@ const fragmentShader = /* glsl */`
   void main() {
     vec3 dir = normalize(vWorldPosition - cameraPosition);
 
-    float tilt = uTime * 0.0004;
+    float tilt = uTime * 0.0003;
     float tiltAngle = radians(50.5); 
     mat3 rotMat  = rotateY(tilt);
     mat3 tiltMat = rotateX(tiltAngle);

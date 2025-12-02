@@ -8,7 +8,7 @@ export const Shork = () => {
   const shork = Entity<Position>({
     id: "shork",
     components: {
-      position: Position({ x: 15, y: 15, z: -0.25 }),
+      position: Position({ x: 15, y: 15, z: -0.67 }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {
@@ -57,7 +57,7 @@ export const Shork = () => {
             mesh.animations = gltf.animations
             mesh.frustumCulled = false
 
-            mesh.scale.set(0.02, 0.02, 0.02)
+            mesh.scale.set(0.06, 0.06, 0.06)
 
             mesh.rotation.order = "YXZ"
             mesh.rotation.y = Math.PI / 3 * 2
