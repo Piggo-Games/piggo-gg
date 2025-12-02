@@ -2,7 +2,7 @@ import { entries, GunNames, randomChoice, World, XY, XYdistance } from "@piggo-g
 import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from "tone"
 
 export type BubbleSounds = "bubble" | "hitmarker"
-export type MusicSounds = "track2" | "birdsong1"
+export type MusicSounds = "track1"
 export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
 export type ToolSounds = "whiff" | "thud" | "slash"
 export type EatSounds = "eat" | "eat2"
@@ -30,10 +30,7 @@ export type SoundPlayProps = {
 }
 
 export type Sound = {
-  music: {
-    state: "stop" | "play",
-    track: MusicSounds
-  }
+  music: MusicSounds
   muted: boolean
   ready: boolean
   state: "closed" | "running" | "suspended"
@@ -41,6 +38,7 @@ export type Sound = {
   stop: (name: ValidSounds) => void
   stopMusic: () => void
   stopAll: () => void
+  musicPlaying: () => boolean
   play: (props: SoundPlayProps) => boolean
   playChoice: (options: ValidSounds[], props?: Omit<SoundPlayProps, "name">) => boolean
 }
@@ -63,15 +61,16 @@ export const Sound = (world: World): Sound => {
   window.addEventListener("focus", () => sound.muted = false)
 
   const sound: Sound = {
-    music: { state: "stop", track: "track2" },
+    music: "track1",
     muted: false,
     state: "closed",
     ready: false,
     tones: {
-      birdsong1: load("birdsong1.mp3", -20),
+      // birdsong1: load("birdsong1.mp3", -20),
       bubble: load("bubble.mp3", -10),
       hitmarker: load("hitmarker.mp3", -5),
-      track2: load("track2.mp3", -10),
+      // track2: load("track2.mp3", -10),
+      track1: load("track1.mp3", -5),
       cassettePlay: load("cassettePlay.mp3", 0),
       cassetteStop: load("cassetteStop.mp3", -5),
       click1: load("click1.mp3", -5),
@@ -106,7 +105,7 @@ export const Sound = (world: World): Sound => {
       }
     },
     stopMusic: () => {
-      const musicSounds: MusicSounds[] = ["birdsong1", "track2"]
+      const musicSounds: MusicSounds[] = ["track1"]
       for (const name of musicSounds) sound.stop(name)
     },
     stopAll: () => {
@@ -123,6 +122,10 @@ export const Sound = (world: World): Sound => {
           }
         }
       }
+    },
+    musicPlaying: () => {
+      const state = sound.tones[sound.music].state
+      return state === "started"
     },
     playChoice: (options: ValidSounds[], props?: Omit<SoundPlayProps, "name">) => {
       if (sound.muted) return false

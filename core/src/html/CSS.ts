@@ -14,7 +14,7 @@ export type CSS = Partial<{
   borderImage: `linear-gradient(${string}) ${number}`
   borderRadius: `${number}px` | `${number}%`
   borderStyle: "solid" | "dashed" | "dotted"
-  bottom: `${number}%` | `${number}px`
+  bottom: `${number}%` | `${number}px` | `calc(${string})` | `${number}vw` | `max(${string})`
   boxSizing: "border-box" | "content-box"
   clipPath: string
   color: LexColor
@@ -25,10 +25,10 @@ export type CSS = Partial<{
   flexShrink: number
   float: "left" | "right" | "none"
   fontFamily: "Courier New" | "Arial"
-  fontSize: `${number}px` | `${number}vw` | `${number}vh` | `min(${string})` | `max(${string})`
+  fontSize: `${number}px` | `${number}vw` | `${number}vh` | `min(${string})` | `max(${string})` | `clamp(${string})`
   fontWeight: "normal" | "bold" | "bolder" | "lighter" | number
-  gap: `${number}px` | `${number}%`
-  height: "inherit" | `${number}px` | `${number}%` | "auto" | `${number}vh` | `${number}dvh` | "fit-content"
+  gap: `${number}px` | `${number}%` | `${number}vw` | `${number}vh`
+  height: "inherit" | `${number}px` | `${number}%` | `${number}vw` | "auto" | `${number}vh` | `${number}dvh` | "fit-content" | `min(${string})` | `calc(${string})`
   imageRendering: "auto" | "crisp-edges" | "pixelated"
   justifyContent: "center" | "flex-start" | "flex-end" | "space-between" | "space-around"
   left: `${number}%` | `${number}px` | `${number}dvh` | `calc(${string})`
@@ -52,7 +52,7 @@ export type CSS = Partial<{
   paddingBottom: `${number}px` | `${number}%`
   paddingLeft: `${number}px` | `${number}%`
   paddingRight: `${number}px` | `${number}%`
-  paddingTop: `${number}px` | `${number}%`
+  paddingTop: `${number}px` | `${number}%` | `${number}vw` | `${number}vh`
   pointerEvents: "none" | "auto"
   position: "absolute" | "relative" | "fixed" | "sticky" | "static"
   right: `${number}%` | `${number}px`

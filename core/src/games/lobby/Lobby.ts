@@ -1,7 +1,8 @@
 import {
-  Background, Island, Entity, GameBuilder, getBrowser, HButton, HImg, HText,
-  HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC, piggoVersion,
-  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend
+  Background, Island, Entity, GameBuilder, getBrowser, HButton,
+  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
+  NPC, piggoVersion, PixiRenderSystem, RefreshableDiv, Strike, Volley,
+  World, canvasAppend, HtmlFpsText, HDiv
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -21,7 +22,8 @@ export const Lobby: GameBuilder<LobbyState> = {
     entities: [
       Background({ moving: true, rays: true }),
       GameLobby(),
-      HtmlLagText()
+      HtmlLagText(),
+      HtmlFpsText()
     ],
     netcode: "delay"
   })
@@ -35,7 +37,11 @@ const GameButton = (game: GameBuilder, world: World) => {
 
   return HButton({
     style: {
-      width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
+      width: "min(20vw, 180px)",
+      height: "min(19.4vw, 170px)",
+      borderRadius: "12px",
+      fontSize: "24px",
+      position: "relative",
       transition: "transform 0.5s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
@@ -59,20 +65,27 @@ const GameButton = (game: GameBuilder, world: World) => {
     onHoverOut: (button) => {
       if (state.starting) return
       button.style.boxShadow = "none"
-
       button.style.transform = "translate(0%, 0%)"
-
-      button.style.width = "180px"
-      button.style.height = "170px"
     }
   },
     HImg({
       src: `${game.id}-256.jpg`,
-      style: { top: "50%", width: "176px", height: "166px", transform: "translate(-50%, -50%)" }
+      style: {
+        top: "50%",
+        width: "100%",
+        height: "101%",
+        transform: "translate(-50%, -50%)"
+      }
     }),
     HText({
       text: game.id,
-      style: { fontSize: "24px", left: "50%", transform: "translate(-50%)", bottom: "-34px", fontWeight: "bold" }
+      style: {
+        fontSize: "min(2.4vw, 22px)",
+        left: "50%",
+        transform: "translate(-50%)",
+        bottom: "max(-4vw, -34px)",
+        fontWeight: "bold"
+      }
     })
   )
 }
@@ -86,7 +99,7 @@ const Profile = (world: World): RefreshableDiv => {
   const ProfileFrame = (frame: number) => HImg({
     style: {
       width: "min(6.6vw, 100px)",
-      borderRadius: "8px",
+      borderRadius: "12px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
       visibility: "hidden",
@@ -124,7 +137,10 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "min(13.4vw, 200px)", aspectRatio: "20 / 17",
+        position: "relative",
+        width: "min(13.4vw, 200px)",
+        aspectRatio: "20 / 17",
+        borderRadius: "12px",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -153,6 +169,57 @@ const Profile = (world: World): RefreshableDiv => {
   }
 }
 
+const MusicToggle = (world: World): RefreshableDiv => {
+
+  const setVisual = (button: HTMLButtonElement) => {
+    const enabled = world.client?.sound.musicPlaying()
+    button.style.boxShadow = enabled ? "0 0 10px 2px #6cf" : "none"
+    button.style.opacity = enabled ? "1" : "0.7"
+  }
+
+  const button = HButton({
+    style: {
+      position: "relative",
+      width: "36px",
+      height: "36px",
+      borderRadius: "10px",
+      display: "flex",
+      justifyContent: "center",
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
+      border: "2px solid #ffffff",
+      transition: "transform 0.3s ease, box-shadow 0.2s ease"
+    },
+    onClick: () => {
+      const enabled = world.client?.sound.musicPlaying()
+      if (!enabled) {
+        world.client?.sound.stopMusic()
+        world.client?.sound.play({ name: "track1", fadeIn: 0 })
+      } else {
+        world.client?.sound.stopMusic()
+      }
+    },
+    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
+    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
+  },
+    HImg({
+      src: "music.svg",
+      style: {
+        width: "22px",
+        height: "22px",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        transition: "transform 0.5s ease, box-shadow 0.2s ease"
+      }
+    })
+  )
+
+  return {
+    div: button,
+    update: () => setVisual(button)
+  }
+}
+
 const Version = () => HtmlText({
   text: `v${piggoVersion}`,
   style: {
@@ -165,7 +232,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
   div: HText({
     id: "playersOnline",
     style: {
-      position: "fixed", right: "15px", top: "15px", fontSize: "18px", color: "white", opacity: "0.7",
+      position: "fixed", right: "15px", bottom: "15px", fontSize: "18px", color: "white", opacity: "0.7",
       userSelect: "none", pointerEvents: "none"
     }
   }),
@@ -187,6 +254,7 @@ const GameLobby = (): Entity => {
 
   let lobbiesMenu: RefreshableDiv | undefined = undefined
   let profile: RefreshableDiv | undefined = undefined
+  let musicToggle: RefreshableDiv | undefined = undefined
   let playersOnline: RefreshableDiv | undefined = undefined
 
   if (getBrowser() === "safari") {
@@ -213,7 +281,23 @@ const GameLobby = (): Entity => {
             canvasAppend(playersOnline.div)
 
             profile = Profile(world)
-            canvasAppend(profile.div)
+            musicToggle = MusicToggle(world)
+
+            const profileRow = HDiv({
+              style: {
+                position: "fixed",
+                top: "16px",
+                left: "16px",
+                display: "flex",
+                gap: "12px",
+                alignItems: "flex-start",
+              }
+            },
+              profile.div,
+              musicToggle.div
+            )
+
+            canvasAppend(profileRow)
 
             const shell = HtmlDiv({
               left: "50%",
@@ -230,7 +314,8 @@ const GameLobby = (): Entity => {
               flexDirection: "row",
               transform: "translate(-50%)",
               left: "50%",
-              border: "none"
+              border: "none",
+              paddingTop: "1vh",
             })
             shell.appendChild(gameButtonsShell)
 
@@ -264,6 +349,7 @@ const GameLobby = (): Entity => {
           if (world.client) {
             lobbiesMenu?.update()
             profile?.update()
+            musicToggle?.update()
             playersOnline?.update()
           }
         }

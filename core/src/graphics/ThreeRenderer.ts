@@ -1,5 +1,5 @@
-import { ClientSystemBuilder, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
-import { Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
+import { ClientSystemBuilder, dummyPromise, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
+import { Mesh, Scene, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
@@ -12,7 +12,7 @@ export type ThreeRenderer = {
   scene: Scene
   tLoader: TextureLoader
   append: (...elements: HTMLElement[]) => void
-  activate: (world: World) => void
+  activate: (world: World) => Promise<void>
   deactivate: () => void
   resize: () => void
 }
@@ -50,9 +50,11 @@ export const ThreeRenderer = (): ThreeRenderer => {
 
       renderer.ready = false
     },
-    activate: (world: World) => {
+    activate: async (world: World) => {
       if (renderer.ready) return
-      renderer.ready = true
+      const t1 = performance.now()
+
+      await dummyPromise()
 
       renderer.canvas = replaceCanvas()
 
@@ -82,7 +84,11 @@ export const ThreeRenderer = (): ThreeRenderer => {
         webgl?.render(renderer.scene, renderer.camera.c)
       })
 
+      renderer.ready = true
+
       renderer.resize()
+
+      // logPerf("ThreeRenderer.activate", t1)
     }
   }
   return renderer
@@ -103,31 +109,31 @@ export const ThreeDebugSystem = ClientSystemBuilder({
         if (!world.debug) return
 
         // character mesh
-        const pc = world.client?.character()
-        if (pc) {
-          if (!meshes["debug_sphere1"]) {
-            const sphere1 = new Mesh(
-              new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0xff0000, wireframe: true })
-            )
-            meshes["debug_sphere1"] = sphere1
-            world.three?.scene.add(sphere1)
-          }
+        // const pc = world.client?.character()
+        // if (pc) {
+        //   if (!meshes["debug_sphere1"]) {
+        //     const sphere1 = new Mesh(
+        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0xff0000, wireframe: true })
+        //     )
+        //     meshes["debug_sphere1"] = sphere1
+        //     world.three?.scene.add(sphere1)
+        //   }
 
-          if (!meshes["debug_sphere2"]) {
-            const sphere2 = new Mesh(
-              new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0x00ff00, wireframe: true })
-            )
-            meshes["debug_sphere2"] = sphere2
-            world.three?.scene.add(sphere2)
-          }
+        //   if (!meshes["debug_sphere2"]) {
+        //     const sphere2 = new Mesh(
+        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0x00ff00, wireframe: true })
+        //     )
+        //     meshes["debug_sphere2"] = sphere2
+        //     world.three?.scene.add(sphere2)
+        //   }
 
-          const mesh1 = meshes["debug_sphere1"]
-          const mesh2 = meshes["debug_sphere2"]
-          const { x, y, z } = pc.components.position.interpolate(world, delta)
+        //   const mesh1 = meshes["debug_sphere1"]
+        //   const mesh2 = meshes["debug_sphere2"]
+        //   const { x, y, z } = pc.components.position.interpolate(world, delta)
 
-          mesh1.position.set(x, z, y)
-          mesh2.position.set(x, z + 0.41, y)
-        }
+          // mesh1.position.set(x, z, y)
+          // mesh2.position.set(x, z + 0.41, y)
+        // }
       },
       onTick: () => {
         if (!world.debug) {

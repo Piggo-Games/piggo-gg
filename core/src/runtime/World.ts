@@ -64,7 +64,6 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   let lastRender = 0
   let framesThisSecond = 0
-
   let opacity = 1
 
   const world: World = {
@@ -236,13 +235,10 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       }
 
       // fade in
-      const bigdiv = document.getElementById("bigdiv")
-      if (bigdiv) {
+      const fadeinDiv = document.getElementById("fadein-div")
+      if (fadeinDiv) {
         opacity -= since * 0.001
-        bigdiv.style.opacity = opacity.toString()
-        if (opacity <= 0) {
-          bigdiv.remove()
-        }
+        opacity <= 0 ? fadeinDiv.remove() : fadeinDiv.style.opacity = `${opacity}`
       }
     },
     players: () => {
@@ -271,7 +267,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       delete world.entities["player-dummy-2"]
 
       // stop music
-      world.client?.sound.stopMusic()
+      // world.client?.sound.stopMusic()
 
       // clear blocks
       world.blocks.clear()
@@ -303,9 +299,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
       const { entities, systems } = world.game
 
-      if (world.pixi) {
-        world.pixi.camera.scaleTo(2.5)
-      }
+      // pixi camera
+      if (world.pixi) world.pixi.camera.scaleTo(2.5)
 
       // add new entities
       for (const entity of entities) {
@@ -313,11 +308,13 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         world.addEntity(entity)
       }
 
+      // systems
       world.addSystemBuilders(systems)
 
+      // commands
       commands?.forEach((command) => world.commands[command.id] = command)
 
-      // update renderer
+      // update renderer (async)
       if (world.game.renderer === "pixi" && !world.pixi?.ready) {
         world.three?.deactivate()
         world.pixi?.activate(world)
@@ -332,14 +329,9 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       // black out the scene
       if (world.client) {
         const div = HDiv({
-          id: "bigdiv",
+          id: "fadein-div",
           style: {
-            left: "0px",
-            top: "0px",
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            backgroundColor: "black"
+            left: "0px", top: "0px", width: "100%", height: "100%", backgroundColor: "black"
           }
         })
         opacity = 1

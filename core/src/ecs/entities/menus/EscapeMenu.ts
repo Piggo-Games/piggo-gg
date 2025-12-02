@@ -111,6 +111,51 @@ export const EscapeMenu = (world: World): Entity => {
   const skins = SkinsMenu()
   const settings = SettingsMenu(world)
 
+  const setMusicVisual = (button: HTMLButtonElement, world: World) => {
+    const enabled = world.client?.sound.musicPlaying()
+    button.style.boxShadow = enabled ? "0 0 8px 3px #6cf" : "none"
+    button.style.opacity = enabled ? "1" : "0.75"
+  }
+
+  const musicButton = HButton({
+    style: {
+      width: "44px",
+      height: "44px",
+      left: "0px",
+      bottom: "0px",
+      borderRadius: "10px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
+      border: "2px solid #ffffff",
+      transition: "transform 0.3s ease, box-shadow 0.2s ease"
+    },
+    onClick: () => {
+      const enabled = world.client?.sound.musicPlaying()
+      if (!enabled) {
+        world.client?.sound.stopMusic()
+        world.client?.sound.play({ name: "track1", fadeIn: 0 })
+      } else {
+        world.client?.sound.stopMusic()
+      }
+    },
+    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
+    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
+  },
+    HImg({
+      src: "music.svg",
+      style: {
+        width: "26px",
+        height: "26px",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        position: "absolute"
+      }
+    })
+  )
+
   const shell = HtmlDiv({
     position: "relative",
     width: "100%",
@@ -133,12 +178,15 @@ export const EscapeMenu = (world: World): Entity => {
       width: "40px",
       height: "40px",
       right: "0px",
-      bottom: "0px"
+      bottom: "0px",
+      transition: "transform 0.5s ease, box-shadow 0.2s ease"
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
-    }
+    },
+    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
+    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
   },
     HImg({
       src: "home.svg",
@@ -156,6 +204,8 @@ export const EscapeMenu = (world: World): Entity => {
       width: "calc(100% + 4px)",
     }
   })
+
+  if (!world.client?.mobile) topRowDiv.appendChild(musicButton)
   if (!world.client?.mobile) topRowDiv.appendChild(art)
   if (!world.client?.mobile) topRowDiv.appendChild(returnToHomescreen)
 
@@ -187,6 +237,7 @@ export const EscapeMenu = (world: World): Entity => {
 
           // menu buttons
           styleButton(returnToHomescreen, world.client?.isLeader() ?? false, returnToHomescreen.matches(":hover"))
+          setMusicVisual(musicButton, world)
           styleButton(lobbiesButton, activeMenu !== "lobbies", lobbiesButton.matches(":hover"))
           styleButton(skinsButton, activeMenu !== "skins", skinsButton.matches(":hover"))
           styleButton(settingsButton, activeMenu !== "settings", settingsButton.matches(":hover"))
