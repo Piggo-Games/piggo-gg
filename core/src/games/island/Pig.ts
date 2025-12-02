@@ -16,7 +16,7 @@ export const Pig = () => {
   const pig = Entity<Position>({
     id: "pig",
     components: {
-      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI }),
+      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI / 4 }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {

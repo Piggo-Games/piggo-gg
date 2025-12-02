@@ -206,8 +206,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           for (const target of hitboxEntities) {
             const tpos = target.components.position.data
-            const sinR = sin(tpos.rotation)
-            const cosR = cos(tpos.rotation)
+            const sinR = sin(-tpos.rotation)
+            const cosR = cos(-tpos.rotation)
             const sinNeg = -sinR
 
             for (const shape of target.components.hitbox.shapes) {
