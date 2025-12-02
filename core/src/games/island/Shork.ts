@@ -1,4 +1,4 @@
-import { Collider, cos, Entity, NPC, PI, Position, sin, Three } from "@piggo-gg/core"
+import { Collider, cos, Entity, NPC, Position, sin, Three } from "@piggo-gg/core"
 import { Group, Mesh, Object3DEventMap } from "three"
 
 export const Shork = () => {
@@ -28,7 +28,7 @@ export const Shork = () => {
             const dirY = pcPos.y - shorkPos.y
             const length = Math.sqrt(dirX * dirX + dirY * dirY)
 
-            if (length < 0.3) {
+            if (length < 1) {
               position.setVelocity({ x: 0, y: 0 })
               return
             }
@@ -39,11 +39,12 @@ export const Shork = () => {
             position.data.rotation = Math.atan2(dirX, dirY)
           } else {
 
-            position.rotate(0.002)
-            const r = position.data.rotation + PI / 2
+            position.rotate(0.016)
+            const r = position.data.rotation
 
             position.setVelocity({
-              x: cos(-r) * speed, y: sin(-r) * speed
+              x: sin(r) * speed,
+              y: cos(r) * speed
             })
           }
         }
