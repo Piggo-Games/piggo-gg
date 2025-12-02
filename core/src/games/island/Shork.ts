@@ -5,6 +5,8 @@ export const Shork = () => {
 
   let mesh: Group<Object3DEventMap> | undefined = undefined
 
+  const speed = 0.5
+
   const shork = Entity<Position>({
     id: "shork",
     components: {
@@ -14,7 +16,7 @@ export const Shork = () => {
         behavior: (_, world) => {
           if (!mesh) return
 
-          const { position }  = shork.components
+          const { position } = shork.components
           const pc = world.client?.character()
 
           // if swimming, move toward player
@@ -37,10 +39,11 @@ export const Shork = () => {
             position.data.rotation = Math.atan2(dirX, dirY)
           } else {
 
-            const { rotation } = position.data
+            position.rotate(0.002)
+            const r = position.data.rotation + PI / 2
+
             position.setVelocity({
-              x: cos(rotation),
-              y: sin(rotation)
+              x: cos(-r) * speed, y: sin(-r) * speed
             })
           }
         }
