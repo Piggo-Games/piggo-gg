@@ -1,10 +1,9 @@
-import { Collider, Entity, Hitbox, HitboxShape, NPC, Position, Three } from "@piggo-gg/core"
+import { Collider, Entity, Health, Hitbox, HitboxShape, NPC, Position, Three } from "@piggo-gg/core"
 import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Pig = () => {
 
   let mesh: Group<Object3DEventMap> | undefined = undefined
-  let died = false
   let hitboxes: { body?: Mesh } = {}
 
   const bodyHitbox: HitboxShape = {
@@ -13,20 +12,20 @@ export const Pig = () => {
     offset: { x: 0, y: 0, z: 0.17 }
   }
 
-  const pig = Entity<Position>({
+  const pig = Entity<Position | Health>({
     id: "pig",
     components: {
-      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI / 4 }),
+      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
+      health: Health({ hp: 10 }),
       npc: NPC({
         behavior: (_, world) => {
-          if (!mesh || died) return
+          if (!mesh) return
 
-          const pc = world.client?.character()
-          if (!died && pc?.components.inventory?.activeItem(world)?.id.startsWith("dagger")) {
-            died = true
+          if (pig.components.health.dead()) {
             mesh.rotation.x = Math.PI / 2
             hitboxes.body!.visible = false
+            return
           }
 
           // pig.components.position.data.rotation += 0.01

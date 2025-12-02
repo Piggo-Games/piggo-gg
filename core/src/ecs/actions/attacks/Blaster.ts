@@ -4,7 +4,7 @@ import {
   Particle, Position, randomColorBG, randomColorRY, randomVector3,
   rayBoxIntersect, rotateAroundZ, sin, Three, World, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
-import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
+import { Color, CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
@@ -16,37 +16,11 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let tracer: Object3D | undefined = undefined
   let tracerState = { tick: 0, velocity: { x: 0, y: 0, z: 0 }, pos: { x: 0, y: 0, z: 0 } }
 
-  const particles: Particle[] = []
+  // const particles: Particle[] = []
 
   let cd = -100
 
   const recoilRate = 0.06
-
-  const spawnParticles = (pos: XYZ, world: World, water = false) => {
-    const proto = particles[0]
-    if (!proto) return
-
-    // explosion particles
-    for (let i = 0; i < 20; i++) {
-      const mesh = proto.mesh.clone()
-      mesh.position.set(pos.x, pos.z, pos.y)
-
-      // vary the color
-      const color = water ? randomColorBG() : randomColorRY()
-      mesh.material = new MeshPhongMaterial({ color, emissive: color })
-
-      particles.push({
-        mesh,
-        tick: world.tick,
-        velocity: randomVector3(0.03),
-        pos: { ...pos },
-        duration: water ? 9 : 6,
-        gravity: water ? 0.0024 : 0
-      })
-
-      world.three?.scene.add(mesh)
-    }
-  }
 
   const item = Entity<ItemComponents>({
     id: `blaster-${character.id}`,
@@ -69,17 +43,17 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           // particles
-          for (let i = 1; i < particles.length; i++) {
-            const p = particles[i]
+          // for (let i = 1; i < particles.length; i++) {
+          //   const p = particles[i]
 
-            p.pos = {
-              x: p.pos.x + p.velocity.x,
-              y: p.pos.y + p.velocity.y,
-              z: p.pos.z + p.velocity.z
-            }
+          //   p.pos = {
+          //     x: p.pos.x + p.velocity.x,
+          //     y: p.pos.y + p.velocity.y,
+          //     z: p.pos.z + p.velocity.z
+          //   }
 
-            p.velocity.z -= p.gravity
-          }
+          //   p.velocity.z -= p.gravity
+          // }
         }
       }),
       input: Input({
@@ -164,6 +138,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           // raycast against hitboxes
           for (const target of hitboxEntities) {
+            if (target.components.health?.dead()) continue
             const tpos = target.components.position.data
             const sinR = sin(-tpos.rotation)
             const cosR = cos(-tpos.rotation)
@@ -213,7 +188,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
             console.log("hit")
-            spawnParticles(hitboxHit.point, world, true)
+            hitboxHit.entity.components.health?.damage(1, world)
+            world.three?.spawnParticles(hitboxHit.point, world, "blood")
             return
           }
 
@@ -226,11 +202,11 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             const x = eyePos.x + dir.x * t
             const y = eyePos.y + dir.z * t
 
-            spawnParticles({ x, y, z: -0.06 }, world, true)
+            world.three?.spawnParticles({ x, y, z: -0.06 }, world, "water")
             return
           }
 
-          spawnParticles(hit.edge, world)
+          world.three?.spawnParticles(hit.edge, world)
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
@@ -245,11 +221,11 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           tracer = new Mesh(tracerGeometry, new MeshPhongMaterial({ color: 0xffff99, emissive: 0xffff99 }))
           three.scene.add(tracer)
 
-          // particles
-          const particleMesh = new Mesh(new SphereGeometry(0.008, 6, 6))
-          particleMesh.castShadow = true
+          // // particles
+          // const particleMesh = new Mesh(new SphereGeometry(0.008, 6, 6))
+          // particleMesh.castShadow = true
 
-          particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
+          // particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
 
           // gun
           three.gLoader.load("flintlock.gltf", (gltf) => {
@@ -292,24 +268,24 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             }
           }
 
-          // particles
-          for (let i = 1; i < particles.length; i++) {
-            const p = particles[i]
+          // // particles
+          // for (let i = 1; i < particles.length; i++) {
+          //   const p = particles[i]
 
-            if (world.tick - p.tick >= p.duration) {
-              if (p.mesh.parent) {
-                world.three?.scene.remove(p.mesh)
-              }
-              particles.splice(i, 1)
-              i--
-            } else {
-              p.mesh.position.set(
-                p.pos.x + p.velocity.x * ratio,
-                p.pos.z + p.velocity.z * ratio,
-                p.pos.y + p.velocity.y * ratio
-              )
-            }
-          }
+          //   if (world.tick - p.tick >= p.duration) {
+          //     if (p.mesh.parent) {
+          //       world.three?.scene.remove(p.mesh)
+          //     }
+          //     particles.splice(i, 1)
+          //     i--
+          //   } else {
+          //     p.mesh.position.set(
+          //       p.pos.x + p.velocity.x * ratio,
+          //       p.pos.z + p.velocity.z * ratio,
+          //       p.pos.y + p.velocity.y * ratio
+          //     )
+          //   }
+          // }
 
           if (!mesh) return
 
