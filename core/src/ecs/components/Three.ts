@@ -1,4 +1,4 @@
-import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World, max } from "@piggo-gg/core"
+import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World, min, max } from "@piggo-gg/core"
 import { Color, Mesh, Object3D, Object3DEventMap } from "three"
 
 type ThreeInit = (_: { o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer }) => Promise<void>
@@ -43,14 +43,12 @@ export const Three = (props: ThreeProps = {}): Three => {
       world.three?.scene.remove(...three.o)
     },
     flash: (intensity: number) => {
-      three.emission = max(1, three.emission + intensity)
+      three.emission = min(1, three.emission + intensity)
 
-      console.log("FLASH", three.emission)
       for (const o of three.o) {
         o.traverse((child) => {
           if (child instanceof Mesh) {
             const mat = (child as any).material
-            console.log("MAT", mat)
             if (mat) {
               if (mat.emissive) {
                 mat.emissiveIntensity = three.emission
@@ -111,13 +109,25 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
         }
 
         // handle emission decay
-        // for (const entity of entities) {
-        //   const { three } = entity.components
-        //   if (three.emission > 0) {
-        //     three.emission -= since * 2
-        //     three.emission = Math.max(0, three.emission)
-        //   }
-        // }
+        for (const entity of entities) {
+          const { three } = entity.components
+          if (three.emission > 0) {
+            three.emission = max(0, three.emission - since / 25 / 40)
+
+            for (const o of three.o) {
+              o.traverse((child) => {
+                if (child instanceof Mesh) {
+                  const mat = (child as any).material
+                  if (mat) {
+                    if (mat.emissive) {
+                      mat.emissiveIntensity = three.emission
+                    }
+                  }
+                }
+              })
+            }
+          }
+        }
       }
     }
   }
