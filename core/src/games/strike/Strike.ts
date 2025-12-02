@@ -83,10 +83,8 @@ const StrikeSystem = SystemBuilder({
   id: "StrikeSystem",
   init: (world) => {
 
-    const t1 = performance.now()
     world.blocks.loadMap(RetakeMap)
     world.blocks.coloring = RetakeMapColoring
-    logPerf("load strike map", t1)
 
     const mobileUI = MobileUI(world)
 
