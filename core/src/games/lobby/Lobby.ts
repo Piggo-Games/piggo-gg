@@ -159,10 +159,11 @@ const Profile = (world: World): RefreshableDiv => {
 }
 
 const MusicToggle = (world: World): RefreshableDiv => {
-  let enabled = false
+  // let enabled = false
 
   const setVisual = (button: HTMLButtonElement) => {
-    button.style.boxShadow = enabled ? "0 0 10px 3px #6cf" : "none"
+    const enabled = world.client?.sound.music.state === "play"
+    button.style.boxShadow = enabled ? "0 0 10px 2px #6cf" : "none"
     button.style.opacity = enabled ? "1" : "0.7"
   }
 
@@ -173,14 +174,13 @@ const MusicToggle = (world: World): RefreshableDiv => {
       height: "36px",
       borderRadius: "10px",
       display: "flex",
-      // alignItems: "center",
       justifyContent: "center",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
       border: "2px solid #ffffff",
-      transition: "transform 0.3s ease, box-shadow 0.2s ease",
+      transition: "transform 0.3s ease, box-shadow 0.2s ease"
     },
     onClick: () => {
-      enabled = !enabled
+      const enabled = world.client?.sound.music.state !== "play"
       if (enabled) {
         world.client?.sound.stopMusic()
         const played = world.client?.sound.play({ name: "track2", fadeIn: 0 })
@@ -189,7 +189,6 @@ const MusicToggle = (world: World): RefreshableDiv => {
         world.client?.sound.stopMusic()
         if (world.client) world.client.sound.music.state = "stop"
       }
-      setVisual(button)
     },
     onHover: (btn) => btn.style.transform = "translate(0, -4px)",
     onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
@@ -202,14 +201,10 @@ const MusicToggle = (world: World): RefreshableDiv => {
         left: "50%",
         top: "50%",
         transform: "translate(-50%, -50%)",
-        transition: "transform 0.5s ease, box-shadow 0.2s ease",
-        // transition: "filter 0.2s ease"
-        // filter: "drop-shadow(0 0 4px rgba(0,0,0,0.4))"
+        transition: "transform 0.5s ease, box-shadow 0.2s ease"
       }
     })
   )
-
-  setVisual(button)
 
   return {
     div: button,
