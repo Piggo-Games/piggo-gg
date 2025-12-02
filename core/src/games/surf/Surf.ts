@@ -1,9 +1,10 @@
 import {
-  Background, Entity, GameBuilder, HtmlText, Networked, NPC, PixiRenderSystem,
+  Entity, GameBuilder, HtmlText, Networked, NPC, ThreeSystem, SystemBuilder,
   canvasAppend
 } from "@piggo-gg/core"
+import { SurfRamp } from "../../ecs/entities/objects/Ramp"
 
-// Lightweight surf prototype that reuses the Pixi renderer with a simple banner.
+// Lightweight surf prototype with a simple 3D ramp scene.
 export const Surf: GameBuilder = {
   id: "surf",
   init: () => {
@@ -30,12 +31,15 @@ export const Surf: GameBuilder = {
 
     return {
       id: "surf",
-      renderer: "pixi",
+      renderer: "three",
       settings: {},
       state: {},
-      systems: [PixiRenderSystem],
+      systems: [
+        ThreeSystem,
+        SurfCameraSystem
+      ],
       entities: [
-        Background({ moving: true, rays: true }),
+        SurfRamp(),
         Entity({
           id: "surf-banner",
           components: {
@@ -50,3 +54,20 @@ export const Surf: GameBuilder = {
     }
   }
 }
+
+const SurfCameraSystem = SystemBuilder({
+  id: "SurfCameraSystem",
+  init: (world) => {
+    return {
+      id: "SurfCameraSystem",
+      query: [],
+      priority: 1,
+      onTick: () => {
+        if (!world.three) return
+        // Park the camera so the ramp is visible.
+        world.three.camera.c.position.set(3.5, 2.5, 6)
+        world.three.camera.c.lookAt(0, 0.5, 0)
+      }
+    }
+  }
+})
