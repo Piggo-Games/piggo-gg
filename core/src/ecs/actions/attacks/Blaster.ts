@@ -204,6 +204,25 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           let hitboxHit: { entity: Entity<Position | Hitbox>, distance: number, point: XYZ } | undefined
 
+          function computeWorldAABB(center: XYZ, half: XYZ, sinR: number, cosR: number) {
+            // rotation matrix for Z:
+            // [ cos  -sin ]
+            // [ sin   cos ]
+
+            const absCos = Math.abs(cosR);
+            const absSin = Math.abs(sinR);
+
+            // expand the half extents due to rotation
+            const hx = half.x * absCos + half.y * absSin;
+            const hy = half.x * absSin + half.y * absCos;
+
+            return {
+              min: { x: center.x - hx, y: center.y - hy, z: center.z - half.z },
+              max: { x: center.x + hx, y: center.y + hy, z: center.z + half.z }
+            };
+          }
+
+
           for (const target of hitboxEntities) {
             const tpos = target.components.position.data
             const sinR = sin(tpos.rotation)
