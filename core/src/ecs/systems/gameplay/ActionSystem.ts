@@ -1,4 +1,4 @@
-import { Entity, Player, SystemBuilder, entries, keys, stringify, Position, Character } from "@piggo-gg/core"
+import { Entity, Player, SystemBuilder, entries, keys, stringify, Position, Character, logPerf } from "@piggo-gg/core"
 
 export const ActionSystem: SystemBuilder<"ActionSystem"> = {
   id: "ActionSystem",
@@ -19,7 +19,7 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
       const actionsAtTick = world.actions.atTick(world.tick)
       if (!actionsAtTick) return
 
-      for ( const [entityId, actions] of entries(actionsAtTick)) {
+      for (const [entityId, actions] of entries(actionsAtTick)) {
 
         // commands
         if (entityId === "world") {
@@ -27,7 +27,10 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
             const command = world.commands[invokedAction.actionId]
 
             const player = invokedAction.playerId ? world.entity(invokedAction.playerId) as Player : undefined
+
+            const now = performance.now()
             if (command) command.invoke({ params: invokedAction.params ?? {}, world, player })
+            logPerf(`command ${invokedAction.actionId} from ${entityId}`, now, 2)
           })
           return
         }
@@ -62,7 +65,10 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
           // execute the action
           const player = invokedAction.playerId ? world.entity(invokedAction.playerId) as Player : undefined
           const character = invokedAction.characterId ? world.entity(invokedAction.characterId) as Character : undefined
-          action.invoke({ params: invokedAction.params ?? {}, entity, world, player, character, offline: invokedAction.offline ?? false } )
+
+          const now = performance.now()
+          action.invoke({ params: invokedAction.params ?? {}, entity, world, player, character, offline: invokedAction.offline ?? false })
+          logPerf(`action ${invokedAction.actionId} from ${entityId}`, now, 2)
         }
       }
     }

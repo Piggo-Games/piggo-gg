@@ -303,9 +303,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
       const { entities, systems } = world.game
 
-      if (world.pixi) {
-        world.pixi.camera.scaleTo(2.5)
-      }
+      // pixi camera
+      if (world.pixi) world.pixi.camera.scaleTo(2.5)
 
       // add new entities
       for (const entity of entities) {
@@ -313,8 +312,10 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         world.addEntity(entity)
       }
 
+      // systems
       world.addSystemBuilders(systems)
 
+      // commands
       commands?.forEach((command) => world.commands[command.id] = command)
 
       // update renderer
@@ -334,12 +335,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         const div = HDiv({
           id: "bigdiv",
           style: {
-            left: "0px",
-            top: "0px",
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            backgroundColor: "black"
+            left: "0px", top: "0px", width: "100%", height: "100%", backgroundColor: "black"
           }
         })
         opacity = 1
