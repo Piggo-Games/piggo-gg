@@ -1,4 +1,4 @@
-import { Collider, Entity, NPC, Position, Three } from "@piggo-gg/core"
+import { Collider, Entity, Hitbox, HitboxShape, NPC, Position, Three } from "@piggo-gg/core"
 import { BoxGeometry, Group, Mesh, MeshPhongMaterial, Object3DEventMap } from "three"
 
 export const Pig = () => {
@@ -6,6 +6,12 @@ export const Pig = () => {
   let mesh: Group<Object3DEventMap> | undefined = undefined
   let died = false
   let hitboxes: { body?: Mesh } = {}
+
+  const bodyHitbox: HitboxShape = {
+    type: "box",
+    width: 0.28, height: 0.18, depth: 0.34,
+    offset: { x: 0, y: 0, z: 0.17 }
+  }
 
   const pig = Entity<Position>({
     id: "pig",
@@ -28,13 +34,14 @@ export const Pig = () => {
           // move hitbox
           if (hitboxes.body) {
             const pos = pig.components.position.data
-            hitboxes.body.position.set(pos.x, pos.z + 0.17, pos.y)
+            hitboxes.body.position.set(pos.x, pos.z + bodyHitbox.offset.z, pos.y)
             hitboxes.body.rotation.y = mesh.rotation.y
 
             hitboxes.body.visible = world.debug
           }
         }
       }),
+      hitbox: Hitbox([bodyHitbox]),
       three: Three({
         onRender: ({ delta, world }) => {
           const pos = pig.components.position.interpolate(world, delta)
@@ -44,7 +51,7 @@ export const Pig = () => {
           }
         },
         init: async ({ o, three }) => {
-          const bodyGeo = new BoxGeometry(0.28, 0.18, 0.34)
+          const bodyGeo = new BoxGeometry(bodyHitbox.width, bodyHitbox.height, bodyHitbox.depth)
           const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, wireframe: true })
           hitboxes.body = new Mesh(bodyGeo, bodyMat)
 
