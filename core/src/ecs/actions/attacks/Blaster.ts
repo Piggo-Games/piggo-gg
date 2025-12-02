@@ -2,12 +2,43 @@ import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity,
   Input, Item, ItemComponents, max, min, modelOffset, Networked,
   nextColor, NPC, Particle, Position, randomColorBG, randomColorRY,
-  randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring
+  randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring, Hitbox
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
+}
+
+const rayBoxIntersect = (origin: XYZ, dir: XYZ, min: XYZ, max: XYZ): number | null => {
+  let tmin = 0
+  let tmax = Infinity
+
+  for (const axis of ["x", "y", "z"] as const) {
+    const d = dir[axis]
+    const o = origin[axis]
+    const minA = min[axis]
+    const maxA = max[axis]
+
+    if (Math.abs(d) < 1e-8) {
+      if (o < minA || o > maxA) return null
+      continue
+    }
+
+    let t1 = (minA - o) / d
+    let t2 = (maxA - o) / d
+
+    if (t1 > t2) [t1, t2] = [t2, t1]
+
+    tmin = Math.max(tmin, t1)
+    tmax = Math.min(tmax, t2)
+
+    if (tmin > tmax) return null
+  }
+
+  if (tmax < 0) return null
+
+  return tmin >= 0 ? tmin : tmax
 }
 
 export const BlasterItem = ({ character }: { character: Character }) => {
@@ -157,8 +188,56 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           //   distance: undefined
           // }
 
+          const worldDir = { x: dir.x, y: dir.z, z: dir.y }
+          const maxRayDistance = 30
+
+          const hitboxEntities = world.queryEntities<Position | Hitbox>(
+            ["position", "hitbox"],
+            (e) => e.id !== character.id && !e.removed
+          )
+
+          let hitboxHit: { entity: Entity<Position | Hitbox>, distance: number, point: XYZ } | undefined
+
+          for (const target of hitboxEntities) {
+            const pos = target.components.position.data
+            for (const shape of target.components.hitbox.shapes) {
+              const center = {
+                x: pos.x + shape.offset.x,
+                y: pos.y + shape.offset.y,
+                z: pos.z + shape.offset.z
+              }
+
+              const half = { x: shape.width / 2, y: shape.depth / 2, z: shape.height / 2 }
+              const min = { x: center.x - half.x, y: center.y - half.y, z: center.z - half.z }
+              const max = { x: center.x + half.x, y: center.y + half.y, z: center.z + half.z }
+
+              const t = rayBoxIntersect(eyePos, worldDir, min, max)
+              if (t === null || t > maxRayDistance) continue
+
+              if (!hitboxHit || t < hitboxHit.distance) {
+                hitboxHit = {
+                  entity: target,
+                  distance: t,
+                  point: {
+                    x: eyePos.x + worldDir.x * t,
+                    y: eyePos.y + worldDir.y * t,
+                    z: eyePos.z + worldDir.z * t
+                  }
+                }
+              }
+            }
+          }
+
           // raycast against blocks
           const hit = blockInLine({ from: eyePos, dir, world, cap: 60, maxDist: 30 })
+          const blockDistance = hit ? XYZdistance(eyePos, hit.edge) : Infinity
+
+          if (hitboxHit && hitboxHit.distance <= blockDistance) {
+            console.log("Hitbox hit", hitboxHit.entity)
+            spawnParticles(hitboxHit.point, world)
+            return
+          }
+
           if (!hit) {
             if (dir.y >= 0) return
 

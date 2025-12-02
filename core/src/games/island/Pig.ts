@@ -16,7 +16,7 @@ export const Pig = () => {
   const pig = Entity<Position>({
     id: "pig",
     components: {
-      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003 }),
+      position: Position({ x: 11, y: 12, z: 2, gravity: 0.003, rotation: Math.PI }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {
@@ -29,7 +29,8 @@ export const Pig = () => {
             hitboxes.body!.visible = false
           }
 
-          mesh.rotation.y += world.debug ? 0.01 : 0
+          // mesh.rotation.y += world.debug ? 0.01 : 0
+          pig.components.position.data.rotation += 0.01
 
           // move hitbox
           if (hitboxes.body) {
@@ -48,6 +49,7 @@ export const Pig = () => {
 
           if (mesh) {
             mesh.position.set(pos.x, pos.z, pos.y)
+            mesh.rotation.y = pig.components.position.data.rotation
           }
         },
         init: async ({ o, three }) => {
@@ -66,7 +68,7 @@ export const Pig = () => {
             mesh.scale.set(0.02, 0.02, 0.02)
 
             mesh.rotation.order = "YXZ"
-            mesh.rotation.y = Math.PI / 3 * 2
+            // mesh.rotation.y = Math.PI / 3 * 2
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
