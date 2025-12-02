@@ -66,7 +66,6 @@ export const Pig = () => {
             mesh.scale.set(0.02, 0.02, 0.02)
 
             mesh.rotation.order = "YXZ"
-            // mesh.rotation.y = Math.PI / 3 * 2
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
