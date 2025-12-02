@@ -182,12 +182,15 @@ export const EscapeMenu = (world: World): Entity => {
       width: "40px",
       height: "40px",
       right: "0px",
-      bottom: "0px"
+      bottom: "0px",
+      transition: "transform 0.5s ease, box-shadow 0.2s ease"
     },
     onClick: () => {
       if (!world.client?.isLeader()) return
       world.actions.push(world.tick + 1, "world", { actionId: "game", params: { game: "lobby" } })
-    }
+    },
+    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
+    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
   },
     HImg({
       src: "home.svg",

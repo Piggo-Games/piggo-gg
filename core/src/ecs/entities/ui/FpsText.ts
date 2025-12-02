@@ -51,7 +51,7 @@ export const HtmlLagText = () => {
   const div = HText({
     style: {
       right: "16px",
-      bottom: "16px",
+      top: "16px",
       color: "#00dd00",
       textShadow: "none",
       visibility: "hidden",
