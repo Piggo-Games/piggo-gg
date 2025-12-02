@@ -1,8 +1,8 @@
 import {
-  Background, Island, Entity, GameBuilder, getBrowser, HButton, HImg, HText,
-  HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC, piggoVersion,
-  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend, HtmlFpsText,
-  HDiv
+  Background, Island, Entity, GameBuilder, getBrowser, HButton,
+  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
+  NPC, piggoVersion, PixiRenderSystem, RefreshableDiv, Strike, Volley,
+  World, canvasAppend, HtmlFpsText, HDiv
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -37,7 +37,11 @@ const GameButton = (game: GameBuilder, world: World) => {
 
   return HButton({
     style: {
-      width: "180px", height: "170px", borderRadius: "12px", fontSize: "24px", position: "relative",
+      width: "min(20vw, 180px)",
+      height: "min(19.4vw, 170px)",
+      borderRadius: "12px",
+      fontSize: "24px",
+      position: "relative",
       transition: "transform 0.5s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
@@ -61,20 +65,27 @@ const GameButton = (game: GameBuilder, world: World) => {
     onHoverOut: (button) => {
       if (state.starting) return
       button.style.boxShadow = "none"
-
       button.style.transform = "translate(0%, 0%)"
-
-      button.style.width = "180px"
-      button.style.height = "170px"
     }
   },
     HImg({
       src: `${game.id}-256.jpg`,
-      style: { top: "50%", width: "176px", height: "166px", transform: "translate(-50%, -50%)" }
+      style: {
+        top: "50%",
+        width: "100%",
+        height: "101%",
+        transform: "translate(-50%, -50%)"
+      }
     }),
     HText({
       text: game.id,
-      style: { fontSize: "24px", left: "50%", transform: "translate(-50%)", bottom: "-34px", fontWeight: "bold" }
+      style: {
+        fontSize: "min(2.4vw, 22px)",
+        left: "50%",
+        transform: "translate(-50%)",
+        bottom: "max(-4vw, -34px)",
+        fontWeight: "bold"
+      }
     })
   )
 }
@@ -159,10 +170,9 @@ const Profile = (world: World): RefreshableDiv => {
 }
 
 const MusicToggle = (world: World): RefreshableDiv => {
-  // let enabled = false
 
   const setVisual = (button: HTMLButtonElement) => {
-    const enabled = world.client?.sound.music.state === "play"
+    const enabled = world.client?.sound.musicPlaying()
     button.style.boxShadow = enabled ? "0 0 10px 2px #6cf" : "none"
     button.style.opacity = enabled ? "1" : "0.7"
   }
@@ -180,14 +190,12 @@ const MusicToggle = (world: World): RefreshableDiv => {
       transition: "transform 0.3s ease, box-shadow 0.2s ease"
     },
     onClick: () => {
-      const enabled = world.client?.sound.music.state !== "play"
-      if (enabled) {
+      const enabled = world.client?.sound.musicPlaying()
+      if (!enabled) {
         world.client?.sound.stopMusic()
-        const played = world.client?.sound.play({ name: "track1", fadeIn: 0 })
-        if (played) world.client!.sound.music.state = "play"
+        world.client?.sound.play({ name: "track1", fadeIn: 0 })
       } else {
         world.client?.sound.stopMusic()
-        if (world.client) world.client.sound.music.state = "stop"
       }
     },
     onHover: (btn) => btn.style.transform = "translate(0, -4px)",
@@ -306,7 +314,8 @@ const GameLobby = (): Entity => {
               flexDirection: "row",
               transform: "translate(-50%)",
               left: "50%",
-              border: "none"
+              border: "none",
+              paddingTop: "1vh",
             })
             shell.appendChild(gameButtonsShell)
 

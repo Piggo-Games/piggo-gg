@@ -112,9 +112,9 @@ export const EscapeMenu = (world: World): Entity => {
   const settings = SettingsMenu(world)
 
   const setMusicVisual = (button: HTMLButtonElement, world: World) => {
-    const musicEnabled = world.client?.sound.music.state === "play"
-    button.style.boxShadow = musicEnabled ? "0 0 8px 3px #6cf" : "none"
-    button.style.opacity = musicEnabled ? "1" : "0.75"
+    const enabled = world.client?.sound.musicPlaying()
+    button.style.boxShadow = enabled ? "0 0 8px 3px #6cf" : "none"
+    button.style.opacity = enabled ? "1" : "0.75"
   }
 
   const musicButton = HButton({
@@ -132,14 +132,12 @@ export const EscapeMenu = (world: World): Entity => {
       transition: "transform 0.3s ease, box-shadow 0.2s ease"
     },
     onClick: () => {
-      const musicEnabled = world.client?.sound.music.state !== "play"
-      if (musicEnabled) {
+      const enabled = world.client?.sound.musicPlaying()
+      if (!enabled) {
         world.client?.sound.stopMusic()
-        const played = world.client?.sound.play({ name: "track1", fadeIn: 0 })
-        if (played) world.client!.sound.music.state = "play"
+        world.client?.sound.play({ name: "track1", fadeIn: 0 })
       } else {
         world.client?.sound.stopMusic()
-        if (world.client) world.client.sound.music.state = "stop"
       }
     },
     onHover: (btn) => btn.style.transform = "translate(0, -4px)",

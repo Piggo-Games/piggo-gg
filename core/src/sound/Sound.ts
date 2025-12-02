@@ -30,10 +30,7 @@ export type SoundPlayProps = {
 }
 
 export type Sound = {
-  music: {
-    state: "stop" | "play",
-    track: MusicSounds
-  }
+  music: MusicSounds
   muted: boolean
   ready: boolean
   state: "closed" | "running" | "suspended"
@@ -41,6 +38,7 @@ export type Sound = {
   stop: (name: ValidSounds) => void
   stopMusic: () => void
   stopAll: () => void
+  musicPlaying: () => boolean
   play: (props: SoundPlayProps) => boolean
   playChoice: (options: ValidSounds[], props?: Omit<SoundPlayProps, "name">) => boolean
 }
@@ -63,7 +61,7 @@ export const Sound = (world: World): Sound => {
   window.addEventListener("focus", () => sound.muted = false)
 
   const sound: Sound = {
-    music: { state: "stop", track: "track1" },
+    music: "track1",
     muted: false,
     state: "closed",
     ready: false,
@@ -124,6 +122,10 @@ export const Sound = (world: World): Sound => {
           }
         }
       }
+    },
+    musicPlaying: () => {
+      const state = sound.tones[sound.music].state
+      return state === "started"
     },
     playChoice: (options: ValidSounds[], props?: Omit<SoundPlayProps, "name">) => {
       if (sound.muted) return false
