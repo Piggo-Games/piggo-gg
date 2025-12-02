@@ -239,10 +239,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       const fadeinDiv = document.getElementById("fadein-div")
       if (fadeinDiv) {
         opacity -= since * 0.001
-        fadeinDiv.style.opacity = opacity.toString()
-        if (opacity <= 0) {
-          fadeinDiv.remove()
-        }
+        opacity <= 0 ? fadeinDiv.remove() : fadeinDiv.style.opacity = `${opacity}`
       }
     },
     players: () => {

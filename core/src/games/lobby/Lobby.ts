@@ -1,7 +1,7 @@
 import {
   Background, Island, Entity, GameBuilder, getBrowser, HButton, HImg, HText,
   HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC, piggoVersion,
-  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend
+  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend, HtmlFpsText
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -21,7 +21,8 @@ export const Lobby: GameBuilder<LobbyState> = {
     entities: [
       Background({ moving: true, rays: true }),
       GameLobby(),
-      HtmlLagText()
+      HtmlLagText(),
+      HtmlFpsText()
     ],
     netcode: "delay"
   })
@@ -165,7 +166,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
   div: HText({
     id: "playersOnline",
     style: {
-      position: "fixed", right: "15px", top: "15px", fontSize: "18px", color: "white", opacity: "0.7",
+      position: "fixed", right: "15px", bottom: "15px", fontSize: "18px", color: "white", opacity: "0.7",
       userSelect: "none", pointerEvents: "none"
     }
   }),

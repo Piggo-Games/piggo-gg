@@ -1,8 +1,8 @@
 import {
   BlockMeshSystem, BlockPhysicsSystem, Crosshair, ThreeNametagSystem, EscapeMenu,
   GameBuilder, Hitmarker, HtmlChat, HUDSystem, InventorySystem, logPerf, min,
-  Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeSystem,
-  DummyPlayer, HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText, HUDSystemProps
+  Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem, ThreeSystem, DummyPlayer,
+  HtmlFeed, DummyPlayer2, TeamNumber, XYZR, HtmlLagText, HUDSystemProps, HtmlFpsText
 } from "@piggo-gg/core"
 import { Sarge } from "./Sarge"
 import { RetakeMap, RetakeMapColoring } from "./RetakeMap"
@@ -73,7 +73,8 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       DummyPlayer(),
       DummyPlayer2(),
       PhaseBanner(),
-      HtmlLagText()
+      HtmlLagText(),
+      HtmlFpsText()
     ]
   })
 }
@@ -82,8 +83,10 @@ const StrikeSystem = SystemBuilder({
   id: "StrikeSystem",
   init: (world) => {
 
+    const t1 = performance.now()
     world.blocks.loadMap(RetakeMap)
     world.blocks.coloring = RetakeMapColoring
+    logPerf("load strike map", t1)
 
     const mobileUI = MobileUI(world)
 
