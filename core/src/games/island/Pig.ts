@@ -28,10 +28,6 @@ export const Pig = () => {
             return
           }
 
-          if (world.tick % 40 === 0) {
-            pig.components.three.flash(0.5)
-          }
-
           // pig.components.position.data.rotation += 0.01
 
           // move hitbox

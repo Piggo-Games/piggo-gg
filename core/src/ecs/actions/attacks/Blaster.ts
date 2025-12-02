@@ -172,7 +172,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
             hitboxHit.entity.components.health?.damage(1, world)
-            world.three?.spawnParticles(hitboxHit.point, world, "blood")
+            hitboxHit.entity.components.three?.flash(0.5)
             return
           }
 

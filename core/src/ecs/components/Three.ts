@@ -112,7 +112,7 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
         for (const entity of entities) {
           const { three } = entity.components
           if (three.emission > 0) {
-            three.emission = max(0, three.emission - since / 25 / 40)
+            three.emission = max(0, three.emission - since / 25 / 20)
 
             for (const o of three.o) {
               o.traverse((child) => {
