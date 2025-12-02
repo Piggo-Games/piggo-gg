@@ -29,7 +29,6 @@ export const Pig = () => {
             hitboxes.body!.visible = false
           }
 
-          // mesh.rotation.y += world.debug ? 0.01 : 0
           pig.components.position.data.rotation += 0.01
 
           // move hitbox
