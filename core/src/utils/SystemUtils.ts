@@ -1,4 +1,4 @@
-export const piggoVersion: `0.${number}.${number}` = "0.49.3"
+export const piggoVersion: `0.${number}.${number}` = "0.49.4"
 
 export const isMobile = (): boolean => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -44,7 +44,7 @@ export const getBrowser = () => {
   return undefined
 }
 
-export const replaceCanvas = () => {
+export const replaceCanvas = (): HTMLCanvasElement => {
   const canvas = document.getElementById("canvas") as HTMLCanvasElement | undefined
 
   const newCanvas = document.createElement("canvas")
@@ -66,4 +66,8 @@ export const canvasAppend = (element: HTMLElement) => {
   if (canvasParent) {
     canvasParent.appendChild(element)
   }
+}
+
+export const dummyPromise = async (ms: number = 1) => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

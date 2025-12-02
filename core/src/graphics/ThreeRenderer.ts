@@ -1,4 +1,4 @@
-import { ClientSystemBuilder, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
+import { ClientSystemBuilder, dummyPromise, logPerf, replaceCanvas, screenWH, ThreeCamera, values, World } from "@piggo-gg/core"
 import { Mesh, MeshPhongMaterial, Scene, SphereGeometry, TextureLoader, WebGLRenderer } from "three"
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
@@ -12,7 +12,7 @@ export type ThreeRenderer = {
   scene: Scene
   tLoader: TextureLoader
   append: (...elements: HTMLElement[]) => void
-  activate: (world: World) => void
+  activate: (world: World) => Promise<void>
   deactivate: () => void
   resize: () => void
 }
@@ -50,9 +50,11 @@ export const ThreeRenderer = (): ThreeRenderer => {
 
       renderer.ready = false
     },
-    activate: (world: World) => {
+    activate: async (world: World) => {
       if (renderer.ready) return
       renderer.ready = true
+
+      await dummyPromise()
 
       renderer.canvas = replaceCanvas()
 

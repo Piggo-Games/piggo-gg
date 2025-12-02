@@ -236,12 +236,12 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       }
 
       // fade in
-      const bigdiv = document.getElementById("bigdiv")
-      if (bigdiv) {
+      const fadeinDiv = document.getElementById("fadein-div")
+      if (fadeinDiv) {
         opacity -= since * 0.001
-        bigdiv.style.opacity = opacity.toString()
+        fadeinDiv.style.opacity = opacity.toString()
         if (opacity <= 0) {
-          bigdiv.remove()
+          fadeinDiv.remove()
         }
       }
     },
@@ -318,7 +318,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       // commands
       commands?.forEach((command) => world.commands[command.id] = command)
 
-      // update renderer
+      // update renderer (async)
       if (world.game.renderer === "pixi" && !world.pixi?.ready) {
         world.three?.deactivate()
         world.pixi?.activate(world)
@@ -333,7 +333,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       // black out the scene
       if (world.client) {
         const div = HDiv({
-          id: "bigdiv",
+          id: "fadein-div",
           style: {
             left: "0px", top: "0px", width: "100%", height: "100%", backgroundColor: "black"
           }

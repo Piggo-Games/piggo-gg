@@ -30,7 +30,7 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
 
             const now = performance.now()
             if (command) command.invoke({ params: invokedAction.params ?? {}, world, player })
-            logPerf(`command ${invokedAction.actionId} from ${entityId}`, now, 2)
+            logPerf(`command ${invokedAction.actionId}`, now)
           })
           return
         }
@@ -68,7 +68,7 @@ export const ActionSystem: SystemBuilder<"ActionSystem"> = {
 
           const now = performance.now()
           action.invoke({ params: invokedAction.params ?? {}, entity, world, player, character, offline: invokedAction.offline ?? false })
-          logPerf(`action ${invokedAction.actionId} from ${entityId}`, now, 2)
+          logPerf(`action ${invokedAction.actionId} from ${entityId}`, now)
         }
       }
     }

@@ -1,6 +1,6 @@
 import {
   ClientSystemBuilder, DebugBounds, Entity, PixiCamera, Position, Renderable,
-  TextBox, World, logPerf, pixiGraphics, replaceCanvas, screenWH, values
+  TextBox, World, dummyPromise, logPerf, pixiGraphics, replaceCanvas, screenWH, values
 } from "@piggo-gg/core"
 import { Application, Graphics, Text } from "pixi.js"
 
@@ -61,6 +61,8 @@ export const PixiRenderer = (): PixiRenderer => {
     activate: async (world: World) => {
       if (renderer.ready) return
       renderer.ready = true
+
+      await dummyPromise()
 
       renderer.canvas = replaceCanvas()
 
