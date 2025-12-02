@@ -1,51 +1,14 @@
 import {
-  Action, Actions, blockInLine, Character, cos, Effects, Entity,
-  Input, Item, ItemComponents, max, min, modelOffset, Networked,
-  nextColor, NPC, Particle, Position, randomColorBG, randomColorRY,
-  randomVector3, sin, Three, World, XY, XYZ, XYZdistance, XYZstring, Hitbox
+  Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
+  Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC,
+  Particle, Position, randomColorBG, randomColorRY, randomVector3,
+  rayBoxIntersect, rotateAroundZ, sin, Three, World, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 type ShootParams = {
   pos: XYZ, aim: XY
 }
-
-const rayBoxIntersect = (origin: XYZ, dir: XYZ, min: XYZ, max: XYZ): number | null => {
-  let tmin = 0
-  let tmax = Infinity
-
-  for (const axis of ["x", "y", "z"] as const) {
-    const d = dir[axis]
-    const o = origin[axis]
-    const minA = min[axis]
-    const maxA = max[axis]
-
-    if (Math.abs(d) < 1e-8) {
-      if (o < minA || o > maxA) return null
-      continue
-    }
-
-    let t1 = (minA - o) / d
-    let t2 = (maxA - o) / d
-
-    if (t1 > t2) [t1, t2] = [t2, t1]
-
-    tmin = Math.max(tmin, t1)
-    tmax = Math.min(tmax, t2)
-
-    if (tmin > tmax) return null
-  }
-
-  if (tmax < 0) return null
-
-  return tmin >= 0 ? tmin : tmax
-}
-
-const rotateAroundZ = (v: XYZ, sinR: number, cosR: number): XYZ => ({
-  x: v.x * cosR - v.y * sinR,
-  y: v.x * sinR + v.y * cosR,
-  z: v.z
-})
 
 export const BlasterItem = ({ character }: { character: Character }) => {
 
@@ -189,11 +152,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             }
           }
 
-          // let hit: { block: BlockInLine | undefined, distance: number | undefined } = {
-          //   block: undefined,
-          //   distance: undefined
-          // }
-
           const worldDir = { x: dir.x, y: dir.z, z: dir.y }
           const maxRayDistance = 30
 
@@ -204,6 +162,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           let hitboxHit: { entity: Entity<Position | Hitbox>, distance: number, point: XYZ } | undefined
 
+          // raycast against hitboxes
           for (const target of hitboxEntities) {
             const tpos = target.components.position.data
             const sinR = sin(-tpos.rotation)
