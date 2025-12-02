@@ -137,7 +137,7 @@ export const EscapeMenu = (world: World): Entity => {
       const musicEnabled = world.client?.sound.music.state !== "play"
       if (musicEnabled) {
         world.client?.sound.stopMusic()
-        const played = world.client?.sound.play({ name: "track2", fadeIn: 0 })
+        const played = world.client?.sound.play({ name: "cafe", fadeIn: 0 })
         if (played) world.client!.sound.music.state = "play"
       } else {
         world.client?.sound.stopMusic()

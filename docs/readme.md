@@ -24,6 +24,8 @@ health icon | https://www.svgrepo.com/svg/499213/health | license: GPL
 
 scroll down icon | https://www.svgrepo.com/svg/522650/scroll-down | license: attribution
 
+music icon | https://www.svgrepo.com/svg/532708/music | license: attribution
+
 block textures | https://github.com/shackhornold/UwUCraft/ | license: MIT
 
 eagle mesh | https://opengameart.org/content/animated-animales-low-poly

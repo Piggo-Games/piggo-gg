@@ -2,7 +2,7 @@ import { entries, GunNames, randomChoice, World, XY, XYdistance } from "@piggo-g
 import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from "tone"
 
 export type BubbleSounds = "bubble" | "hitmarker"
-export type MusicSounds = "track2" | "birdsong1"
+export type MusicSounds = "cafe"
 export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
 export type ToolSounds = "whiff" | "thud" | "slash"
 export type EatSounds = "eat" | "eat2"
@@ -63,15 +63,16 @@ export const Sound = (world: World): Sound => {
   window.addEventListener("focus", () => sound.muted = false)
 
   const sound: Sound = {
-    music: { state: "stop", track: "track2" },
+    music: { state: "stop", track: "cafe" },
     muted: false,
     state: "closed",
     ready: false,
     tones: {
-      birdsong1: load("birdsong1.mp3", -20),
+      // birdsong1: load("birdsong1.mp3", -20),
       bubble: load("bubble.mp3", -10),
       hitmarker: load("hitmarker.mp3", -5),
-      track2: load("track2.mp3", -10),
+      // track2: load("track2.mp3", -10),
+      cafe: load("cafe.mp3", -5),
       cassettePlay: load("cassettePlay.mp3", 0),
       cassetteStop: load("cassetteStop.mp3", -5),
       click1: load("click1.mp3", -5),
@@ -106,14 +107,14 @@ export const Sound = (world: World): Sound => {
       }
     },
     stopMusic: () => {
-      const musicSounds: MusicSounds[] = ["birdsong1", "track2"]
+      const musicSounds: MusicSounds[] = ["cafe"]
       for (const name of musicSounds) sound.stop(name)
     },
     stopAll: () => {
       for (const [name, tone] of entries(sound.tones)) {
         if (tone.state === "started") {
           try {
-            if (name.startsWith("track")) {
+            if (name.startsWith("cafe")) {
               // sound.mute = true
             } else {
               tone.stop()
