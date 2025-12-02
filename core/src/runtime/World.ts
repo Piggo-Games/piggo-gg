@@ -64,7 +64,6 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   let lastRender = 0
   let framesThisSecond = 0
-
   let opacity = 1
 
   const world: World = {

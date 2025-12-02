@@ -87,7 +87,7 @@ const Profile = (world: World): RefreshableDiv => {
   const ProfileFrame = (frame: number) => HImg({
     style: {
       width: "min(6.6vw, 100px)",
-      borderRadius: "8px",
+      borderRadius: "12px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
       visibility: "hidden",
@@ -125,7 +125,7 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "min(13.4vw, 200px)", aspectRatio: "20 / 17",
+        top: "16px", left: "16px", width: "min(13.4vw, 200px)", aspectRatio: "20 / 17", borderRadius: "12px",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {

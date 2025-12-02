@@ -60,7 +60,6 @@ export const PixiRenderer = (): PixiRenderer => {
     },
     activate: async (world: World) => {
       if (renderer.ready) return
-      renderer.ready = true
 
       await dummyPromise()
 
@@ -82,9 +81,6 @@ export const PixiRenderer = (): PixiRenderer => {
         preferWebGLVersion: 2
       })
 
-      // resize once
-      renderer.handleResize()
-
       // set up the camera
       app.stage.addChild(renderer.camera.root)
 
@@ -105,6 +101,11 @@ export const PixiRenderer = (): PixiRenderer => {
 
       // schedule onRender
       app.ticker.add(world.onRender)
+
+      renderer.ready = true
+
+      // resize once
+      renderer.handleResize()
     },
     setBgColor: (color: number) => {
       if (app.renderer) app.renderer.background.color = color

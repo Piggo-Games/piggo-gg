@@ -52,8 +52,6 @@ export const ThreeRenderer = (): ThreeRenderer => {
     },
     activate: async (world: World) => {
       if (renderer.ready) return
-      renderer.ready = true
-
       const t1 = performance.now()
 
       await dummyPromise()
@@ -85,6 +83,8 @@ export const ThreeRenderer = (): ThreeRenderer => {
 
         webgl?.render(renderer.scene, renderer.camera.c)
       })
+
+      renderer.ready = true
 
       renderer.resize()
 
