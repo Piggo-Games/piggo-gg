@@ -1,7 +1,8 @@
 import {
   Background, Island, Entity, GameBuilder, getBrowser, HButton, HImg, HText,
   HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC, piggoVersion,
-  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend, HtmlFpsText
+  PixiRenderSystem, RefreshableDiv, Strike, Volley, World, canvasAppend, HtmlFpsText,
+  HDiv
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -125,7 +126,10 @@ const Profile = (world: World): RefreshableDiv => {
     },
     div: HButton({
       style: {
-        top: "16px", left: "16px", width: "min(13.4vw, 200px)", aspectRatio: "20 / 17", borderRadius: "12px",
+        position: "relative",
+        width: "min(13.4vw, 200px)",
+        aspectRatio: "20 / 17",
+        borderRadius: "12px",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
       },
       onClick: (button) => {
@@ -151,6 +155,65 @@ const Profile = (world: World): RefreshableDiv => {
         }
       })
     )
+  }
+}
+
+const MusicToggle = (world: World): RefreshableDiv => {
+  let enabled = false
+
+  const setVisual = (button: HTMLButtonElement) => {
+    button.style.boxShadow = enabled ? "0 0 10px 3px #6cf" : "none"
+    button.style.opacity = enabled ? "1" : "0.7"
+  }
+
+  const button = HButton({
+    style: {
+      position: "relative",
+      width: "36px",
+      height: "36px",
+      borderRadius: "10px",
+      display: "flex",
+      // alignItems: "center",
+      justifyContent: "center",
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
+      border: "2px solid #ffffff",
+      transition: "transform 0.3s ease, box-shadow 0.2s ease",
+    },
+    onClick: () => {
+      enabled = !enabled
+      if (enabled) {
+        world.client?.sound.stopMusic()
+        const played = world.client?.sound.play({ name: "track2", fadeIn: 0 })
+        if (played) world.client!.sound.music.state = "play"
+      } else {
+        world.client?.sound.stopMusic()
+        if (world.client) world.client.sound.music.state = "stop"
+      }
+      setVisual(button)
+    },
+    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
+    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
+  },
+    HImg({
+      src: "music.svg",
+      style: {
+        width: "22px",
+        height: "22px",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        transition: "transform 0.5s ease, box-shadow 0.2s ease",
+        // transition: "filter 0.2s ease"
+        // filter: "drop-shadow(0 0 4px rgba(0,0,0,0.4))"
+      }
+    })
+  )
+
+  setVisual(button)
+
+  return {
+    div: button,
+    update: () => setVisual(button)
   }
 }
 
@@ -188,6 +251,7 @@ const GameLobby = (): Entity => {
 
   let lobbiesMenu: RefreshableDiv | undefined = undefined
   let profile: RefreshableDiv | undefined = undefined
+  let musicToggle: RefreshableDiv | undefined = undefined
   let playersOnline: RefreshableDiv | undefined = undefined
 
   if (getBrowser() === "safari") {
@@ -214,7 +278,23 @@ const GameLobby = (): Entity => {
             canvasAppend(playersOnline.div)
 
             profile = Profile(world)
-            canvasAppend(profile.div)
+            musicToggle = MusicToggle(world)
+
+            const profileRow = HDiv({
+              style: {
+                position: "fixed",
+                top: "16px",
+                left: "16px",
+                display: "flex",
+                gap: "12px",
+                alignItems: "flex-start",
+              }
+            },
+              profile.div,
+              musicToggle.div
+            )
+
+            canvasAppend(profileRow)
 
             const shell = HtmlDiv({
               left: "50%",
@@ -265,6 +345,7 @@ const GameLobby = (): Entity => {
           if (world.client) {
             lobbiesMenu?.update()
             profile?.update()
+            musicToggle?.update()
             playersOnline?.update()
           }
         }
