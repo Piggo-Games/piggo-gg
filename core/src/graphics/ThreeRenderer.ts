@@ -135,28 +135,25 @@ export const ThreeRenderer = (): ThreeRenderer => {
   return renderer
 }
 
-export const ThreeDebugSystem = ClientSystemBuilder({
-  id: "ThreeDebugSystem",
+export const ParticleSystem = ClientSystemBuilder({
+  id: "ParticleSystem",
   init: (world) => {
 
-    let meshes: Record<string, Mesh> = {}
-
-    // particles
     const particleMesh = new Mesh(new SphereGeometry(0.008, 6, 6))
     particleMesh.castShadow = true
 
     world.three!.particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
 
     return {
-      id: "ThreeDebugSystem",
+      id: "ParticleSystem",
       priority: 5,
       skipOnRollback: true,
       query: ["debug", "three", "position"],
       onRender: (_, delta) => {
-        if (!world.debug) return
-        const ratio = delta / 25
+        if (!world.three) return
 
-        const { particles } = world.three!
+        const ratio = delta / 25
+        const { particles } = world.three
 
         // particles
         for (let i = 1; i < particles.length; i++) {
@@ -176,40 +173,22 @@ export const ThreeDebugSystem = ClientSystemBuilder({
             )
           }
         }
-
-        // character mesh
-        // const pc = world.client?.character()
-        // if (pc) {
-        //   if (!meshes["debug_sphere1"]) {
-        //     const sphere1 = new Mesh(
-        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0xff0000, wireframe: true })
-        //     )
-        //     meshes["debug_sphere1"] = sphere1
-        //     world.three?.scene.add(sphere1)
-        //   }
-
-        //   if (!meshes["debug_sphere2"]) {
-        //     const sphere2 = new Mesh(
-        //       new SphereGeometry(0.1), new MeshPhongMaterial({ color: 0x00ff00, wireframe: true })
-        //     )
-        //     meshes["debug_sphere2"] = sphere2
-        //     world.three?.scene.add(sphere2)
-        //   }
-
-        //   const mesh1 = meshes["debug_sphere1"]
-        //   const mesh2 = meshes["debug_sphere2"]
-        //   const { x, y, z } = pc.components.position.interpolate(world, delta)
-
-        // mesh1.position.set(x, z, y)
-        // mesh2.position.set(x, z + 0.41, y)
-        // }
       },
       onTick: () => {
-        if (!world.debug) {
-          for (const mesh of values(meshes)) {
-            world.three?.scene.remove(mesh)
+        if (!world.three) return
+
+        const { particles } = world.three
+
+        for (let i = 1; i < particles.length; i++) {
+          const p = particles[i]
+
+          p.pos = {
+            x: p.pos.x + p.velocity.x,
+            y: p.pos.y + p.velocity.y,
+            z: p.pos.z + p.velocity.z
           }
-          meshes = {}
+
+          p.velocity.z -= p.gravity
         }
       }
     }

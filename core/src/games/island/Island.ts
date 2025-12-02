@@ -2,7 +2,7 @@ import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
   InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ThreeDebugSystem, ThreeNametagSystem, ThreeSystem, Water
+  ThreeCameraSystem, ParticleSystem, ThreeNametagSystem, ThreeSystem, Water
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
@@ -47,7 +47,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       ThreeSystem,
       InventorySystem,
       BlockMeshSystem,
-      ThreeDebugSystem
+      ParticleSystem
     ],
     entities: [
       Crosshair(),

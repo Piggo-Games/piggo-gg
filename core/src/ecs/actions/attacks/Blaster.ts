@@ -221,12 +221,6 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           tracer = new Mesh(tracerGeometry, new MeshPhongMaterial({ color: 0xffff99, emissive: 0xffff99 }))
           three.scene.add(tracer)
 
-          // // particles
-          // const particleMesh = new Mesh(new SphereGeometry(0.008, 6, 6))
-          // particleMesh.castShadow = true
-
-          // particles.push({ mesh: particleMesh, velocity: { x: 0, y: 0, z: 0 }, tick: 0, pos: { x: 0, y: 0, z: 0 }, duration: 0, gravity: 0 })
-
           // gun
           three.gLoader.load("flintlock.gltf", (gltf) => {
             mesh = gltf.scene
