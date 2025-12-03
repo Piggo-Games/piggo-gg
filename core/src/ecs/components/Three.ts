@@ -14,7 +14,7 @@ type OnRenderProps = {
 
 export type Three = Component<"three", {}> & {
   initialized: boolean
-  emission: number
+  emissive: number
   o: Object3D[]
   init: undefined | ThreeInit
   onRender: undefined | ((_: OnRenderProps) => void)
@@ -34,7 +34,7 @@ export const Three = (props: ThreeProps = {}): Three => {
     type: "three",
     data: {},
     initialized: false,
-    emission: 0,
+    emissive: 0,
     o: [],
     init: props.init,
     onRender: props.onRender,
@@ -43,7 +43,7 @@ export const Three = (props: ThreeProps = {}): Three => {
       world.three?.scene.remove(...three.o)
     },
     flash: (intensity: number) => {
-      three.emission = min(1, three.emission + intensity)
+      three.emissive = min(1, three.emissive + intensity)
 
       for (const o of three.o) {
         o.traverse((child) => {
@@ -51,7 +51,7 @@ export const Three = (props: ThreeProps = {}): Three => {
             const mat = (child as any).material
             if (mat) {
               if (mat.emissive) {
-                mat.emissiveIntensity = three.emission
+                mat.emissiveIntensity = three.emissive
                 mat.emissive = new Color(0xffffff)
               }
             }
@@ -108,11 +108,11 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
           three.onRender?.({ entity, world, client: world.client!, delta, since, three: world.three! })
         }
 
-        // handle emission decay
+        // handle emissive decay
         for (const entity of entities) {
           const { three } = entity.components
-          if (three.emission > 0) {
-            three.emission = max(0, three.emission - since / 25 / 20)
+          if (three.emissive > 0) {
+            three.emissive = max(0, three.emissive - since / 25 / 20)
 
             for (const o of three.o) {
               o.traverse((child) => {
@@ -120,7 +120,7 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
                   const mat = (child as any).material
                   if (mat) {
                     if (mat.emissive) {
-                      mat.emissiveIntensity = three.emission
+                      mat.emissiveIntensity = three.emissive
                     }
                   }
                 }
