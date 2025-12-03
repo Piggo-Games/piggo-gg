@@ -11,6 +11,7 @@ add core core
 add docs docs
 add web web
 add server server
+add electron electron
 
 # install dependencies
 run bun install --production
