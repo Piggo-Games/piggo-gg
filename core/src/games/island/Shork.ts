@@ -5,7 +5,7 @@ export const Shork = () => {
 
   let mesh: Group<Object3DEventMap> | undefined = undefined
 
-  const speed = 0.5
+  const speed = 0.6
 
   const shork = Entity<Position>({
     id: "shork",
@@ -17,7 +17,9 @@ export const Shork = () => {
           if (!mesh) return
 
           const { position } = shork.components
-          const pc = world.client?.character()
+          const pc = world.client?.character() // todo all players
+
+          if (pc?.components.health?.dead()) return
 
           // if swimming, move toward player
           if (pc?.components.position.data.swimming) {
@@ -28,9 +30,10 @@ export const Shork = () => {
             const dirY = pcPos.y - shorkPos.y
             const length = Math.sqrt(dirX * dirX + dirY * dirY)
 
+            // eat the player
             if (length < 1) {
-              position.setVelocity({ x: 0, y: 0 })
-              return
+              pc.components.health?.damage(100, world)
+              pc.components.three?.flash(0.5)
             }
 
             position.setVelocity({ x: dirX / length * 1, y: dirY / length * 1 })

@@ -198,7 +198,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
-          world.blocks.remove(hit.inside)
+          // world.blocks.remove(hit.inside)
         }),
       }),
       three: Three({
