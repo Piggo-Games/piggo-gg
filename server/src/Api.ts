@@ -279,7 +279,7 @@ export const Api = (): Api => {
 
           // check valid origin
           if (!origin || !ValidOrigins.includes(origin)) {
-            console.log("blocked origin:", origin, r.headers.get("user-agent"))
+            console.log("blocked origin:", origin)
             return HttpError(403, "invalid origin", origin ?? "")
           }
 
