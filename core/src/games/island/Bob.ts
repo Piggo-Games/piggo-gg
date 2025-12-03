@@ -21,7 +21,7 @@ export const Bob = (player: Player): Character => {
   let hitboxes: { body: undefined | Mesh, head: undefined | Mesh } = { body: undefined, head: undefined }
 
   let mesh: Object3D = new Object3D()
-  // let block: undefined | Mesh<BoxGeometry, MeshPhysicalMaterial[], Object3DEventMap> = undefined
+  let block: undefined | Mesh<BoxGeometry, MeshPhysicalMaterial[], Object3DEventMap> = undefined
   let helper: SkeletonHelper | undefined = undefined
 
   let pigMixer: AnimationMixer | undefined
@@ -409,26 +409,29 @@ export const Bob = (player: Player): Character => {
           mesh.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
 
           // block position
-          // if (block) {
-          //   block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
+          if (block) {
+            block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
 
-          //   const { localAim } = client.controls
-          //   const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
+            const { localAim } = client.controls
+            const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
 
-          //   let offset = three.camera.dir(world, 0.002)
+            let offset = three.camera.dir(world, 0.002)
 
-          //   // vertical adjustment
-          //   offset.x -= dir.x * localAim.y * 0.001
-          //   offset.z -= dir.y * localAim.y * 0.001
-          //   if (localAim.y > 0) {
-          //     offset.y += localAim.y * 0.0007
-          //   }
+            // vertical adjustment
+            offset.x -= dir.x * localAim.y * 0.001
+            offset.z -= dir.y * localAim.y * 0.001
+            if (localAim.y > 0) {
+              offset.y += localAim.y * 0.0007
+            }
 
-          //   block.position.add(offset)
+            block.position.add(offset)
 
-          //   block.quaternion.copy(three.camera.c.quaternion)
-          //   block.rotation.y = 0
-          // }
+            block.quaternion.copy(three.camera.c.quaternion)
+            block.rotation.y = 0
+
+            const { blockColor } = world.settings<IslandSettings>()
+            block.material.forEach((mat) => mat.color.set(blockColor))
+          }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
           hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
@@ -498,12 +501,6 @@ export const Bob = (player: Player): Character => {
               }
             })
           }
-
-          // update block color
-          // if (block) {
-          //   const { blockColor } = world.settings<IslandSettings>()
-          //   block.material.forEach((mat) => mat.color.set(blockColor))
-          // }
         },
         init: async ({ o, world, three }) => {
 
@@ -563,13 +560,13 @@ export const Bob = (player: Player): Character => {
 
             o.push(mesh)
 
-            // block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
-            // block.castShadow = true
-            // block.frustumCulled = false
-            // block.rotation.order = "ZXY"
-            // MarbleTexture(block.material, three)
+            block = new Mesh(new BoxGeometry(0.001, 0.001, 0.001), BlockMaterial())
+            block.castShadow = true
+            block.frustumCulled = false
+            block.rotation.order = "ZXY"
+            MarbleTexture(block.material, three)
 
-            // o.push(block)
+            o.push(block)
           })
         }
       })

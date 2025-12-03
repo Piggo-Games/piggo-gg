@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
-  Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
+  Input, IslandSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
@@ -31,12 +31,10 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       item: Item({
         name: "blaster",
         onTick: () => {
-          console.log("blaster tick")
           const { recoil } = character.components.position.data
 
           if (recoil > 0) {
             character.components.position.data.recoil = max(0, recoil - recoilRate)
-            console.log("recoil", character.components.position.data.recoil)
           }
         }
       }),
@@ -76,7 +74,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           const { pos, aim } = params
-          spinUntil = world.tick + spinDuration
+          // spinUntil = world.tick + spinDuration
 
           const eyePos = { x: pos.x, y: pos.y, z: pos.z + 0.5 }
           const eyes = new Vector3(eyePos.x, eyePos.z, eyePos.y)
@@ -199,6 +197,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           world.three?.spawnParticles(hit.edge, world)
+
+          // change block color
+          if (world.debug && hit.inside.type === 12) {
+            const { blockColor } = world.settings<IslandSettings>()
+            world.blocks.coloring[`${hit.inside.x},${hit.inside.y},${hit.inside.z}`] = blockColor
+            world.blocks.invalidate()
+          }
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
