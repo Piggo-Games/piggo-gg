@@ -1,44 +1,25 @@
-import { dayness, Entity, max, min, Position, Three } from "@piggo-gg/core"
+import { dayness, Entity, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
 
-  let surface: Mesh<BufferGeometry, ShaderMaterial> | undefined = undefined
+  let mesh: Mesh<BufferGeometry, ShaderMaterial> | undefined = undefined
 
   const sky = Entity<Three>({
     id: "new-sky",
     components: {
       position: Position(),
       three: Three({
-        onTick: ({ client }) => {
-          if (!surface) return
-
-          const pc = client.character()
-          if (!pc) return
-
-          let z = pc.components.position.data.z + 0.0
-
-          // adjust the water height
-          // if (z > 0.3) {
-          //   z -= 0.3
-          //   surface.position.y = -min(z / 4, 0.7)
-          // } else if (z < -0.51) {
-          //   z += 0.51
-          //   surface.position.y = max(z / 4, -1)
-          // } else {
-          //   surface.position.y = 0
-          // }
-        },
         onRender: ({ delta, world }) => {
-          if (surface) {
-            const mat = surface.material as ShaderMaterial
+          if (mesh) {
+            const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.012
             mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },
         init: async ({ o, three }) => {
-          surface = new Mesh()
+          mesh = new Mesh()
 
           const halfSize = 200
           const surfaceY = -0.04
@@ -59,7 +40,7 @@ export const Water = () => {
           surfaceGeometry.setAttribute("position", new BufferAttribute(surfaceVertices, 3))
           surfaceGeometry.setIndex(surfaceIndices)
 
-          surface.geometry = surfaceGeometry
+          mesh.geometry = surfaceGeometry
 
           const surfaceMat = new ShaderMaterial({
             vertexShader: surfaceVertex,
@@ -90,9 +71,9 @@ export const Water = () => {
             surfaceMat.uniforms.uNormalMap2.value = t
           })
 
-          surface.material = surfaceMat;
+          mesh.material = surfaceMat
 
-          o.push(surface)
+          o.push(mesh)
         }
       })
     }

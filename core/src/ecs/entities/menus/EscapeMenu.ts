@@ -228,7 +228,7 @@ export const EscapeMenu = (world: World): Entity => {
 
           // overall visibility
           if (world.client) {
-            const visible = world.client.menu
+            const visible = world.client.menu && (world.tick - world.game.started > 20)
             bg.style.visibility = visible ? "visible" : "hidden"
             wrapper.style.visibility = visible ? "visible" : "hidden"
 

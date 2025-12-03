@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
-  Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC,
+  Input, IslandSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
@@ -14,10 +14,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let mesh: Object3D | undefined = undefined
   let tracer: Object3D | undefined = undefined
   let tracerState = { tick: 0, velocity: { x: 0, y: 0, z: 0 }, pos: { x: 0, y: 0, z: 0 } }
+  let spinUntil: number | null = null
 
   let cd = -100
 
-  const recoilRate = 0.06
+  const recoilRate = 0.03
+  const spinDuration = 24
+  const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
     id: `blaster-${character.id}`,
@@ -25,18 +28,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       position: Position(),
       effects: Effects(),
       networked: Networked(),
-      item: Item({ name: "blaster", stackable: false }),
-      npc: NPC({
-        behavior: (_, world) => {
+      item: Item({
+        name: "blaster",
+        onTick: () => {
           const { recoil } = character.components.position.data
 
           if (recoil > 0) {
             character.components.position.data.recoil = max(0, recoil - recoilRate)
-          }
-
-          // dummy auto reload
-          if (character.id.includes("dummy") && world.tick % 120 === 0) {
-            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
           }
         }
       }),
@@ -46,6 +44,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
+            if (spinUntil && world.tick < spinUntil + 4) return
             if (cd + 6 > world.tick) return
             cd = world.tick
 
@@ -75,14 +74,17 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           const { pos, aim } = params
+          spinUntil = world.tick + spinDuration
 
           const eyePos = { x: pos.x, y: pos.y, z: pos.z + 0.5 }
           const eyes = new Vector3(eyePos.x, eyePos.z, eyePos.y)
 
           const { recoil } = character.components.position.data
 
+          if (recoil) aim.y += recoil * 0.1
+
           // apply recoil
-          character.components.position.data.recoil = min(0.7, recoil + 0.45)
+          character.components.position.data.recoil = min(0.7, recoil + 0.55)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)
@@ -196,9 +198,16 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           world.three?.spawnParticles(hit.edge, world)
 
+          // change block color
+          if (world.debug && hit.inside.type === 12) {
+            const { blockColor } = world.settings<IslandSettings>()
+            world.blocks.coloring[`${hit.inside.x},${hit.inside.y},${hit.inside.z}`] = blockColor
+            world.blocks.invalidate()
+          }
+
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
-          world.blocks.remove(hit.inside)
+          // world.blocks.remove(hit.inside)
         }),
       }),
       three: Three({
@@ -277,6 +286,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           mesh.rotation.y = aim.x
           mesh.rotation.x = aim.y + localRecoil * 0.5
+
+          if (spinUntil && spinUntil > world.tick) {
+            const spinRemaining = spinUntil - world.tick - ratio
+            if (spinRemaining > 0) {
+              mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
+            }
+          }
         }
       })
     },

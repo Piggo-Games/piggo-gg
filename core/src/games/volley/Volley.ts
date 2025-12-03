@@ -54,7 +54,7 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
     systems: [
       PhysicsSystem("local"),
       PhysicsSystem("global"),
-      SpawnSystem(Vince),
+      SpawnSystem({ spawner: Vince, pos: { x: 8, y: 8, z: 2 } }),
       VolleySystem,
       ShadowSystem,
       TargetSystem,

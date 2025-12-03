@@ -42,7 +42,7 @@ export const Bob = (player: Player): Character => {
     id: `bob-${player.id}`,
     components: {
       position: Position({
-        x: 8.12, y: 8, z: 2,
+        x: -6, y: 6.6, z: 2,
         friction: true,
         gravity: 0.003,
         aim: { x: 0, y: 0 }
@@ -360,7 +360,7 @@ export const Bob = (player: Player): Character => {
       three: Three({
         onTick: ({ three, world, client }) => {
 
-          if (block) block.visible = client.mobile?.horizontal() !== false
+          // if (block) block.visible = client.mobile?.horizontal() !== false
 
           if (!wipMesh) return
 
@@ -428,6 +428,11 @@ export const Bob = (player: Player): Character => {
 
             block.quaternion.copy(three.camera.c.quaternion)
             block.rotation.y = 0
+
+            const { blockColor } = world.settings<IslandSettings>()
+            block.material.forEach((mat) => mat.color.set(blockColor))
+
+            block.visible = world.debug
           }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
@@ -497,12 +502,6 @@ export const Bob = (player: Player): Character => {
                 child.material.opacity = opacity
               }
             })
-          }
-
-          // update block color
-          if (block) {
-            const { blockColor } = world.settings<IslandSettings>()
-            block.material.forEach((mat) => mat.color.set(blockColor))
           }
         },
         init: async ({ o, world, three }) => {

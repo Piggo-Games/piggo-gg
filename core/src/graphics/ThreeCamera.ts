@@ -124,11 +124,11 @@ export const ThreeCameraSystem = () => ClientSystemBuilder({
             camera.c.position.set(firstPos.x, firstPos.z, firstPos.y)
           }
 
-          if (world.game.id === "island") {
-            camera.c.rotation.set(y, x, 0)
-          } else {
+          // if (world.game.id === "island") {
+          //   camera.c.rotation.set(y, x, 0)
+          // } else {
             camera.c.rotation.set(y + recoil * 0.03, x, 0)
-          }
+          // 
         } else {
           if (camera.transition < 100) {
             camera.c.position.set(
