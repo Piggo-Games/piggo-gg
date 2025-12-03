@@ -26,9 +26,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       position: Position(),
       effects: Effects(),
       networked: Networked(),
-      item: Item({ name: "dagger", stackable: false }),
-      npc: NPC({
-        behavior: () => {
+      item: Item({
+        name: "dagger", onTick: () => {
           const { recoil } = character.components.position.data
 
           if (recoil > 0) {

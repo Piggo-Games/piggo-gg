@@ -18,8 +18,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
   let cd = -100
 
-  const recoilRate = 0.06
-  const spinDuration = 20
+  const recoilRate = 0.03
+  const spinDuration = 24
   const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
@@ -28,18 +28,15 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       position: Position(),
       effects: Effects(),
       networked: Networked(),
-      item: Item({ name: "blaster", stackable: false }),
-      npc: NPC({
-        behavior: (_, world) => {
+      item: Item({
+        name: "blaster",
+        onTick: () => {
+          console.log("blaster tick")
           const { recoil } = character.components.position.data
 
           if (recoil > 0) {
             character.components.position.data.recoil = max(0, recoil - recoilRate)
-          }
-
-          // dummy auto reload
-          if (character.id.includes("dummy") && world.tick % 120 === 0) {
-            world.actions.push(world.tick, item.id, { actionId: "reload", params: { value: world.tick + 40 } })
+            console.log("recoil", character.components.position.data.recoil)
           }
         }
       }),
@@ -86,8 +83,10 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           const { recoil } = character.components.position.data
 
+          if (recoil) aim.y += recoil * 0.1
+
           // apply recoil
-          character.components.position.data.recoil = min(0.7, recoil + 0.45)
+          character.components.position.data.recoil = min(0.7, recoil + 0.55)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)

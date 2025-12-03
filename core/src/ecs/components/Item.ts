@@ -8,6 +8,7 @@ export type Item = Component<"item"> & {
   dropped: boolean
   equipped: boolean
   stackable: boolean
+  onTick: undefined | (() => void)
 }
 
 export type ItemActionParams = {
@@ -24,14 +25,16 @@ export type ItemProps = {
   dropped?: boolean
   equipped?: boolean
   stackable?: boolean
+  onTick?: () => void
 }
 
-export const Item = ({ name, dropped, equipped, stackable }: ItemProps): Item => ({
+export const Item = ({ name, dropped, equipped, stackable, onTick }: ItemProps): Item => ({
   name,
   type: "item",
   dropped: dropped ?? false,
   equipped: equipped ?? false,
-  stackable: stackable ?? false
+  stackable: stackable ?? false,
+  onTick
 })
 
 export type ItemComponents = Position | Actions | Effects | Item | Networked

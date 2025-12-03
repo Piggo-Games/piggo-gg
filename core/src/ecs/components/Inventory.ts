@@ -165,6 +165,8 @@ export const InventorySystem: SystemBuilder<"InventorySystem"> = {
         if (activeItem) {
           // activeItem.components.renderable.visible = true
           activeItem.components.item.equipped = true
+
+          activeItem.components.item.onTick?.()
         }
       })
     }
