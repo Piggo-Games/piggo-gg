@@ -5,7 +5,8 @@ export const ValidOrigins = [
   "http://localhost:8000",
   "https://piggo.gg",
   "https://dev.piggo.gg",
-  "https://1433003541521236100.discordsays.com"
+  "https://1433003541521236100.discordsays.com",
+  "file://"
 ]
 
 export const CORSHeaders = (origin: string) => ({

@@ -4,7 +4,8 @@
   "workspaces": [
     "core",
     "web",
-    "server"
+    "server",
+    "electron"
   ],
   "scripts": {
     "prod": "bun gen && bun --cwd server start",
@@ -24,6 +25,7 @@
     "typescript": "5.9.2"
   },
   "devDependencies": {
+    "@types/node": "22.7.4",
     "ts-loader": "9.4.2"
   }
 }
