@@ -3,7 +3,7 @@ import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderM
 
 export const Water = () => {
 
-  let surface: Mesh<BufferGeometry, ShaderMaterial> | undefined = undefined
+  let mesh: Mesh<BufferGeometry, ShaderMaterial> | undefined = undefined
 
   const sky = Entity<Three>({
     id: "new-sky",
@@ -11,10 +11,13 @@ export const Water = () => {
       position: Position(),
       three: Three({
         onTick: ({ client }) => {
-          if (!surface) return
+          if (!mesh) return
 
           const pc = client.character()
           if (!pc) return
+
+          // mesh.position.x = pc.components.position.data.x
+          // mesh.position.z = pc.components.position.data.y
 
           let z = pc.components.position.data.z + 0.0
 
@@ -30,15 +33,15 @@ export const Water = () => {
           // }
         },
         onRender: ({ delta, world }) => {
-          if (surface) {
-            const mat = surface.material as ShaderMaterial
+          if (mesh) {
+            const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.012
             mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },
         init: async ({ o, three }) => {
-          surface = new Mesh()
+          mesh = new Mesh()
 
           const halfSize = 200
           const surfaceY = -0.04
@@ -59,7 +62,7 @@ export const Water = () => {
           surfaceGeometry.setAttribute("position", new BufferAttribute(surfaceVertices, 3))
           surfaceGeometry.setIndex(surfaceIndices)
 
-          surface.geometry = surfaceGeometry
+          mesh.geometry = surfaceGeometry
 
           const surfaceMat = new ShaderMaterial({
             vertexShader: surfaceVertex,
@@ -90,9 +93,9 @@ export const Water = () => {
             surfaceMat.uniforms.uNormalMap2.value = t
           })
 
-          surface.material = surfaceMat;
+          mesh.material = surfaceMat
 
-          o.push(surface)
+          o.push(mesh)
         }
       })
     }
