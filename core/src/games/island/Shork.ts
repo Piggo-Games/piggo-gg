@@ -10,7 +10,7 @@ export const Shork = () => {
   const shork = Entity<Position>({
     id: "shork",
     components: {
-      position: Position({ x: 15, y: 15, z: -0.67 }),
+      position: Position({ x: -3, y: 15, z: -0.67 }),
       collider: Collider({ shape: "ball", radius: 0.1 }),
       npc: NPC({
         behavior: (_, world) => {

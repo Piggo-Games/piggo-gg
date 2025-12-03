@@ -42,7 +42,7 @@ export const Bob = (player: Player): Character => {
     id: `bob-${player.id}`,
     components: {
       position: Position({
-        x: 8.12, y: 8, z: 2,
+        x: -6, y: 6.6, z: 2,
         friction: true,
         gravity: 0.003,
         aim: { x: 0, y: 0 }

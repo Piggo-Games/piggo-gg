@@ -20,7 +20,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
   const swingDistance = 0.75
 
   let dist = 0
-  const recoilRate = 0.06
+  const recoilRate = 0.08
 
   const item = Entity<ItemComponents>({
     id: `dagger-${character.id}`,

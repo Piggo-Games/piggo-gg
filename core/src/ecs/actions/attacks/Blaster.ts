@@ -74,7 +74,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           const { pos, aim } = params
-          // spinUntil = world.tick + spinDuration
+          spinUntil = world.tick + spinDuration
 
           const eyePos = { x: pos.x, y: pos.y, z: pos.z + 0.5 }
           const eyes = new Vector3(eyePos.x, eyePos.z, eyePos.y)
