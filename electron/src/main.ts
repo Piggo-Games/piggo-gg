@@ -1,10 +1,5 @@
 import { app, BrowserWindow, shell } from "electron"
 
-const resolveWebEntry = () => {
-  const domain = true ? "https://localhost:8000" : "https://piggo.gg"
-  return { type: "url", domain }
-}
-
 const createWindow = () => {
   const window = new BrowserWindow({
     width: 1280,
@@ -19,14 +14,12 @@ const createWindow = () => {
     title: "Piggo"
   })
 
-  // console.log(process.versions);
   app.getGPUInfo('complete').then((info) => {
     // console.log("GPU Info:", info);
   });
 
-  const entry = resolveWebEntry()
-  if (entry.type === "file") window.loadFile(entry.domain)
-  else window.loadURL(entry.domain)
+  const domain = true ? "https://localhost:8000" : "https://piggo.gg"
+  window.loadURL(domain)
 
   window.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
@@ -53,6 +46,5 @@ app.whenReady().then(() => {
 })
 
 app.on("window-all-closed", () => {
-  // if (process.platform !== "darwin") app.quit()
   app.quit()
 })

@@ -105,7 +105,6 @@ export const ThreeRenderer = (): ThreeRenderer => {
       })
 
       webgl.setPixelRatio(window.devicePixelRatio)
-      console.log("ratio", window.devicePixelRatio)
       webgl.shadowMap.enabled = true
       webgl.shadowMap.type = 2
 
