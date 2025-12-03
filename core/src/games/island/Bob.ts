@@ -361,6 +361,16 @@ export const Bob = (player: Player): Character => {
       three: Three({
         onTick: ({ three, world, client }) => {
 
+          // debug
+          if (world.debug && player.id.includes("dummy")) {
+            if (world.tick % 80 === 0) {
+              // switch weapon
+              const currentIndex = bob.components.inventory!.data.activeItemIndex
+              const nextIndex = currentIndex === 0 ? 1 : 0
+              world.actions.push(world.tick + 1, bob.id, { actionId: "setActiveItemIndex", params: { index: nextIndex } })
+            }
+          }
+
           // if (block) block.visible = client.mobile?.horizontal() !== false
 
           if (!wipMesh) return
@@ -410,43 +420,43 @@ export const Bob = (player: Player): Character => {
           mesh.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
 
           // block position
-          if (block) {
-            block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
+          // if (block) {
+          //   block.position.set(interpolated.x, interpolated.z + 0.4984, interpolated.y)
 
-            const { localAim } = client.controls
-            const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
+          //   const { localAim } = client.controls
+          //   const dir = { x: sin(localAim.x), y: cos(localAim.x), z: sin(localAim.y) }
 
-            let offset = three.camera.dir(world, 0.002)
+          //   let offset = three.camera.dir(world, 0.002)
 
-            // vertical adjustment
-            offset.x -= dir.x * localAim.y * 0.001
-            offset.z -= dir.y * localAim.y * 0.001
-            if (localAim.y > 0) {
-              offset.y += localAim.y * 0.0007
-            }
+          //   // vertical adjustment
+          //   offset.x -= dir.x * localAim.y * 0.001
+          //   offset.z -= dir.y * localAim.y * 0.001
+          //   if (localAim.y > 0) {
+          //     offset.y += localAim.y * 0.0007
+          //   }
 
-            block.position.add(offset)
+          //   block.position.add(offset)
 
-            block.quaternion.copy(three.camera.c.quaternion)
-            block.rotation.y = 0
+          //   block.quaternion.copy(three.camera.c.quaternion)
+          //   block.rotation.y = 0
 
-            const { blockColor } = world.settings<IslandSettings>()
-            block.material.forEach((mat) => mat.color.set(blockColor))
+          //   const { blockColor } = world.settings<IslandSettings>()
+          //   block.material.forEach((mat) => mat.color.set(blockColor))
 
-            block.visible = world.debug
-          }
+          //   block.visible = world.debug
+          // }
 
-          hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
-          hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
+          // hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
+          // hitboxes.head?.position.set(interpolated.x, interpolated.z + 0.535, interpolated.y)
 
           // rotation
           mesh.rotation.y = orientation.x + PI
 
           // team color
-          if (lastTeamNumber !== player.components.team.data.team) {
-            colorMaterials(mesh, BobColors, player.components.team.data.team)
-            lastTeamNumber = player.components.team.data.team
-          }
+          // if (lastTeamNumber !== player.components.team.data.team) {
+          //   colorMaterials(mesh, BobColors, player.components.team.data.team)
+          //   lastTeamNumber = player.components.team.data.team
+          // }
 
           // animation
           let speed = hypot(position.data.velocity.x, position.data.velocity.y)
@@ -529,27 +539,26 @@ export const Bob = (player: Player): Character => {
           }
 
           // character model
-          three.gLoader.load("cowboy.glb", (gltf) => {
+          three.gLoader.load("pirate.gltf", (gltf) => {
 
             mesh = cloneSkeleton(gltf.scene)
             mesh.animations = gltf.animations
             mesh.frustumCulled = false
-            mesh.scale.set(0.18, 0.18, 0.18)
+            mesh.scale.set(0.02, 0.021, 0.02)
 
             // helper = new SkeletonHelper(mesh.children[0].children[1])
 
             copyMaterials(gltf.scene, mesh)
-            colorMaterials(mesh, BobColors, player.components.team.data.team)
 
             pigMixer = new AnimationMixer(mesh)
 
-            idleAnimation = pigMixer.clipAction(mesh.animations[2])
-            runAnimation = pigMixer.clipAction(mesh.animations[8])
-            deathAnimation = pigMixer.clipAction(mesh.animations[0])
-            deathAnimation.loop = 2200
-            deathAnimation.clampWhenFinished = true
+            // idleAnimation = pigMixer.clipAction(mesh.animations[2])
+            // runAnimation = pigMixer.clipAction(mesh.animations[8])
+            // deathAnimation = pigMixer.clipAction(mesh.animations[0])
+            // deathAnimation.loop = 2200
+            // deathAnimation.clampWhenFinished = true
 
-            idleAnimation?.play()
+            // idleAnimation?.play()
 
             mesh.traverse((child) => {
               if (child instanceof Mesh) {
@@ -577,16 +586,4 @@ export const Bob = (player: Player): Character => {
   })
 
   return bob
-}
-
-const BobColors: ColorMapping = {
-  "cead86": { 2: "#be9393", 1: "#be9393" },
-  "4f535a": { 2: "#4f535a", 1: "#7e4f19" },
-  "312e2b": { 2: "#312e2b", 1: "#2b1608" },
-  "161616": { 2: "#453089", 1: "#671029" },
-
-  "7e4f19": { 2: "#4f535a", 1: "#7e4f19" },
-  "2b1608": { 2: "#312e2b", 1: "#2b1608" },
-  "453089": { 2: "#453089", 1: "#671029" },
-  "671029": { 2: "#453089", 1: "#671029" }
 }

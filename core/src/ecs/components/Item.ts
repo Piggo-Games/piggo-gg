@@ -1,6 +1,6 @@
 import {
   Actions, Component, Effects, Entity, Networked, Position,
-  ProtoEntity, SystemBuilder, XY, abs, hypot, min, pickupItem, round
+  ProtoEntity, SystemBuilder, World, XY, abs, hypot, min, pickupItem, round
 } from "@piggo-gg/core"
 
 export type Item = Component<"item"> & {
@@ -8,7 +8,7 @@ export type Item = Component<"item"> & {
   dropped: boolean
   equipped: boolean
   stackable: boolean
-  onTick: undefined | (() => void)
+  onTick: undefined | ((world: World) => void)
 }
 
 export type ItemActionParams = {
@@ -25,7 +25,7 @@ export type ItemProps = {
   dropped?: boolean
   equipped?: boolean
   stackable?: boolean
-  onTick?: () => void
+  onTick?: (world: World) => void
 }
 
 export const Item = ({ name, dropped, equipped, stackable, onTick }: ItemProps): Item => ({
