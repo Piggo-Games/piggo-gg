@@ -3,7 +3,7 @@ import {
   Item, ItemComponents, PI, Position, Three, XY, cos, max, modelOffset,
   Networked, NPC, rotateAroundZ, sin, sphereBoxIntersect
 } from "@piggo-gg/core"
-import { Mesh, Object3D } from "three"
+import { Mesh, MeshBasicMaterial, Object3D, SphereGeometry } from "three"
 
 type SwingParams = {
   aim: XY
@@ -13,8 +13,12 @@ export const DaggerItem = ({ character }: { character: Character }) => {
 
   let mesh: Object3D | undefined = undefined
   let cd = -100
+  let debugSphere: Mesh | undefined = undefined
+  let lastSwing: { tick: number, center: { x: number, y: number, z: number } } | undefined = undefined
 
   const recoilRate = 0.06
+  const swingRadius = 0.35
+  const swingDistance = 0.75
 
   const item = Entity<ItemComponents>({
     id: `dagger-${character.id}`,
@@ -53,9 +57,6 @@ export const DaggerItem = ({ character }: { character: Character }) => {
 
           const aim = params.aim ?? character.components.position.data.aim
 
-          const swingRadius = 0.45
-          const swingDistance = 0.75
-
           const pos = character.components.position.xyz()
           const forward = {
             x: -sin(aim.x) * cos(aim.y),
@@ -68,6 +69,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             y: pos.y + forward.y * swingDistance,
             z: pos.z + 0.45 + forward.z * swingDistance
           }
+
+          lastSwing = { tick: world.tick, center }
 
           const hitboxEntities = world.queryEntities<Position | Hitbox | Health>(
             ["position", "hitbox"],
@@ -131,6 +134,12 @@ export const DaggerItem = ({ character }: { character: Character }) => {
 
             o.push(mesh)
           })
+
+          const geo = new SphereGeometry(swingRadius, 12, 12)
+          const mat = new MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+          debugSphere = new Mesh(geo, mat)
+          debugSphere.visible = false
+          o.push(debugSphere)
         },
         onRender: ({ world, delta, client, three }) => {
           const ratio = delta / 25
@@ -144,6 +153,14 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             return
           } else {
             mesh.visible = true
+          }
+
+          if (debugSphere && lastSwing) {
+            const show = world.tick - lastSwing.tick < 8
+            debugSphere.visible = show && world.debug
+            if (show) {
+              debugSphere.position.set(lastSwing.center.x, lastSwing.center.z, lastSwing.center.y)
+            }
           }
 
           if (character.components.health?.dead() || character.components.inventory?.activeItem(world)?.id !== item.id) {
