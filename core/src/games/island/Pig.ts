@@ -59,7 +59,7 @@ export const Pig = () => {
         },
         init: async ({ o, three }) => {
           const bodyGeo = new BoxGeometry(bodyHitbox.width, bodyHitbox.height, bodyHitbox.depth)
-          const bodyMat = new MeshPhongMaterial({ color: 0x0000ff, wireframe: true })
+          const bodyMat = new MeshPhongMaterial({ color: 0xffff00, wireframe: true })
           hitboxes.body = new Mesh(bodyGeo, bodyMat)
 
           o.push(hitboxes.body)

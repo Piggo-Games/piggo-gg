@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
-  Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC,
+  Input, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
@@ -14,10 +14,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let mesh: Object3D | undefined = undefined
   let tracer: Object3D | undefined = undefined
   let tracerState = { tick: 0, velocity: { x: 0, y: 0, z: 0 }, pos: { x: 0, y: 0, z: 0 } }
+  let spinUntil: number | null = null
 
   let cd = -100
 
   const recoilRate = 0.06
+  const spinDuration = 20
+  const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
     id: `blaster-${character.id}`,
@@ -46,6 +49,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
+            if (spinUntil && world.tick < spinUntil + 4) return
             if (cd + 6 > world.tick) return
             cd = world.tick
 
@@ -75,6 +79,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           }
 
           const { pos, aim } = params
+          spinUntil = world.tick + spinDuration
 
           const eyePos = { x: pos.x, y: pos.y, z: pos.z + 0.5 }
           const eyes = new Vector3(eyePos.x, eyePos.z, eyePos.y)
@@ -277,6 +282,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           mesh.rotation.y = aim.x
           mesh.rotation.x = aim.y + localRecoil * 0.5
+
+          if (spinUntil && spinUntil > world.tick) {
+            const spinRemaining = spinUntil - world.tick - ratio
+            if (spinRemaining > 0) {
+              mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
+            }
+          }
         }
       })
     },
