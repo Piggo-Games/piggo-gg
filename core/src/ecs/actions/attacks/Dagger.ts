@@ -16,9 +16,11 @@ export const DaggerItem = ({ character }: { character: Character }) => {
   let debugSphere: Mesh | undefined = undefined
   let lastSwing: { tick: number, center: { x: number, y: number, z: number } } | undefined = undefined
 
-  const recoilRate = 0.06
   const swingRadius = 0.35
   const swingDistance = 0.75
+
+  let dist = 0
+  const recoilRate = 0.06
 
   const item = Entity<ItemComponents>({
     id: `dagger-${character.id}`,
@@ -28,10 +30,11 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       networked: Networked(),
       item: Item({
         name: "dagger", onTick: () => {
-          const { recoil } = character.components.position.data
+          // const { recoil } = character.components.position.data
 
-          if (recoil > 0) {
-            character.components.position.data.recoil = max(0, recoil - recoilRate)
+          if (dist > 0) {
+            dist = max(0, dist - recoilRate)
+            // character.components.position.data.recoil = max(0, recoil - recoilRate)
           }
         }
       }),
@@ -41,7 +44,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
-            if (cd + 14 > world.tick) return
+            // if (cd + 14 > world.tick) return
+            if (dist > 0) return
             cd = world.tick
 
             const swingAim = aim ?? character.components.position.data.aim
@@ -52,7 +56,8 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       }),
       actions: Actions({
         swing: Action<SwingParams>("swing", ({ world, params }) => {
-          character.components.position.data.recoil = 1.5
+          // character.components.position.data.recoil = 1.5
+          dist = 1.5
 
           const aim = params.aim ?? character.components.position.data.aim
 
@@ -180,11 +185,12 @@ export const DaggerItem = ({ character }: { character: Character }) => {
             pos.y + offset.z
           )
 
-          const localRecoil = recoil ? recoil - recoilRate * ratio : 0
+          // const localRecoil = recoil ? recoil - recoilRate * ratio : 0
+          const localDist = dist ? dist - recoilRate * ratio : 0
 
           // rotation
-          mesh.rotation.y = aim.x + PI / 2 + localRecoil * 0.5
-          mesh.rotation.z = aim.y - localRecoil * 0.5
+          mesh.rotation.y = aim.x + PI / 2 + localDist * 0.5
+          mesh.rotation.z = aim.y - localDist * 0.5
         }
       })
     }
