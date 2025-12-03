@@ -1,8 +1,11 @@
 import { Character, Controlling, Player, SystemBuilder } from "@piggo-gg/core"
 
-type CharacterSpawner = (player: Player) => Character
+export type SpawnSystemProps = {
+  spawner: (player: Player) => Character
+  pos: { x: number, y: number, z: number }
+}
 
-export const SpawnSystem = (spawner: CharacterSpawner) => SystemBuilder<"SpawnSystem">({
+export const SpawnSystem = ({ spawner, pos }: SpawnSystemProps) => SystemBuilder<"SpawnSystem">({
   id: "SpawnSystem",
   init: (world) => {
 
@@ -49,8 +52,7 @@ export const SpawnSystem = (spawner: CharacterSpawner) => SystemBuilder<"SpawnSy
             health.revive()
 
             // reset position
-            if (!player.id.includes("dummy")) position.setPosition({ x: 8, y: 8 })
-            position.setPosition({ z: 2 })
+            if (!player.id.includes("dummy")) position.setPosition(pos)
           }
         })
       }

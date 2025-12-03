@@ -45,7 +45,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       round: null,
     },
     systems: [
-      SpawnSystem(Sarge),
+      SpawnSystem({ spawner: Sarge, pos: { x: 8, y: 8, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),

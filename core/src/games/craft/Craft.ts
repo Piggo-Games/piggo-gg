@@ -53,7 +53,7 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       willStart: null
     },
     systems: [
-      SpawnSystem(Carl),
+      SpawnSystem({ spawner: Carl, pos: { x: 8, y: 8, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),

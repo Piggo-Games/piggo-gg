@@ -37,7 +37,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       doubleJumped: []
     },
     systems: [
-      SpawnSystem(Bob),
+      SpawnSystem({ spawner: Bob, pos: { x: -6, y: 6.6, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),

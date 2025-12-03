@@ -34,6 +34,7 @@ export const Shork = () => {
             if (length < 1) {
               pc.components.health?.damage(100, world)
               pc.components.three?.flash(0.5)
+              world.client?.sound.play({ name: "eat", start: 0.2, threshold: { pos: pcPos, distance: 10 } })
             }
 
             position.setVelocity({ x: dirX / length * 1, y: dirY / length * 1 })
