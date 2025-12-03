@@ -1,12 +1,6 @@
 import { app, BrowserWindow, shell } from "electron"
-import fs from "node:fs"
-import path from "node:path"
 
 const resolveWebEntry = () => {
-  // const localHtml = path.resolve(__dirname, "..", "..", "web", "res", "index.html")
-  // if (fs.existsSync(localHtml)) return {
-  //   type: "file", value: localHtml
-  // }
   const domain = true ? "https://localhost:8000" : "https://piggo.gg"
   return { type: "url", domain }
 }
@@ -15,18 +9,19 @@ const createWindow = () => {
   const window = new BrowserWindow({
     width: 1280,
     height: 720,
+    minHeight: 612,
+    minWidth: 1088,
     backgroundColor: "#000000",
     autoHideMenuBar: true,
     webPreferences: {
-      contextIsolation: true,
-      // backgroundThrottling: false
+      contextIsolation: true
     },
     title: "Piggo"
   })
 
-  console.log(process.versions);
+  // console.log(process.versions);
   app.getGPUInfo('complete').then((info) => {
-    console.log("GPU Info:", info);
+    // console.log("GPU Info:", info);
   });
 
   const entry = resolveWebEntry()
