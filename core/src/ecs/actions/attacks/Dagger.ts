@@ -126,7 +126,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
 
           three.gLoader.load("dagger.gltf", (gltf) => {
             mesh = gltf.scene
-            mesh.scale.set(0.004, 0.004, 0.004)
+            mesh.scale.set(0.01, 0.01, 0.01)
 
             mesh.rotation.order = "YXZ"
 
@@ -180,9 +180,9 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           // position
           const offset = modelOffset(aim)
           mesh.position.set(
-            pos.x + offset.x,
-            pos.z + 0.45 + offset.y,
-            pos.y + offset.z
+            pos.x + offset.x * 2,
+            pos.z + 0.41 + offset.y,
+            pos.y + offset.z * 2
           )
 
           // const localRecoil = recoil ? recoil - recoilRate * ratio : 0
