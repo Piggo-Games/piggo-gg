@@ -76,7 +76,7 @@ export const DeagleItem = ({ character }: { character: Character }) => {
 
           // TODO move to a system
           if (recoil > 0) {
-            // character.components.position.data.recoil = max(0, recoil - recoilRate)
+            character.components.position.data.recoil = max(0, recoil - recoilRate)
           }
 
           const { gun } = item.components

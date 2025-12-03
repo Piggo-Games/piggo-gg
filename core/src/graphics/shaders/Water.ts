@@ -1,4 +1,4 @@
-import { dayness, Entity, max, min, Position, Three } from "@piggo-gg/core"
+import { dayness, Entity, Position, Three } from "@piggo-gg/core"
 import { RepeatWrapping, Vector3, Mesh, BufferGeometry, BufferAttribute, ShaderMaterial, UniformsLib } from "three"
 
 export const Water = () => {
@@ -10,28 +10,6 @@ export const Water = () => {
     components: {
       position: Position(),
       three: Three({
-        onTick: ({ client }) => {
-          if (!mesh) return
-
-          const pc = client.character()
-          if (!pc) return
-
-          // mesh.position.x = pc.components.position.data.x
-          // mesh.position.z = pc.components.position.data.y
-
-          let z = pc.components.position.data.z + 0.0
-
-          // adjust the water height
-          // if (z > 0.3) {
-          //   z -= 0.3
-          //   surface.position.y = -min(z / 4, 0.7)
-          // } else if (z < -0.51) {
-          //   z += 0.51
-          //   surface.position.y = max(z / 4, -1)
-          // } else {
-          //   surface.position.y = 0
-          // }
-        },
         onRender: ({ delta, world }) => {
           if (mesh) {
             const mat = mesh.material as ShaderMaterial

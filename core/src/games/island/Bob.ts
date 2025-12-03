@@ -431,6 +431,8 @@ export const Bob = (player: Player): Character => {
 
             const { blockColor } = world.settings<IslandSettings>()
             block.material.forEach((mat) => mat.color.set(blockColor))
+
+            block.visible = world.debug
           }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
