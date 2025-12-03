@@ -1,8 +1,8 @@
 import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
-  InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder,
-  ThreeCameraSystem, ParticleSystem, ThreeNametagSystem, ThreeSystem, Water
+  InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
+  ParticleSystem, ThreeNametagSystem, ThreeSystem, Water, Hitmarker
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
@@ -51,6 +51,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
     ],
     entities: [
       Crosshair(),
+      Hitmarker(),
       // HtmlInventory(),
       EscapeMenu(world),
       HtmlChat(),

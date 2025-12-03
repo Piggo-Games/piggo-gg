@@ -171,8 +171,13 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           const blockDistance = hit ? XYZdistance(eyePos, hit.edge) : Infinity
 
           if (hitboxHit && hitboxHit.distance <= blockDistance) {
-            hitboxHit.entity.components.health?.damage(1, world)
+            hitboxHit.entity.components.health?.damage(2, world)
             hitboxHit.entity.components.three?.flash(0.5)
+
+            if (character.id === world.client?.character()?.id) {
+              world.client.controls.localHit = { tick: world.tick, headshot: false }
+            }
+
             return
           }
 
