@@ -1,8 +1,13 @@
 import {
-  Action, Actions, Character, Effects, Entity, Input, Item,
-  ItemComponents, max, modelOffset, Networked, NPC, PI, Position, Three
+  Action, Actions, Character, Effects, Entity, Health, Hitbox, Input,
+  Item, ItemComponents, PI, Position, Three, XY, cos, max, modelOffset,
+  Networked, NPC, rotateAroundZ, sin, sphereBoxIntersect
 } from "@piggo-gg/core"
 import { Mesh, Object3D } from "three"
+
+type SwingParams = {
+  aim: XY
+}
 
 export const DaggerItem = ({ character }: { character: Character }) => {
 
@@ -29,22 +34,84 @@ export const DaggerItem = ({ character }: { character: Character }) => {
       }),
       input: Input({
         press: {
-          "mb1": ({ character, world, client }) => {
+          "mb1": ({ character, world, client, aim }) => {
             if (!character) return
             if (!document.pointerLockElement && !client.mobile) return
 
             if (cd + 14 > world.tick) return
             cd = world.tick
 
-            return { actionId: "swing", params: {} }
+            const swingAim = aim ?? character.components.position.data.aim
+
+            return { actionId: "swing", params: { aim: swingAim } }
           }
         }
       }),
       actions: Actions({
-        swing: Action("swing", ({ world, params }) => {
+        swing: Action<SwingParams>("swing", ({ world, params }) => {
           character.components.position.data.recoil = 1.5
 
-          world.client?.sound.play({ name: "whiff" })
+          const aim = params.aim ?? character.components.position.data.aim
+
+          const swingRadius = 0.45
+          const swingDistance = 0.75
+
+          const pos = character.components.position.xyz()
+          const forward = {
+            x: -sin(aim.x) * cos(aim.y),
+            y: -cos(aim.x) * cos(aim.y),
+            z: sin(aim.y)
+          }
+
+          const center = {
+            x: pos.x + forward.x * swingDistance,
+            y: pos.y + forward.y * swingDistance,
+            z: pos.z + 0.45 + forward.z * swingDistance
+          }
+
+          const hitboxEntities = world.queryEntities<Position | Hitbox | Health>(
+            ["position", "hitbox"],
+            (e) => e.id !== character.id && !e.removed
+          )
+
+          let hit = false
+
+          for (const target of hitboxEntities) {
+            const { position, health, hitbox } = target.components
+            if (health?.dead()) continue
+
+            const { rotation, x, y, z } = position.data
+            const sinR = sin(-rotation)
+            const cosR = cos(-rotation)
+
+            for (const shape of hitbox.shapes) {
+              const offset = rotateAroundZ(shape.offset, sinR, cosR)
+
+              const boxCenter = {
+                x: x + offset.x,
+                y: y + offset.y,
+                z: z + offset.z
+              }
+
+              const half = { x: shape.width / 2, y: shape.depth / 2, z: shape.height / 2 }
+
+              if (sphereBoxIntersect(center, swingRadius, boxCenter, half, sinR, cosR)) {
+                health?.damage(3, world, character.id, "dagger")
+                target.components.three?.flash(0.5)
+                hit = true
+                break
+              }
+            }
+          }
+
+          if (hit) {
+            world.client?.sound.play({ name: "slash" })
+            if (character.id === world.client?.character()?.id) {
+              world.client.controls.localHit = { tick: world.tick, headshot: false }
+            }
+          } else {
+            world.client?.sound.play({ name: "whiff" })
+          }
         })
       }),
       three: Three({
