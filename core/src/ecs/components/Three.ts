@@ -1,7 +1,7 @@
-import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World } from "@piggo-gg/core"
-import { Object3D, Object3DEventMap } from "three"
+import { Client, ClientSystemBuilder, Component, ThreeRenderer, Entity, Position, World, min, max } from "@piggo-gg/core"
+import { Color, Mesh, Object3D, Object3DEventMap } from "three"
 
-type ThreeInit = (_: {o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer}) => Promise<void>
+type ThreeInit = (_: { o: Object3D<Object3DEventMap>[], entity: Entity<Three | Position>, world: World, three: ThreeRenderer }) => Promise<void>
 
 type OnRenderProps = {
   entity: Entity<Three | Position>
@@ -14,11 +14,13 @@ type OnRenderProps = {
 
 export type Three = Component<"three", {}> & {
   initialized: boolean
+  emissive: number
   o: Object3D[]
   init: undefined | ThreeInit
   onRender: undefined | ((_: OnRenderProps) => void)
   onTick: undefined | ((_: Omit<OnRenderProps, "delta" | "since">) => void)
   cleanup: (world: World) => void
+  flash: (intensity: number) => void
 }
 
 export type ThreeProps = {
@@ -32,12 +34,30 @@ export const Three = (props: ThreeProps = {}): Three => {
     type: "three",
     data: {},
     initialized: false,
+    emissive: 0,
     o: [],
     init: props.init,
     onRender: props.onRender,
     onTick: props.onTick,
     cleanup: (world) => {
       world.three?.scene.remove(...three.o)
+    },
+    flash: (intensity: number) => {
+      three.emissive = min(1, three.emissive + intensity)
+
+      for (const o of three.o) {
+        o.traverse((child) => {
+          if (child instanceof Mesh) {
+            const mat = (child as any).material
+            if (mat) {
+              if (mat.emissive) {
+                mat.emissiveIntensity = three.emissive
+                mat.emissive = new Color(0xffffff)
+              }
+            }
+          }
+        })
+      }
     }
   }
 
@@ -86,6 +106,27 @@ export const ThreeSystem = ClientSystemBuilder<"ThreeSystem">({
         for (const entity of entities) {
           const { three } = entity.components
           three.onRender?.({ entity, world, client: world.client!, delta, since, three: world.three! })
+        }
+
+        // handle emissive decay
+        for (const entity of entities) {
+          const { three } = entity.components
+          if (three.emissive > 0) {
+            three.emissive = max(0, three.emissive - since / 25 / 20)
+
+            for (const o of three.o) {
+              o.traverse((child) => {
+                if (child instanceof Mesh) {
+                  const mat = (child as any).material
+                  if (mat) {
+                    if (mat.emissive) {
+                      mat.emissiveIntensity = three.emissive
+                    }
+                  }
+                }
+              })
+            }
+          }
         }
       }
     }

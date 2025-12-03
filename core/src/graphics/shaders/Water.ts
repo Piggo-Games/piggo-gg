@@ -33,7 +33,7 @@ export const Water = () => {
           if (surface) {
             const mat = surface.material as ShaderMaterial
 
-            mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.016
+            mat.uniforms.uTime.value = (world.tick + delta / 25) * 0.012
             mat.uniforms.uDay.value = dayness(world.tick, delta)
           }
         },

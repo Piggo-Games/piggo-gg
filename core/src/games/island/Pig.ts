@@ -22,7 +22,14 @@ export const Pig = () => {
         behavior: (_, world) => {
           if (!mesh) return
 
-          if (pig.components.health.dead()) {
+          const { died } = pig.components.health.data
+          if (died) {
+            if (world.tick - died > 80) {
+              pig.components.health.data.hp = 10
+              pig.components.health.data.died = null
+              mesh.rotation.x = 0
+              return
+            }
             mesh.rotation.x = Math.PI / 2
             hitboxes.body!.visible = false
             return

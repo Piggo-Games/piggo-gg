@@ -396,3 +396,31 @@ export const rotateAroundZ = (v: XYZ, sinR: number, cosR: number): XYZ => ({
   y: v.x * sinR + v.y * cosR,
   z: v.z
 })
+
+// checks if a sphere intersects a rotated box
+export const sphereBoxIntersect = (
+  center: XYZ,
+  radius: number,
+  boxCenter: XYZ,
+  half: XYZ,
+  sinR: number,
+  cosR: number
+): boolean => {
+  const local = rotateAroundZ({
+    x: center.x - boxCenter.x,
+    y: center.y - boxCenter.y,
+    z: center.z - boxCenter.z
+  }, -sinR, cosR)
+
+  const closest = {
+    x: minmax(local.x, -half.x, half.x),
+    y: minmax(local.y, -half.y, half.y),
+    z: minmax(local.z, -half.z, half.z)
+  }
+
+  const dx = local.x - closest.x
+  const dy = local.y - closest.y
+  const dz = local.z - closest.z
+
+  return dx * dx + dy * dy + dz * dz <= radius * radius
+}
