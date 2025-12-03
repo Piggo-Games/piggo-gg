@@ -96,6 +96,7 @@ export const Bob = (player: Player): Character => {
           "mb2": ({ hold, world, character }) => {
             if (hold && placeCD + 6 > world.tick) return
             if (!character) return
+            if (!world.debug) return
 
             placeCD = hold ? world.tick : world.tick + 6
 

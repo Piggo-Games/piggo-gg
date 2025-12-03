@@ -19,7 +19,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let cd = -100
 
   const recoilRate = 0.03
-  const spinDuration = 24
+  const spinDuration = 20
   const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({

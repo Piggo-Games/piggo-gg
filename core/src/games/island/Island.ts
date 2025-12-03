@@ -126,18 +126,18 @@ const IslandSystem = SystemBuilder({
 const controls: HUDSystemProps = {
   clusters: [
     {
-      label: "shoot|color|place",
-      buttons: [["mb1", "mb3", "mb2"]],
+      label: "shoot",
+      buttons: [["mb1"]],
       fontSize: "16px"
     },
-    {
-      label: "place area",
-      buttons: [["x"]],
-    },
-    {
-      label: "fly",
-      buttons: [["f"]]
-    },
+    // {
+    //   label: "place area",
+    //   buttons: [["x"]],
+    // },
+    // {
+    //   label: "fly",
+    //   buttons: [["f"]]
+    // },
     {
       label: "move",
       buttons: [
