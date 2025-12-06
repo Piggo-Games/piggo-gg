@@ -30,7 +30,7 @@ export const ThreeNametag = (player: Player): ThreeNametag => {
 
       const interpolated = position.interpolate(world, delta)
 
-      group.position.set(interpolated.x, interpolated.z + 0.62, interpolated.y)
+      group.position.set(interpolated.x, interpolated.z + 0.64, interpolated.y)
 
       // update text if needed
       const { name } = player.components.pc.data

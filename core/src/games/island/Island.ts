@@ -2,8 +2,7 @@ import {
   BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
   GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
   InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ParticleSystem, ThreeNametagSystem, ThreeSystem, Water, Hitmarker,
-  DummyPlayer
+  ParticleSystem, ThreeNametagSystem, ThreeSystem, Water, Hitmarker, DummyPlayer
 } from "@piggo-gg/core"
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
@@ -63,7 +62,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       HtmlFpsText(),
       Pig(),
       Shork(),
-      DummyPlayer()
+      // DummyPlayer()
     ]
   })
 }

@@ -181,7 +181,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
           const offset = modelOffset(aim)
           mesh.position.set(
             pos.x + offset.x * 2,
-            pos.z + 0.41 + offset.y,
+            pos.z + 0.40 + offset.y,
             pos.y + offset.z * 2
           )
 
