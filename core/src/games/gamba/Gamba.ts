@@ -6,7 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 
-const arenaWidth = 360
+const arenaWidth = 520
 const arenaHeight = 210
 
 export type GambaState = {
@@ -64,7 +64,8 @@ const GambaSystem = SystemBuilder({
       if (!world.pixi) return
 
       const { w } = screenWH()
-      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 0.9)))
+      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.05)))
+      console.log("targetScale", targetScale)
 
       if (Math.abs(targetScale - lastScale) > 0.02) {
         world.pixi.camera.scaleTo(targetScale)
@@ -79,9 +80,9 @@ const GambaSystem = SystemBuilder({
       query: [],
       priority: 6,
       onTick: () => {
-        updateScale()
+        // updateScale()
 
-        const pc = world.client?.character()
+        // const pc = world.client?.character()
         // console.log(pc?.components.position.xyz())
       }
     }
@@ -91,7 +92,7 @@ const GambaSystem = SystemBuilder({
 const Arena = (): Entity[] => {
   return [
     ArenaFloor(),
-    CenterMark(),
+    // CenterMark(),
     // ArenaLabel(),
     ...ArenaWalls()
   ]
@@ -105,10 +106,10 @@ const ArenaFloor = () => Entity({
     renderable: Renderable({
       zIndex: 2,
       setup: async (renderable) => {
-        renderable.setBevel({ lightAlpha: 0.1, shadowAlpha: 0.18 })
-        renderable.c = pixiGraphics()
-          .roundRect(-arenaWidth / 2, -arenaHeight / 2, arenaWidth, arenaHeight, 18)
-          .fill({ color: 0x0b2434, alpha: 0.92 })
+        // renderable.setBevel({ lightAlpha: 0.1, shadowAlpha: 0.18 })
+        // renderable.c = pixiGraphics()
+        //   .roundRect(-arenaWidth / 2, -arenaHeight / 2, arenaWidth, arenaHeight, 18)
+        //   .fill({ color: 0x0b2434, alpha: 0.92 })
         // .stroke({ color: 0xffffff, alpha: 0.16, width: 3 })
       }
     })
@@ -119,11 +120,21 @@ const ArenaWalls = (): Entity[] => {
   const halfW = arenaWidth / 2
   const halfH = arenaHeight / 2
 
+  const offset = 60
+
   return [
-    LineWall({ id: "gamba-wall-top", points: [-halfW, -halfH, halfW, -halfH], visible: true, strokeAlpha: 0.3 }),
-    LineWall({ id: "gamba-wall-bottom", points: [-halfW, halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 }),
-    LineWall({ id: "gamba-wall-left", points: [-halfW, -halfH, -halfW, halfH], visible: true, strokeAlpha: 0.3 }),
-    LineWall({ id: "gamba-wall-right", points: [halfW, -halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 })
+    // LineWall({ id: "gamba-wall-top", points: [-halfW + offset, -halfH, halfW - offset, -halfH], visible: true, strokeAlpha: 0.3 }),
+    // LineWall({ id: "gamba-wall-bottom", points: [-halfW, halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 }),
+    // LineWall({ id: "gamba-wall-left", points: [-halfW + offset, -halfH, -halfW, halfH], visible: true, strokeAlpha: 0.3 }),
+    // LineWall({ id: "gamba-wall-right", points: [halfW - offset, -halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 })
+
+    LineWall({ id: "all-walls", points: [
+      -halfW + offset, -halfH,
+      halfW - offset, -halfH,
+      halfW, halfH,
+      -halfW, halfH,
+      -halfW + offset, -halfH
+    ], visible: true, strokeAlpha: 0, fill: 0x7B3F00 })
   ]
 }
 
