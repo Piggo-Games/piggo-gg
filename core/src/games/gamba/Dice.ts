@@ -6,7 +6,7 @@ import { Sprite } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
 
-  let spinning = false
+  let rolling = false
 
   const dice = ItemEntity({
     id: `dice`,
@@ -24,19 +24,16 @@ export const Dice: ItemBuilder = ({ character }) => {
       }),
       actions: Actions({
         roll: () => {
-          if (spinning) {
-            spinning = false
+          if (rolling) {
+            rolling = false
             return
           }
-
-          spinning = true
-
-          // dice.components.position.rotate(0.5)
+          rolling = true
         }
       }),
       npc: NPC({
         behavior: () => {
-          // if (spinning) {
+          // if (rolling) {
           //   const { position } = dice.components
           //   position.rotate(0.2)
           // }
@@ -51,7 +48,7 @@ export const Dice: ItemBuilder = ({ character }) => {
         interpolate: true,
         rotates: true,
         onRender: () => {
-          if (spinning) {
+          if (rolling) {
             const { position } = dice.components
             position.rotate(0.1)
           }
