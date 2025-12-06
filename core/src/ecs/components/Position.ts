@@ -293,6 +293,8 @@ export const PositionSystem = SystemBuilder<"PositionSystem">({
               z: z
             }
 
+            // console.log("updated following position", entity.id, "target", target.id, x, y, z, "to", position.data.x, position.data.y, position.data.z)
+
             position.lastCollided = target.components.position.lastCollided
             position.localVelocity = { ...target.components.position.localVelocity }
           }

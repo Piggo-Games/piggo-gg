@@ -54,7 +54,7 @@ export const Vince = (player: Player) => Character({
           if (hold === 5) {
             world.debug = !world.debug
           }
-        },
+        }
       }
     }),
     actions: Actions({
