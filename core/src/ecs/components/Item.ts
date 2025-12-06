@@ -1,6 +1,7 @@
 import {
-  Actions, Component, Effects, ElementKinds, Entity, ItemBuilder, Networked, Position,
-  ProtoEntity, Renderable, SystemBuilder, ValidSounds, Whack, World, XY, abs, hypot, loadTexture, min, pickupItem, round
+  Actions, Component, Effects, ElementKinds, Entity, Input, ItemBuilder,
+  Networked, Position, ProtoEntity, Renderable, SystemBuilder, ValidSounds,
+  Whack, World, XY, abs, hypot, loadTexture, min, pickupItem, round
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -99,39 +100,52 @@ export type ToolProps = {
 
 export const Tool = (
   { name, sound, damage }: ToolProps
-): ItemBuilder => ({ character, id }): ItemEntity => ItemEntity({
-  id: id ?? `${name}-${character.id}`,
-  components: {
-    networked: Networked(),
-    position: Position({ follows: character?.id ?? "" }),
-    actions: Actions({
-      // mb1: Whack(sound, (e => {
-      //   const { element } = e.components
-      //   return damage[element?.data.kind ?? "flesh"]
-      // }))
-    }),
-    item: Item({ name, flips: true }),
-    effects: Effects(),
-    // clickable: Clickable({
-    //   width: 20, height: 20, active: false, anchor: { x: 0.5, y: 0.5 }
-    // }),
-    renderable: Renderable({
-      scaleMode: "nearest",
-      zIndex: 3,
-      scale: 2.5,
-      anchor: { x: 0.5, y: 0.5 },
-      interpolate: true,
-      visible: true,
-      rotates: true,
-      // outline: { color: 0x000000, thickness: 1 },
-      setup: async (r: Renderable) => {
-        const textures = await loadTexture(`${name}.json`)
+): ItemBuilder => ({ character, id }): ItemEntity => {
 
-        r.c = new Sprite(textures["0"])
-      }
-    })
-  }
-})
+  let cd = -100
+
+  const entity = ItemEntity({
+    id: id ?? `${name}-${character.id}`,
+    components: {
+      networked: Networked(),
+      position: Position({ follows: character?.id ?? "" }),
+      input: Input({
+        press: {
+          "mb1": ({ mouse, hold, world }) => {
+            // if (hold) return
+            if (world.tick - cd < 20) return
+
+            cd = world.tick
+            return { actionId: "whack", params: { mouse, character: character.id } }
+          }
+        }
+      }),
+      actions: Actions({
+        whack: Whack(sound, 10)
+      }),
+      item: Item({ name, flips: true }),
+      effects: Effects(),
+      // clickable: Clickable({
+      //   width: 20, height: 20, active: false, anchor: { x: 0.5, y: 0.5 }
+      // }),
+      renderable: Renderable({
+        scaleMode: "nearest",
+        zIndex: 3,
+        scale: 2.5,
+        anchor: { x: 0.5, y: 0.5 },
+        interpolate: true,
+        visible: true,
+        rotates: true,
+        setup: async (r: Renderable) => {
+          const textures = await loadTexture(`${name}.json`)
+
+          r.c = new Sprite(textures["0"])
+        }
+      })
+    }
+  })
+  return entity
+}
 
 export const Axe = Tool({ name: "axe", sound: "thud", damage: { flesh: 15, wood: 25, rock: 10 } })
 export const Sword = Tool({ name: "sword", sound: "slash", damage: { flesh: 25, wood: 10, rock: 10 } })

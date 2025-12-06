@@ -21,7 +21,6 @@ export const Whack = (sound: ValidSounds, damage: DamageCalculation) => Action<K
     if (!position) return
 
     if (position.data.pointingDelta.x > 0) {
-      // position.rotateUp(1)
       position.rotate(1)
     } else {
       position.rotate(-1)
