@@ -1,17 +1,10 @@
 import {
-  Actions, Background, Character, Collider, Cursor, Entity, EscapeMenu,
-  GameBuilder, HUDSystem, HUDSystemProps, HtmlChat, HtmlFpsText, HtmlLagText,
-  Input, LineWall, Move, Networked, PhysicsSystem, PixiCameraSystem,
-  PixiRenderSystem, PixiSkins, Player, Position, Renderable, Shadow,
-  SpawnSystem, SwitchTeam, SystemBuilder, Team, WASDInputMap, pixiGraphics,
-  pixiText, screenWH, VolleyCharacterAnimations, VolleyCharacterDynamic,
-  InventorySystem,
-  Inventory,
-  Sword,
-  ItemSystem,
-  Point,
-  Debug
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
+  Networked, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
+  Renderable, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
 } from "@piggo-gg/core"
+import { Gary } from "./Gary"
 
 const arenaWidth = 360
 const arenaHeight = 210
@@ -39,7 +32,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     systems: [
       PhysicsSystem("local"),
       PhysicsSystem("global"),
-      SpawnSystem({ spawner: GambaPlayer, pos: { x: 0, y: 0, z: 0 } }),
+      SpawnSystem({ spawner: Gary, pos: { x: 0, y: 0, z: 0 } }),
       GambaSystem,
       PixiRenderSystem,
       HUDSystem(controls),
@@ -165,72 +158,6 @@ const CenterMark = () => Entity({
 //     })
 //   }
 // })
-
-const GambaPlayer = (player: Player): Character => {
-  const skin = player.components.team.data.team === 1 ? "dude-blue" : "dude-red"
-
-  return Character({
-    id: `gamba-${player.id}`,
-    components: {
-      debug: Debug(),
-      position: Position({
-        x: player.components.team.data.team === 1 ? -80 : 80,
-        y: 0,
-        z: 0,
-        speed: 120,
-        gravity: 0,
-        velocityResets: 1
-      }),
-      collider: Collider({ shape: "ball", radius: 6, group: "notself" }),
-      networked: Networked(),
-      team: Team(player.components.team.data.team),
-      inventory: Inventory([Sword]),
-      shadow: Shadow(5),
-      input: Input({
-        press: {
-          ...WASDInputMap.press,
-          "t": ({ hold }) => {
-            if (hold) return
-            return { actionId: "SwitchTeam" }
-          },
-          "g": ({ world, hold }) => {
-            if (hold === 5) {
-              world.debug = !world.debug
-            }
-          }
-        },
-        release: {
-          "escape": ({ client }) => {
-            client.menu = !client.menu
-          },
-          "mb1": ({ client, target }) => {
-            if (target !== "canvas") return
-            if (client.menu) client.menu = false
-          }
-        }
-      }),
-      actions: Actions({
-        move: Move,
-        point: Point,
-        SwitchTeam
-      }),
-      renderable: Renderable({
-        anchor: { x: 0.55, y: 0.9 },
-        scale: 1.2,
-        zIndex: 4,
-        interpolate: true,
-        scaleMode: "nearest",
-        skin,
-        setup: async (renderable) => {
-          const desiredSkin = renderable.data.desiredSkin ?? skin
-          await PixiSkins[desiredSkin](renderable)
-        },
-        animationSelect: VolleyCharacterAnimations,
-        onTick: VolleyCharacterDynamic
-      })
-    }
-  })
-}
 
 const controls: HUDSystemProps = {
   clusters: [
