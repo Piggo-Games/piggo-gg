@@ -64,7 +64,7 @@ export const ItemSystem = SystemBuilder({
 
         if (!follows) continue
 
-        if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
+        // if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
 
         if (item.flips) {
           if (pointingDelta.x < 0) {
@@ -136,6 +136,11 @@ export const Tool = (
         interpolate: true,
         visible: true,
         rotates: true,
+        onTick: () => {
+          const { rotation } = entity.components.position.data
+
+          if (rotation) entity.components.position.rotate(rotation > 0 ? -0.1 : 0.1, true)
+        },
         setup: async (r: Renderable) => {
           const textures = await loadTexture(`${name}.json`)
 

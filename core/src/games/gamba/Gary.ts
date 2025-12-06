@@ -3,6 +3,7 @@ import {
   PixiSkins, Player, Point, Position, Renderable, Shadow, SwitchTeam, Sword,
   Team, VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
 } from "@piggo-gg/core"
+import { Dice } from "./Dice"
 
 export const Gary = (player: Player): Character => {
 
@@ -21,7 +22,7 @@ export const Gary = (player: Player): Character => {
       collider: Collider({ shape: "ball", radius: 6, group: "notself" }),
       networked: Networked(),
       team: Team(player.components.team.data.team),
-      inventory: Inventory([Sword]),
+      inventory: Inventory([Dice]),
       shadow: Shadow(5),
       input: Input({
         press: {
