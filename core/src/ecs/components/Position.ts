@@ -162,7 +162,6 @@ export const Position = (props: PositionProps = {}): Position => {
 
       // check cache
       if (interpolatedCache.tick === world.tick && interpolatedCache.delta === delta) {
-        console.log("cache hit", interpolatedCache.xyz)
         return interpolatedCache.xyz
       }
 

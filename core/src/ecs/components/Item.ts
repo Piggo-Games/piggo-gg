@@ -8,6 +8,7 @@ export type Item = Component<"item"> & {
   name: string
   dropped: boolean
   equipped: boolean
+  flips: boolean
   stackable: boolean
   onTick: undefined | ((world: World) => void)
 }
@@ -29,11 +30,12 @@ export type ItemProps = {
   onTick?: (world: World) => void
 }
 
-export const Item = ({ name, dropped, equipped, stackable, onTick }: ItemProps): Item => ({
+export const Item = ({ name, dropped, equipped, stackable, onTick, flips }: ItemProps): Item => ({
   name,
   type: "item",
   dropped: dropped ?? false,
   equipped: equipped ?? false,
+  flips: flips ?? false,
   stackable: stackable ?? false,
   onTick
 })
@@ -54,21 +56,25 @@ export const ItemSystem = SystemBuilder({
     id: "ItemSystem",
     query: ["item", "renderable", "position"],
     priority: 5,
-    onTick: (entities: Entity<Item | Position>[]) => {
+    onTick: (entities: Entity<Item | Position | Renderable>[]) => {
       for (const entity of entities) {
-        const { position, item } = entity.components
+        const { position, item, renderable } = entity.components
         const { pointingDelta, rotation, follows } = position.data
 
         if (!follows) continue
 
         if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
 
-        // console.log(position.xyz())        
+        if (item.flips) {
+          if (pointingDelta.x < 0) {
+            renderable.c.scale.x = -abs(renderable.c.scale.x)
+          } else {
+            renderable.c.scale.x = abs(renderable.c.scale.x)
+          }
+        }
 
         if (!item.dropped) {
           const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
-
-          // console.log("delta", pointingDelta, "hypotenuse", hypotenuse)
 
           const hyp_x = pointingDelta.x / hypotenuse
           const hyp_y = pointingDelta.y / hypotenuse

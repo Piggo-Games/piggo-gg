@@ -209,7 +209,7 @@ export const InputSystem = ClientSystemBuilder({
       // check for actions
       const { input, actions, position, inventory } = character.components
 
-      const { x, y } = position.data
+      const { x, y, z } = position.data
 
       // update position.pointing
       if (world.pixi) {
@@ -226,8 +226,10 @@ export const InputSystem = ClientSystemBuilder({
         //   }
         // } else {
           pointingDelta = {
-            x: round(mouse.x - x, 2),
-            y: round(mouse.y - (y - position.data.z), 2)
+            x: mouse.x - x,
+            y: mouse.y - (y - z)
+            // x: round(mouse.x - x, 2),
+            // y: round(mouse.y - (y - z), 2)
           }
         // }
 
@@ -430,6 +432,18 @@ export const InputSystem = ClientSystemBuilder({
       priority: 1,
       skipOnRollback: true,
       onRender: () => {
+        if (pixi) {
+          const mouseBefore = { ...client.controls.mouse }
+
+          client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+          mouse = client.controls.mouse
+
+          // console.log("mouse delta", {
+          //   x: client.controls.mouse.x - mouseBefore.x,
+          //   y: client.controls.mouse.y - mouseBefore.y
+          // })
+        }
+
         if (!client.mobile) return
 
         const { power, angle, active } = client.controls.right

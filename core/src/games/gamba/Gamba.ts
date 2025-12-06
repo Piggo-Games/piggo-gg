@@ -1,7 +1,7 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  Background, Cursor, Debug, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
-  Networked, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
+  Networked, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
   Renderable, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
@@ -37,6 +37,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       PixiRenderSystem,
       HUDSystem(controls),
       PixiCameraSystem(),
+      // PixiCameraSystem(({ x, y }) => ({ x, y, z: 0 })),
+      PixiDebugSystem,
       InventorySystem,
       ItemSystem
     ],
@@ -129,7 +131,7 @@ const CenterMark = () => Entity({
   id: "gamba-center",
   components: {
     position: Position(),
-    networked: Networked(),
+    debug: Debug(),
     renderable: Renderable({
       zIndex: 3,
       setup: async (renderable) => {
