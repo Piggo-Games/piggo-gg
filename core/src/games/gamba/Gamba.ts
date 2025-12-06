@@ -36,7 +36,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       GambaSystem,
       PixiRenderSystem,
       HUDSystem(controls),
-      PixiCameraSystem(() => ({ x: 0, y: 0, z: 0 })),
+      PixiCameraSystem(),
       InventorySystem,
       ItemSystem
     ],
@@ -55,10 +55,6 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
 const GambaSystem = SystemBuilder({
   id: "GambaSystem",
   init: (world) => {
-
-    if (world.pixi) {
-      // world.pixi.camera.focus = { x: 0, y: 0, z: 0 }
-    }
 
     let lastScale = 0
 
@@ -82,6 +78,9 @@ const GambaSystem = SystemBuilder({
       priority: 6,
       onTick: () => {
         updateScale()
+
+        const pc = world.client?.character()
+        // console.log(pc?.components.position.xyz())
       }
     }
   }
@@ -143,22 +142,6 @@ const CenterMark = () => Entity({
   }
 })
 
-// const ArenaLabel = () => Entity({
-//   id: "gamba-label",
-//   components: {
-//     position: Position({ x: 0, y: -arenaHeight / 2 - 16 }),
-//     networked: Networked(),
-//     renderable: Renderable({
-//       zIndex: 4,
-//       setContainer: async () => pixiText({
-//         text: "Gamba (WIP)",
-//         anchor: { x: 0.5, y: 0.5 },
-//         style: { fontSize: 18, fill: 0xffffff, dropShadow: true }
-//       })
-//     })
-//   }
-// })
-
 const controls: HUDSystemProps = {
   clusters: [
     {
@@ -174,7 +157,7 @@ const controls: HUDSystemProps = {
     },
     {
       label: "menu",
-      buttons: [["esc"], ["click canvas"]]
+      buttons: [["esc"]]
     }
   ]
 }

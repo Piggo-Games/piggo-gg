@@ -68,7 +68,7 @@ export const ItemSystem = SystemBuilder({
         if (!item.dropped) {
           const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
 
-          console.log("delta", pointingDelta, "hypotenuse", hypotenuse)
+          // console.log("delta", pointingDelta, "hypotenuse", hypotenuse)
 
           const hyp_x = pointingDelta.x / hypotenuse
           const hyp_y = pointingDelta.y / hypotenuse

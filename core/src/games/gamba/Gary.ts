@@ -5,7 +5,6 @@ import {
 } from "@piggo-gg/core"
 
 export const Gary = (player: Player): Character => {
-  const skin = player.components.team.data.team === 1 ? "dude-blue" : "dude-red"
 
   return Character({
     id: `gary-${player.id}`,
@@ -58,10 +57,10 @@ export const Gary = (player: Player): Character => {
         zIndex: 4,
         interpolate: true,
         scaleMode: "nearest",
-        skin,
+        skin: "dude-white",
         setup: async (renderable) => {
-          const desiredSkin = renderable.data.desiredSkin ?? skin
-          await PixiSkins[desiredSkin](renderable)
+          // const desiredSkin = renderable.data.desiredSkin ?? skin
+          await PixiSkins["dude-white"](renderable)
         },
         animationSelect: VolleyCharacterAnimations,
         onTick: VolleyCharacterDynamic
