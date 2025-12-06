@@ -81,8 +81,8 @@ export const ItemSystem = SystemBuilder({
           const hyp_y = pointingDelta.y / hypotenuse
 
           position.data.offset = {
-            x: round(hyp_x * min(20, abs(pointingDelta.x)), 2),
-            y: round(hyp_y * min(20, abs(pointingDelta.y)) - 7, 2)
+            x: round(hyp_x * min(14, abs(pointingDelta.x)), 2),
+            y: round(hyp_y * min(14, abs(pointingDelta.y)) - 7, 2)
           }
         }
       }
@@ -130,7 +130,7 @@ export const Tool = (
       // }),
       renderable: Renderable({
         scaleMode: "nearest",
-        zIndex: 3,
+        zIndex: 4,
         scale: 2.5,
         anchor: { x: 0.5, y: 0.5 },
         interpolate: true,

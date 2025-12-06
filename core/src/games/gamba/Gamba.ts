@@ -65,7 +65,6 @@ const GambaSystem = SystemBuilder({
 
       const { w } = screenWH()
       const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.05)))
-      console.log("targetScale", targetScale)
 
       if (Math.abs(targetScale - lastScale) > 0.02) {
         world.pixi.camera.scaleTo(targetScale)
@@ -163,10 +162,6 @@ const controls: HUDSystemProps = {
         ["A", "S", "D"],
         ["W"]
       ]
-    },
-    {
-      label: "switch team",
-      buttons: [["t"]]
     },
     {
       label: "menu",
