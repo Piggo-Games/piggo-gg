@@ -1,5 +1,5 @@
-import { Entity, loadTexture, pixiGraphics, Position, Renderable, XY } from "@piggo-gg/core"
-import { MaskFilter, Sprite } from "pixi.js"
+import { Entity, loadTexture, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
+import { Sprite } from "pixi.js"
 
 export const Sand = () => {
 
