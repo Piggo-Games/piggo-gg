@@ -1,6 +1,6 @@
 import {
-  Actions, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, Networked, NPC, Position, Renderable
+  Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
+  loadTexture, max, min, Networked, NPC, Position, Renderable
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -12,7 +12,8 @@ export const Dice: ItemBuilder = ({ character }) => {
     id: `dice`,
     components: {
       networked: Networked(),
-      position: Position({ follows: character.id }),
+      collider: Collider({ shape: "ball", radius: 4, group: "1" }),
+      position: Position({ follows: character.id, gravity: 0.04 }),
       item: Item({ name: "Dice" }),
       input: Input({
         press: {
@@ -29,14 +30,24 @@ export const Dice: ItemBuilder = ({ character }) => {
             return
           }
           rolling = true
+
+          dice.components.position.setVelocity({
+            x: 100, z: 1,
+          })
+          dice.components.position.data.follows = null
         }
       }),
       npc: NPC({
         behavior: () => {
-          // if (rolling) {
-          //   const { position } = dice.components
-          //   position.rotate(0.2)
-          // }
+          if (rolling) {
+            const { position } = dice.components
+            // position.rotate(0.2)
+
+            // position.scaleVelocity(0.99, 4)
+            if (position.data.z <= 0) {
+              position.scaleVelocity(0.98, 4)
+            }
+          }
         }
       }),
       effects: Effects(),
@@ -50,7 +61,12 @@ export const Dice: ItemBuilder = ({ character }) => {
         onRender: () => {
           if (rolling) {
             const { position } = dice.components
-            position.rotate(0.1)
+
+
+            // position.rotate(0.1)
+            const factor = position.data.velocity.x + position.data.velocity.y
+            position.rotate(min(0.1, factor * 0.001))
+            console.log("rotating", factor)
           }
         },
         setup: async (r: Renderable) => {

@@ -37,7 +37,7 @@ export type Position = Component<"position", {
   setPosition: (_: { x?: number, y?: number, z?: number }) => Position
   setRotation: (_: number) => Position
   setVelocity: (_: { x?: number, y?: number, z?: number }) => Position
-  scaleVelocity: (factor: number) => Position
+  scaleVelocity: (factor: number, threshold?: number) => Position
   submerged: (capped?: boolean) => number
   impulse: (_: { x?: number, y?: number, z?: number }) => Position
   interpolate: (world: World, delta: number) => XYZ
@@ -131,12 +131,12 @@ export const Position = (props: PositionProps = {}): Position => {
 
       return position.updateOrientation()
     },
-    scaleVelocity: (factor: number) => {
+    scaleVelocity: (factor: number, threshold: number = 0.02) => {
       position.data.velocity.x *= factor
       position.data.velocity.y *= factor
 
-      if (abs(position.data.velocity.x) < 0.02) position.data.velocity.x = 0
-      if (abs(position.data.velocity.y) < 0.02) position.data.velocity.y = 0
+      if (abs(position.data.velocity.x) < threshold) position.data.velocity.x = 0
+      if (abs(position.data.velocity.y) < threshold) position.data.velocity.y = 0
 
       return position
     },

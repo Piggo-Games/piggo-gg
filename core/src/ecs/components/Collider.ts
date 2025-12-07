@@ -92,7 +92,7 @@ export const Collider = ({
     const s = ColliderDesc.polyline(Float32Array.from(points))
     colliderDesc = s
   } else {
-    throw new Error("Invalid collider shape")
+    throw new Error(`Invalid collider shape ${shape}`)
   }
 
   colliderDesc.setFriction(0)

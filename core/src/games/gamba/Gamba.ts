@@ -122,18 +122,19 @@ const ArenaWalls = (): Entity[] => {
   const offset = 60
 
   return [
-    // LineWall({ id: "gamba-wall-top", points: [-halfW + offset, -halfH, halfW - offset, -halfH], visible: true, strokeAlpha: 0.3 }),
-    // LineWall({ id: "gamba-wall-bottom", points: [-halfW, halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 }),
-    // LineWall({ id: "gamba-wall-left", points: [-halfW + offset, -halfH, -halfW, halfH], visible: true, strokeAlpha: 0.3 }),
-    // LineWall({ id: "gamba-wall-right", points: [halfW - offset, -halfH, halfW, halfH], visible: true, strokeAlpha: 0.3 })
-
-    LineWall({ id: "all-walls", points: [
-      -halfW + offset, -halfH,
-      halfW - offset, -halfH,
-      halfW, halfH,
-      -halfW, halfH,
-      -halfW + offset, -halfH
-    ], visible: true, strokeAlpha: 0, fill: 0x7B3F00 })
+    LineWall({
+      id: "all-walls", points: [
+        -halfW + offset, -halfH,
+        halfW - offset, -halfH,
+        halfW, halfH,
+        -halfW, halfH,
+        -halfW + offset, -halfH
+      ],
+      visible: true,
+      strokeAlpha: 0,
+      fill: 0x7B3F00,
+      group: "1"
+    })
   ]
 }
 
