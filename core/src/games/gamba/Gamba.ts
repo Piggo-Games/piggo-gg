@@ -54,7 +54,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlLagText(),
       HtmlFpsText(),
       Sand(),
-      Water2D()
+      // Water2D()
     ]
   })
 }

@@ -11,10 +11,19 @@ export const Dice: ItemBuilder = ({ character }) => {
 
   let rolling = false
   let bounced = false
+  let landed = false
 
   let sides: Record<number, Sprite> = {}
   let side = 1
   let sideAcc = 0
+
+  const reset = () => {
+    rolling = false
+    sideAcc = 0
+    bounced = false
+    landed = false
+    side = 1
+  }
 
   const dice = ItemEntity({
     id: `dice`,
@@ -37,9 +46,7 @@ export const Dice: ItemBuilder = ({ character }) => {
         roll: ({ params }) => {
           if (!dice.components.position.data.follows) {
             dice.components.position.data.follows = character.id
-            rolling = false
-            sideAcc = 0
-            bounced = false
+            reset()
             return
           }
 
@@ -59,7 +66,7 @@ export const Dice: ItemBuilder = ({ character }) => {
         }
       }),
       npc: NPC({
-        behavior: () => {
+        behavior: (_, world) => {
           const { position } = dice.components
 
           if (dice.components.renderable?.initialized && sides[side]) {
@@ -71,12 +78,18 @@ export const Dice: ItemBuilder = ({ character }) => {
 
           const grounded = position.data.z <= 0
 
+          if (grounded && bounced && !landed) {
+            landed = true
+            world.client?.sound.play({ name: "dice2" })
+          }
+
           if (rolling && grounded && !bounced) {
             bounced = true
+            world.client?.sound.play({ name: "dice1" })
             position.setVelocity({ z: throwUp * 0.7 })
           }
 
-          const factor = (position.data.z <= 0 && bounced) ? 0.95 : 0.994
+          const factor = (grounded && bounced) ? 0.95 : 0.994
           position.scaleVelocity(factor, 8)
 
           if (rolling) sideAcc += factor
