@@ -154,7 +154,6 @@ export const PixiCameraSystem = (follow: Follow = () => ({ x: 0, y: 0, z: 0 })) 
           x: x + renderable.position.x,
           y: y + renderable.position.y
         }
-        // console.log(renderable.position, x, y, pixi.camera.focus.id, pixi.camera.focus.components.position.data.x)
 
         pixi?.camera.moveTo({ x: offset.x, y: offset.y - z })
       }

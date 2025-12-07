@@ -131,14 +131,6 @@ const controls: HUDSystemProps = {
       buttons: [["mb1"]],
       fontSize: "16px"
     },
-    // {
-    //   label: "place area",
-    //   buttons: [["x"]],
-    // },
-    // {
-    //   label: "fly",
-    //   buttons: [["f"]]
-    // },
     {
       label: "move",
       buttons: [

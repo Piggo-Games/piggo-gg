@@ -145,8 +145,6 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
           if (position.data.velocityResets && (abs(diffX) > 1 || abs(diffY) > 1)) {
             if (sign(linvel.y) !== sign(position.data.velocity.y) && sign(linvel.x) !== sign(position.data.velocity.x)) {
               position.lastCollided = world.tick
-
-              console.log(collider.colliderDesc.restitution)
               // continue
             }
           }

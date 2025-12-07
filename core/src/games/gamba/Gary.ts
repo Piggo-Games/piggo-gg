@@ -63,7 +63,6 @@ export const Gary = (player: Player): Character => {
         scaleMode: "nearest",
         skin: "dude-white",
         setup: async (renderable) => {
-          // const desiredSkin = renderable.data.desiredSkin ?? skin
           await PixiSkins["dude-white"](renderable)
         },
         animationSelect: VolleyCharacterAnimations,

@@ -2,9 +2,9 @@ import {
   Action, Actions, Character, Collider, copyMaterials, Health,
   BlasterItem, Inventory, max, Networked, PI, Place, Player,
   Point, Position, Team, XYZ, XZ, IslandSettings, cloneSkeleton,
-  Ready, ColorMapping, nextColor, MarbleTexture, BlockMaterial,
-  IslandState, blockInLine, hypot, Input, Three, upAndDir, colorMaterials,
-  cos, sin, BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
+  Ready, nextColor, MarbleTexture, BlockMaterial, IslandState,
+  blockInLine, hypot, Input, Three, upAndDir, cos, sin,
+  BlocksMesh, nextBlock, DaggerItem, setActiveItemIndex
 } from "@piggo-gg/core"
 import {
   AnimationAction, AnimationMixer, BoxGeometry, CapsuleGeometry, Mesh, MeshPhongMaterial,
@@ -451,12 +451,6 @@ export const Bob = (player: Player): Character => {
 
           // rotation
           mesh.rotation.y = orientation.x + PI
-
-          // team color
-          // if (lastTeamNumber !== player.components.team.data.team) {
-          //   colorMaterials(mesh, BobColors, player.components.team.data.team)
-          //   lastTeamNumber = player.components.team.data.team
-          // }
 
           // animation
           let speed = hypot(position.data.velocity.x, position.data.velocity.y)
