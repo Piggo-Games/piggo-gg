@@ -73,7 +73,6 @@ export const Dice: ItemBuilder = ({ character }) => {
 
           if (rolling && grounded && !bounced) {
             bounced = true
-            console.log("DICE BOUNCED")
             position.setVelocity({ z: throwUp * 0.7 })
           }
 

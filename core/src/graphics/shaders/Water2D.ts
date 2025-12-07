@@ -1,13 +1,19 @@
-import { Entity, Position, Renderable } from "@piggo-gg/core"
-import { Geometry, Mesh, Shader, Texture } from "pixi.js"
+import { Entity, loadTexture, Position, Renderable } from "@piggo-gg/core"
+import { Assets, Geometry, Mesh, Shader, Texture } from "pixi.js"
 
 export const Water2D = (): Entity => {
 
-  const geometry = new Geometry({
-    // attributes: {
+  const geometry = new Geometry()
 
-    // }
-  })
+  const positions = new Float32Array([
+    -500, 0,
+    500, 0,
+    500, 500,
+    -500, 500
+  ])
+
+  geometry.addAttribute("aPosition", positions)
+  geometry.addIndex([0, 1, 2, 2, 3, 0])
 
   const water2D = Entity({
     id: `water2D`,
@@ -17,7 +23,7 @@ export const Water2D = (): Entity => {
         setup: async (r) => {
           r.c = new Mesh({
             geometry,
-            shader: Water2DShader(), 
+            shader: await Water2DShader(),
             interactive: false,
             cullable: false,
             isRenderGroup: true,
@@ -117,15 +123,9 @@ const fragmentSrc = `
   }
 `
 
-export type Water2DShaderProps = {
-  normalMap1?: Texture
-  normalMap2?: Texture
-  resolution?: [number, number]
-}
-
-export const Water2DShader = (props: Water2DShaderProps = {}): Shader => {
-  const normalMap1 = props.normalMap1 ?? Texture.from("waterNormal1.png")
-  const normalMap2 = props.normalMap2 ?? Texture.from("waterNormal2.png")
+export const Water2DShader = async (): Promise<Shader> => {
+  const normalMap1 = await Assets.load("waterNormal1.png") as Texture
+  const normalMap2 = await Assets.load("waterNormal2.png") as Texture
 
   normalMap1.source.addressMode = "repeat"
   normalMap2.source.addressMode = "repeat"
@@ -135,23 +135,27 @@ export const Water2DShader = (props: Water2DShaderProps = {}): Shader => {
       vertex: vertexSrc,
       fragment: fragmentSrc
     },
-    resources: {
-      uniforms: {
-        uCamera: { value: [0, 0], type: "vec2<f32>" },
-        uResolution: { value: props.resolution ?? [window.innerWidth, window.innerHeight], type: "vec2<f32>" },
-        uZoom: { value: 1.0, type: "f32" },
-        uTime: { value: 0, type: "f32" },
-        uDay: { value: 1, type: "f32" },
-        uNormalMap1: { value: normalMap1, type: "sampler2D" },
-        uNormalMap2: { value: normalMap2, type: "sampler2D" },
-        uNormalScale: { value: 0.1, type: "f32" },
-        uNormalStrength: { value: 1.0, type: "f32" },
-        uDirToLight: { value: [1, 0, 1], type: "vec3<f32>" },
-        uLight: { value: [1, 1, 1], type: "vec3<f32>" },
-        uFogNear: { value: 5.0, type: "f32" },
-        uFogFar: { value: 50.0, type: "f32" }
-      }
-    }
+    // resources: {
+    //   uNormalMap1: { value: normalMap1, type: "sampler2D" },
+    //   uNormalMap2: { value: normalMap2, type: "sampler2D" },
+    //   uniforms: {
+    //     uniforms: {
+    //       uCamera: { value: [0, 0], type: "vec2<f32>" },
+    //       uResolution: { value: [window.innerWidth, window.innerHeight], type: "vec2<f32>" },
+    //       uZoom: { value: 1.0, type: "f32" },
+    //       uTime: { value: 0, type: "f32" },
+    //       uDay: { value: 1, type: "f32" },
+    //       // uNormalMap1: { value: normalMap1, type: "sampler2D" },
+    //       // uNormalMap2: { value: normalMap2, type: "sampler2D" },
+    //       uNormalScale: { value: 0.1, type: "f32" },
+    //       uNormalStrength: { value: 1.0, type: "f32" },
+    //       uDirToLight: { value: [1, 0, 1], type: "vec3<f32>" },
+    //       uLight: { value: [1, 1, 1], type: "vec3<f32>" },
+    //       uFogNear: { value: 5.0, type: "f32" },
+    //       uFogFar: { value: 50.0, type: "f32" }
+    //     }
+    //   }
+    // }
   })
 
   // @ts-expect-error

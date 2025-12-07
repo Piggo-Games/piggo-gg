@@ -2,7 +2,7 @@ import {
   Background, Cursor, Debug, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall, NametagSystem,
   Networked, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
-  Renderable, ShadowSystem, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
+  Renderable, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, pixiGraphics, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 import { Sand } from "./Sand"
@@ -53,7 +53,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlChat(),
       HtmlLagText(),
       HtmlFpsText(),
-      Sand()
+      Sand(),
+      Water2D()
     ]
   })
 }
