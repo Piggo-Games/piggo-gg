@@ -1,16 +1,13 @@
 import {
-  abs,
-  Actions, Collider, cos, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, max, min, Networked, NPC, PI, Position, positionDelta, Renderable,
-  Shadow, sign,
-  sin
+  abs, Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
+  loadTexture, max, min, Networked, NPC, PI, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
 
   let rolling = false
-  let bounced = 0
+  let bounced = false
 
   const dice = ItemEntity({
     id: `dice`,
@@ -33,6 +30,7 @@ export const Dice: ItemBuilder = ({ character }) => {
         roll: ({ params }) => {
           if (!rolling && !dice.components.position.data.follows) {
             dice.components.position.data.follows = character.id
+            bounced = false
             return
           }
 
@@ -48,9 +46,7 @@ export const Dice: ItemBuilder = ({ character }) => {
           const x = 150 * xRatio
           const y = 150 * yRatio
 
-          dice.components.position.setVelocity({
-            x, y, z: 1,
-          })
+          dice.components.position.setVelocity({ x, y, z: 1 })
           dice.components.position.data.follows = null
         }
       }),
@@ -60,12 +56,12 @@ export const Dice: ItemBuilder = ({ character }) => {
 
           const grounded = position.data.z <= 0
 
-          if (rolling && grounded && bounced < 2) {
-            bounced += 1
-            position.setVelocity({ z: 0.8 / bounced })
+          if (rolling && grounded && !bounced) {
+            bounced = true
+            position.setVelocity({ z: 0.8 })
           }
 
-          const factor = (position.data.z <= 0 && bounced >= 2) ? 0.95 : 0.99
+          const factor = (position.data.z <= 0 && bounced) ? 0.95 : 0.99
           position.scaleVelocity(factor, 12)
         }
       }),
@@ -81,7 +77,7 @@ export const Dice: ItemBuilder = ({ character }) => {
           if (rolling) {
             const { position } = dice.components
 
-            const factor = position.data.velocity.x + position.data.velocity.y
+            const factor = abs(position.data.velocity.x) + abs(position.data.velocity.y)
 
             // if slow, stop flat
             if (factor < 40) {
