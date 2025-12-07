@@ -16,25 +16,8 @@ export const Sand = () => {
       position: Position(),
       renderable: Renderable({
         zIndex: 3,
-        setup: async (r, renderer) => {
+        setup: async (r) => {
           const texture = await loadTexture("sand.json")
-
-          // for (let i = 0; i < 8; i++) {
-          //   const copy = new Sprite(texture["0"])
-          //   copy.anchor.set(0.5, 0.5)
-          //   copy.x = -200 + i * 44
-
-
-          //   r.c.addChild(copy)
-          // }
-
-          const mask = pixiGraphics()
-          // mask.circle(0, 0, 50).fill({ color: 0xffff00 })
-          // const maskSprite = new Sprite(renderer.app.renderer.generateTexture({ mask }))
-          // r.c.addChild(maskSprite)
-
-          // const filter = new MaskFilter({ sprite: maskSprite, inverse: true })
-          // r.c.filters = [filter]
 
           const maskPoints = [
             -halfW + offset, -halfH,
@@ -44,36 +27,25 @@ export const Sand = () => {
             -halfW + offset, -halfH
           ]
 
+          const mask = pixiGraphics()
           for (let i = 0; i < maskPoints.length; i += 2) {
             mask.lineTo(maskPoints[i], maskPoints[i + 1])
           }
           mask.stroke({ width: 1, color: 0xffff00, alpha: 1 }).fill({ color: 0xffff00 })
 
           r.c.addChild(mask)
-
           r.c.mask = mask
 
-          // r.c.addChild(mask)
+          for (let j = 0; j < 6; j++) {
+            for (let i = 0; i < 14; i++) {
+              const copy = new Sprite(texture["0"])
+              copy.anchor.set(0.5, 0.5)
+              copy.x = -260 + i * 44
+              copy.y = -100 + j * 44
 
-          // const maskSprite = new Sprite(mask
-
-          // r.c.mask = mask
-
-
-          for (let i = 0; i < 14; i++) {
-            const copy = new Sprite(texture["0"])
-            copy.anchor.set(0.5, 0.5)
-            copy.x = -260 + i * 44
-
-
-            r.c.addChild(copy)
+              r.c.addChild(copy)
+            }
           }
-
-
-
-          // r.c.addChild(s)
-
-          // r.c = new Sprite(texture["0"])
         }
       })
     }
