@@ -1,5 +1,5 @@
 import { Collider, ColliderGroups, Entity, Health, Networked, Position, Renderable, SensorCallback, XY } from "@piggo-gg/core"
-import { Graphics } from "pixi.js"
+import { Graphics, Texture } from "pixi.js"
 
 export type LineWallProps = {
   points: number[]
@@ -10,12 +10,13 @@ export type LineWallProps = {
   sensor?: SensorCallback
   id?: string
   fill?: number
+  texture?: Texture
   strokeAlpha?: number
   group?: keyof typeof ColliderGroups
 }
 
 export const LineWall = (
-  { points, position, visible, hp, id, hittable, sensor, fill, strokeAlpha, group }: LineWallProps
+  { points, position, visible, hp, id, hittable, sensor, fill, texture, strokeAlpha, group }: LineWallProps
 ): Entity<Position | Renderable | Collider> => {
 
   let newPoints: number[] = []
@@ -69,6 +70,7 @@ export const LineWall = (
           }
           g.stroke({ width: 2, color: 0xffffff, alpha: strokeAlpha ?? 1 })
           if (fill) g.fill({ color: fill })
+          if (texture) g.fill({ texture })
           return g
         }
       })

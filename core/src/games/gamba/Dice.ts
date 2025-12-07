@@ -1,13 +1,17 @@
 import {
   abs, Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, max, min, Networked, NPC, PI, Position, Renderable, Shadow
+  loadTexture, max, min, Networked, NPC, PI, Position, randomChoice, Renderable, Shadow
 } from "@piggo-gg/core"
-import { Sprite } from "pixi.js"
+import { Sprite, Texture } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
 
   let rolling = false
   let bounced = false
+
+  let sides: Record<number, Sprite> = {}
+  let side = 1
+  let sideAcc = 0
 
   const dice = ItemEntity({
     id: `dice`,
@@ -25,27 +29,28 @@ export const Dice: ItemBuilder = ({ character }) => {
           }
         }
       }),
-      shadow: Shadow(3, 6),
+      shadow: Shadow(2.8, 3),
       actions: Actions({
         roll: ({ params }) => {
-          if (!rolling && !dice.components.position.data.follows) {
+          if (!dice.components.position.data.follows) {
             dice.components.position.data.follows = character.id
+            rolling = false
+            sideAcc = 0
             bounced = false
             return
           }
 
           rolling = true
 
-          dice.components.position.data.z = 0.01
-
           const { pointingDelta } = params
 
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
 
-          const x = 150 * xRatio
-          const y = 150 * yRatio
+          const x = 180 * xRatio
+          const y = 180 * yRatio
 
+          dice.components.position.data.z = 0.01
           dice.components.position.setVelocity({ x, y, z: 1 })
           dice.components.position.data.follows = null
         }
@@ -54,23 +59,36 @@ export const Dice: ItemBuilder = ({ character }) => {
         behavior: () => {
           const { position } = dice.components
 
+          if (dice.components.renderable?.initialized && sides[side]) {
+            for (const child of dice.components.renderable!.c.children) {
+              child.visible = false
+            }
+            dice.components.renderable!.c.children[side - 1].visible = true
+          }
+
           const grounded = position.data.z <= 0
 
           if (rolling && grounded && !bounced) {
             bounced = true
+            console.log("DICE BOUNCED")
             position.setVelocity({ z: 0.8 })
           }
 
           const factor = (position.data.z <= 0 && bounced) ? 0.95 : 0.99
-          position.scaleVelocity(factor, 12)
+          position.scaleVelocity(factor, 8)
+
+          if (rolling) sideAcc += factor
+          // sideAcc += factor
+          if (sideAcc > 12) {
+            sideAcc = 0
+            side = randomChoice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
+          }
         }
       }),
       effects: Effects(),
       renderable: Renderable({
         scaleMode: "nearest",
         zIndex: 4,
-        scale: 1,
-        anchor: { x: 0.5, y: 0.5 },
         interpolate: true,
         rotates: true,
         onRender: () => {
@@ -102,7 +120,11 @@ export const Dice: ItemBuilder = ({ character }) => {
         setup: async (r: Renderable) => {
           const textures = await loadTexture(`dice.json`)
 
-          r.c = new Sprite(textures["0"])
+          for (let i = 1; i <= 6; i++) {
+            sides[i] = new Sprite(textures[`${i}`])
+            sides[i].anchor.set(0.5, 0.5)
+            r.c.addChild(sides[i])
+          }
         }
       })
     }

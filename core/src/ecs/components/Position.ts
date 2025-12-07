@@ -1,6 +1,6 @@
 import {
   Component, Entity, Oct, OctString, PI, SystemBuilder,
-  World, XY, XYZ, abs, max, min, round, toOctString
+  World, XY, XYZ, abs, hypot, max, min, round, toOctString
 } from "@piggo-gg/core"
 
 export type Position = Component<"position", {
@@ -131,12 +131,16 @@ export const Position = (props: PositionProps = {}): Position => {
 
       return position.updateOrientation()
     },
-    scaleVelocity: (factor: number, threshold: number = 0.02) => {
+    scaleVelocity: (factor: number, threshold: number = 0.03) => {
       position.data.velocity.x *= factor
       position.data.velocity.y *= factor
 
-      if (abs(position.data.velocity.x) < threshold) position.data.velocity.x = 0
-      if (abs(position.data.velocity.y) < threshold) position.data.velocity.y = 0
+      const h = hypot(position.data.velocity.x, position.data.velocity.y)
+
+      if (h < threshold) {
+        position.data.velocity.x = 0
+        position.data.velocity.y = 0
+      }
 
       return position
     },
