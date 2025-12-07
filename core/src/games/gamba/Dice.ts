@@ -1,7 +1,9 @@
 import {
-  Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, max, min, Networked, NPC, PI, Position, Renderable,
-  Shadow, sign
+  abs,
+  Actions, Collider, cos, Effects, Input, Item, ItemBuilder, ItemEntity,
+  loadTexture, max, min, Networked, NPC, PI, Position, positionDelta, Renderable,
+  Shadow, sign,
+  sin
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -21,22 +23,33 @@ export const Dice: ItemBuilder = ({ character }) => {
         press: {
           mb1: ({ world, hold, entity }) => {
             if (hold) return
-            return { actionId: "roll", params: { entityId: entity } }
+            const { pointingDelta } = character.components.position.data
+            return { actionId: "roll", params: { entityId: entity, pointingDelta } }
           }
         }
       }),
       shadow: Shadow(3, 6),
       actions: Actions({
-        roll: () => {
-          if (rolling) {
-            rolling = false
+        roll: ({ params }) => {
+          if (!rolling && !dice.components.position.data.follows) {
+            dice.components.position.data.follows = character.id
             return
           }
+
           rolling = true
 
           dice.components.position.data.z = 0.01
+
+          const { pointingDelta } = params
+
+          const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
+          const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
+
+          const x = 150 * xRatio
+          const y = 150 * yRatio
+
           dice.components.position.setVelocity({
-            x: 120, z: 1,
+            x, y, z: 1,
           })
           dice.components.position.data.follows = null
         }
@@ -44,6 +57,7 @@ export const Dice: ItemBuilder = ({ character }) => {
       npc: NPC({
         behavior: () => {
           const { position } = dice.components
+
           const grounded = position.data.z <= 0
 
           if (rolling && grounded && bounced < 2) {
