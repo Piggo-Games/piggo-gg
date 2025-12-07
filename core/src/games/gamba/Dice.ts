@@ -89,7 +89,7 @@ export const Dice: ItemBuilder = ({ character }) => {
             position.setVelocity({ z: throwUp * 0.7 })
           }
 
-          const factor = (grounded && bounced) ? 0.95 : 0.994
+          const factor = (grounded && bounced) ? 0.92 : 0.994
           position.scaleVelocity(factor, 8)
 
           if (rolling) sideAcc += factor
