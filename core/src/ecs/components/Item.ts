@@ -57,7 +57,7 @@ export const ItemSystem = SystemBuilder({
     id: "ItemSystem",
     query: ["item", "renderable", "position"],
     priority: 5,
-    onTick: (entities: Entity<Item | Position | Renderable>[]) => {
+    onRender: (entities: Entity<Item | Position | Renderable>[]) => {
       for (const entity of entities) {
         const { position, item, renderable } = entity.components
         const { pointingDelta, rotation, follows } = position.data
@@ -82,7 +82,7 @@ export const ItemSystem = SystemBuilder({
 
           position.data.offset = {
             x: round(hyp_x * min(14, abs(pointingDelta.x)), 2),
-            y: round(hyp_y * min(14, abs(pointingDelta.y)) - 7, 2)
+            y: round(hyp_y * min(12, abs(pointingDelta.y)) - 4, 2)
           }
         }
       }

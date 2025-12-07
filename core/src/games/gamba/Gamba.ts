@@ -1,8 +1,8 @@
 import {
-  Background, Cursor, Debug, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
-  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall, NametagSystem,
-  Networked, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
-  Renderable, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, pixiGraphics, screenWH
+  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
+  NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
+  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 import { Sand } from "./Sand"
@@ -38,7 +38,6 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       PixiRenderSystem,
       HUDSystem(controls),
       PixiCameraSystem(),
-      // PixiCameraSystem(({ x, y }) => ({ x, y, z: 0 })),
       PixiDebugSystem,
       InventorySystem,
       ItemSystem,
@@ -47,7 +46,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     ],
     entities: [
       Background({ rays: true }),
-      ArenaWalls(),
+      Wall(),
       Cursor(),
       EscapeMenu(world),
       HtmlChat(),
@@ -93,7 +92,7 @@ const GambaSystem = SystemBuilder({
   }
 })
 
-const ArenaWalls = (): Entity => {
+const Wall = (): Entity => {
   const halfW = arenaWidth / 2
   const halfH = arenaHeight / 2
 
@@ -108,31 +107,17 @@ const ArenaWalls = (): Entity => {
       -halfW + offset, -halfH
     ],
     visible: false,
-    strokeAlpha: 0,
-    fill: 0x7B3F00,
     group: "all"
   })
 }
 
-const CenterMark = () => Entity({
-  id: "gamba-center",
-  components: {
-    position: Position(),
-    debug: Debug(),
-    renderable: Renderable({
-      zIndex: 3,
-      setup: async (renderable) => {
-        renderable.c = pixiGraphics()
-          .circle(0, 0, 8)
-          .fill({ color: 0xffb347, alpha: 0.8 })
-          .stroke({ color: 0xffffff, alpha: 0.9, width: 2 })
-      }
-    })
-  }
-})
-
 const controls: HUDSystemProps = {
+  direction: "row",
   clusters: [
+    {
+      label: "roll",
+      buttons: [["mb1"]]
+    },
     {
       label: "move",
       buttons: [
