@@ -100,6 +100,11 @@ export const Dice: ItemBuilder = ({ character }) => {
 
             const factor = abs(position.data.velocity.x) + abs(position.data.velocity.y)
 
+            // if it rolls past 90deg, return to 0
+            if (position.data.rotation >= PI / 2) {
+              position.data.rotation = 0 + (position.data.rotation - PI / 2)
+            }
+
             // if slow, stop flat
             if (factor < 40) {
 

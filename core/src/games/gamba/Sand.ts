@@ -15,7 +15,7 @@ export const Sand = () => {
     components: {
       position: Position(),
       renderable: Renderable({
-        zIndex: 3,
+        zIndex: 2,
         setup: async (r) => {
           const texture = await loadTexture("sand.json")
 
@@ -27,8 +27,8 @@ export const Sand = () => {
             -halfW + offset, -halfH
           ]
 
-          const mask = pixiGraphics()
-          for (let i = 0; i < maskPoints.length; i += 2) {
+          const mask = pixiGraphics().moveTo(maskPoints[0], maskPoints[1])
+          for (let i = 2; i < maskPoints.length; i += 2) {
             mask.lineTo(maskPoints[i], maskPoints[i + 1])
           }
           mask.stroke({ width: 1, color: 0xffff00, alpha: 1 }).fill({ color: 0xffff00 })
@@ -37,11 +37,11 @@ export const Sand = () => {
           r.c.mask = mask
 
           for (let j = 0; j < 6; j++) {
-            for (let i = 0; i < 14; i++) {
+            for (let i = 0; i < 13; i++) {
               const copy = new Sprite(texture["0"])
               copy.anchor.set(0.5, 0.5)
               copy.x = -260 + i * 44
-              copy.y = -100 + j * 44
+              copy.y = -102 + j * 37
 
               r.c.addChild(copy)
             }

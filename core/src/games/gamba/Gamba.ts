@@ -106,7 +106,7 @@ const ArenaWalls = (): Entity => {
       -halfW, halfH,
       -halfW + offset, -halfH
     ],
-    visible: true,
+    visible: false,
     strokeAlpha: 0,
     fill: 0x7B3F00,
     group: "all"
