@@ -94,7 +94,7 @@ export const PixiCamera = (app: Application): PixiCamera => {
 
 type Follow = (_: XYZ) => XYZ
 
-export const PixiCameraSystem = (follow: Follow = ({ x, y }) => ({ x, y, z: 0 })) => ClientSystemBuilder({
+export const PixiCameraSystem = (follow: Follow = () => ({ x: 0, y: 0, z: 0 })) => ClientSystemBuilder({
   id: "PixiCameraSystem",
   init: (world) => {
     const { pixi } = world
@@ -112,7 +112,7 @@ export const PixiCameraSystem = (follow: Follow = ({ x, y }) => ({ x, y, z: 0 })
     return {
       id: "PixiCameraSystem",
       query: ["renderable", "position"],
-      priority: 9,
+      priority: 10,
       onTick: (entities: Entity<Renderable | Position>[]) => {
         // camera focus on player's character
         const character = world.client?.character()

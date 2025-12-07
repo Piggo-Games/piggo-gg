@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island, HDiv
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island, HDiv, Gamba
 } from "@piggo-gg/core"
 
 export type World = {
@@ -80,6 +80,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       "island": Island,
       "craft": Craft,
       "lobby": Lobby,
+      "gamba": Gamba,
       "strike": Strike,
       "volley": Volley,
       "volley3d": Volley3d,

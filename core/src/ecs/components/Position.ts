@@ -1,6 +1,6 @@
 import {
   Component, Entity, Oct, OctString, PI, SystemBuilder,
-  World, XY, XYZ, abs, max, min, round, toOctString
+  World, XY, XYZ, abs, hypot, max, min, round, toOctString
 } from "@piggo-gg/core"
 
 export type Position = Component<"position", {
@@ -37,7 +37,7 @@ export type Position = Component<"position", {
   setPosition: (_: { x?: number, y?: number, z?: number }) => Position
   setRotation: (_: number) => Position
   setVelocity: (_: { x?: number, y?: number, z?: number }) => Position
-  scaleVelocity: (factor: number) => Position
+  scaleVelocity: (factor: number, threshold?: number) => Position
   submerged: (capped?: boolean) => number
   impulse: (_: { x?: number, y?: number, z?: number }) => Position
   interpolate: (world: World, delta: number) => XYZ
@@ -131,12 +131,16 @@ export const Position = (props: PositionProps = {}): Position => {
 
       return position.updateOrientation()
     },
-    scaleVelocity: (factor: number) => {
+    scaleVelocity: (factor: number, threshold: number = 0.03) => {
       position.data.velocity.x *= factor
       position.data.velocity.y *= factor
 
-      if (abs(position.data.velocity.x) < 0.02) position.data.velocity.x = 0
-      if (abs(position.data.velocity.y) < 0.02) position.data.velocity.y = 0
+      const h = hypot(position.data.velocity.x, position.data.velocity.y)
+
+      if (h < threshold) {
+        position.data.velocity.x = 0
+        position.data.velocity.y = 0
+      }
 
       return position
     },
@@ -292,6 +296,8 @@ export const PositionSystem = SystemBuilder<"PositionSystem">({
               y: y + position.data.offset.y,
               z: z
             }
+
+            // console.log("updated following position", entity.id, "target", target.id, x, y, z, "to", position.data.x, position.data.y, position.data.z)
 
             position.lastCollided = target.components.position.lastCollided
             position.localVelocity = { ...target.components.position.localVelocity }

@@ -10,7 +10,7 @@ export const InputSystem = ClientSystemBuilder({
     const pixi = world.pixi
     const client = world.client!
 
-    let { mouse } = client.controls
+    let mouse: XY = { x: 0, y: 0 }
 
     const localAim = () => ({ ...client.controls.localAim })
 
@@ -58,7 +58,10 @@ export const InputSystem = ClientSystemBuilder({
       }
 
       // mouse
-      if (pixi) client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+      if (pixi) {
+        client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+        mouse = client.controls.mouse
+      }
     })
 
     document.addEventListener("pointerdown", (event) => {
@@ -206,26 +209,16 @@ export const InputSystem = ClientSystemBuilder({
       // check for actions
       const { input, actions, position, inventory } = character.components
 
-      const { x, y } = position.data
+      const { x, y, z } = position.data
 
       // update position.pointing
       if (world.pixi) {
         const angle = Math.atan2(mouse.y - y, mouse.x - x)
         const pointing = round((angle + Math.PI) / (Math.PI / 4)) % 8
 
-        let pointingDelta: XY
-
-        if (world.pixi?.camera.focus) {
-          const { width, height } = world.pixi?.wh()
-          pointingDelta = {
-            x: round(client.controls.mouseScreen.x - (width / 2), 2),
-            y: round(client.controls.mouseScreen.y - (height / 2), 2)
-          }
-        } else {
-          pointingDelta = {
-            x: round(mouse.x - x, 2),
-            y: round(mouse.y - (y - position.data.z), 2)
-          }
+        const pointingDelta: XY = {
+          x: mouse.x - x,
+          y: mouse.y - (y - z)
         }
 
         if (actions.actionMap["point"]) {
@@ -425,6 +418,11 @@ export const InputSystem = ClientSystemBuilder({
       priority: 1,
       skipOnRollback: true,
       onRender: () => {
+        if (pixi) {
+          client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+          mouse = client.controls.mouse
+        }
+
         if (!client.mobile) return
 
         const { power, angle, active } = client.controls.right

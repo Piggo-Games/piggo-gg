@@ -19,7 +19,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let cd = -100
 
   const recoilRate = 0.03
-  const spinDuration = 24
+  const spinDuration = 20
   const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
@@ -30,11 +30,21 @@ export const BlasterItem = ({ character }: { character: Character }) => {
       networked: Networked(),
       item: Item({
         name: "blaster",
-        onTick: () => {
+        onTick: (world) => {
           const { recoil } = character.components.position.data
 
           if (recoil > 0) {
             character.components.position.data.recoil = max(0, recoil - recoilRate)
+          }
+
+          if (character.id.includes("dummy") && world.debug) {
+            if (world.tick % 40 === 0) {
+              world.actions.push(world.tick + 1, item.id, { actionId: "shoot", params: { pos: { x: 0, y: 0, z: 0 }, aim: { x: 0, y: 0 } } })
+            }
+
+            // if (world.tick % 200 === 0) {
+            //   world.actions.push(world.tick + 1, character.id, { actionId: "setActiveItemIndex", params: { index: 1 } })
+            // }
           }
         }
       }),
@@ -221,7 +231,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           // gun
           three.gLoader.load("flintlock.gltf", (gltf) => {
             mesh = gltf.scene
-            mesh.scale.set(0.005, 0.005, 0.005)
+            mesh.scale.set(0.01, 0.01, 0.01)
 
             mesh.rotation.order = "YXZ"
 
@@ -262,8 +272,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           if (!mesh) return
 
           if (three.camera.mode === "third" && character.id === world.client?.character()?.id) {
-            mesh.visible = false
-            return
+            mesh.visible = true
+            // return
           } else {
             mesh.visible = true
           }
@@ -276,9 +286,9 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           // gun
           const offset = modelOffset(aim)
           mesh.position.set(
-            pos.x + offset.x,
-            pos.z + 0.47 + offset.y,
-            pos.y + offset.z
+            pos.x + offset.x * 2,
+            pos.z + 0.465 + offset.y,
+            pos.y + offset.z * 2
           )
 
           const { recoil } = character.components.position.data

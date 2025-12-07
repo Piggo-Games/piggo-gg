@@ -1,4 +1,4 @@
-import { Collider, ColliderGroups, Entity, Health, Networked, Position, Renderable, SensorCallback, XY } from "@piggo-gg/core"
+import { Collider, ColliderGroups, Entity, Health, loadTexture, Networked, Position, Renderable, SensorCallback, XY } from "@piggo-gg/core"
 import { Graphics } from "pixi.js"
 
 export type LineWallProps = {
@@ -10,12 +10,13 @@ export type LineWallProps = {
   sensor?: SensorCallback
   id?: string
   fill?: number
+  texture?: `${string}.json`
   strokeAlpha?: number
   group?: keyof typeof ColliderGroups
 }
 
 export const LineWall = (
-  { points, position, visible, hp, id, hittable, sensor, fill, strokeAlpha, group }: LineWallProps
+  { points, position, visible, hp, id, hittable, sensor, fill, texture, strokeAlpha, group }: LineWallProps
 ): Entity<Position | Renderable | Collider> => {
 
   let newPoints: number[] = []
@@ -67,8 +68,16 @@ export const LineWall = (
           for (let i = 2; i < newPoints.length; i += 2) {
             g.lineTo(newPoints[i], newPoints[i + 1])
           }
+
           g.stroke({ width: 2, color: 0xffffff, alpha: strokeAlpha ?? 1 })
+
           if (fill) g.fill({ color: fill })
+
+          if (texture) {
+            const t = await loadTexture(texture)
+            g.fill({ texture: t["0"] })
+          }
+
           return g
         }
       })
