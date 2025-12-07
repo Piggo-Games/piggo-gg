@@ -2,7 +2,7 @@ import { DudeSkin, Entity, Position, Renderable, VolleyCharacterAnimations, Voll
 
 export const BlueGuy = (): Entity => {
 
-  const redGuy = Entity({
+  const blueGuy = Entity({
     id: "blue-guy",
     components: {
       position: Position(),
@@ -19,5 +19,5 @@ export const BlueGuy = (): Entity => {
     }
   })
 
-  return redGuy
+  return blueGuy
 }
