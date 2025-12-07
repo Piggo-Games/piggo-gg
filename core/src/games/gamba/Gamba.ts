@@ -1,7 +1,6 @@
 import {
   Background, Cursor, Debug, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
-  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
-  NametagSystem,
+  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall, NametagSystem,
   Networked, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
   Renderable, ShadowSystem, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
 } from "@piggo-gg/core"
@@ -136,7 +135,8 @@ const ArenaWalls = (): Entity[] => {
       visible: true,
       strokeAlpha: 0,
       fill: 0x7B3F00,
-      group: "1"
+      group: "1",
+      // texture: "wood.json"
     })
   ]
 }

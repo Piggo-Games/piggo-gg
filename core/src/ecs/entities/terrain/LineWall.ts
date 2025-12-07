@@ -1,5 +1,5 @@
-import { Collider, ColliderGroups, Entity, Health, Networked, Position, Renderable, SensorCallback, XY } from "@piggo-gg/core"
-import { Graphics, Texture } from "pixi.js"
+import { Collider, ColliderGroups, Entity, Health, loadTexture, Networked, Position, Renderable, SensorCallback, XY } from "@piggo-gg/core"
+import { Graphics, Matrix, Texture, TilingSprite } from "pixi.js"
 
 export type LineWallProps = {
   points: number[]
@@ -10,7 +10,7 @@ export type LineWallProps = {
   sensor?: SensorCallback
   id?: string
   fill?: number
-  texture?: Texture
+  texture?: `${string}.json`
   strokeAlpha?: number
   group?: keyof typeof ColliderGroups
 }
@@ -70,7 +70,13 @@ export const LineWall = (
           }
           g.stroke({ width: 2, color: 0xffffff, alpha: strokeAlpha ?? 1 })
           if (fill) g.fill({ color: fill })
-          if (texture) g.fill({ texture })
+
+
+          if (texture) {
+            const t = await loadTexture(texture)
+            g.fill({ texture: t["0"] })
+            //, matrix: (new Matrix()).scale(0.2, 0.2)
+          }
           return g
         }
       })

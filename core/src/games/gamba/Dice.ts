@@ -2,9 +2,12 @@ import {
   abs, Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
   loadTexture, max, min, Networked, NPC, PI, Position, randomChoice, Renderable, Shadow
 } from "@piggo-gg/core"
-import { Sprite, Texture } from "pixi.js"
+import { Sprite } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
+
+  const throwSpeed = 200
+  const throwUp = 2
 
   let rolling = false
   let bounced = false
@@ -18,11 +21,11 @@ export const Dice: ItemBuilder = ({ character }) => {
     components: {
       networked: Networked(),
       collider: Collider({ shape: "ball", radius: 4, group: "1" }),
-      position: Position({ follows: character.id, gravity: 0.04 }),
+      position: Position({ follows: character.id, gravity: 0.1 }),
       item: Item({ name: "Dice" }),
       input: Input({
         press: {
-          mb1: ({ world, hold, entity }) => {
+          mb1: ({ hold, entity }) => {
             if (hold) return
             const { pointingDelta } = character.components.position.data
             return { actionId: "roll", params: { entityId: entity, pointingDelta } }
@@ -47,11 +50,11 @@ export const Dice: ItemBuilder = ({ character }) => {
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
 
-          const x = 180 * xRatio
-          const y = 180 * yRatio
+          const x = throwSpeed * xRatio
+          const y = throwSpeed * yRatio
 
-          dice.components.position.data.z = 0.01
-          dice.components.position.setVelocity({ x, y, z: 1 })
+          dice.components.position.data.z = 0.01 + character.components.position.data.z
+          dice.components.position.setVelocity({ x, y, z: throwUp })
           dice.components.position.data.follows = null
         }
       }),
@@ -71,10 +74,10 @@ export const Dice: ItemBuilder = ({ character }) => {
           if (rolling && grounded && !bounced) {
             bounced = true
             console.log("DICE BOUNCED")
-            position.setVelocity({ z: 0.8 })
+            position.setVelocity({ z: throwUp * 0.7 })
           }
 
-          const factor = (position.data.z <= 0 && bounced) ? 0.95 : 0.99
+          const factor = (position.data.z <= 0 && bounced) ? 0.95 : 0.994
           position.scaleVelocity(factor, 8)
 
           if (rolling) sideAcc += factor

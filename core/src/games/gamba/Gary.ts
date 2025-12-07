@@ -1,7 +1,7 @@
 import {
-  Actions, Character, Collider, Debug, Input, Inventory, Move, Networked,
-  PixiSkins, Player, Point, Position, Renderable, Shadow, SwitchTeam, Sword,
-  Team, VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
+  Action, Actions, Character, Collider, Debug, Input, Inventory, Move,
+  Networked, PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
+  VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
 } from "@piggo-gg/core"
 import { Dice } from "./Dice"
 
@@ -13,11 +13,7 @@ export const Gary = (player: Player): Character => {
       debug: Debug(),
       position: Position({
         x: player.components.team.data.team === 1 ? -80 : 80,
-        y: 0,
-        z: 0,
-        speed: 120,
-        gravity: 0,
-        velocityResets: 1
+        speed: 120, gravity: 0.3, velocityResets: 1
       }),
       collider: Collider({ shape: "ball", radius: 6, group: "notself" }),
       networked: Networked(),
@@ -35,7 +31,11 @@ export const Gary = (player: Player): Character => {
             if (hold === 5) {
               world.debug = !world.debug
             }
-          }
+          },
+          " ": ({ hold }) => {
+            if (hold) return
+            return { actionId: "jump" }
+          },
         },
         release: {
           "escape": ({ client }) => {
@@ -50,7 +50,10 @@ export const Gary = (player: Player): Character => {
       actions: Actions({
         move: Move,
         point: Point,
-        SwitchTeam
+        jump: Action("jump", ({ entity }) => {
+          if (!entity?.components?.position?.data.standing) return
+          entity.components.position.setVelocity({ z: 5 })
+        }),
       }),
       renderable: Renderable({
         anchor: { x: 0.55, y: 0.9 },
