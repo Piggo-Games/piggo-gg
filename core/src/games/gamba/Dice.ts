@@ -6,7 +6,7 @@ import { Sprite } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
 
-  const throwSpeed = 200
+  const throwSpeed = 140
   const throwUp = 2
 
   let rolling = false
@@ -21,7 +21,7 @@ export const Dice: ItemBuilder = ({ character }) => {
     components: {
       networked: Networked(),
       collider: Collider({ shape: "ball", radius: 4, group: "1" }),
-      position: Position({ follows: character.id, gravity: 0.1 }),
+      position: Position({ follows: character.id, gravity: 0.12 }),
       item: Item({ name: "Dice" }),
       input: Input({
         press: {
@@ -32,7 +32,7 @@ export const Dice: ItemBuilder = ({ character }) => {
           }
         }
       }),
-      shadow: Shadow(2.8, 3),
+      shadow: Shadow(3, 4),
       actions: Actions({
         roll: ({ params }) => {
           if (!dice.components.position.data.follows) {
