@@ -216,24 +216,10 @@ export const InputSystem = ClientSystemBuilder({
         const angle = Math.atan2(mouse.y - y, mouse.x - x)
         const pointing = round((angle + Math.PI) / (Math.PI / 4)) % 8
 
-        let pointingDelta: XY
-
-        // if (world.pixi?.camera.focus) {
-        //   const { width, height } = world.pixi?.wh()
-        //   pointingDelta = {
-        //     x: round(client.controls.mouseScreen.x - (width / 2), 2),
-        //     y: round(client.controls.mouseScreen.y - (height / 2), 2)
-        //   }
-        // } else {
-          pointingDelta = {
-            x: mouse.x - x,
-            y: mouse.y - (y - z)
-            // x: round(mouse.x - x, 2),
-            // y: round(mouse.y - (y - z), 2)
-          }
-        // }
-
-        // console.log("pointingDelta", pointingDelta, )
+        const pointingDelta: XY = {
+          x: mouse.x - x,
+          y: mouse.y - (y - z)
+        }
 
         if (actions.actionMap["point"]) {
           world.actions.push(world.tick, character.id, {
@@ -433,15 +419,8 @@ export const InputSystem = ClientSystemBuilder({
       skipOnRollback: true,
       onRender: () => {
         if (pixi) {
-          const mouseBefore = { ...client.controls.mouse }
-
           client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
           mouse = client.controls.mouse
-
-          // console.log("mouse delta", {
-          //   x: client.controls.mouse.x - mouseBefore.x,
-          //   y: client.controls.mouse.y - mouseBefore.y
-          // })
         }
 
         if (!client.mobile) return
