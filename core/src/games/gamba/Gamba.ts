@@ -5,6 +5,7 @@ import {
   Renderable, ShadowSystem, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
+import { Sand } from "./Sand"
 
 const arenaWidth = 520
 const arenaHeight = 210
@@ -46,12 +47,13 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     ],
     entities: [
       Background({ rays: true }),
-      ...Arena(),
+      ArenaWalls(),
       Cursor(),
       EscapeMenu(world),
       HtmlChat(),
       HtmlLagText(),
-      HtmlFpsText()
+      HtmlFpsText(),
+      Sand()
     ]
   })
 }
@@ -90,55 +92,25 @@ const GambaSystem = SystemBuilder({
   }
 })
 
-const Arena = (): Entity[] => {
-  return [
-    ArenaFloor(),
-    // CenterMark(),
-    // ArenaLabel(),
-    ...ArenaWalls()
-  ]
-}
-
-const ArenaFloor = () => Entity({
-  id: "gamba-floor",
-  components: {
-    position: Position(),
-    networked: Networked(),
-    renderable: Renderable({
-      zIndex: 2,
-      setup: async (renderable) => {
-        // renderable.setBevel({ lightAlpha: 0.1, shadowAlpha: 0.18 })
-        // renderable.c = pixiGraphics()
-        //   .roundRect(-arenaWidth / 2, -arenaHeight / 2, arenaWidth, arenaHeight, 18)
-        //   .fill({ color: 0x0b2434, alpha: 0.92 })
-        // .stroke({ color: 0xffffff, alpha: 0.16, width: 3 })
-      }
-    })
-  }
-})
-
-const ArenaWalls = (): Entity[] => {
+const ArenaWalls = (): Entity => {
   const halfW = arenaWidth / 2
   const halfH = arenaHeight / 2
 
   const offset = 60
 
-  return [
-    LineWall({
-      id: "all-walls", points: [
-        -halfW + offset, -halfH,
-        halfW - offset, -halfH,
-        halfW, halfH,
-        -halfW, halfH,
-        -halfW + offset, -halfH
-      ],
-      visible: true,
-      strokeAlpha: 0,
-      fill: 0x7B3F00,
-      group: "1",
-      // texture: "wood.json"
-    })
-  ]
+  return LineWall({
+    id: "all-walls", points: [
+      -halfW + offset, -halfH,
+      halfW - offset, -halfH,
+      halfW, halfH,
+      -halfW, halfH,
+      -halfW + offset, -halfH
+    ],
+    visible: true,
+    strokeAlpha: 0,
+    fill: 0x7B3F00,
+    group: "all"
+  })
 }
 
 const CenterMark = () => Entity({

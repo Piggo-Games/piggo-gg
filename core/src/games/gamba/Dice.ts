@@ -20,7 +20,7 @@ export const Dice: ItemBuilder = ({ character }) => {
     id: `dice`,
     components: {
       networked: Networked(),
-      collider: Collider({ shape: "ball", radius: 4, group: "1" }),
+      collider: Collider({ shape: "ball", radius: 4, group: "2" }),
       position: Position({ follows: character.id, gravity: 0.12 }),
       item: Item({ name: "Dice" }),
       input: Input({
