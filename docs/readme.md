@@ -12,6 +12,8 @@ lofi music | https://freemusicarchive.org/music/holiznacc0/
 
 ### assets
 
+beach spritesheet | https://srtoasty.itch.io/islands | license: CC0
+
 dice sound | https://freesound.org/people/andresix/sounds/347807/ | license: CC0
 
 dice sprite | https://opengameart.org/content/pixel-art-dice-faces | license: attribution
