@@ -2,7 +2,7 @@ import {
   Background, Cursor, Debug, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
   Networked, PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position,
-  Renderable, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
+  Renderable, ShadowSystem, SpawnSystem, SystemBuilder, pixiGraphics, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 
@@ -40,7 +40,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       // PixiCameraSystem(({ x, y }) => ({ x, y, z: 0 })),
       PixiDebugSystem,
       InventorySystem,
-      ItemSystem
+      ItemSystem,
+      ShadowSystem
     ],
     entities: [
       Background({ rays: true }),

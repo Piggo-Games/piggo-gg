@@ -1,12 +1,14 @@
 import {
   Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, max, min, Networked, NPC, Position, Renderable
+  loadTexture, max, min, Networked, NPC, PI, Position, Renderable,
+  Shadow, sign
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const Dice: ItemBuilder = ({ character }) => {
 
   let rolling = false
+  let bounced = 0
 
   const dice = ItemEntity({
     id: `dice`,
@@ -23,6 +25,7 @@ export const Dice: ItemBuilder = ({ character }) => {
           }
         }
       }),
+      shadow: Shadow(3, 6),
       actions: Actions({
         roll: () => {
           if (rolling) {
@@ -31,23 +34,25 @@ export const Dice: ItemBuilder = ({ character }) => {
           }
           rolling = true
 
+          dice.components.position.data.z = 0.01
           dice.components.position.setVelocity({
-            x: 100, z: 1,
+            x: 120, z: 1,
           })
           dice.components.position.data.follows = null
         }
       }),
       npc: NPC({
         behavior: () => {
-          if (rolling) {
-            const { position } = dice.components
-            // position.rotate(0.2)
+          const { position } = dice.components
+          const grounded = position.data.z <= 0
 
-            // position.scaleVelocity(0.99, 4)
-            if (position.data.z <= 0) {
-              position.scaleVelocity(0.98, 4)
-            }
+          if (rolling && grounded && bounced < 2) {
+            bounced += 1
+            position.setVelocity({ z: 0.8 / bounced })
           }
+
+          const factor = (position.data.z <= 0 && bounced >= 2) ? 0.95 : 0.99
+          position.scaleVelocity(factor, 12)
         }
       }),
       effects: Effects(),
@@ -62,11 +67,26 @@ export const Dice: ItemBuilder = ({ character }) => {
           if (rolling) {
             const { position } = dice.components
 
-
-            // position.rotate(0.1)
             const factor = position.data.velocity.x + position.data.velocity.y
+
+            // if slow, stop flat
+            if (factor < 40) {
+
+              const flat = position.data.rotation % (PI / 2)
+              const flatCycle = position.data.rotation / (PI / 2)
+
+              if (flat > 0.02) {
+                position.rotate(max(0.02, flat * 0.001))
+                const curCycle = position.data.rotation / (PI / 2)
+                if (flatCycle !== curCycle) {
+                  position.data.rotation = curCycle * (PI / 2)
+                }
+              } else {
+                rolling = false
+              }
+              return
+            }
             position.rotate(min(0.1, factor * 0.001))
-            console.log("rotating", factor)
           }
         },
         setup: async (r: Renderable) => {
