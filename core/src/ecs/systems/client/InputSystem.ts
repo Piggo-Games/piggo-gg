@@ -355,6 +355,28 @@ export const InputSystem = ClientSystemBuilder({
             }
           }
         }
+
+        for (const keyUp in activeItem.components.input?.inputMap.release) {
+          const keyMouse = bufferUp.get(keyUp)
+
+          if (keyMouse) {
+            const invocation = activeItem.components.input?.inputMap.release[keyMouse.key]?.({
+              aim: localAim(),
+              character,
+              entity: activeItem,
+              hold: keyMouse.hold,
+              mouse,
+              client,
+              tick: world.tick,
+              world
+            })
+            if (invocation && activeItem.components.actions.actionMap[invocation.actionId]) {
+              invocation.playerId = client.playerId()
+              invocation.characterId = character.id
+              world.actions.push(world.tick, activeItem.id, invocation)
+            }
+          }
+        }
       }
     }
 

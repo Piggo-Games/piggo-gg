@@ -35,7 +35,8 @@ export const Dice: ItemBuilder = ({ character }) => {
       input: Input({
         press: {
           mb1: ({ hold, entity }) => {
-            if (hold) return
+            if (rolling || hold) return
+
             const { pointingDelta } = character.components.position.data
             return { actionId: "roll", params: { entityId: entity, pointingDelta } }
           }
@@ -56,9 +57,11 @@ export const Dice: ItemBuilder = ({ character }) => {
 
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
+          const strength = Math.min(abs(pointingDelta.x) + abs(pointingDelta.y) - 50, 200)
+          console.log(strength)
 
-          const x = throwSpeed * xRatio
-          const y = throwSpeed * yRatio
+          const x = throwSpeed * xRatio + strength * xRatio
+          const y = throwSpeed * yRatio + strength * yRatio
 
           dice.components.position.data.z = 0.01 + character.components.position.data.z
           dice.components.position.setVelocity({ x, y, z: throwUp })
