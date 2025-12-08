@@ -1,4 +1,4 @@
-import { Component, Entity, InvokedAction, Position, SystemBuilder, World } from "@piggo-gg/core"
+import { Component, Entity, InvokedAction, SystemBuilder, World } from "@piggo-gg/core"
 
 export type NPC = Component<"npc"> & {
   behavior: (entity: Entity<NPC>, world: World) => InvokedAction | null | void

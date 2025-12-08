@@ -75,7 +75,7 @@ export const OuterBeachWall = (): Entity => {
       -w - 8, h,
       -w + offset, -h - 8
     ],
-    // visible: true,
+    visible: true,
     group: "all"
   })
 }

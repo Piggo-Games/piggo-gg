@@ -10,9 +10,9 @@ export const Flag = (): Entity => {
       collider: Collider({
         shape: "ball", radius: 2, isStatic: true, group: "2"
       }),
-      shadow: Shadow(2, -2, 2),
+      shadow: Shadow(2, -1.5, 0.5),
       renderable: Renderable({
-        anchor: { x: 0, y: 1 },
+        anchor: { x: 0.05, y: 1 },
         scale: 1,
         zIndex: 4,
         interpolate: true,
