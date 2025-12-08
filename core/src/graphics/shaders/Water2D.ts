@@ -1,5 +1,5 @@
 import { Entity, pixiRect, Position, Renderable } from "@piggo-gg/core"
-import { Assets, BlurFilter, DisplacementFilter, Geometry, Sprite, Texture, TilingSprite, WRAP_MODES } from "pixi.js"
+import { Assets, BlurFilter, DisplacementFilter, Geometry, Sprite, TilingSprite } from "pixi.js"
 
 export const Water2D = (): Entity => {
 
@@ -28,11 +28,9 @@ export const Water2D = (): Entity => {
         anchor: { x: 0, y: 0 },
         zIndex: 0,
         scaleMode: "nearest",
-        onRender: ({ delta, world }) => {
+        onRender: () => {
           if (dMap) dMap.x += 0.2
           if (dMap) dMap.x += 0.1
-          console.log("render water", dMap?.x)
-          // if (tiled) tiled.tilePosition.x = (world.tick + delta / 25) * 0.5
         },
         setup: async (r) => {
 

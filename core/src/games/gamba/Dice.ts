@@ -67,15 +67,15 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const strength = Math.min(abs(pointingDelta.x) + abs(pointingDelta.y) - 70, 200)
 
-          const offset = (order === 1) ? -0.6 : 0.6
+          const offset = (order === 1) ? -1 : 1
 
-          const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 60
-          const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 60
+          const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 40
+          const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 40
 
           const { position: cpos } = character.components
 
           dice.components.position.data.z = 0.01 + cpos.data.z
-          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) })
+          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) + offset * 0.2 })
           dice.components.position.data.follows = null
           dice.components.item.dropped = true
         }
