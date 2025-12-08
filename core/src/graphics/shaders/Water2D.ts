@@ -35,14 +35,14 @@ export const Water2D = (): Entity => {
         setup: async (r) => {
 
           const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.3, strokeWidth: 1 } })
-            .fill({ color: 0x0076cc, alpha: 1 })
+            .fill({ color: 0x005599, alpha: 1 })
 
           dMap = new Sprite(await Assets.load("displacement_map.png"))
-          dMap.texture.baseTexture.wrapMode = "repeat"
+          dMap.texture.source.addressMode = "repeat"
 
           const wave = Sprite.from(await Assets.load("night.png"))
           tiled = new TilingSprite({
-            texture: wave.texture, width: 2000, height: 2000, alpha: 0.6,
+            texture: wave.texture, width: 2000, height: 2000, alpha: 0.5,
             position: { x: -1000, y: -60 },
             tilePosition: { x: 207, y: -20 }
           })

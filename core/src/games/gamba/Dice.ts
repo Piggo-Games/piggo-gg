@@ -69,8 +69,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
           const offset = (order === 1) ? -1 : 1
 
-          const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 40
-          const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 40
+          const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 30
+          const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 30
 
           const { position: cpos } = character.components
 
