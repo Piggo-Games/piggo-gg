@@ -3,7 +3,7 @@ import { Sprite } from "pixi.js"
 
 export const Beach = () => {
 
-  const arenaWidth = 520
+  const arenaWidth = 500
   const arenaHeight = 100
   const w2 = arenaWidth / 2
   const h2 = arenaHeight / 2
@@ -36,12 +36,12 @@ export const Beach = () => {
           r.c.addChild(mask)
           r.c.mask = mask
 
-          for (let j = 0; j < 6; j++) {
+          for (let j = 0; j < 3; j++) {
             for (let i = 0; i < 13; i++) {
               const copy = new Sprite(texture["0"])
               copy.anchor.set(0.5, 0.5)
               copy.x = -260 + i * 44
-              copy.y = -102 + j * 37
+              copy.y = -45 + j * 37
 
               r.c.addChild(copy)
             }

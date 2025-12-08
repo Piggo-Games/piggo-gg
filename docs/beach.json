@@ -1,0 +1,10 @@
+{
+  "frames": {
+    "0": { "frame": { "x": 3, "y": 2, "w": 45, "h": 46 } }
+  },
+  "meta": {
+    "image": "beach.jpg",
+    "size": { "w": 129, "h": 81 },
+    "scale": "1"
+  }
+}

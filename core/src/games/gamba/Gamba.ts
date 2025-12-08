@@ -8,7 +8,7 @@ import { Gary } from "./Gary"
 import { Beach } from "./Beach"
 import { BlueGuy } from "./enemies/BlueGuy"
 
-const arenaWidth = 520
+const arenaWidth = 500
 const arenaHeight = 100
 
 export type GambaState = {
@@ -108,7 +108,8 @@ const Wall = (): Entity => {
       -halfW, halfH,
       -halfW + offset, -halfH
     ],
-    visible: false,
+    // fill: 0x0000ff,
+    // visible: true,
     group: "all"
   })
 }
