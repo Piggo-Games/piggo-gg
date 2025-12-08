@@ -2,7 +2,7 @@ import { Collider, Debug, Entity, loadTexture, pixiAnimation, Position, Renderab
 
 export const StarGuy = (): Entity => {
 
-  const blueGuy = Entity({
+  const star = Entity({
     id: "blue-guy",
     components: {
       position: Position({ x: 140 }),
@@ -19,7 +19,7 @@ export const StarGuy = (): Entity => {
         scaleMode: "nearest",
         animationSelect: () => "idle",
         setup: async (r) => {
-          const t = await loadTexture("redstar.json")
+          const t = await loadTexture("StarGuy.json")
 
           r.animations = {
             idle: pixiAnimation(
@@ -31,5 +31,5 @@ export const StarGuy = (): Entity => {
     }
   })
 
-  return blueGuy
+  return star
 }
