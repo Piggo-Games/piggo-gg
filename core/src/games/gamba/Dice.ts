@@ -4,7 +4,7 @@ import {
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-export const Dice: ItemBuilder = ({ character }) => {
+export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
   const throwSpeed = 140
   const throwUp = 2
@@ -25,8 +25,10 @@ export const Dice: ItemBuilder = ({ character }) => {
     side = 1
   }
 
+  const id = `dice-${character.id}-${order}`
+
   const dice = ItemEntity({
-    id: `dice`,
+    id,
     components: {
       networked: Networked(),
       debug: Debug(),
@@ -39,7 +41,7 @@ export const Dice: ItemBuilder = ({ character }) => {
             if (rolling || hold) return
 
             const { pointingDelta } = character.components.position.data
-            return { actionId: "roll", params: { entityId: entity, pointingDelta } }
+            return { actionId: "roll", params: { entityId: id, pointingDelta } }
           }
         }
       }),

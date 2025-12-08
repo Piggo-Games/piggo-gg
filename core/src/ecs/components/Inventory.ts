@@ -154,8 +154,10 @@ export const InventorySystem: SystemBuilder<"InventorySystem"> = {
                 inventory.data.items[index] = undefined
               }
             } else {
-              // itemEntity.components.renderable.visible = false
-              itemEntity.components.item.equipped = false
+              const { item, renderable } = itemEntity.components
+
+              if (renderable) renderable.visible = false
+              item.equipped = false
             }
           }
         }
@@ -163,10 +165,12 @@ export const InventorySystem: SystemBuilder<"InventorySystem"> = {
         // update active item
         const activeItem = inventory.activeItem(world)
         if (activeItem) {
-          // activeItem.components.renderable.visible = true
-          activeItem.components.item.equipped = true
+          const { item, renderable } = activeItem.components
 
-          activeItem.components.item.onTick?.(world)
+          if (renderable) renderable.visible = true
+          item.equipped = true
+
+          item.onTick?.(world)
         }
       })
     }
