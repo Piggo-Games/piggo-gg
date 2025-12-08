@@ -78,7 +78,7 @@ export const PixiCamera = (app: Application): PixiCamera => {
   }
 
   const rescale = () => {
-    const min = 1.2
+    const min = 2
     const max = 5
 
     if (camera.scale < min) camera.scale = min

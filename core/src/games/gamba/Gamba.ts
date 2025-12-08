@@ -70,7 +70,7 @@ const GambaSystem = SystemBuilder({
       if (!world.pixi) return
 
       const { w } = screenWH()
-      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.05)))
+      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.4)))
 
       if (Math.abs(targetScale - lastScale) > 0.02) {
         world.pixi.camera.scaleTo(targetScale)

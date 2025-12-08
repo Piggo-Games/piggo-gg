@@ -1,5 +1,5 @@
 import { Entity, pixiRect, Position, Renderable } from "@piggo-gg/core"
-import { Assets, DisplacementFilter, Geometry, Sprite, Texture, TilingSprite, WRAP_MODES } from "pixi.js"
+import { Assets, BlurFilter, DisplacementFilter, Geometry, Sprite, Texture, TilingSprite, WRAP_MODES } from "pixi.js"
 
 export const Water2D = (): Entity => {
 
@@ -46,11 +46,13 @@ export const Water2D = (): Entity => {
           tiled = new TilingSprite({
             texture: wave.texture, width: 2000, height: 2000, alpha: 0.4,
             position: { x: -1000, y: -60 },
-            tilePosition: { x: 207, y: 20 }
+            tilePosition: { x: 207, y: -20 }
           })
 
           dFilter = new DisplacementFilter({ sprite: dMap, scale: 30 })
-          tiled.filters = [dFilter]
+          const blurFilter = new BlurFilter({ strength: 1 })
+
+          tiled.filters = [dFilter, blurFilter]
 
           r.c.addChild(dMap, area, tiled)
         }
