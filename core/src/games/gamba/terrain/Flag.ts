@@ -5,16 +5,16 @@ export const Flag = (): Entity => {
   const flag = Entity({
     id: "flag",
     components: {
-      position: Position({ x: 180, y: -40 }),
+      position: Position({ x: 176, y: -36 }),
       debug: Debug(),
       collider: Collider({
-        shape: "ball", radius: 1, isStatic: true, group: "2"
+        shape: "ball", radius: 2, isStatic: true, group: "2"
       }),
       shadow: Shadow(2, -2, 2),
       renderable: Renderable({
         anchor: { x: 0, y: 1 },
         scale: 1,
-        zIndex: 3,
+        zIndex: 4,
         interpolate: true,
         scaleMode: "nearest",
         animationSelect: () => "idle",

@@ -1,17 +1,16 @@
 import {
-  Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
-  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
+  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
   NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
 } from "@piggo-gg/core"
-import { Gary } from "./Gary"
-import { Beach } from "./terrain/Beach"
 import { StarGuy } from "./enemies/StarGuy"
-import { Pier } from "./terrain/Pier"
+import { Gary } from "./Gary"
+import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
+import { Pier } from "./terrain/Pier"
 
 const arenaWidth = 500
-const arenaHeight = 100
 
 export type GambaState = {
   round: number
@@ -49,17 +48,19 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     ],
     entities: [
       Background({ rays: true }),
-      Wall(),
+      BeachWall(),
+      OuterBeachWall(),
+      Beach(),
+      Pier(),
+      Flag(),
+      StarGuy(),
+      Water2D(),
+
       Cursor(),
       EscapeMenu(world),
       HtmlChat(),
       HtmlLagText(),
       HtmlFpsText(),
-      Beach(),
-      Pier(),
-      Flag(),
-      StarGuy(),
-      Water2D()
     ]
   })
 }
@@ -89,34 +90,11 @@ const GambaSystem = SystemBuilder({
       query: [],
       priority: 6,
       onTick: () => {
-        // updateScale()
 
-        // const pc = world.client?.character()
-        // console.log(pc?.components.position.xyz())
       }
     }
   }
 })
-
-const Wall = (): Entity => {
-  const halfW = arenaWidth / 2
-  const halfH = arenaHeight / 2
-
-  const offset = 60
-
-  return LineWall({
-    id: "all-walls", points: [
-      -halfW + offset, -halfH,
-      halfW - offset, -halfH,
-      halfW, halfH - 3,
-      -halfW, halfH - 3,
-      -halfW + offset, -halfH
-    ],
-    // fill: 0x0000ff,
-    // visible: true,
-    group: "all"
-  })
-}
 
 const controls: HUDSystemProps = {
   direction: "row",
