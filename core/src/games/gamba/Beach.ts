@@ -5,8 +5,8 @@ export const Beach = () => {
 
   const arenaWidth = 520
   const arenaHeight = 100
-  const halfW = arenaWidth / 2
-  const halfH = arenaHeight / 2
+  const w2 = arenaWidth / 2
+  const h2 = arenaHeight / 2
 
   const offset = 60
 
@@ -20,11 +20,11 @@ export const Beach = () => {
           const texture = await loadTexture("beach.json")
 
           const maskPoints = [
-            -halfW + offset, -halfH,
-            halfW - offset, -halfH,
-            halfW, halfH,
-            -halfW, halfH,
-            -halfW + offset, -halfH
+            -w2 + offset, -h2,
+            w2 - offset, -h2,
+            w2, h2,
+            -w2, h2,
+            -w2 + offset, -h2
           ]
 
           const mask = pixiGraphics().moveTo(maskPoints[0], maskPoints[1])
