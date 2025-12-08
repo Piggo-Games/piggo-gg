@@ -77,6 +77,7 @@ const ShadowEntity = (target: Target, size: number, yOffset: number, xOffset: nu
         position.lastCollided = lastCollided
 
         renderable.c.alpha = 0.3 - pos.z / 500
+        renderable.visible = target.components.renderable.visible
       },
       setup: async (renderable) => {
         renderable.c = pixiGraphics().ellipse(0, 1, size * 2, size).fill({ color: 0x000000, alpha: 1 })

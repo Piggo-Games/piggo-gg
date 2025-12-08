@@ -15,7 +15,7 @@ export const Gary = (player: Player): Character => {
       collider: Collider({ shape: "ball", radius: 6, group: "1" }),
       networked: Networked(),
       team: Team(player.components.team.data.team),
-      inventory: Inventory([Dice]),
+      inventory: Inventory([Dice(1), Dice(2)]),
       shadow: Shadow(5),
       input: Input({
         press: {

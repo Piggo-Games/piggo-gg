@@ -2,7 +2,7 @@ import {
   Background, Cursor, Entity, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, LineWall,
   NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
-  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, screenWH
+  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 import { Beach } from "./Beach"
@@ -54,8 +54,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlLagText(),
       HtmlFpsText(),
       Beach(),
-      StarGuy()
-      // Water2D()
+      StarGuy(),
+      Water2D()
     ]
   })
 }
@@ -70,7 +70,7 @@ const GambaSystem = SystemBuilder({
       if (!world.pixi) return
 
       const { w } = screenWH()
-      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.05)))
+      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.3)))
 
       if (Math.abs(targetScale - lastScale) > 0.02) {
         world.pixi.camera.scaleTo(targetScale)
