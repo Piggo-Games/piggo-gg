@@ -1,4 +1,4 @@
-import { Collider, Debug, DudeSkin, Entity, Position, Renderable, VolleyCharacterAnimations, VolleyCharacterDynamic } from "@piggo-gg/core"
+import { Collider, Debug, DudeSkin, Entity, Position, Renderable, Shadow, VolleyCharacterAnimations, VolleyCharacterDynamic } from "@piggo-gg/core"
 
 export const BlueGuy = (): Entity => {
 
@@ -10,6 +10,7 @@ export const BlueGuy = (): Entity => {
       collider: Collider ({
         shape: "ball", radius: 5, isStatic: true, group: "all"
       }),
+      shadow: Shadow(5),
       renderable: Renderable({
         anchor: { x: 0.55, y: 0.9 },
         scale: -1.2,
