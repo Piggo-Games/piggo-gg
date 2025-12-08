@@ -5,7 +5,7 @@ import {
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
-import { Sand } from "./Sand"
+import { Beach } from "./Beach"
 import { BlueGuy } from "./enemies/BlueGuy"
 
 const arenaWidth = 520
@@ -53,7 +53,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlChat(),
       HtmlLagText(),
       HtmlFpsText(),
-      Sand(),
+      Beach(),
       BlueGuy()
       // Water2D()
     ]

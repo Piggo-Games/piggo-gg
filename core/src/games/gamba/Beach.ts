@@ -1,7 +1,7 @@
 import { Entity, loadTexture, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-export const Sand = () => {
+export const Beach = () => {
 
   const arenaWidth = 520
   const arenaHeight = 210
@@ -10,14 +10,14 @@ export const Sand = () => {
 
   const offset = 60
 
-  const sand = Entity({
-    id: `sand`,
+  const beach = Entity({
+    id: `beach`,
     components: {
       position: Position(),
       renderable: Renderable({
         zIndex: 2,
         setup: async (r) => {
-          const texture = await loadTexture("sand.json")
+          const texture = await loadTexture("beach.json")
 
           const maskPoints = [
             -halfW + offset, -halfH,
@@ -51,5 +51,5 @@ export const Sand = () => {
     }
   })
 
-  return sand
+  return beach
 }
