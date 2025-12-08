@@ -11,7 +11,7 @@ export const Gary = (player: Player): Character => {
     id: `gary-${player.id}`,
     components: {
       debug: Debug(),
-      position: Position({ x: -120, speed: 120, gravity: 0.3, velocityResets: 1 }),
+      position: Position({ x: -140, speed: 120, gravity: 0.3, velocityResets: 1 }),
       collider: Collider({ shape: "ball", radius: 6, group: "1" }),
       networked: Networked(),
       team: Team(player.components.team.data.team),

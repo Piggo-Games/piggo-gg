@@ -5,7 +5,7 @@ export const BlueGuy = (): Entity => {
   const blueGuy = Entity({
     id: "blue-guy",
     components: {
-      position: Position({ x: 120 }),
+      position: Position({ x: 140 }),
       debug: Debug(),
       collider: Collider ({
         shape: "ball", radius: 5, isStatic: true, group: "2"
