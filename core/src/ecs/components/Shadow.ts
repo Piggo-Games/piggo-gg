@@ -2,10 +2,10 @@ import {
   ClientSystemBuilder, Entity, pixiGraphics, Position, Renderable, Component, entries
 } from "@piggo-gg/core"
 
-export type Shadow = Component<"shadow"> & { size: number, yOffset: number }
+export type Shadow = Component<"shadow"> & { size: number, yOffset: number, xOffset: number }
 
-export const Shadow = (size: number, yOffset: number = 0): Shadow => ({
-  type: "shadow", size, yOffset
+export const Shadow = (size: number, yOffset: number = 0, xOffset: number = 0): Shadow => ({
+  type: "shadow", size, yOffset, xOffset
 })
 
 type Target = Entity<Position | Renderable | Shadow>
@@ -43,8 +43,8 @@ export const ShadowSystem = ClientSystemBuilder({
         // create shadows
         for (const target of entities) {
           if (!shadows[target.id]) {
-            const { size, yOffset } = target.components.shadow
-            const shadowEntity = ShadowEntity(target, size, yOffset)
+            const { size, yOffset, xOffset } = target.components.shadow
+            const shadowEntity = ShadowEntity(target, size, yOffset, xOffset)
 
             shadows[target.id] = shadowEntity
             targets[target.id] = target
@@ -57,7 +57,7 @@ export const ShadowSystem = ClientSystemBuilder({
   }
 })
 
-const ShadowEntity = (target: Target, size: number, yOffset: number) => Entity<Renderable>({
+const ShadowEntity = (target: Target, size: number, yOffset: number, xOffset: number) => Entity<Renderable>({
   id: `shadow-${target.id}`,
   components: {
     position: Position(),
@@ -70,7 +70,7 @@ const ShadowEntity = (target: Target, size: number, yOffset: number) => Entity<R
 
         const { data: pos, lastCollided, localVelocity } = target.components.position
 
-        position.setPosition({ x: pos.x, y: pos.y - 0.1 + yOffset, z: 0 })
+        position.setPosition({ x: pos.x + xOffset, y: pos.y - 0.1 + yOffset, z: 0 })
         position.setVelocity({ ...pos.velocity, z: 0 })
 
         position.localVelocity = { ...localVelocity, z: 0 }
