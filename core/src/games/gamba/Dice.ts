@@ -1,5 +1,5 @@
 import {
-  abs, Actions, Collider, Effects, Input, Item, ItemBuilder, ItemEntity,
+  abs, Actions, Collider, Debug, Effects, Input, Item, ItemBuilder, ItemEntity,
   loadTexture, max, min, Networked, NPC, PI, Position, randomChoice, Renderable, Shadow
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
@@ -29,6 +29,7 @@ export const Dice: ItemBuilder = ({ character }) => {
     id: `dice`,
     components: {
       networked: Networked(),
+      debug: Debug(),
       collider: Collider({ shape: "ball", radius: 4, group: "2", restitution: 1 }),
       position: Position({ follows: character.id, gravity: 0.12 }),
       item: Item({ name: "Dice" }),
@@ -57,20 +58,24 @@ export const Dice: ItemBuilder = ({ character }) => {
 
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
-          const strength = Math.min(abs(pointingDelta.x) + abs(pointingDelta.y) - 50, 200)
-          console.log(strength)
+          const strength = Math.min(abs(pointingDelta.x) + abs(pointingDelta.y) - 70, 200)
 
           const x = throwSpeed * xRatio + strength * xRatio
           const y = throwSpeed * yRatio + strength * yRatio
 
-          dice.components.position.data.z = 0.01 + character.components.position.data.z
-          dice.components.position.setVelocity({ x, y, z: throwUp })
+          const { position: cpos } = character.components
+
+          dice.components.position.data.z = 0.01 + cpos.data.z
+          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) })
           dice.components.position.data.follows = null
         }
       }),
       npc: NPC({
         behavior: (_, world) => {
-          const { position } = dice.components
+          const { position, collider } = dice.components
+
+          // should fly over bad guys
+          collider!.setGroup((position.data.z > 20) ? "3" : "2")
 
           if (dice.components.renderable?.initialized && sides[side]) {
             for (const child of dice.components.renderable!.c.children) {

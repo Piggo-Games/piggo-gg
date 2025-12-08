@@ -209,7 +209,7 @@ export const InputSystem = ClientSystemBuilder({
       // check for actions
       const { input, actions, position, inventory } = character.components
 
-      const { x, y, z } = position.data
+      const { x, y } = position.data
 
       // update position.pointing
       if (world.pixi) {
@@ -218,7 +218,7 @@ export const InputSystem = ClientSystemBuilder({
 
         const pointingDelta: XY = {
           x: mouse.x - x,
-          y: mouse.y - (y - z)
+          y: mouse.y - y
         }
 
         if (actions.actionMap["point"]) {

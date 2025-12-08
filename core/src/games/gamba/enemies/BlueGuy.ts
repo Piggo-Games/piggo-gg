@@ -8,7 +8,7 @@ export const BlueGuy = (): Entity => {
       position: Position({ x: 120 }),
       debug: Debug(),
       collider: Collider ({
-        shape: "ball", radius: 5, isStatic: true, group: "all"
+        shape: "ball", radius: 5, isStatic: true, group: "2"
       }),
       shadow: Shadow(5),
       renderable: Renderable({
