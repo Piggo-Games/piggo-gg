@@ -1,29 +1,29 @@
 import { Collider, Debug, Entity, loadTexture, pixiAnimation, Position, Renderable, Shadow } from "@piggo-gg/core"
 
-export const StarGuy = (): Entity => {
+export const Flag = (): Entity => {
 
-  const star = Entity({
-    id: "blue-guy",
+  const flag = Entity({
+    id: "flag",
     components: {
-      position: Position({ x: 140 }),
+      position: Position({ x: 180, y: -40 }),
       debug: Debug(),
       collider: Collider({
-        shape: "ball", radius: 10, isStatic: true, group: "2"
+        shape: "ball", radius: 1, isStatic: true, group: "2"
       }),
-      shadow: Shadow(9, 0, 1),
+      shadow: Shadow(2, -2, 2),
       renderable: Renderable({
-        anchor: { x: 0.5, y: 0.9 },
-        scale: 1.8,
-        zIndex: 4,
+        anchor: { x: 0, y: 1 },
+        scale: 1,
+        zIndex: 3,
         interpolate: true,
         scaleMode: "nearest",
         animationSelect: () => "idle",
         setup: async (r) => {
-          const t = await loadTexture("StarGuy.json")
+          const t = await loadTexture("flag.json")
 
           r.animations = {
             idle: pixiAnimation(
-              [1, 2, 3, 4, 5, 6, 7, 8].map(i => t[`idle${i}`])
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => t[`idle${i}`])
             )
           }
         }
@@ -31,5 +31,5 @@ export const StarGuy = (): Entity => {
     }
   })
 
-  return star
+  return flag
 }

@@ -5,8 +5,10 @@ import {
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
-import { Beach } from "./Beach"
+import { Beach } from "./terrain/Beach"
 import { StarGuy } from "./enemies/StarGuy"
+import { Pier } from "./terrain/Pier"
+import { Flag } from "./terrain/Flag"
 
 const arenaWidth = 500
 const arenaHeight = 100
@@ -54,6 +56,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlLagText(),
       HtmlFpsText(),
       Beach(),
+      Pier(),
+      Flag(),
       StarGuy(),
       Water2D()
     ]
@@ -104,8 +108,8 @@ const Wall = (): Entity => {
     id: "all-walls", points: [
       -halfW + offset, -halfH,
       halfW - offset, -halfH,
-      halfW, halfH,
-      -halfW, halfH,
+      halfW, halfH - 3,
+      -halfW, halfH - 3,
       -halfW + offset, -halfH
     ],
     // fill: 0x0000ff,
