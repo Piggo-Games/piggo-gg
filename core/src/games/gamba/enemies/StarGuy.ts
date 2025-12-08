@@ -1,6 +1,6 @@
-import { Collider, Debug, DudeSkin, Entity, loadTexture, pixiAnimation, Position, Renderable, Shadow, VolleyCharacterAnimations, VolleyCharacterDynamic } from "@piggo-gg/core"
+import { Collider, Debug, Entity, loadTexture, pixiAnimation, Position, Renderable, Shadow } from "@piggo-gg/core"
 
-export const BlueGuy = (): Entity => {
+export const StarGuy = (): Entity => {
 
   const blueGuy = Entity({
     id: "blue-guy",

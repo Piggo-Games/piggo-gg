@@ -6,7 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
 import { Beach } from "./Beach"
-import { BlueGuy } from "./enemies/BlueGuy"
+import { StarGuy } from "./enemies/StarGuy"
 
 const arenaWidth = 500
 const arenaHeight = 100
@@ -54,7 +54,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlLagText(),
       HtmlFpsText(),
       Beach(),
-      BlueGuy()
+      StarGuy()
       // Water2D()
     ]
   })
