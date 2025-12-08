@@ -6,7 +6,7 @@ import { Sprite } from "pixi.js"
 
 export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
-  const throwSpeed = 140
+  const throwSpeed = 100
   const throwUp = 2
 
   let rolling = false
@@ -22,7 +22,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
     sideAcc = 0
     bounced = false
     landed = false
-    side = 1
+    dice.components.item.dropped = false
   }
 
   const id = `dice-${character.id}-${order}`
@@ -37,10 +37,15 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
       item: Item({ name: "Dice" }),
       input: Input({
         press: {
-          mb1: ({ hold, entity }) => {
+          mb1: ({ hold, world }) => {
             if (rolling || hold) return
 
             const { pointingDelta } = character.components.position.data
+
+            const otherDiceId = `dice-${character.id}-${order === 1 ? 2 : 1}`
+
+            world.actions.push(world.tick, otherDiceId, { actionId: "roll", params: { entityId: id, pointingDelta } })
+
             return { actionId: "roll", params: { entityId: id, pointingDelta } }
           }
         }
@@ -62,14 +67,17 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const strength = Math.min(abs(pointingDelta.x) + abs(pointingDelta.y) - 70, 200)
 
-          const x = throwSpeed * xRatio + strength * xRatio
-          const y = throwSpeed * yRatio + strength * yRatio
+          const offset = (order === 1) ? -0.6 : 0.6
+
+          const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 60
+          const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 60
 
           const { position: cpos } = character.components
 
           dice.components.position.data.z = 0.01 + cpos.data.z
           dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) })
           dice.components.position.data.follows = null
+          dice.components.item.dropped = true
         }
       }),
       npc: NPC({

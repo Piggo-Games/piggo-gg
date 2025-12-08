@@ -156,7 +156,7 @@ export const InventorySystem: SystemBuilder<"InventorySystem"> = {
             } else {
               const { item, renderable } = itemEntity.components
 
-              if (renderable) renderable.visible = false
+              if (renderable) renderable.visible = item.dropped
               item.equipped = false
             }
           }
