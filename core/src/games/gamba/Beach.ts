@@ -4,7 +4,7 @@ import { Sprite } from "pixi.js"
 export const Beach = () => {
 
   const arenaWidth = 520
-  const arenaHeight = 210
+  const arenaHeight = 100
   const halfW = arenaWidth / 2
   const halfH = arenaHeight / 2
 

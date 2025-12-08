@@ -9,7 +9,7 @@ import { Beach } from "./Beach"
 import { BlueGuy } from "./enemies/BlueGuy"
 
 const arenaWidth = 520
-const arenaHeight = 210
+const arenaHeight = 100
 
 export type GambaState = {
   round: number
