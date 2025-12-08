@@ -5,10 +5,11 @@ import {
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, screenWH
 } from "@piggo-gg/core"
 import { Gary } from "./Gary"
-import { Sand } from "./Sand"
+import { Beach } from "./Beach"
+import { StarGuy } from "./enemies/StarGuy"
 
-const arenaWidth = 520
-const arenaHeight = 210
+const arenaWidth = 500
+const arenaHeight = 100
 
 export type GambaState = {
   round: number
@@ -52,7 +53,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       HtmlChat(),
       HtmlLagText(),
       HtmlFpsText(),
-      Sand(),
+      Beach(),
+      StarGuy()
       // Water2D()
     ]
   })
@@ -106,7 +108,8 @@ const Wall = (): Entity => {
       -halfW, halfH,
       -halfW + offset, -halfH
     ],
-    visible: false,
+    // fill: 0x0000ff,
+    // visible: true,
     group: "all"
   })
 }

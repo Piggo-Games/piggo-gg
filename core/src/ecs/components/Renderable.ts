@@ -1,4 +1,4 @@
-import { Component, Entity, PixiRenderer, World, XY, keys, values, Position, PixiSkins, Client } from "@piggo-gg/core"
+import { Component, Entity, PixiRenderer, World, XY, keys, values, Position, PixiSkins, Client, abs } from "@piggo-gg/core"
 import { AdvancedBloomFilter, BevelFilter, GlowFilter, GodrayFilter, OutlineFilter } from "pixi-filters"
 import { AnimatedSprite, BlurFilter, Container, Filter, Graphics, Sprite } from "pixi.js"
 
@@ -122,7 +122,7 @@ export const Renderable = (props: RenderableProps): Renderable => {
     prepareAnimations: (color: number = 0xffffff, alpha: number = 1) => {
       values(renderable.animations).forEach((animation: AnimatedSprite) => {
         animation.animationSpeed = 0.1
-        animation.scale.set(renderable.scale)
+        animation.scale.set(renderable.scale, abs(renderable.scale))
         animation.anchor.set(renderable.anchor.x, renderable.anchor.y)
         animation.texture.source.scaleMode = renderable.scaleMode
         animation.tint = color
@@ -283,7 +283,7 @@ export const Renderable = (props: RenderableProps): Renderable => {
       } else {
         const c = renderable.c as Sprite | Graphics
         if (c.texture) {
-          c.scale = props.scale ?? 1
+          if (props.scale) c.scale = props.scale
 
           // @ts-expect-error
           if (c.anchor) c.anchor.set(renderable.anchor.x, renderable.anchor.y)

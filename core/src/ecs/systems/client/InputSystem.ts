@@ -209,7 +209,7 @@ export const InputSystem = ClientSystemBuilder({
       // check for actions
       const { input, actions, position, inventory } = character.components
 
-      const { x, y, z } = position.data
+      const { x, y } = position.data
 
       // update position.pointing
       if (world.pixi) {
@@ -218,7 +218,7 @@ export const InputSystem = ClientSystemBuilder({
 
         const pointingDelta: XY = {
           x: mouse.x - x,
-          y: mouse.y - (y - z)
+          y: mouse.y - y
         }
 
         if (actions.actionMap["point"]) {
@@ -347,6 +347,28 @@ export const InputSystem = ClientSystemBuilder({
               tick: keyMouse.tick,
               world,
               delta: keyMouse.delta
+            })
+            if (invocation && activeItem.components.actions.actionMap[invocation.actionId]) {
+              invocation.playerId = client.playerId()
+              invocation.characterId = character.id
+              world.actions.push(world.tick, activeItem.id, invocation)
+            }
+          }
+        }
+
+        for (const keyUp in activeItem.components.input?.inputMap.release) {
+          const keyMouse = bufferUp.get(keyUp)
+
+          if (keyMouse) {
+            const invocation = activeItem.components.input?.inputMap.release[keyMouse.key]?.({
+              aim: localAim(),
+              character,
+              entity: activeItem,
+              hold: keyMouse.hold,
+              mouse,
+              client,
+              tick: world.tick,
+              world
             })
             if (invocation && activeItem.components.actions.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
