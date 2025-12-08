@@ -28,14 +28,14 @@ export const Water2D = (): Entity => {
         anchor: { x: 0, y: 0 },
         zIndex: 0,
         scaleMode: "nearest",
-        onRender: () => {
-          if (dMap) dMap.x += 0.2
-          if (dMap) dMap.x += 0.1
+        onRender: ({ delta, world }) => {
+          if (dMap) dMap.x = (world.tick + delta / 25) * 1
+          if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
         },
         setup: async (r) => {
 
           const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.3, strokeWidth: 1 } })
-            .fill({ color: 0x005599, alpha: 1 })
+            .fill({ color: 0x004099, alpha: 1 })
 
           dMap = new Sprite(await Assets.load("displacement_map.png"))
           dMap.texture.source.addressMode = "repeat"
