@@ -51,11 +51,11 @@ export const Beach = () => Entity({
 
 export const BeachWall = (): Entity => LineWall({
   id: "beach-wall", points: [
-    -w2 + offset, -h2 - 3,
-    w2 - offset, -h2 - 3,
+    -w2 + offset, -h2 - 1,
+    w2 - offset, -h2 - 1,
     w2, h2 - 3,
     -w2, h2 - 3,
-    -w2 + offset, -h2 - 3
+    -w2 + offset, -h2 - 1
   ],
   // fill: 0x0000ff,
   // visible: true,
