@@ -14,6 +14,8 @@ const arenaWidth = 500
 
 export type GambaState = {
   round: number
+  die1: number | null
+  die2: number | null
 }
 
 export type GambaSettings = {
@@ -30,7 +32,9 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       showControls: true
     },
     state: {
-      round: 1
+      round: 1,
+      die1: null,
+      die2: null
     },
     systems: [
       PhysicsSystem("local"),
