@@ -11,7 +11,7 @@ export const NumBoard = (): Entity => {
 
     const chars = numStr.length
 
-    let startX = chars === 1 ? 11 : 0
+    let startX = chars === 1 ? 33 - 15.5 : 0
 
     // hide everything
     for (const digit of values(digits)) {
@@ -62,12 +62,11 @@ export const NumBoard = (): Entity => {
             sprite.scale.set(3)
             sprite.texture.source.scaleMode = "nearest"
             r.c.addChild(sprite)
-            // digits.push(sprite)
+
             digits[key] = sprite
           }
 
           displayNumber(11)
-          console.log("NumBoard set up")
         }
       })
     }
