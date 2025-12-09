@@ -87,6 +87,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
       }),
       npc: NPC({
         behavior: (_, world) => {
+          const state = world.state<GambaState>()
+
           const { position, collider, item } = dice.components
 
           // should fly over bad guys
@@ -117,8 +119,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
           if (rolling) {
             sideAcc += factor
+            state[`die${order}`] = null
           } else if (!decided && item.dropped) {
-            const state = world.state<GambaState>()
             state[`die${order}`] = side
             decided = true
           }

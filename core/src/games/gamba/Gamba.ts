@@ -16,6 +16,7 @@ export type GambaState = {
   round: number
   die1: number | null
   die2: number | null
+  rolled: number | null
 }
 
 export type GambaSettings = {
@@ -34,7 +35,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     state: {
       round: 1,
       die1: null,
-      die2: null
+      die2: null,
+      rolled: null
     },
     systems: [
       PhysicsSystem("local"),
@@ -94,7 +96,17 @@ const GambaSystem = SystemBuilder({
       query: [],
       priority: 6,
       onTick: () => {
+        const state = world.state<GambaState>()
 
+        if (state.die1 && state.die2 && state.rolled === null) {
+          const result = state.die1 + state.die2
+          state.rolled = result
+          console.log(`Rolled a ${result}`)
+        }
+
+        if (state.die1 === null || state.die2 === null) {
+          state.rolled = null
+        }
       }
     }
   }
