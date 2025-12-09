@@ -1,0 +1,12 @@
+{
+  "frames": {
+    "0": {"frame": {"x": 0, "y": 0, "w": 32, "h": 32}},
+    "1": {"frame": {"x": 0, "y": 32, "w": 32, "h": 32}}
+  },
+  "meta": {
+    "image": "BoardGreen.png",
+    "format": "RGBA32",
+    "size": { "w": 32, "h": 64 },
+    "scale": "0.5"
+  }
+}
