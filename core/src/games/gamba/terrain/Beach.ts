@@ -69,13 +69,13 @@ export const OuterBeachWall = (): Entity => {
 
   return LineWall({
     id: "outer-beach-wall", points: [
-      -w + offset, -h - 8,
-      w - offset, -h - 8,
-      w + 8, h,
-      -w - 8, h,
-      -w + offset, -h - 8
+      -w + offset - 4, -h - 8,
+      w - offset + 4, -h - 8,
+      w + 12, h,
+      -w - 12, h,
+      -w + offset - 4, -h - 8
     ],
-    visible: true,
+    // visible: true,
     group: "all"
   })
 }

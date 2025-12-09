@@ -5,6 +5,7 @@ import {
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
   Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island, HDiv, Gamba
 } from "@piggo-gg/core"
+import { World as RapierWorld } from "@dimforge/rapier2d-compat"
 
 export type World = {
   actions: TickBuffer<InvokedAction>
@@ -19,6 +20,7 @@ export type World = {
   lastTick: DOMHighResTimeStamp
   messages: TickBuffer<string>
   mode: "client" | "server"
+  physics : undefined | RapierWorld
   pixi: PixiRenderer | undefined
   random: Random
   systems: Record<string, System>
@@ -89,6 +91,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     lastTick: 0,
     mode: mode ?? "client",
     pixi,
+    physics: undefined,
     random: Random(123456111),
     systems: {},
     three,
@@ -255,9 +258,9 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       // console.log("SETTING GAME", gameTitle)
 
       // remove old entities
-      values(world.entities).forEach((entity) => {
+      for (const entity of values(world.entities)) {
         if (!entity.persists) world.removeEntity(entity.id)
-      })
+      }
 
       for (const el of values(document.getElementsByClassName("lex"))) {
         el.remove()

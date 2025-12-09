@@ -298,7 +298,7 @@ export const PixiRenderSystem = ClientSystemBuilder({
 
           // world renderables
           const { velocity } = position.data
-          if ((velocity.x || velocity.y || velocity.z)) {
+          if ((velocity.x || velocity.y || velocity.z) || position.localVelocity.x || position.localVelocity.y || position.localVelocity.z) {
 
             const interpolated = position.interpolate(world, delta)
 
