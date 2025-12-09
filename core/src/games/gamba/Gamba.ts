@@ -9,6 +9,7 @@ import { Gary } from "./Gary"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
+import { NumBoard } from "./ui/NumBoard"
 
 const arenaWidth = 500
 
@@ -62,6 +63,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       StarGuy(),
       Water2D(),
 
+      NumBoard(),
+
       Cursor(),
       EscapeMenu(world),
       HtmlChat(),
@@ -101,7 +104,7 @@ const GambaSystem = SystemBuilder({
         if (state.die1 && state.die2 && state.rolled === null) {
           const result = state.die1 + state.die2
           state.rolled = result
-          console.log(`Rolled a ${result}`)
+          console.log(`rolled ${result}`)
         }
 
         if (state.die1 === null || state.die2 === null) {
