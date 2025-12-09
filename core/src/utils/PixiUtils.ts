@@ -18,6 +18,7 @@ export type pixiTextStyle = {
   fontWeight?: TextStyleFontWeight
   resolution?: number
 }
+
 export type pixiTextProps = { text: string, anchor?: XY, pos?: XY, style?: pixiTextStyle }
 
 export const pixiContainer = (): Container => new Container()
@@ -172,3 +173,5 @@ export const loadTexture = async (file: string): Promise<Record<string, any>> =>
 export const loadTextureCached = (file: string): Record<string, any> | undefined => {
   return textureCache[file]
 }
+
+export const load = async (url: string) => Assets.load(url)

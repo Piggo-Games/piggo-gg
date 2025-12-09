@@ -1,5 +1,5 @@
 import { Entity, pixiRect, Position, Renderable } from "@piggo-gg/core"
-import { Assets, BlurFilter, DisplacementFilter, Geometry, Sprite, TilingSprite } from "pixi.js"
+import { Assets, BlurFilter, DisplacementFilter, FillGradient, Geometry, Sprite, TilingSprite } from "pixi.js"
 
 export const Water2D = (): Entity => {
 
@@ -14,8 +14,6 @@ export const Water2D = (): Entity => {
 
   geometry.addAttribute("aPosition", positions)
   geometry.addIndex([0, 1, 2, 2, 3, 0])
-
-  let tiled: TilingSprite | undefined = undefined
 
   let dMap: Sprite | undefined = undefined
   let dFilter: DisplacementFilter | undefined = undefined
@@ -33,26 +31,31 @@ export const Water2D = (): Entity => {
           if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
         },
         setup: async (r) => {
-
-          const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.3, strokeWidth: 1 } })
-            .fill({ color: 0x004099, alpha: 1 })
+          const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.2, strokeWidth: 1 } })
+            .fill(new FillGradient({
+              colorStops: [
+                { offset: 0, color: 0x0050bb },
+                { offset: 0.07, color: 0x00254d },
+                { offset: 0.12, color: 0x000000 },
+              ]
+            }))
 
           dMap = new Sprite(await Assets.load("displacement_map.png"))
           dMap.texture.source.addressMode = "repeat"
 
-          const wave = Sprite.from(await Assets.load("night.png"))
-          tiled = new TilingSprite({
-            texture: wave.texture, width: 2000, height: 2000, alpha: 0.5,
+          const night = Sprite.from(await Assets.load("night.png"))
+          const stars = new TilingSprite({
+            texture: night.texture, width: 2000, height: 2000, alpha: 0.6,
             position: { x: -1000, y: -60 },
             tilePosition: { x: 207, y: -20 }
           })
 
-          dFilter = new DisplacementFilter({ sprite: dMap, scale: 30 })
-          const blurFilter = new BlurFilter({ strength: 1 })
+          stars.filters = [
+            new DisplacementFilter({ sprite: dMap, scale: 30 }),
+            new BlurFilter({ strength: 1 })
+          ]
 
-          tiled.filters = [dFilter, blurFilter]
-
-          r.c.addChild(dMap, area, tiled)
+          r.c.addChild(dMap, area, stars)
         }
       })
     }

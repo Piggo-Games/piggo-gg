@@ -10,9 +10,9 @@ export const StarGuy = (): Entity => {
       collider: Collider({
         shape: "ball", radius: 10, isStatic: true, group: "2"
       }),
-      shadow: Shadow(9, 0, -1),
+      shadow: Shadow(9, 0, 1),
       renderable: Renderable({
-        anchor: { x: 0.55, y: 0.9 },
+        anchor: { x: 0.5, y: 0.9 },
         scale: 1.8,
         zIndex: 4,
         interpolate: true,

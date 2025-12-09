@@ -62,7 +62,7 @@ const ShadowEntity = (target: Target, size: number, yOffset: number, xOffset: nu
   components: {
     position: Position(),
     renderable: Renderable({
-      zIndex: target.components.renderable.zIndex - 1,
+      zIndex: target.components.renderable.zIndex - 0.1,
       interpolate: true,
       onTick: ({ entity }) => {
         const { position, renderable } = entity.components

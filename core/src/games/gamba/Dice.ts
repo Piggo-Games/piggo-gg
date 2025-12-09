@@ -32,7 +32,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
     components: {
       networked: Networked(),
       debug: Debug(),
-      collider: Collider({ shape: "ball", radius: 4, group: "2", restitution: 1 }),
+      collider: Collider({ shape: "ball", radius: 3, group: "none", restitution: 1 }),
       position: Position({ follows: character.id, gravity: 0.12 }),
       item: Item({ name: "Dice" }),
       input: Input({
@@ -50,7 +50,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           }
         }
       }),
-      shadow: Shadow(3, 4),
+      shadow: Shadow(3.5, 4),
       actions: Actions({
         roll: ({ params }) => {
           if (!dice.components.position.data.follows) {
@@ -78,14 +78,15 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) + offset * 0.2 })
           dice.components.position.data.follows = null
           dice.components.item.dropped = true
+          dice.components.collider!.setGroup("2")
         }
       }),
       npc: NPC({
         behavior: (_, world) => {
-          const { position, collider } = dice.components
+          const { position, collider, item } = dice.components
 
           // should fly over bad guys
-          collider!.setGroup((position.data.z > 20) ? "3" : "2")
+          collider!.setGroup(!item.dropped ? "none" : (position.data.z > 20) ? "3" : "2")
 
           if (dice.components.renderable?.initialized && sides[side]) {
             for (const child of dice.components.renderable!.c.children) {

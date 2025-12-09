@@ -81,8 +81,8 @@ export const ItemSystem = SystemBuilder({
           const hyp_y = pointingDelta.y / hypotenuse
 
           position.data.offset = {
-            x: round(hyp_x * min(14, abs(pointingDelta.x)), 2),
-            y: round(hyp_y * min(12, abs(pointingDelta.y)) - 4, 2)
+            x: round(hyp_x * min(10, abs(pointingDelta.x)), 2),
+            y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
           }
         }
       }
