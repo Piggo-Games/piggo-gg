@@ -104,7 +104,6 @@ const GambaSystem = SystemBuilder({
         if (state.die1 && state.die2 && state.rolled === null) {
           const result = state.die1 + state.die2
           state.rolled = result
-          console.log(`rolled ${result}`)
         }
 
         if (state.die1 === null || state.die2 === null) {

@@ -26,7 +26,6 @@ export const NumBoard = (): Entity => {
       }
 
       const sprite = digits[key]
-      console.log("showing", key, sprite)
 
       sprite.x = startX + i * 11 * 3 - 16
       sprite.y = 0
