@@ -9,11 +9,15 @@ import { Gary } from "./Gary"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
+import { NumBoard } from "./ui/NumBoard"
 
 const arenaWidth = 500
 
 export type GambaState = {
   round: number
+  die1: number | null
+  die2: number | null
+  rolled: number | null
 }
 
 export type GambaSettings = {
@@ -30,7 +34,10 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       showControls: true
     },
     state: {
-      round: 1
+      round: 1,
+      die1: null,
+      die2: null,
+      rolled: null
     },
     systems: [
       PhysicsSystem("local"),
@@ -55,6 +62,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Flag(),
       StarGuy(),
       Water2D(),
+
+      NumBoard(),
 
       Cursor(),
       EscapeMenu(world),
@@ -90,7 +99,16 @@ const GambaSystem = SystemBuilder({
       query: [],
       priority: 6,
       onTick: () => {
+        const state = world.state<GambaState>()
 
+        if (state.die1 && state.die2 && state.rolled === null) {
+          const result = state.die1 + state.die2
+          state.rolled = result
+        }
+
+        if (state.die1 === null || state.die2 === null) {
+          state.rolled = null
+        }
       }
     }
   }

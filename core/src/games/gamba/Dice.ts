@@ -1,6 +1,7 @@
 import {
-  abs, Actions, Collider, Debug, Effects, Input, Item, ItemBuilder, ItemEntity,
-  loadTexture, max, min, Networked, NPC, PI, Position, randomChoice, Renderable, Shadow
+  abs, Actions, Collider, Debug, Effects, GambaState, Input,
+  Item, ItemBuilder, ItemEntity, loadTexture, max, min, Networked,
+  NPC, PI, Position, randomChoice, Renderable, Shadow
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -12,6 +13,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
   let rolling = false
   let bounced = false
   let landed = false
+  let decided = false
 
   let sides: Record<number, Sprite> = {}
   let side = 1
@@ -22,6 +24,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
     sideAcc = 0
     bounced = false
     landed = false
+    decided = false
+
     dice.components.item.dropped = false
   }
 
@@ -83,6 +87,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
       }),
       npc: NPC({
         behavior: (_, world) => {
+          const state = world.state<GambaState>()
+
           const { position, collider, item } = dice.components
 
           // should fly over bad guys
@@ -111,8 +117,14 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const factor = (grounded && bounced) ? 0.92 : 0.994
           position.scaleVelocity(factor, 8)
 
-          if (rolling) sideAcc += factor
-          // sideAcc += factor
+          if (rolling) {
+            sideAcc += factor
+            state[`die${order}`] = null
+          } else if (!decided && item.dropped) {
+            state[`die${order}`] = side
+            decided = true
+          }
+
           if (sideAcc > 12) {
             sideAcc = 0
             side = randomChoice([1, 2, 3, 4, 5, 6].filter(s => s !== side))

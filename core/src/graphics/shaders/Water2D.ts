@@ -34,9 +34,9 @@ export const Water2D = (): Entity => {
           const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.2, strokeWidth: 1 } })
             .fill(new FillGradient({
               colorStops: [
-                { offset: 0, color: 0x0050bb },
-                { offset: 0.07, color: 0x00254d },
-                { offset: 0.12, color: 0x000000 },
+                { offset: 0, color: 0x0050cb },
+                { offset: 0.07, color: 0x00255d },
+                { offset: 0.12, color: 0x000010 },
               ]
             }))
 
