@@ -31,7 +31,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         height: "fit-content",
         alignItems: props.direction === "row" ? "flex-end" : "center",
         transform: "translate(-50%)",
-        gap: "2vw",
+        gap: "3vh",
         // border: "1px solid red"
       }
     })
