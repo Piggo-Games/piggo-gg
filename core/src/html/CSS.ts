@@ -50,8 +50,8 @@ export type CSS = Partial<{
   overflowY: "visible" | "hidden" | "scroll" | "auto"
   padding: `${number}px` | `${number}%`,
   paddingBottom: `${number}px` | `${number}%`
-  paddingLeft: `${number}px` | `${number}%`
-  paddingRight: `${number}px` | `${number}%`
+  paddingLeft: `${number}px` | `${number}%` | `${number}vw` | `${number}vh`
+  paddingRight: `${number}px` | `${number}%` | `${number}vw` | `${number}vh`
   paddingTop: `${number}px` | `${number}%` | `${number}vw` | `${number}vh`
   pointerEvents: "none" | "auto"
   position: "absolute" | "relative" | "fixed" | "sticky" | "static"
