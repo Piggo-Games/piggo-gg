@@ -31,7 +31,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         height: "fit-content",
         alignItems: props.direction === "row" ? "flex-end" : "center",
         transform: "translate(-50%)",
-        gap: "30px",
+        gap: "3vh",
         // border: "1px solid red"
       }
     })
@@ -93,7 +93,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         }
       }
 
-      const label = KeyLabel(cluster.label, cluster.fontSize ?? "18px")
+      const label = KeyLabel(cluster.label, cluster.fontSize ?? "1.8vh")
       clusterDiv.appendChild(label)
     }
 
@@ -139,10 +139,10 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
   style: {
     position: "relative",
     width: "fit-content",
-    paddingRight: "12px",
-    paddingLeft: "12px",
-    height: "36px",
-    fontSize: "20px",
+    paddingRight: "1.2vh",
+    paddingLeft: "1.2vh",
+    height: "3.6vh",
+    fontSize: "2vh",
     ...ogButtonStyle
   }
 })
@@ -150,13 +150,13 @@ const KeyButton = (props: KeyButtonProps) => HtmlButton({
 const KeyImg = (src: string) => HImg({
   src,
   style: {
-    width: "36px",
+    width: "3.6vh",
     position: "relative",
     transform: "translate(0%)"
   }
 })
 
-const KeyLabel = (text: string, fontSize: `${number}px`) => HtmlText({
+const KeyLabel = (text: string, fontSize: `${number}px` | `${number}vh`) => HtmlText({
   text,
   style: {
     position: "relative",

@@ -57,7 +57,7 @@ export const ItemSystem = SystemBuilder({
     id: "ItemSystem",
     query: ["item", "renderable", "position"],
     priority: 5,
-    onRender: (entities: Entity<Item | Position | Renderable>[]) => {
+    onTick: (entities: Entity<Item | Position | Renderable>[]) => {
       for (const entity of entities) {
         const { position, item, renderable } = entity.components
         const { pointingDelta, rotation, follows } = position.data

@@ -1,7 +1,7 @@
 import {
   abs, Actions, Collider, Debug, Effects, GambaState, Input,
-  Item, ItemBuilder, ItemEntity, loadTexture, max, min, Networked,
-  NPC, PI, Position, randomChoice, Renderable, Shadow
+  Item, ItemBuilder, ItemEntity, loadTexture, max, min,
+  Networked, NPC, PI, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -127,7 +127,31 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
           if (sideAcc > 12) {
             sideAcc = 0
-            side = randomChoice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
+            side = world.random.choice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
+          }
+
+          // rolling logic
+          if (rolling) {
+            const speed = abs(position.data.velocity.x) + abs(position.data.velocity.y)
+
+            // if it rolls past 90deg, return to 0
+            if (position.data.rotation >= PI / 2) {
+              position.data.rotation = 0 + (position.data.rotation - PI / 2)
+            }
+
+            // if slow, stop flat
+            if (speed >= 60) {
+              position.rotate(min(0.3, speed * 0.003))
+            } else {
+              if (position.data.rotation <= 0.2) {
+                position.data.rotation = 0
+                rolling = false
+                return
+              }
+
+              const amount = max(0.09, speed * 0.003)
+              position.rotate(amount)
+            }
           }
         }
       }),
@@ -137,37 +161,6 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
         zIndex: 4,
         interpolate: true,
         rotates: true,
-        onRender: () => {
-          if (rolling) {
-            const { position } = dice.components
-
-            const factor = abs(position.data.velocity.x) + abs(position.data.velocity.y)
-
-            // if it rolls past 90deg, return to 0
-            if (position.data.rotation >= PI / 2) {
-              position.data.rotation = 0 + (position.data.rotation - PI / 2)
-            }
-
-            // if slow, stop flat
-            if (factor < 40) {
-
-              const flat = position.data.rotation % (PI / 2)
-              const flatCycle = position.data.rotation / (PI / 2)
-
-              if (flat > 0.02) {
-                position.rotate(max(0.02, flat * 0.001))
-                const curCycle = position.data.rotation / (PI / 2)
-                if (flatCycle !== curCycle) {
-                  position.data.rotation = curCycle * (PI / 2)
-                }
-              } else {
-                rolling = false
-              }
-              return
-            }
-            position.rotate(min(0.1, factor * 0.001))
-          }
-        },
         setup: async (r: Renderable) => {
           const textures = await loadTexture(`dice.json`)
 
