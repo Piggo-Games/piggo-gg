@@ -1,7 +1,7 @@
 import {
   abs, Actions, Collider, Debug, Effects, GambaState, Input,
-  Item, ItemBuilder, ItemEntity, loadTexture, max, min, Networked,
-  NPC, PI, Position, randomChoice, Renderable, Shadow
+  Item, ItemBuilder, ItemEntity, loadTexture, max, min,
+  Networked, NPC, PI, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
@@ -127,7 +127,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
 
           if (sideAcc > 12) {
             sideAcc = 0
-            side = randomChoice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
+            side = world.random.choice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
           }
 
           // rolling logic
