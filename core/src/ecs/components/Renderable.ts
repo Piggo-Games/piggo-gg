@@ -1,9 +1,9 @@
 import { Component, Entity, PixiRenderer, World, XY, keys, values, Position, PixiSkins, Client, abs } from "@piggo-gg/core"
-import { AdvancedBloomFilter, BevelFilter, GlowFilter, GodrayFilter, OutlineFilter } from "pixi-filters"
+import { AdvancedBloomFilter, BevelFilter, ColorOverlayFilter, GlowFilter, GodrayFilter, OutlineFilter } from "pixi-filters"
 import { AnimatedSprite, BlurFilter, Container, Filter, Graphics, Sprite } from "pixi.js"
 
 export type Dynamic = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client }) => void)
-export type DynamicDelta = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client, delta: number }) => void)
+export type DynamicDelta = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client, delta: number, since: number }) => void)
 
 export type Renderable = Component<"renderable", {
   desiredSkin: PixiSkins | null
@@ -51,6 +51,7 @@ export type Renderable = Component<"renderable", {
   setBlur: (_?: { strength?: number }) => void
   setGlow: (_?: { color?: number, quality?: number, innerStrength?: number, outerStrength?: number }) => void
   setOutline: (_?: { color: number, thickness: number }) => void
+  setOverlay: (_?: { alpha?: number, color?: number }) => void
   setRays: (_?: { gain?: number, alpha?: number, lacunarity?: number }) => void
   cleanup: () => void
 }
@@ -207,6 +208,13 @@ export const Renderable = (props: RenderableProps): Renderable => {
         renderable.filters["outline"] = new OutlineFilter({ thickness, color, quality: 1 })
         renderable.c.filters = values(renderable.filters)
       }
+    },
+    setOverlay: (props: { alpha?: number, color?: number } = {}) => {
+      const alpha = props.alpha ?? 0.5
+      const color = props.color ?? 0xffffff
+
+      renderable.filters["overlay"] = new ColorOverlayFilter({ color, alpha })
+      renderable.c.filters = values(renderable.filters)
     },
     setRays: (props: { gain?: number, alpha?: number, lacunarity?: number } = {}) => {
       const gain = props.gain ?? 0.5
