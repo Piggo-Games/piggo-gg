@@ -2,6 +2,7 @@ import {
   ClientSystemBuilder, DebugBounds, Entity, PixiCamera, Position, Renderable,
   TextBox, World, dummyPromise, logPerf, pixiGraphics, replaceCanvas, screenWH, values
 } from "@piggo-gg/core"
+import { ColorOverlayFilter } from "pixi-filters"
 import { Application, Graphics, Text } from "pixi.js"
 
 export type PixiRenderer = {
@@ -271,7 +272,7 @@ export const PixiRenderSystem = ClientSystemBuilder({
           updateScreenFixed(entity)
         }
       },
-      onRender(entities: Entity<Renderable | Position>[], delta) {
+      onRender(entities: Entity<Renderable | Position>[], delta, since) {
         const { pixi, client } = world
         if (!pixi || !client) return
 
@@ -279,13 +280,13 @@ export const PixiRenderSystem = ClientSystemBuilder({
           const { position, renderable } = entity.components
 
           if (renderable.onRender && renderable.initialized) {
-            renderable.onRender({ container: renderable.c, client, delta, entity, renderable, world })
+            renderable.onRender({ container: renderable.c, client, delta, entity, renderable, world, since })
           }
 
           // children onRender
           if (renderable.children && renderable.initialized) {
             for (const child of renderable.children) {
-              child.onRender?.({ container: child.c, entity, world, renderable: child, client, delta })
+              child.onRender?.({ container: child.c, entity, world, renderable: child, client, delta, since })
             }
           }
 
@@ -308,6 +309,15 @@ export const PixiRenderSystem = ClientSystemBuilder({
             }
 
             renderable.c.position.set(offset.x, offset.y - interpolated.z)
+          }
+
+          // color overlay filter
+          const filter = renderable.filters["overlay"] as ColorOverlayFilter
+          if (filter) {
+            const { alpha } = filter
+            if (alpha > 0) {
+              filter.alpha = Math.max(0, alpha - (since / 25 / 50))
+            }
           }
         }
       }
