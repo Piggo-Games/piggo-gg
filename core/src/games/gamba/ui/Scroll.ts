@@ -16,6 +16,16 @@ export const Scroll = (): Entity => {
           const t = await load("scroll.png")
 
           r.c = new Sprite(t)
+
+          r.c.eventMode = "dynamic"
+
+          r.c.onmouseenter = () => {
+            r.setOverlay({ color: 0xffffaa, alpha: 0.5 })
+            console.log("hovered scroll")
+          }
+          r.c.onmouseleave = () => {
+            // r.setOverlay(null)
+          }
         }
       })
     }

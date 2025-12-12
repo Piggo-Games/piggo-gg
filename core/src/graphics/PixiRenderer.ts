@@ -290,6 +290,15 @@ export const PixiRenderSystem = ClientSystemBuilder({
             }
           }
 
+          // color overlay filter
+          const filter = renderable.filters["overlay"] as ColorOverlayFilter
+          if (filter) {
+            const { alpha } = filter
+            if (alpha > 0) {
+              filter.alpha = Math.max(0, alpha - (since / 25 / 50))
+            }
+          }
+
           if (!renderable.rendered || !renderable.interpolate) continue
 
           // UI renderables
@@ -309,15 +318,6 @@ export const PixiRenderSystem = ClientSystemBuilder({
             }
 
             renderable.c.position.set(offset.x, offset.y - interpolated.z)
-          }
-
-          // color overlay filter
-          const filter = renderable.filters["overlay"] as ColorOverlayFilter
-          if (filter) {
-            const { alpha } = filter
-            if (alpha > 0) {
-              filter.alpha = Math.max(0, alpha - (since / 25 / 50))
-            }
           }
         }
       }
