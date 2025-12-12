@@ -1,24 +1,24 @@
 import { Entity, load, Position, Renderable } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-export const Pier = (): Entity => {
+export const Scroll = (): Entity => {
 
-  const pier = Entity({
-    id: `pier`,
+  const scroll = Entity({
+    id: `scroll`,
     components: {
       position: Position({
-        y: 97, x: -140
+        y: 90, x: 0
       }),
       renderable: Renderable({
         zIndex: 2,
-        scale: 3,
+        scale: 2,
         setup: async (r) => {
-          const t = await load("pier.png")
+          const t = await load("scroll.png")
 
           r.c = new Sprite(t)
         }
       })
     }
   })
-  return pier
+  return scroll
 }

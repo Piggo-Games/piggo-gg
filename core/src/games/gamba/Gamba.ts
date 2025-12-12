@@ -10,6 +10,7 @@ import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
+import { Scroll } from "./ui/Scroll"
 
 const arenaWidth = 500
 
@@ -66,6 +67,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Water2D(),
 
       NumBoard(),
+      Scroll(),
 
       Cursor(),
       EscapeMenu(world),
