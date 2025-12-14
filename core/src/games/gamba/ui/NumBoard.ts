@@ -78,7 +78,7 @@ export const NumBoard = (): Entity => {
             digits[key] = sprite
           }
 
-          displayNumber(11)
+          displayNumber(0)
         }
       })
     }

@@ -1,5 +1,5 @@
 import {
-  abs, Actions, Collider, Debug, Effects, GambaState, Input,
+  abs, Actions, Collider, D6, Debug, Effects, GambaState, Input,
   Item, ItemBuilder, ItemEntity, loadTexture, max, min,
   Networked, NPC, PI, Position, Renderable, Shadow
 } from "@piggo-gg/core"
@@ -121,7 +121,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
             sideAcc += factor
             state[`die${order}`] = null
           } else if (!decided && item.dropped) {
-            state[`die${order}`] = side
+            state[`die${order}`] = side as D6
             decided = true
           }
 
