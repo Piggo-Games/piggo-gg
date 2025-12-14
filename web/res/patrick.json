@@ -10,7 +10,7 @@
     "idle8": {"frame": {"x": 0, "y": 210, "w": 34, "h": 30}}
   },
   "meta": {
-    "image": "StarGuy.png",
+    "image": "patrick.png",
     "format": "RGBA8888",
     "size": { "w": 34, "h": 240 },
     "scale": "1"
