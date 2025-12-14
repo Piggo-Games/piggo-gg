@@ -69,7 +69,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Patrick(),
       Water2D(),
 
-      DummyPlayer(),
+      // DummyPlayer(),
 
       NumBoard(),
       Scroll(),
