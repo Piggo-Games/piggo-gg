@@ -9,6 +9,11 @@ const ignoreActions = ["point"]
 const otherCharacter = (id: string, world: World) => {
   if (id === world.client?.character()?.id) return false
   if (id.startsWith("carl") || id.startsWith("vince") || id.startsWith("sarge") || id.startsWith("gary")) return true
+
+  // check if it follows a character
+  // const entity = world.entity(id)
+  // if (entity && entity.components.position?.data.follows?.startsWith("gary")) return true
+
   return false
 }
 
