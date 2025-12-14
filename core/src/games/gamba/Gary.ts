@@ -12,7 +12,7 @@ export const Gary = (player: Player): Character => {
     components: {
       debug: Debug(),
       position: Position({ x: -140, speed: 120, gravity: 0.3, velocityResets: 1 }),
-      collider: Collider({ shape: "ball", radius: 6, group: "notself" }),
+      collider: Collider({ shape: "ball", radius: 6, group: "notme2" }),
       networked: Networked(),
       team: Team(player.components.team.data.team),
       inventory: Inventory([Dice(1), Dice(2)]),

@@ -13,7 +13,7 @@ export const Bot = (team: TeamNumber, pos: PositionProps): Entity<Position | Tea
       debug: Debug(),
       position: Position({ velocityResets: 1, speed: 120, gravity: 0.3, ...pos }),
       networked: Networked(),
-      collider: Collider({ shape: "ball", radius: 4, group: "notself" }),
+      collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
       team: Team(team),
       actions: Actions({
         move: Move,

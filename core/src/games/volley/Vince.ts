@@ -14,7 +14,7 @@ export const Vince = (player: Player) => Character({
       velocityResets: 1, speed: 125, gravity: 0.3
     }),
     networked: Networked(),
-    collider: Collider({ shape: "ball", radius: 4, group: "notself" }),
+    collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
     team: Team(player.components.team.data.team),
     input: Input({
       release: {
