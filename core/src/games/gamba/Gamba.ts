@@ -1,9 +1,8 @@
 import {
-  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
-  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
-  PixiNametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
-  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, World, screenWH,
-  DummyPlayer
+  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
+  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
+  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, ShadowSystem,
+  SpawnSystem, SystemBuilder, Water2D, World, screenWH, DummyPlayer
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
@@ -31,9 +30,9 @@ export type GambaSettings = {
 }
 
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "gamba",
+  id: "6-7",
   init: (world) => ({
-    id: "gamba",
+    id: "6-7",
     netcode: "rollback",
     renderer: "pixi",
     settings: {
