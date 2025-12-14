@@ -30,9 +30,9 @@ export type GambaSettings = {
 }
 
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "6-7",
+  id: "67",
   init: (world) => ({
-    id: "6-7",
+    id: "67",
     netcode: "rollback",
     renderer: "pixi",
     settings: {

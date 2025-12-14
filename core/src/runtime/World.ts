@@ -82,7 +82,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       "island": Island,
       "craft": Craft,
       "lobby": Lobby,
-      "6-7": Gamba,
+      "67": Gamba,
       "strike": Strike,
       "volley": Volley,
       "volley3d": Volley3d,
@@ -187,7 +187,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.tick += 1
       world.time = now
 
-      if (world.client?.discord) world.setGame("6-7")
+      if (world.client?.discord) world.setGame("67")
       world.client?.discord?.login(world.client)
 
       // store serialized entities
