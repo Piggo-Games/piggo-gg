@@ -175,10 +175,10 @@ export const PixiRenderSystem = ClientSystemBuilder({
           const { position, renderable } = entity.components
 
           // render if skin changed
-          if (renderable.currentSkin && renderable.currentSkin !== renderable.data.desiredSkin) {
-            renderable.c.removeChildren()
-            renderable.rendered = false
-          }
+          // if (renderable.currentSkin && renderable.currentSkin !== renderable.data.desiredSkin) {
+          //   renderable.c.removeChildren()
+          //   renderable.rendered = false
+          // }
 
           // render if new entity
           if (!renderable.rendered) {
@@ -252,7 +252,7 @@ export const PixiRenderSystem = ClientSystemBuilder({
             renderable.bufferedAnimation = ""
           }
 
-          // set visible
+          // set visibility
           if (renderable.c.renderable !== renderable.visible) renderable.c.renderable = renderable.visible
         }
         logPerf("render loop", time)
