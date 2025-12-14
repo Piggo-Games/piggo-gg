@@ -81,7 +81,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
             text: title,
             pos: { x: 0, y: -14 },
             anchor: { x: 0.5, y: 0 },
-            style: { fontSize: 6, fill: textColor, align: "center", resolution: 16 }
+            style: { fontSize: 5, fill: textColor, align: "center", resolution: 16 }
           })
 
           const descriptionText = pixiText({
