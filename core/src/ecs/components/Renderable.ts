@@ -120,8 +120,6 @@ export const Renderable = (props: RenderableProps): Renderable => {
         animation.texture.source.scaleMode = renderable.scaleMode
         animation.tint = color
         animation.alpha = alpha
-
-        renderable.c.addChild(animation)
       }
       renderable.bufferedAnimation = keys(renderable.animations)[0]
     },
