@@ -56,10 +56,11 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
       }),
       shadow: Shadow(3.5, 4),
       actions: Actions({
-        roll: ({ params }) => {
+        roll: ({ params, world }) => {
           if (!dice.components.position.data.follows) {
             dice.components.position.data.follows = character.id
             reset()
+            world.actions.push(world.tick + 2, id, { actionId: "roll", params })
             return
           }
 
@@ -76,10 +77,10 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 30
           const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 30
 
-          const { position: cpos } = character.components
+          const charZ = character.components.position.data.z
 
-          dice.components.position.data.z = 0.01 + cpos.data.z
-          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) + offset * 0.2 })
+          dice.components.position.data.z = 0.01 + charZ
+          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - charZ) + offset * 0.2 })
           dice.components.position.data.follows = null
           dice.components.item.dropped = true
           dice.components.collider!.setGroup("2")
