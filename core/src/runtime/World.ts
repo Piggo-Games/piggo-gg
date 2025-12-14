@@ -187,7 +187,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.tick += 1
       world.time = now
 
-      world.client?.discord?.login(world.client)
+      if (world.client?.discord) world.setGame("gamba")
+      // world.client?.discord?.login(world.client)
 
       // store serialized entities
       world.entitiesAtTick[world.tick] = {}
@@ -254,6 +255,8 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     },
     setGame: (gameTitle: GameTitle) => {
       const game = world.games[gameTitle]
+
+      if (gameTitle === world.game.id) return
 
       // console.log("SETTING GAME", gameTitle)
 

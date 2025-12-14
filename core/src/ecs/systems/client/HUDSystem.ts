@@ -10,6 +10,7 @@ type Cluster = {
 
 export type HUDSystemProps = {
   direction?: "column" | "row"
+  from?: { top: number, left: number }
   clusters: Cluster[]
 }
 
@@ -35,6 +36,13 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         // border: "1px solid red"
       }
     })
+
+    if (props.from) {
+      wrapper.style.top = `${props.from.top}px`
+      wrapper.style.left = `${props.from.left}px`
+      wrapper.style.bottom = ""
+      wrapper.style.transform = "translate(0%)"
+    }
 
     document.getElementById("canvas-parent")?.append(wrapper)
 

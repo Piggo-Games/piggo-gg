@@ -2,7 +2,7 @@ import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
   NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
-  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
+  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, World, screenWH
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
@@ -51,7 +51,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       SpawnSystem({ spawner: Gary, pos: { x: 0, y: 0, z: 0 } }),
       GambaSystem,
       PixiRenderSystem,
-      HUDSystem(controls),
+      HUDSystem(controls(world)),
       PixiCameraSystem(),
       PixiDebugSystem,
       InventorySystem,
@@ -139,8 +139,9 @@ const GambaSystem = SystemBuilder({
   }
 })
 
-const controls: HUDSystemProps = {
-  direction: "row",
+const controls = (world: World): HUDSystemProps => ({
+  direction: world.client?.discord ? "row" : "column",
+  ...(world.client?.discord ? { from: { top: 20, left: 20 } } : {}),
   clusters: [
     {
       label: "roll",
@@ -158,4 +159,4 @@ const controls: HUDSystemProps = {
       buttons: [["esc"]]
     }
   ]
-}
+})
