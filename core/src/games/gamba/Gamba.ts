@@ -1,7 +1,7 @@
 import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
-  NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
+  PixiNametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, World, screenWH
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
@@ -57,7 +57,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       InventorySystem,
       ItemSystem,
       ShadowSystem,
-      NametagSystem
+      PixiNametagSystem
     ],
     entities: [
       Background({ rays: true }),

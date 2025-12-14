@@ -3,15 +3,15 @@ import {
   Position, Renderable, TeamColors, entries, pixiText
 } from "@piggo-gg/core"
 
-export const NametagSystem = ClientSystemBuilder({
-  id: "NametagSystem",
+export const PixiNametagSystem = ClientSystemBuilder({
+  id: "PixiNametagSystem",
   init: (world) => {
 
     const nametags: Record<string, Entity<Renderable | Position>> = {}
     const characters: Record<string, Character> = {}
 
     return {
-      id: "NametagSystem",
+      id: "PixiNametagSystem",
       query: ["pc"],
       priority: 6,
       skipOnRollback: true,
