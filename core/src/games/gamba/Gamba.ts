@@ -10,7 +10,7 @@ import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
-import { Scroll } from "./ui/Scroll"
+import { Scroll, ScrollProps } from "./ui/Scroll"
 
 const arenaWidth = 500
 
@@ -28,6 +28,23 @@ export type GambaState = {
 export type GambaSettings = {
   showControls: boolean
 }
+
+const scrollAbilities: ScrollProps[] = [
+  {
+    id: "rally",
+    title: "Rally",
+    description: "allies take 1 less DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 10, y: 100 }
+  },
+  {
+    id: "slice",
+    title: "Slice",
+    description: "enemies take 1D6 extra DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 110, y: 100 }
+  }
+]
 
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
   id: "67",
@@ -72,7 +89,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       // DummyPlayer(),
 
       NumBoard(),
-      Scroll(),
+      ...scrollAbilities.map((scroll) => Scroll(scroll)),
 
       Cursor(),
       EscapeMenu(world),
