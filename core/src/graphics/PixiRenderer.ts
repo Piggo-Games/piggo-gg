@@ -174,12 +174,6 @@ export const PixiRenderSystem = ClientSystemBuilder({
         for (const entity of entities) {
           const { position, renderable } = entity.components
 
-          // render if skin changed
-          // if (renderable.currentSkin && renderable.currentSkin !== renderable.data.desiredSkin) {
-          //   renderable.c.removeChildren()
-          //   renderable.rendered = false
-          // }
-
           // render if new entity
           if (!renderable.rendered) {
             renderNewEntity(entity)
