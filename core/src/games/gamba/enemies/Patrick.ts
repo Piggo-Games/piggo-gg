@@ -1,9 +1,9 @@
 import { Collider, Debug, Entity, loadTexture, pixiAnimation, Position, Renderable, Shadow } from "@piggo-gg/core"
 
-export const StarGuy = (): Entity => {
+export const Patrick = (): Entity => {
 
-  const star = Entity({
-    id: "blue-guy",
+  const patrick = Entity({
+    id: "patrick",
     components: {
       position: Position({ x: 140 }),
       debug: Debug(),
@@ -26,10 +26,20 @@ export const StarGuy = (): Entity => {
               [1, 2, 3, 4, 5, 6, 7, 8].map(i => t[`idle${i}`])
             )
           }
+
+          // r.setOverlay({ color: 0xffffaa, alpha: 10 })
+
+          r.c.eventMode = "dynamic"
+
+          r.c.onmouseenter = () => {
+            r.setOverlay({ color: 0xffffaa, alpha: 0.5 })
+            // hovering = true
+            console.log("hover")
+          }
         }
       })
     }
   })
 
-  return star
+  return patrick
 }

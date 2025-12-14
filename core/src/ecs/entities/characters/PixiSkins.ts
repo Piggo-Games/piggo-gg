@@ -10,7 +10,7 @@ export const ChangeSkin = Action<{ skin: PixiSkins }>("changeSkin", ({ params, e
   const { renderable } = entity.components
   if (!renderable) return
 
-  renderable.data.desiredSkin = skin
+  // renderable.data.desiredSkin = skin
 })
 
 export const DudeSkin = (color: "red" | "blue" | "white"): PixiSkin => async (r) => {

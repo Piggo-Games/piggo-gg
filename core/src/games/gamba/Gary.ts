@@ -58,7 +58,6 @@ export const Gary = (player: Player): Character => {
         zIndex: 4,
         interpolate: true,
         scaleMode: "nearest",
-        skin: "dude-white",
         setup: async (renderable) => {
           await PixiSkins["dude-white"](renderable)
         },

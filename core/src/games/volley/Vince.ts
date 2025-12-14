@@ -73,9 +73,8 @@ export const Vince = (player: Player) => Character({
       zIndex: 4,
       interpolate: true,
       scaleMode: "nearest",
-      skin: (player.components.pc.data.name.startsWith("noob")) ? "dude-white" : "ghost",
       setup: async (r) => {
-        await PixiSkins[r.data.desiredSkin ?? "dude-white"](r)
+        await PixiSkins["dude-white"](r)
       },
       animationSelect: VolleyCharacterAnimations,
       onTick: VolleyCharacterDynamic

@@ -1,13 +1,11 @@
-import { Component, Entity, PixiRenderer, World, XY, keys, values, Position, PixiSkins, Client, abs } from "@piggo-gg/core"
+import { Component, Entity, PixiRenderer, World, XY, keys, values, Position, Client, abs } from "@piggo-gg/core"
 import { AdvancedBloomFilter, BevelFilter, ColorOverlayFilter, GlowFilter, GodrayFilter, OutlineFilter } from "pixi-filters"
 import { AnimatedSprite, BlurFilter, Container, Filter, Graphics, Sprite } from "pixi.js"
 
 export type Dynamic = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client }) => void)
 export type DynamicDelta = ((_: { container: Container, renderable: Renderable, entity: Entity<Renderable | Position>, world: World, client: Client, delta: number, since: number }) => void)
 
-export type Renderable = Component<"renderable", {
-  desiredSkin: PixiSkins | null
-}> & {
+export type Renderable = Component<"renderable"> & {
   activeAnimation: string
   anchor: XY
   animation: AnimatedSprite | undefined
@@ -18,7 +16,6 @@ export type Renderable = Component<"renderable", {
   c: Container
   children: Renderable[] | undefined
   cullable: boolean
-  currentSkin: PixiSkins | null
   color: number
   filters: Record<string, Filter>
   interactiveChildren: boolean
@@ -72,7 +69,6 @@ export type RenderableProps = {
   rotates?: boolean
   scale?: number
   scaleMode?: "nearest" | "linear"
-  skin?: PixiSkins
   visible?: boolean
   zIndex?: number
   onRender?: DynamicDelta
@@ -86,9 +82,6 @@ export const Renderable = (props: RenderableProps): Renderable => {
 
   const renderable: Renderable = {
     type: "renderable",
-    data: {
-      desiredSkin: props.skin ?? null
-    },
     activeAnimation: "",
     anchor: props.anchor ?? { x: 0.5, y: 0.5 },
     animation: undefined,
@@ -101,7 +94,6 @@ export const Renderable = (props: RenderableProps): Renderable => {
     color: props.color ?? 0xffffff,
     children: undefined,
     cullable: props.cullable ?? false,
-    currentSkin: null,
     filters: {},
     initialized: false,
     interactiveChildren: props.interactiveChildren ?? false,
@@ -121,24 +113,24 @@ export const Renderable = (props: RenderableProps): Renderable => {
     visible: props.visible ?? true,
     zIndex: props.zIndex ?? 0,
     prepareAnimations: (color: number = 0xffffff, alpha: number = 1) => {
-      values(renderable.animations).forEach((animation: AnimatedSprite) => {
+      for (const animation of values(renderable.animations)) {
         animation.animationSpeed = 0.1
         animation.scale.set(renderable.scale, abs(renderable.scale))
         animation.anchor.set(renderable.anchor.x, renderable.anchor.y)
         animation.texture.source.scaleMode = renderable.scaleMode
         animation.tint = color
         animation.alpha = alpha
-      })
+      }
       renderable.bufferedAnimation = keys(renderable.animations)[0]
     },
     setScale: (xy: XY) => {
       const { x, y } = xy
       if (keys(renderable.animations).length) {
-        values(renderable.animations).forEach((animation: AnimatedSprite) => {
+        for (const animation of values(renderable.animations)) {
           if (x != animation.scale.x || y != animation.scale.y) {
             animation.scale.set(x * renderable.scale, y * renderable.scale)
           }
-        })
+        }
       } else {
         renderable.c.scale.set(x * renderable.scale, y * renderable.scale)
       }
@@ -300,8 +292,6 @@ export const Renderable = (props: RenderableProps): Renderable => {
           if (c.texture.source) c.texture.source.scaleMode = props.scaleMode ?? "nearest"
         }
       }
-      renderable.currentSkin = renderable.data.desiredSkin
-
       renderable.initialized = true
     }
   }

@@ -1,10 +1,10 @@
 import {
-  Background, Character, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
+  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
   NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
 } from "@piggo-gg/core"
-import { StarGuy } from "./enemies/StarGuy"
+import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
@@ -63,7 +63,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Beach(),
       Pier(),
       Flag(),
-      StarGuy(),
+      Patrick(),
       Water2D(),
 
       NumBoard(),
