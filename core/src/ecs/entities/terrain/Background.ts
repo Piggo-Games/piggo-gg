@@ -20,7 +20,6 @@ export const Background = ({ img, json, rays, moving, follow }: BackgroundProps 
       onRender: ({ renderable, since }) => {
         if (moving) {
           const tile = renderable.c as TilingSprite
-          // tile.tilePosition.x = (world.tick + delta / 25) * 0.5
           tile.tilePosition.x += since / 25 * 0.5
         }
       },

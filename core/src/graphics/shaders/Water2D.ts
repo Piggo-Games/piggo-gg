@@ -16,7 +16,6 @@ export const Water2D = (): Entity => {
   geometry.addIndex([0, 1, 2, 2, 3, 0])
 
   let dMap: Sprite | undefined = undefined
-  let dFilter: DisplacementFilter | undefined = undefined
 
   const water2D = Entity({
     id: `water2D`,
@@ -26,9 +25,7 @@ export const Water2D = (): Entity => {
         anchor: { x: 0, y: 0 },
         zIndex: 0,
         scaleMode: "nearest",
-        onRender: ({ delta, world, since }) => {
-          // if (dMap) dMap.x = (world.tick + delta / 25) * 1
-          // if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
+        onRender: ({ since }) => {
           if (dMap) dMap.x += since / 25 * 1
           if (dMap) dMap.y += since / 25 * 0.7
         },
