@@ -3,15 +3,15 @@ import {
   Position, Renderable, TeamColors, entries, pixiText
 } from "@piggo-gg/core"
 
-export const NametagSystem = ClientSystemBuilder({
-  id: "NametagSystem",
+export const PixiNametagSystem = ClientSystemBuilder({
+  id: "PixiNametagSystem",
   init: (world) => {
 
     const nametags: Record<string, Entity<Renderable | Position>> = {}
     const characters: Record<string, Character> = {}
 
     return {
-      id: "NametagSystem",
+      id: "PixiNametagSystem",
       query: ["pc"],
       priority: 6,
       skipOnRollback: true,
@@ -63,11 +63,12 @@ const Nametag = (player: Player, character: Character) => {
   let { name } = player.components.pc.data
   let { team } = player.components.team.data
 
+  // TODO scale with camera zoom
   const render = () => pixiText({
     text: name,
-    style: { fill: TeamColors[team], fontSize: 12, dropShadow: true },
+    style: { fill: TeamColors[team], fontSize: 12, dropShadow: true, scale: 1 },
     anchor: { x: 0.45, y: 0 },
-    pos: { x: 0, y: -44 },
+    pos: { x: 0, y: -44 }
   })
 
   return Entity<Position | Renderable>({

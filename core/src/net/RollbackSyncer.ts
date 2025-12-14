@@ -8,7 +8,12 @@ const ignoreActions = ["point"]
 
 const otherCharacter = (id: string, world: World) => {
   if (id === world.client?.character()?.id) return false
-  if (id.startsWith("carl") || id.startsWith("vince") || id.startsWith("sarge")) return true
+  if (id.startsWith("carl") || id.startsWith("vince") || id.startsWith("sarge") || id.startsWith("gary")) return true
+
+  // check if it follows a character
+  // const entity = world.entity(id)
+  // if (entity && entity.components.position?.data.follows?.startsWith("gary")) return true
+
   return false
 }
 
@@ -171,7 +176,7 @@ export const RollbackSyncer = (world: World): Syncer => {
           // check remote has each action
           for (const action of localActions[entityId]) {
             if (!ignoreActions.includes(action.actionId) && actions.find((a) => a.actionId === action.actionId) === undefined) {
-              mustRollback(`action not found remotely entity:${entityId} action:${action.actionId}`)
+              mustRollback(`action not at remote entity:${entityId} action:${action.actionId}`)
               break
             }
           }

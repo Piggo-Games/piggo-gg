@@ -141,6 +141,10 @@ const controls: HUDSystemProps = {
     {
       label: "jump",
       buttons: [["spacebar"]]
+    },
+    {
+      label: "menu",
+      buttons: [["esc"]]
     }
   ]
 }

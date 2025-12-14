@@ -12,6 +12,7 @@ export type pixiTextStyle = {
   align?: "left" | "center" | "right"
   alpha?: number
   dropShadow?: boolean
+  scale?: number
   fill?: number
   fontFamily?: string
   fontSize?: number
@@ -56,6 +57,7 @@ export const pixiText = ({ text, pos, style, anchor }: pixiTextProps): Text => {
     anchor: anchor ?? 0,
     position: pos ?? { x: 0, y: 0 },
     resolution: style?.resolution ?? 4,
+    scale: style?.scale ?? 1,
     alpha: style?.alpha ?? 1,
     style: {
       align: style?.align ?? "left",

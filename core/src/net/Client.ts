@@ -13,7 +13,8 @@ const servers: Record<ENV, string> = {
   // local: `${DiscordDomain}/.proxy/api`,
   dev: "piggo-api-staging.up.railway.app",
   production: "api.piggo.gg",
-  discord: `${DiscordDomain}/.proxy/api`
+  discord: `${DiscordDomain}/.proxy/api`,
+  // discord: `${DiscordDomain}/.proxy/api-local`
 } as const
 
 const environments: Record<string, ENV> = {
@@ -71,7 +72,7 @@ export type Client = {
   playerId: () => string
   playerName: () => string
   character: () => Character | undefined
-  lobbyCreate: (game: GameTitle, callback?: Callback<LobbyCreate>) => void
+  lobbyCreate: (game?: GameTitle, callback?: Callback<LobbyCreate>) => void
   lobbyJoin: (lobbyId: string, callback: Callback<LobbyJoin>) => void
   lobbyLeave: () => void
   lobbyList: (callback: Callback<LobbyList>) => void
@@ -199,7 +200,7 @@ export const Client = ({ world }: ClientProps): Client => {
     lobbyCreate: (game, callback) => {
       request<LobbyCreate>({
         route: "lobby/create", type: "request", id: randomHash(),
-        game, playerName: client.playerName(), lobbyId: client.discord?.sdk.instanceId ?? ""
+        game: game ?? world.game.id, playerName: client.playerName(), lobbyId: client.discord?.sdk.instanceId ?? ""
       }, (response) => {
         if ("error" in response) {
           console.error("failed to create lobby:", response.error)
@@ -397,7 +398,7 @@ export const Client = ({ world }: ClientProps): Client => {
       client.net.connected = true
 
       if (client.discord?.loggedIn) {
-        client.lobbyCreate("lobby")
+        client.lobbyCreate()
       }
 
       if (localStorage) {

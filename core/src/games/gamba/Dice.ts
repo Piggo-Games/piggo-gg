@@ -1,5 +1,5 @@
 import {
-  abs, Actions, Collider, Debug, Effects, GambaState, Input,
+  abs, Actions, Collider, D6, Data, Debug, Effects, GambaState, Input,
   Item, ItemBuilder, ItemEntity, loadTexture, max, min,
   Networked, NPC, PI, Position, Renderable, Shadow
 } from "@piggo-gg/core"
@@ -16,6 +16,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
   let decided = false
 
   let sides: Record<number, Sprite> = {}
+
   let side = 1
   let sideAcc = 0
 
@@ -36,6 +37,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
     components: {
       networked: Networked(),
       debug: Debug(),
+      data: Data({ data: { side, sideAcc } }),
       collider: Collider({ shape: "ball", radius: 3, group: "none", restitution: 1 }),
       position: Position({ follows: character.id, gravity: 0.12 }),
       item: Item({ name: "Dice" }),
@@ -56,10 +58,11 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
       }),
       shadow: Shadow(3.5, 4),
       actions: Actions({
-        roll: ({ params }) => {
+        roll: ({ params, world }) => {
           if (!dice.components.position.data.follows) {
             dice.components.position.data.follows = character.id
             reset()
+            world.actions.push(world.tick + 2, id, { actionId: "roll", params })
             return
           }
 
@@ -76,10 +79,10 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 30
           const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 30
 
-          const { position: cpos } = character.components
+          const charZ = character.components.position.data.z
 
-          dice.components.position.data.z = 0.01 + cpos.data.z
-          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - cpos.data.z) + offset * 0.2 })
+          dice.components.position.data.z = 0.01 + charZ
+          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - charZ) + offset * 0.2 })
           dice.components.position.data.follows = null
           dice.components.item.dropped = true
           dice.components.collider!.setGroup("2")
@@ -121,7 +124,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
             sideAcc += factor
             state[`die${order}`] = null
           } else if (!decided && item.dropped) {
-            state[`die${order}`] = side
+            state[`die${order}`] = side as D6
             decided = true
           }
 

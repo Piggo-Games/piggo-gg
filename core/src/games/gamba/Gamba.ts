@@ -1,8 +1,8 @@
 import {
-  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
-  HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
-  NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
-  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
+  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
+  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
+  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, ShadowSystem,
+  SpawnSystem, SystemBuilder, Water2D, World, screenWH, DummyPlayer
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
@@ -14,12 +14,15 @@ import { Scroll } from "./ui/Scroll"
 
 const arenaWidth = 500
 
+export type D6 = 1 | 2 | 3 | 4 | 5 | 6
+export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
+
 export type GambaState = {
   round: number
   shooter: string | null
-  die1: number | null
-  die2: number | null
-  rolled: number | null
+  die1: D6 | null
+  die2: D6 | null
+  rolled: null | Roll
 }
 
 export type GambaSettings = {
@@ -27,9 +30,9 @@ export type GambaSettings = {
 }
 
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "gamba",
+  id: "67",
   init: (world) => ({
-    id: "gamba",
+    id: "67",
     netcode: "rollback",
     renderer: "pixi",
     settings: {
@@ -48,13 +51,13 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       SpawnSystem({ spawner: Gary, pos: { x: 0, y: 0, z: 0 } }),
       GambaSystem,
       PixiRenderSystem,
-      HUDSystem(controls),
+      HUDSystem(controls(world)),
       PixiCameraSystem(),
       PixiDebugSystem,
       InventorySystem,
       ItemSystem,
       ShadowSystem,
-      NametagSystem
+      PixiNametagSystem
     ],
     entities: [
       Background({ rays: true }),
@@ -65,6 +68,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Flag(),
       Patrick(),
       Water2D(),
+
+      // DummyPlayer(),
 
       NumBoard(),
       Scroll(),
@@ -106,14 +111,18 @@ const GambaSystem = SystemBuilder({
         const state = world.state<GambaState>()
 
         if (state.die1 && state.die2 && state.rolled === null) {
-          const result = state.die1 + state.die2
-          state.rolled = result
+          let result = state.die1 + state.die2
+          if ((state.die1 === 6 && state.die2 === 1) || (state.die1 === 1 && state.die2 === 6)) {
+            result = 67
+          }
+
+          state.rolled = result as Roll
 
           // damage on 7
           if (state.rolled === 7 && state.shooter) {
             const character = world.entity(state.shooter)
             if (character) {
-              character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
+              // character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
             }
           }
         }
@@ -132,8 +141,9 @@ const GambaSystem = SystemBuilder({
   }
 })
 
-const controls: HUDSystemProps = {
-  direction: "row",
+const controls = (world: World): HUDSystemProps => ({
+  direction: world.client?.discord ? "row" : "column",
+  ...(world.client?.discord ? { from: { top: 20, left: 20 } } : {}),
   clusters: [
     {
       label: "roll",
@@ -151,4 +161,4 @@ const controls: HUDSystemProps = {
       buttons: [["esc"]]
     }
   ]
-}
+})

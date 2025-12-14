@@ -16,7 +16,6 @@ export const Water2D = (): Entity => {
   geometry.addIndex([0, 1, 2, 2, 3, 0])
 
   let dMap: Sprite | undefined = undefined
-  let dFilter: DisplacementFilter | undefined = undefined
 
   const water2D = Entity({
     id: `water2D`,
@@ -26,9 +25,9 @@ export const Water2D = (): Entity => {
         anchor: { x: 0, y: 0 },
         zIndex: 0,
         scaleMode: "nearest",
-        onRender: ({ delta, world }) => {
-          if (dMap) dMap.x = (world.tick + delta / 25) * 1
-          if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
+        onRender: ({ since }) => {
+          if (dMap) dMap.x += since / 25 * 1
+          if (dMap) dMap.y += since / 25 * 0.7
         },
         setup: async (r) => {
           const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.2, strokeWidth: 1 } })
@@ -47,7 +46,7 @@ export const Water2D = (): Entity => {
           const stars = new TilingSprite({
             texture: night.texture, width: 2000, height: 2000, alpha: 0.6,
             position: { x: -1000, y: -60 },
-            tilePosition: { x: 207, y: -20 }
+            tilePosition: { x: 207, y: -40 }
           })
 
           stars.filters = [

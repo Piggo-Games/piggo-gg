@@ -31,7 +31,7 @@ export const Discord = (): Discord | undefined => {
       const foundCookie = async (response: GoodResponse<DiscordMe["response"]>) => {
         client.player.components.pc.data.name = response.username
 
-        client.lobbyCreate("lobby")
+        client.lobbyCreate()
       }
 
       // fresh login
@@ -44,7 +44,7 @@ export const Discord = (): Discord | undefined => {
           authenticated.then((auth) => {
             client.player.components.pc.data.name = auth.user.username
 
-            client.lobbyCreate("lobby")
+            client.lobbyCreate()
           })
         })
       }
