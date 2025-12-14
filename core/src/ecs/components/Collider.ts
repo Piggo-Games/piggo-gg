@@ -5,12 +5,18 @@ export type ColliderShapes = "ball" | "cuboid" | "line"
 
 export type SensorCallback = (e2: Entity<Position | Collider>, world: World) => boolean
 
+// Group | Mask
+// An interaction is allowed between two filters `a` and `b` two conditions
+// are met simultaneously:
+// - The interaction groups of `a` has at least one bit set to `1` in common with the interaction mask of `b`.
+// - The interaction groups of `b` has at least one bit set to `1` in common with the interaction mask of `a`.
+// In other words, interactions are allowed between two filter iff. the following condition is met:
 export const ColliderGroups = {
   all:     "11111111111111111111111111111111",
   default: "11111111000000001111111100000000",
   none:    "00000000000000000000000000000000",
-  notself: "01000000000000001000000000000000",
-  "1":     "00000000000000010000000000000001",
+  notself: "01000000000000000000000000000001",
+  "1":     "01000000000000010100000000000001",
   "2":     "00000000000000100000000000000010",
   "3":     "00000000000001000000000000000100",
   "4":     "00000000000010000000000000001000",

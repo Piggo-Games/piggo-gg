@@ -2,7 +2,8 @@ import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps,
   HtmlChat, HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem,
   PixiNametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
-  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, World, screenWH
+  PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, World, screenWH,
+  DummyPlayer
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
@@ -68,6 +69,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Flag(),
       Patrick(),
       Water2D(),
+
+      DummyPlayer(),
 
       NumBoard(),
       Scroll(),
