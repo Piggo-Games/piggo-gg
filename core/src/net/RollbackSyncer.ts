@@ -171,7 +171,7 @@ export const RollbackSyncer = (world: World): Syncer => {
           // check remote has each action
           for (const action of localActions[entityId]) {
             if (!ignoreActions.includes(action.actionId) && actions.find((a) => a.actionId === action.actionId) === undefined) {
-              mustRollback(`action not found remotely entity:${entityId} action:${action.actionId}`)
+              mustRollback(`action not at remote entity:${entityId} action:${action.actionId}`)
               break
             }
           }

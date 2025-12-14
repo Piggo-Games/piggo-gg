@@ -284,12 +284,11 @@ export const PositionSystem = SystemBuilder<"PositionSystem">({
           const target = world.entity(position.data.follows)
 
           if (target && target.components.position) {
-            const { x, y, z, velocity, pointing, pointingDelta, speed, stop } = target.components.position.data
+            const { x, y, z, velocity, pointing, speed, stop } = target.components.position.data
 
             position.data = {
               ...position.data,
               pointing,
-              pointingDelta: { ...pointingDelta },
               speed,
               stop,
               velocity: { ...velocity },

@@ -1,5 +1,5 @@
 import {
-  Actions, Component, Effects, ElementKinds, Entity, Input, ItemBuilder,
+  Actions, Character, Component, Effects, ElementKinds, Entity, Input, ItemBuilder,
   Networked, Position, ProtoEntity, Renderable, SystemBuilder, ValidSounds,
   Whack, World, XY, abs, hypot, loadTexture, min, pickupItem, round
 } from "@piggo-gg/core"
@@ -53,16 +53,19 @@ export const ItemEntity = (entity: ProtoEntity<ItemComponents>): ItemEntity => {
 
 export const ItemSystem = SystemBuilder({
   id: "ItemSystem",
-  init: () => ({
+  init: (world) => ({
     id: "ItemSystem",
     query: ["item", "renderable", "position"],
     priority: 5,
     onTick: (entities: Entity<Item | Position | Renderable>[]) => {
       for (const entity of entities) {
         const { position, item, renderable } = entity.components
-        const { pointingDelta, rotation, follows } = position.data
+        const { follows } = position.data
 
-        if (!follows) continue
+        const character = world.entity<Position>(follows ?? "")
+        if (!character) continue
+
+        const { pointingDelta } = character.components.position.data
 
         // if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
 
