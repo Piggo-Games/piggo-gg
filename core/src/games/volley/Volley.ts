@@ -274,6 +274,10 @@ const controls: HUDSystemProps = {
     {
       label: "switch team",
       buttons: [["t"]]
+    },
+    {
+      label: "menu",
+      buttons: [["esc"]]
     }
   ]
 }
