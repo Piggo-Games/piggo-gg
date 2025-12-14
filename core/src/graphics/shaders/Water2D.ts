@@ -26,9 +26,11 @@ export const Water2D = (): Entity => {
         anchor: { x: 0, y: 0 },
         zIndex: 0,
         scaleMode: "nearest",
-        onRender: ({ delta, world }) => {
-          if (dMap) dMap.x = (world.tick + delta / 25) * 1
-          if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
+        onRender: ({ delta, world, since }) => {
+          // if (dMap) dMap.x = (world.tick + delta / 25) * 1
+          // if (dMap) dMap.y = (world.tick + delta / 25) * 0.7
+          if (dMap) dMap.x += since / 25 * 1
+          if (dMap) dMap.y += since / 25 * 0.7
         },
         setup: async (r) => {
           const area = pixiRect({ x: -1000, y: -60, w: 2000, h: 2000, style: { strokeAlpha: 0.2, strokeWidth: 1 } })

@@ -17,10 +17,11 @@ export const Background = ({ img, json, rays, moving, follow }: BackgroundProps 
     renderable: Renderable({
       zIndex: -2,
       interpolate: true,
-      onRender: ({ renderable, delta, world }) => {
+      onRender: ({ renderable, since }) => {
         if (moving) {
           const tile = renderable.c as TilingSprite
-          tile.tilePosition.x = (world.tick + delta / 25) * 0.5
+          // tile.tilePosition.x = (world.tick + delta / 25) * 0.5
+          tile.tilePosition.x += since / 25 * 0.5
         }
       },
       onTick: ({ renderable, world, entity }) => {

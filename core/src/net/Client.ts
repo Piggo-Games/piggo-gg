@@ -13,7 +13,8 @@ const servers: Record<ENV, string> = {
   // local: `${DiscordDomain}/.proxy/api`,
   dev: "piggo-api-staging.up.railway.app",
   production: "api.piggo.gg",
-  discord: `${DiscordDomain}/.proxy/api`
+  // discord: `${DiscordDomain}/.proxy/api`,
+  discord: `${DiscordDomain}/.proxy/api-local`
 } as const
 
 const environments: Record<string, ENV> = {
@@ -397,7 +398,7 @@ export const Client = ({ world }: ClientProps): Client => {
       client.net.connected = true
 
       if (client.discord?.loggedIn) {
-        client.lobbyCreate("lobby")
+        client.lobbyCreate()
       }
 
       if (localStorage) {
