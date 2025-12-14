@@ -47,7 +47,7 @@ export const Water2D = (): Entity => {
           const stars = new TilingSprite({
             texture: night.texture, width: 2000, height: 2000, alpha: 0.6,
             position: { x: -1000, y: -60 },
-            tilePosition: { x: 207, y: -20 }
+            tilePosition: { x: 207, y: -40 }
           })
 
           stars.filters = [

@@ -120,7 +120,7 @@ const GambaSystem = SystemBuilder({
           if (state.rolled === 7 && state.shooter) {
             const character = world.entity(state.shooter)
             if (character) {
-              character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
+              // character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
             }
           }
         }
