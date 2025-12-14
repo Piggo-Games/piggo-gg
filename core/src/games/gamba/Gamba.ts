@@ -4,17 +4,19 @@ import {
   NametagSystem, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
   PixiRenderSystem, ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH
 } from "@piggo-gg/core"
-import { StarGuy } from "./enemies/StarGuy"
+import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
+import { Scroll } from "./ui/Scroll"
 
 const arenaWidth = 500
 
 export type GambaState = {
   round: number
+  shooter: string | null
   die1: number | null
   die2: number | null
   rolled: number | null
@@ -35,6 +37,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     },
     state: {
       round: 1,
+      shooter: null,
       die1: null,
       die2: null,
       rolled: null
@@ -60,10 +63,11 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Beach(),
       Pier(),
       Flag(),
-      StarGuy(),
+      Patrick(),
       Water2D(),
 
       NumBoard(),
+      Scroll(),
 
       Cursor(),
       EscapeMenu(world),
@@ -104,10 +108,24 @@ const GambaSystem = SystemBuilder({
         if (state.die1 && state.die2 && state.rolled === null) {
           const result = state.die1 + state.die2
           state.rolled = result
+
+          // damage on 7
+          if (state.rolled === 7 && state.shooter) {
+            const character = world.entity(state.shooter)
+            if (character) {
+              character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
+            }
+          }
         }
 
         if (state.die1 === null || state.die2 === null) {
           state.rolled = null
+        }
+
+        // shooter
+        const characters = world.characters()
+        if (characters.length === 1) {
+          state.shooter = characters[0].id
         }
       }
     }

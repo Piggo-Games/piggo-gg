@@ -1,5 +1,5 @@
 import { Entity, load, Position, Renderable } from "@piggo-gg/core"
-import { Assets, Sprite } from "pixi.js"
+import { Sprite } from "pixi.js"
 
 export const Pier = (): Entity => {
 

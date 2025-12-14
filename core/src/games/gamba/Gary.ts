@@ -7,7 +7,7 @@ import { Dice } from "./Dice"
 
 export const Gary = (player: Player): Character => {
 
-  return Character({
+  const gary = Character({
     id: `gary-${player.id}`,
     components: {
       debug: Debug(),
@@ -29,8 +29,8 @@ export const Gary = (player: Player): Character => {
               world.debug = !world.debug
             }
           },
-          " ": ({ hold }) => {
-            if (hold) return
+          " ": () => {
+            if (!gary.components.position.data.standing || gary.components.position.data.velocity.z > 0) return
             return { actionId: "jump" }
           },
         },
@@ -47,9 +47,9 @@ export const Gary = (player: Player): Character => {
       actions: Actions({
         move: Move,
         point: Point,
-        jump: Action("jump", ({ entity }) => {
-          if (!entity?.components?.position?.data.standing) return
-          entity.components.position.setVelocity({ z: 5 })
+        jump: Action("jump", () => {
+          if (!gary.components.position?.data.standing) return
+          gary.components.position.setVelocity({ z: 5 })
         }),
       }),
       renderable: Renderable({
@@ -58,7 +58,6 @@ export const Gary = (player: Player): Character => {
         zIndex: 4,
         interpolate: true,
         scaleMode: "nearest",
-        skin: "dude-white",
         setup: async (renderable) => {
           await PixiSkins["dude-white"](renderable)
         },
@@ -67,4 +66,6 @@ export const Gary = (player: Player): Character => {
       })
     }
   })
+
+  return gary
 }
