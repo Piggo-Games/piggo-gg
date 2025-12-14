@@ -1,4 +1,4 @@
-import { Entity, GambaState, loadTexture, Position, Renderable, values } from "@piggo-gg/core"
+import { Entity, GambaState, loadTexture, Position, Renderable, Roll, values } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const NumBoard = (): Entity => {
@@ -6,8 +6,8 @@ export const NumBoard = (): Entity => {
   let digits: Record<string, Sprite> = {}
   let rendered = 0
 
-  const displayNumber = (num: number) => {
-    const numStr = num.toString()
+  const displayNumber = (roll: Roll) => {
+    const numStr = roll.toString()
 
     const chars = numStr.length
 
@@ -78,7 +78,7 @@ export const NumBoard = (): Entity => {
             digits[key] = sprite
           }
 
-          displayNumber(0)
+          displayNumber(67)
         }
       })
     }
