@@ -15,13 +15,14 @@ import { Scroll } from "./ui/Scroll"
 const arenaWidth = 500
 
 export type D6 = 1 | 2 | 3 | 4 | 5 | 6
+export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
 
 export type GambaState = {
   round: number
   shooter: string | null
   die1: D6 | null
   die2: D6 | null
-  rolled: null | number
+  rolled: null | Roll
 }
 
 export type GambaSettings = {
@@ -108,8 +109,12 @@ const GambaSystem = SystemBuilder({
         const state = world.state<GambaState>()
 
         if (state.die1 && state.die2 && state.rolled === null) {
-          const result = state.die1 + state.die2
-          state.rolled = result 
+          let result = state.die1 + state.die2
+          if ((state.die1 === 6 && state.die2 === 1) || (state.die1 === 1 && state.die2 === 6)) {
+            result = 67
+          }
+
+          state.rolled = result as Roll
 
           // damage on 7
           if (state.rolled === 7 && state.shooter) {
