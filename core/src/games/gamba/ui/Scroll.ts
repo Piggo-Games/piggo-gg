@@ -1,4 +1,4 @@
-import { Debug, Entity, Position, Renderable, pixiText, values, load, wrapText } from "@piggo-gg/core"
+import { Debug, Entity, Position, Renderable, pixiText, values, load, wrapText, Actions } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 import type { GambaState } from "../Gamba"
 
@@ -24,6 +24,12 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
     components: {
       debug: Debug(),
       position: Position({ x, y }),
+      actions: Actions({
+        selectAbility: ({ params, world }) => {
+          const state = world.state<GambaState>()
+          state.selectedAbility = params.abilityId
+        }
+      }),
       renderable: Renderable({
         zIndex: 2,
         scale: 2.5,
@@ -57,8 +63,9 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
             hovering = false
           }
           r.c.onpointerdown = () => {
-            const state = world.state<GambaState>()
-            state.selectedAbility = id
+            world.actions.push(world.tick + 1, scroll.id, { actionId: "selectAbility", params: { abilityId: id } })
+
+            world.client!.clickThisFrame.set(world.tick)
           }
 
           const titleText = pixiText({
