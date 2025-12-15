@@ -48,9 +48,9 @@ const scrollAbilities: ScrollProps[] = [
 ]
 
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "67",
+  id: "gamba",
   init: (world) => ({
-    id: "67",
+    id: "gamba",
     netcode: "rollback",
     renderer: "pixi",
     settings: {
@@ -112,11 +112,11 @@ const GambaSystem = SystemBuilder({
       if (!world.pixi) return
 
       const { w } = screenWH()
-      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.3)))
+      const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
 
-      if (Math.abs(targetScale - lastScale) > 0.02) {
-        world.pixi.camera.scaleTo(targetScale)
-        lastScale = targetScale
+      if (Math.abs(zoom - lastScale) > 0.02) {
+        world.pixi.camera.scaleTo(zoom)
+        lastScale = zoom
       }
     }
 
@@ -161,12 +161,12 @@ const GambaSystem = SystemBuilder({
 })
 
 const controls = (world: World): HUDSystemProps => ({
-  direction: world.client?.discord ? "row" : "column",
-  ...(world.client?.discord ? { from: { top: 20, left: 20 } } : {}),
+  direction: "row",
+  from: { top: 20, left: 20 },
   clusters: [
     {
-      label: "roll",
-      buttons: [["mb1"]]
+      label: "menu",
+      buttons: [["esc"]]
     },
     {
       label: "move",
@@ -176,8 +176,8 @@ const controls = (world: World): HUDSystemProps => ({
       ]
     },
     {
-      label: "menu",
-      buttons: [["esc"]]
+      label: "roll",
+      buttons: [["mb1"]]
     }
   ]
 })
