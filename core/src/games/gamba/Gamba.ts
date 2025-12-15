@@ -70,7 +70,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       SpawnSystem({ spawner: Gary, pos: { x: 0, y: 0, z: 0 } }),
       GambaSystem,
       PixiRenderSystem,
-      HUDSystem(controls(world)),
+      HUDSystem(controls),
       PixiCameraSystem(),
       PixiDebugSystem,
       InventorySystem,
@@ -160,9 +160,9 @@ const GambaSystem = SystemBuilder({
   }
 })
 
-const controls = (world: World): HUDSystemProps => ({
+const controls: HUDSystemProps = {
   direction: "row",
-  from: { top: 20, left: 20 },
+  from: { top: 26, left: 26 },
   clusters: [
     {
       label: "menu",
@@ -180,4 +180,4 @@ const controls = (world: World): HUDSystemProps => ({
       buttons: [["mb1"]]
     }
   ]
-})
+}

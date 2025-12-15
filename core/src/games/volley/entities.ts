@@ -4,6 +4,7 @@ import {
 } from "@piggo-gg/core"
 import { Texture } from "pixi.js"
 import { range, VolleyState } from "./Volley"
+import { DropShadowFilter } from "pixi-filters"
 
 export const Ball = () => Entity({
   id: "ball",
@@ -116,6 +117,9 @@ export const PostTop = () => Entity({
       setup: async (renderable) => {
         renderable.setBevel()
         renderable.c = pixiGraphics().roundRect(-3, 0, 6, 28, 2).fill({ color: 0x943126, alpha: 1 })
+
+        const dropShadow = new DropShadowFilter({ blur: 0.5, offset: { x: -1, y: 0 } })
+        renderable.c.filters = [dropShadow]
       }
     })
   }
@@ -130,6 +134,9 @@ export const PostBottom = () => Entity({
       setup: async (renderable) => {
         renderable.setBevel()
         renderable.c = pixiGraphics().roundRect(-3, 0, 6, 28, 2).fill({ color: 0x943126, alpha: 1 })
+
+        const dropShadow = new DropShadowFilter({ blur: 0.5, offset: { x: -0.6, y: 1 } })
+        renderable.c.filters = [dropShadow]
       }
     })
   }
@@ -145,6 +152,9 @@ export const Net = () => Entity({
       setup: async (renderable) => {
         renderable.setBevel()
         renderable.c = pixiGraphics().roundRect(-1, -75, 2, 150, 1).fill({ color: 0xffe47a, alpha: 1 })
+
+        const dropShadow = new DropShadowFilter({ blur: 0.5, offset: { x: -1, y: 1 } })
+        renderable.c.filters = [dropShadow]
       }
     })
   }
