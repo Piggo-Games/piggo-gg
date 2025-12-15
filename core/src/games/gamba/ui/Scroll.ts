@@ -1,5 +1,6 @@
 import { Debug, Entity, Position, Renderable, pixiText, values, load } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
+import type { GambaState } from "../Gamba"
 
 export type ScrollProps = {
   id: string
@@ -34,7 +35,6 @@ const wrapText = (text: string, maxChars: number): string => {
 export const Scroll = ({ id, title, description, manaCost, position }: ScrollProps): Entity => {
 
   let hovering = false
-  let overlayActive = false
 
   const x = position?.x ?? 0
   const y = position?.y ?? 90
@@ -53,17 +53,21 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
         scale: 2.5,
         anchor: { x: 0.53, y: 0.5 },
         scaleMode: "nearest",
-        onRender: ({ renderable }) => {
+        onRender: ({ renderable, world }) => {
+          const selected = world.state<GambaState>().selectedAbility === id
+
+          renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
+
+          if (selected) return
+
           if (hovering) {
-            renderable.setOverlay({ color: 0xffffaa, alpha: 0.3 })
-            overlayActive = true
-          } else if (overlayActive) {
+            renderable.setOverlay({ color: 0xffffaa, alpha: 0.2 })
+          } else {
             delete renderable.filters["overlay"]
             renderable.c.filters = values(renderable.filters)
-            overlayActive = false
           }
         },
-        setup: async (r) => {
+        setup: async (r, _, world) => {
           const t = await load("scroll.png")
 
           r.c = new Sprite(t)
@@ -75,6 +79,10 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
           }
           r.c.onmouseleave = () => {
             hovering = false
+          }
+          r.c.onpointerdown = () => {
+            const state = world.state<GambaState>()
+            state.selectedAbility = id
           }
 
           const titleText = pixiText({

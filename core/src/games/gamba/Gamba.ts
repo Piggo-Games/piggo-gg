@@ -22,7 +22,8 @@ export type GambaState = {
   shooter: string | null
   die1: D6 | null
   die2: D6 | null
-  rolled: null | Roll
+  rolled: Roll | null
+  selectedAbility: string | null
 }
 
 export type GambaSettings = {
@@ -60,7 +61,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       shooter: null,
       die1: null,
       die2: null,
-      rolled: null
+      rolled: null,
+      selectedAbility: null
     },
     systems: [
       PhysicsSystem("local"),
