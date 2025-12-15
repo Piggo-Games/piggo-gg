@@ -32,7 +32,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
       }),
       renderable: Renderable({
         zIndex: 2,
-        scale: 2.5,
+        scale: 2.2,
         anchor: { x: 0.53, y: 0.5 },
         scaleMode: "nearest",
         onRender: ({ renderable, world }) => {

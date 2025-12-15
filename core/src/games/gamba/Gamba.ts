@@ -36,14 +36,14 @@ const scrollAbilities: ScrollProps[] = [
     title: "Rally",
     description: "allies take 1 less DMG per hit until your next turn",
     manaCost: 1,
-    position: { x: 10, y: 100 }
+    position: { x: 10, y: 96 }
   },
   {
     id: "slice",
     title: "Slice",
     description: "enemies take 1D6 extra DMG per hit until your next turn",
     manaCost: 1,
-    position: { x: 110, y: 100 }
+    position: { x: 100, y: 96 }
   }
 ]
 
