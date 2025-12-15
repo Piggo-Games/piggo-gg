@@ -22,7 +22,7 @@ export const Patrick = (): Entity => {
         scaleMode: "nearest",
         animationSelect: () => "idle",
         setup: async (r) => {
-          const t = await loadTexture("StarGuy.json")
+          const t = await loadTexture("patrick.json")
 
           r.animations = {
             idle: pixiAnimation(

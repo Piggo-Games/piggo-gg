@@ -10,7 +10,7 @@ import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
-import { Scroll } from "./ui/Scroll"
+import { Scroll, ScrollProps } from "./ui/Scroll"
 
 const arenaWidth = 500
 
@@ -22,17 +22,35 @@ export type GambaState = {
   shooter: string | null
   die1: D6 | null
   die2: D6 | null
-  rolled: null | Roll
+  rolled: Roll | null
+  selectedAbility: string | null
 }
 
 export type GambaSettings = {
   showControls: boolean
 }
 
+const scrollAbilities: ScrollProps[] = [
+  {
+    id: "rally",
+    title: "Rally",
+    description: "allies take 1 less DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 10, y: 100 }
+  },
+  {
+    id: "slice",
+    title: "Slice",
+    description: "enemies take 1D6 extra DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 110, y: 100 }
+  }
+]
+
 export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "67",
+  id: "gamba",
   init: (world) => ({
-    id: "67",
+    id: "gamba",
     netcode: "rollback",
     renderer: "pixi",
     settings: {
@@ -43,7 +61,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       shooter: null,
       die1: null,
       die2: null,
-      rolled: null
+      rolled: null,
+      selectedAbility: null
     },
     systems: [
       PhysicsSystem("local"),
@@ -72,7 +91,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       // DummyPlayer(),
 
       NumBoard(),
-      Scroll(),
+      ...scrollAbilities.map((scroll) => Scroll(scroll)),
 
       Cursor(),
       EscapeMenu(world),
@@ -93,11 +112,11 @@ const GambaSystem = SystemBuilder({
       if (!world.pixi) return
 
       const { w } = screenWH()
-      const targetScale = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.3)))
+      const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
 
-      if (Math.abs(targetScale - lastScale) > 0.02) {
-        world.pixi.camera.scaleTo(targetScale)
-        lastScale = targetScale
+      if (Math.abs(zoom - lastScale) > 0.02) {
+        world.pixi.camera.scaleTo(zoom)
+        lastScale = zoom
       }
     }
 
@@ -142,12 +161,12 @@ const GambaSystem = SystemBuilder({
 })
 
 const controls = (world: World): HUDSystemProps => ({
-  direction: world.client?.discord ? "row" : "column",
-  ...(world.client?.discord ? { from: { top: 20, left: 20 } } : {}),
+  direction: "row",
+  from: { top: 20, left: 20 },
   clusters: [
     {
-      label: "roll",
-      buttons: [["mb1"]]
+      label: "menu",
+      buttons: [["esc"]]
     },
     {
       label: "move",
@@ -157,8 +176,8 @@ const controls = (world: World): HUDSystemProps => ({
       ]
     },
     {
-      label: "menu",
-      buttons: [["esc"]]
+      label: "roll",
+      buttons: [["mb1"]]
     }
   ]
 })
