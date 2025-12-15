@@ -1,4 +1,4 @@
-import { Debug, Entity, Position, Renderable, pixiText, values, load } from "@piggo-gg/core"
+import { Debug, Entity, Position, Renderable, pixiText, values, load, wrapText } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 import type { GambaState } from "../Gamba"
 
@@ -8,28 +8,6 @@ export type ScrollProps = {
   description: string
   manaCost: number
   position?: { x?: number, y?: number }
-}
-
-const wrapText = (text: string, maxChars: number): string => {
-  const words = text.split(" ")
-  const lines: string[] = []
-  let line = ""
-
-  for (const word of words) {
-    const next = line ? `${line} ${word}` : word
-    if (next.length > maxChars) {
-      lines.push(line || word)
-      line = line ? word : ""
-    } else {
-      line = next
-    }
-  }
-
-  if (line.length) {
-    lines.push(line)
-  }
-
-  return lines.join("\n")
 }
 
 export const Scroll = ({ id, title, description, manaCost, position }: ScrollProps): Entity => {
@@ -45,9 +23,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
     id: `scroll-${id}`,
     components: {
       debug: Debug(),
-      position: Position({
-        x, y
-      }),
+      position: Position({ x, y }),
       renderable: Renderable({
         zIndex: 2,
         scale: 2.5,
