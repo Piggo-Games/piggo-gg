@@ -13,7 +13,7 @@ export const Patrick = (): Entity => {
       collider: Collider({
         shape: "ball", radius: 10, isStatic: true, group: "2"
       }),
-      health: Health(),
+      health: Health({ hp: 50, maxHp: 50 }),
       shadow: Shadow(9, 0, 1),
       renderable: Renderable({
         anchor: { x: 0.5, y: 0.9 },
