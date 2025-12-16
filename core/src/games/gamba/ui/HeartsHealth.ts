@@ -1,7 +1,7 @@
 import {
   ClientSystemBuilder, Entity, Health, Position, Renderable, entries, load, pixiText
 } from "@piggo-gg/core"
-import { Sprite } from "pixi.js"
+import { Sprite, Text } from "pixi.js"
 
 // the HeartsSystem draws hearts above characters with Health
 export const HeartsSystem = () => ClientSystemBuilder({
@@ -50,14 +50,13 @@ export const HeartsSystem = () => ClientSystemBuilder({
 
 export const Heart = (entity: Entity<Health | Position>): Entity => {
   const entityId = entity.id
-  const position = Position({ follows: entityId, offset: { x: 0, y: -24 } })
 
-  let hpText: ReturnType<typeof pixiText> | null = null
+  let hpText: Text | null = null
 
   return Entity<Position | Renderable>({
     id: `heart-${entityId}`,
     components: {
-      position,
+      position: Position({ follows: entityId, offset: { x: 0, y: -24 } }),
       renderable: Renderable({
         zIndex: 9,
         interpolate: true,
