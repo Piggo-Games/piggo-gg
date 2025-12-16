@@ -1,7 +1,6 @@
 import {
   AnimatedSprite, AnimatedSpriteFrames, Assets, Container, Graphics,
-  GraphicsContext, GraphicsOptions, Text, TextStyleFontWeight,
-  Texture
+  GraphicsContext, GraphicsOptions, Text, TextStyleFontWeight, Texture
 } from "pixi.js"
 import { XY } from "@piggo-gg/core"
 
