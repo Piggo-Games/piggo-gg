@@ -76,17 +76,6 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
           renderable.visible = targetRenderable?.visible ?? true
 
           if (hpText) hpText.text = `${health.data.hp}`
-
-          if (targetRenderable?.initialized) {
-            const bounds = targetRenderable.c.getLocalBounds()
-            if (bounds.height > 0) {
-              const desiredOffset = -(bounds.height * 0.6)
-
-              if (Math.abs(position.data.offset.y - desiredOffset) > 0.5) {
-                position.data.offset.y = desiredOffset
-              }
-            }
-          }
         },
         setup: async (r) => {
           const t = await load("heart.png")
