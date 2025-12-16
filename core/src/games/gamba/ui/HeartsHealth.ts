@@ -58,7 +58,7 @@ export const Heart = (entity: Entity<Health | Position | Renderable>): Entity =>
       renderable: Renderable({
         zIndex: entity.components.renderable.zIndex,
         interpolate: true,
-        position: { x: -20, y: entityId.startsWith("gary") ? 8 : -50 },
+        position: { x: -20, y: entityId.startsWith("gary") ? 8 : 8 },
         onTick: ({ renderable, world }) => {
           const target = world.entity(entityId)
 
