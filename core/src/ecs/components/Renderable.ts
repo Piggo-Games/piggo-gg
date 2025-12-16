@@ -114,7 +114,7 @@ export const Renderable = (props: RenderableProps): Renderable => {
     zIndex: props.zIndex ?? 0,
     prepareAnimations: (color: number = 0xffffff, alpha: number = 1) => {
       for (const animation of values(renderable.animations)) {
-        animation.animationSpeed = 0.1
+        animation.animationSpeed = 0.09
         animation.scale.set(renderable.scale, abs(renderable.scale))
         animation.anchor.set(renderable.anchor.x, renderable.anchor.y)
         animation.texture.source.scaleMode = renderable.scaleMode
