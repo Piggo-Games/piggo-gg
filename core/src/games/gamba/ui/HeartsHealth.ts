@@ -1,7 +1,7 @@
 import {
   ClientSystemBuilder, Entity, Health, Position, Renderable, entries, load, pixiText
 } from "@piggo-gg/core"
-import { Sprite, Text } from "pixi.js"
+import { Sprite, Text, Texture } from "pixi.js"
 
 // the HeartsSystem draws hearts above characters with Health
 export const HeartsSystem = () => ClientSystemBuilder({
@@ -12,10 +12,10 @@ export const HeartsSystem = () => ClientSystemBuilder({
 
     return {
       id: "HeartsSystem",
-      query: ["health", "position"],
+      query: ["health", "position", "renderable"],
       priority: 6,
       skipOnRollback: true,
-      onTick: (entities: Entity<Health | Position>[]) => {
+      onTick: (entities: Entity<Health | Position | Renderable>[]) => {
 
         // clean up missing entities
         for (const [entityId, heart] of entries(hearts)) {
@@ -48,7 +48,7 @@ export const HeartsSystem = () => ClientSystemBuilder({
   }
 })
 
-export const Heart = (entity: Entity<Health | Position>): Entity => {
+export const Heart = (entity: Entity<Health | Position | Renderable>): Entity => {
   const entityId = entity.id
 
   let hpText: Text | null = null
@@ -56,12 +56,11 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
   return Entity<Position | Renderable>({
     id: `heart-${entityId}`,
     components: {
-      position: Position({ follows: entityId, offset: { x: 0, y: -24 } }),
+      position: Position({ follows: entityId }),
       renderable: Renderable({
-        zIndex: 9,
+        zIndex: entity.components.renderable.zIndex,
         interpolate: true,
-        scaleMode: "nearest",
-        scale: 1,
+        position: { x: -20, y: -40 },
         onTick: ({ renderable, world }) => {
           const target = world.entity(entityId)
 
@@ -70,25 +69,18 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
             return
           }
 
-          const { health, renderable: targetRenderable } = target.components
-
-          renderable.visible = targetRenderable?.visible ?? true
-
-          if (hpText) hpText.text = `${health.data.hp}`
+          renderable.visible = target.components.renderable?.visible ?? false
         },
         setup: async (r) => {
           const t = await load("heart.png")
-          const heartSprite = new Sprite(t)
+          t.source.scaleMode = "nearest"
 
-          hpText = pixiText({
-            text: ``,
-            pos: { x: -22, y: 0 },
-            anchor: { x: 0, y: 0.3 },
-            style: { fontSize: 8, dropShadow: true, resolution: 4 }
-          })
-
-          r.c = heartSprite
-          r.c.addChild(hpText)
+          // copy 5 times
+          for (let i = 0; i < 5; i++) {
+            const copy = new Sprite({ texture: t, scale: { x: 0.9, y: 0.9 } })
+            copy.x = i * 8
+            r.c.addChild(copy)
+          }
         }
       })
     }

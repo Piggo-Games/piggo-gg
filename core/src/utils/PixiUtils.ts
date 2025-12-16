@@ -1,6 +1,7 @@
 import {
   AnimatedSprite, AnimatedSpriteFrames, Assets, Container, Graphics,
-  GraphicsContext, GraphicsOptions, Text, TextStyleFontWeight
+  GraphicsContext, GraphicsOptions, Text, TextStyleFontWeight,
+  Texture
 } from "pixi.js"
 import { XY } from "@piggo-gg/core"
 
@@ -176,4 +177,4 @@ export const loadTextureCached = (file: string): Record<string, any> | undefined
   return textureCache[file]
 }
 
-export const load = async (url: string) => Assets.load(url)
+export const load = async (url: string) => Assets.load(url) as Promise<Texture>
