@@ -11,7 +11,7 @@ export const Patrick = (): Entity => {
       position: Position({ x: 140 }),
       debug: Debug(),
       collider: Collider({
-        shape: "ball", radius: 10, isStatic: true, group: "2"
+        shape: "ellipse", radius: 7, length: 10, isStatic: true, group: "2"
       }),
       health: Health({ hp: 50, maxHp: 50 }),
       shadow: Shadow(9, 0, 1),
