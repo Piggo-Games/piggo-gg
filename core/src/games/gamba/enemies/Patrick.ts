@@ -22,6 +22,9 @@ export const Patrick = (): Entity => {
         interpolate: true,
         scaleMode: "nearest",
         animationSelect: () => "idle",
+        onTick: () => {
+          patrick.components.health!.data.hp += 1
+        },
         setup: async (r) => {
           const t = await loadTexture("patrick.json")
 

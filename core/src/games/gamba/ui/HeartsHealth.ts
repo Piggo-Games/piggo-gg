@@ -52,8 +52,6 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
   const entityId = entity.id
   const position = Position({ follows: entityId, offset: { x: 0, y: -24 } })
 
-  let hp = entity.components.health?.data.hp ?? 0
-
   let hpText: ReturnType<typeof pixiText> | null = null
 
   return Entity<Position | Renderable>({
@@ -64,6 +62,7 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
         zIndex: 9,
         interpolate: true,
         scaleMode: "nearest",
+        scale: 1,
         onTick: ({ renderable, world }) => {
           const target = world.entity(entityId)
 
@@ -76,10 +75,7 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
 
           renderable.visible = targetRenderable?.visible ?? true
 
-          if (hpText && health.data.hp !== hp) {
-            hp = health.data.hp
-            hpText.text = `${hp}`
-          }
+          if (hpText) hpText.text = `${health.data.hp}`
 
           if (targetRenderable?.initialized) {
             const bounds = targetRenderable.c.getLocalBounds()
@@ -95,19 +91,16 @@ export const Heart = (entity: Entity<Health | Position>): Entity => {
         setup: async (r) => {
           const t = await load("heart.png")
           const heartSprite = new Sprite(t)
-          heartSprite.anchor.set(0.5, 0.5)
-          heartSprite.scale.set(3)
-          heartSprite.texture.source.scaleMode = "nearest"
 
-          const textOffset = (heartSprite.width / 2) + 6
           hpText = pixiText({
-            text: `${hp}`,
-            pos: { x: textOffset, y: 0 },
-            anchor: { x: 0, y: 0.5 },
-            style: { fontSize: 8, dropShadow: true, resolution: 12 }
+            text: ``,
+            pos: { x: -22, y: 0 },
+            anchor: { x: 0, y: 0.3 },
+            style: { fontSize: 8, dropShadow: true, resolution: 4 }
           })
 
-          r.c.addChild(heartSprite, hpText)
+          r.c = heartSprite
+          r.c.addChild(hpText)
         }
       })
     }
