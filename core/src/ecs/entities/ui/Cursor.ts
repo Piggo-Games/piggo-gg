@@ -1,4 +1,5 @@
 import { Entity, pixiCircle, Position, Renderable } from "@piggo-gg/core"
+import { DropShadowFilter } from "pixi-filters"
 
 export const Cursor = (): Entity => {
 
@@ -18,8 +19,12 @@ export const Cursor = (): Entity => {
           cursor.components.position.data.x = x
           cursor.components.position.data.y = y
         },
-        setContainer: async () => {
-          return pixiCircle({ x: 0, y: 0, r: 4, style: { color: 0x00ffff, alpha: 1 } })
+        setup: async (r) => {
+          const circle = pixiCircle({ x: 0, y: 0, r: 4, style: { color: 0x00ffff, alpha: 1 } })
+          r.c = circle
+
+          const dropShadow = new DropShadowFilter({ blur: 0, offset: { x: 1, y: 1 } })
+          r.c.filters = [dropShadow]
         },
         zIndex: 12
       })
