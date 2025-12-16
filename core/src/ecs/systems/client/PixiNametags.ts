@@ -3,7 +3,7 @@ import {
   Position, Renderable, TeamColors, entries, pixiText
 } from "@piggo-gg/core"
 
-export const PixiNametagSystem = ClientSystemBuilder({
+export const PixiNametagSystem = (height?: number) => ClientSystemBuilder({
   id: "PixiNametagSystem",
   init: (world) => {
 
@@ -46,7 +46,7 @@ export const PixiNametagSystem = ClientSystemBuilder({
           if (!character) continue
 
           if (!nametags[character.id]) {
-            const nametag = Nametag(player, character)
+            const nametag = Nametag(player, character, height)
             world.addEntity(nametag)
 
             nametags[character.id] = nametag
@@ -58,7 +58,7 @@ export const PixiNametagSystem = ClientSystemBuilder({
   }
 })
 
-const Nametag = (player: Player, character: Character) => {
+const Nametag = (player: Player, character: Character, height: number = 44) => {
 
   let { name } = player.components.pc.data
   let { team } = player.components.team.data
@@ -68,7 +68,7 @@ const Nametag = (player: Player, character: Character) => {
     text: name,
     style: { fill: TeamColors[team], fontSize: 12, dropShadow: true, scale: 1 },
     anchor: { x: 0.45, y: 0 },
-    pos: { x: 0, y: -44 }
+    pos: { x: 0, y: -height }
   })
 
   return Entity<Position | Renderable>({

@@ -59,7 +59,7 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       ShadowSystem,
       TargetSystem,
       PixiRenderSystem,
-      PixiNametagSystem,
+      PixiNametagSystem(),
       HUDSystem(controls),
       PixiCameraSystem(() => ({ x: 225, y: 0, z: 0 })),
       PixiDebugSystem

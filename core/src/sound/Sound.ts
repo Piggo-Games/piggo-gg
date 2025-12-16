@@ -1,7 +1,7 @@
 import { entries, GunNames, randomChoice, World, XY, XYdistance } from "@piggo-gg/core"
 import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from "tone"
 
-export type BubbleSounds = "bubble" | "hitmarker" | "dice1" | "dice2"
+export type BubbleSounds = "bubble" | "hitmarker" | "dice1" | "dice2" | "throw"
 export type MusicSounds = "track1"
 export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
 export type ToolSounds = "whiff" | "thud" | "slash"
@@ -33,7 +33,7 @@ export type Sound = {
   music: MusicSounds
   muted: boolean
   ready: boolean
-  state: "closed" | "running" | "suspended"
+  state: "closed" | "running" | "suspended" | "interrupted"
   tones: Record<ValidSounds, Tone>
   stop: (name: ValidSounds) => void
   stopMusic: () => void
@@ -70,6 +70,7 @@ export const Sound = (world: World): Sound => {
       dice1: load("dice1.mp3", -5),
       dice2: load("dice2.mp3", -5),
       bubble: load("bubble.mp3", -10),
+      throw: load("throw.mp3", -5),
       hitmarker: load("hitmarker.mp3", -5),
       // track2: load("track2.mp3", -10),
       track1: load("track1.mp3", -5),

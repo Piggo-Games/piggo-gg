@@ -1,6 +1,6 @@
 import {
-  Collider, Debug, Entity, loadTexture, pixiAnimation,
-  Position, Renderable, Shadow
+  Collider, Debug, Entity, Health, loadTexture,
+  pixiAnimation, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 
 export const Patrick = (): Entity => {
@@ -11,8 +11,9 @@ export const Patrick = (): Entity => {
       position: Position({ x: 140 }),
       debug: Debug(),
       collider: Collider({
-        shape: "ball", radius: 10, isStatic: true, group: "2"
+        shape: "ellipse", radius: 7, length: 10, isStatic: true, group: "2"
       }),
+      health: Health({ hp: 50, maxHp: 50 }),
       shadow: Shadow(9, 0, 1),
       renderable: Renderable({
         anchor: { x: 0.5, y: 0.9 },

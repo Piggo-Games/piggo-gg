@@ -1,7 +1,7 @@
 import { Component, Entity, Position, World } from "@piggo-gg/core"
 import { Collider as RapierCollider, ColliderDesc, RigidBody, RigidBodyDesc } from "@dimforge/rapier2d-compat"
 
-export type ColliderShapes = "ball" | "cuboid" | "line"
+export type ColliderShapes = "ball" | "cuboid" | "line" | "ellipse"
 
 export type SensorCallback = (e2: Entity<Position | Collider>, world: World) => boolean
 
@@ -98,6 +98,9 @@ export const Collider = ({
   } else if (shape === "line" && points) {
     const s = ColliderDesc.polyline(Float32Array.from(points))
     colliderDesc = s
+  } else if (shape === "ellipse" && radius && length) {
+    colliderDesc = ColliderDesc.capsule(length, radius)
+    colliderDesc.setRotation(Math.PI / 2)
   } else {
     throw new Error(`Invalid collider shape ${shape}`)
   }

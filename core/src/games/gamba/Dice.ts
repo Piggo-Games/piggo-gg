@@ -67,6 +67,7 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           }
 
           rolling = true
+          world.client?.sound.play({ name: "throw" })
 
           const { pointingDelta } = params
 

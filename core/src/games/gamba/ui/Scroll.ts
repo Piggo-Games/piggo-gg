@@ -1,4 +1,4 @@
-import { Debug, Entity, Position, Renderable, pixiText, values, load, wrapText, Actions } from "@piggo-gg/core"
+import { Entity, Position, Renderable, pixiText, values, load, wrapText, Actions } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 import type { GambaState } from "../Gamba"
 
@@ -22,7 +22,6 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
   const scroll = Entity<Renderable>({
     id: `scroll-${id}`,
     components: {
-      debug: Debug(),
       position: Position({ x, y }),
       actions: Actions({
         selectAbility: ({ params, world }) => {

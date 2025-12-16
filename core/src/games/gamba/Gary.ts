@@ -1,5 +1,5 @@
 import {
-  Action, Actions, Character, Collider, Debug, Input, Inventory, Move,
+  Action, Actions, Character, Collider, Debug, Health, Input, Inventory, Move,
   Networked, PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
   VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
 } from "@piggo-gg/core"
@@ -17,6 +17,7 @@ export const Gary = (player: Player): Character => {
       team: Team(player.components.team.data.team),
       inventory: Inventory([Dice(1), Dice(2)]),
       shadow: Shadow(5),
+      health: Health({ hp: 10, maxHp: 10 }),
       input: Input({
         press: {
           ...WASDInputMap.press,

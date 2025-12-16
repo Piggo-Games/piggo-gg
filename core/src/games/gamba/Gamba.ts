@@ -10,6 +10,7 @@ import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
+import { HeartsSystem } from "./ui/HeartsHealth"
 import { Scroll, ScrollProps } from "./ui/Scroll"
 
 const arenaWidth = 500
@@ -76,7 +77,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       InventorySystem,
       ItemSystem,
       ShadowSystem,
-      PixiNametagSystem
+      HeartsSystem(),
+      PixiNametagSystem()
     ],
     entities: [
       Background({ rays: true }),
