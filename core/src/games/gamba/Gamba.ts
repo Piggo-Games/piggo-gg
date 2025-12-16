@@ -78,7 +78,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       ItemSystem,
       ShadowSystem,
       HeartsSystem(),
-      PixiNametagSystem(50)
+      PixiNametagSystem()
     ],
     entities: [
       Background({ rays: true }),
