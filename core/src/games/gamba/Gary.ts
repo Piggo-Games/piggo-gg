@@ -1,11 +1,13 @@
 import {
-  Action, Actions, Character, Collider, Debug, Health, Input, Inventory, Move,
+  Action, Actions, Character, Collider, Debug, GambaState, Health, Input, Inventory, Move,
   Networked, PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
   VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
 } from "@piggo-gg/core"
 import { Dice } from "./Dice"
 
 export const Gary = (player: Player): Character => {
+
+  let glowing = false
 
   const gary = Character({
     id: `gary-${player.id}`,
@@ -63,7 +65,22 @@ export const Gary = (player: Player): Character => {
           await PixiSkins["dude-white"](renderable)
         },
         animationSelect: VolleyCharacterAnimations,
-        onTick: VolleyCharacterDynamic
+        onTick: (props) => {
+          VolleyCharacterDynamic(props)
+
+          const { world, renderable } = props
+
+          const state = world.state<GambaState>()
+          if (!glowing && state.turnPhase === "players" && state.shooter === gary.id) {
+            renderable.setGlow({ color: 0xffffff, outerStrength: 3 })
+            console.log("glow set on", gary.id)
+            glowing = true
+          } else if (glowing && (state.turnPhase !== "players" || state.shooter !== gary.id)) {
+            renderable.setGlow()
+            console.log("glow removed on", gary.id)
+            glowing = false
+          }
+        }
       })
     }
   })

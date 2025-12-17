@@ -75,7 +75,6 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
           let row = 0
           while (numHearts > row * 10) {
             const numThisRow = min(10, numHearts - row * 10)
-            console.log("numThisRow", numThisRow, target.id)
 
             let gap = 32 / (numThisRow - 1)
 

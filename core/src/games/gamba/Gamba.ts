@@ -20,6 +20,12 @@ export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
 
 export type GambaState = {
   round: number
+  turnPhase: "players" | "monster"
+  turnIndex: number
+  turnTarget: Roll | null
+  rollId: number
+  handledRollId: number
+  autoRollAt: number | null
   shooter: string | null
   die1: D6 | null
   die2: D6 | null
@@ -59,6 +65,12 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     },
     state: {
       round: 1,
+      turnPhase: "players",
+      turnIndex: 0,
+      turnTarget: null,
+      rollId: 0,
+      handledRollId: 0,
+      autoRollAt: null,
       shooter: null,
       die1: null,
       die2: null,
@@ -109,6 +121,81 @@ const GambaSystem = SystemBuilder({
   init: (world) => {
 
     let lastScale = 0
+    const monsterId = "patrick"
+    const d6: D6[] = [1, 2, 3, 4, 5, 6]
+
+    const beginTurn = (state: GambaState, actorId: string | null) => {
+      state.shooter = actorId
+      state.turnTarget = null
+      state.autoRollAt = null
+    }
+
+    const beginPlayerTurn = (state: GambaState, characters: { id: string }[]) => {
+      console.log("beginPlayerTurn", state.turnIndex, characters)
+
+      state.turnPhase = "players"
+      if (characters.length === 0) {
+        beginTurn(state, null)
+        return
+      }
+
+      if (state.turnIndex >= characters.length) {
+        state.turnIndex = 0
+      }
+
+      beginTurn(state, characters[state.turnIndex]?.id ?? null)
+    }
+
+    const beginMonsterTurn = (state: GambaState) => {
+      state.turnPhase = "monster"
+      state.turnIndex = 0
+      beginTurn(state, monsterId)
+      state.autoRollAt = world.tick + 20
+    }
+
+    const advanceTurn = (state: GambaState, characters: { id: string }[]) => {
+      if (state.turnPhase === "monster") {
+        state.round += 1
+        state.turnPhase = "players"
+        state.turnIndex = 0
+        beginPlayerTurn(state, characters)
+        return
+      }
+
+      state.turnIndex += 1
+
+      if (state.turnIndex >= characters.length) {
+        beginMonsterTurn(state)
+        return
+      }
+
+      beginPlayerTurn(state, characters)
+    }
+
+    const scheduleMonsterRoll = (state: GambaState) => {
+      state.autoRollAt = world.tick + 20
+    }
+
+    const maybeAutoRollMonster = (state: GambaState) => {
+      if (state.turnPhase !== "monster") return
+      if (!state.shooter) return
+      if (state.autoRollAt === null || world.tick < state.autoRollAt) return
+
+      state.rolled = null
+      state.autoRollAt = null
+
+      console.log("auto rolling for monster")
+      state.die1 = world.random.choice(d6)
+      state.die2 = world.random.choice(d6)
+    }
+
+    const triggerAbility = (_: { state: GambaState, shooterId: string }) => {
+      console.log("ABILITY")
+    }
+
+    const triggerCrit = (_: { state: GambaState, shooterId: string, die1: D6, die2: D6 }) => {
+      console.log("CRIT")
+    }
 
     const updateScale = () => {
       if (!world.pixi) return
@@ -131,6 +218,21 @@ const GambaSystem = SystemBuilder({
       onTick: () => {
         const state = world.state<GambaState>()
 
+        const characters = world.characters()
+
+        if (state.shooter === null) {
+          beginPlayerTurn(state, characters)
+        } else if (state.turnPhase === "players") {
+          const expected = characters[state.turnIndex]?.id ?? null
+          if (state.shooter !== expected) {
+            beginPlayerTurn(state, characters)
+          }
+        } else if (state.turnPhase === "monster" && state.shooter !== monsterId) {
+          beginMonsterTurn(state)
+        }
+
+        maybeAutoRollMonster(state)
+
         if (state.die1 && state.die2 && state.rolled === null) {
           let result = state.die1 + state.die2
           if ((state.die1 === 6 && state.die2 === 1) || (state.die1 === 1 && state.die2 === 6)) {
@@ -138,6 +240,7 @@ const GambaSystem = SystemBuilder({
           }
 
           state.rolled = result as Roll
+          state.rollId += 1
 
           // damage on 7
           if (state.rolled === 7 && state.shooter) {
@@ -152,10 +255,39 @@ const GambaSystem = SystemBuilder({
           state.rolled = null
         }
 
-        // shooter
-        const characters = world.characters()
-        if (characters.length === 1) {
-          state.shooter = characters[0].id
+        if (state.rolled !== null && state.rollId !== state.handledRollId) {
+          state.handledRollId = state.rollId
+
+          if (state.rolled === 67 && state.shooter && state.die1 && state.die2) {
+            triggerCrit({ state, shooterId: state.shooter, die1: state.die1, die2: state.die2 })
+            advanceTurn(state, characters)
+            return
+          }
+
+          if (state.rolled === 7) {
+            advanceTurn(state, characters)
+            return
+          }
+
+          if (state.turnTarget === null) {
+            state.turnTarget = state.rolled
+            if (state.turnPhase === "monster") {
+              scheduleMonsterRoll(state)
+            }
+            return
+          }
+
+          if (state.rolled === state.turnTarget) {
+            if (state.shooter) {
+              triggerAbility({ state, shooterId: state.shooter })
+            }
+            advanceTurn(state, characters)
+            return
+          }
+
+          if (state.turnPhase === "monster") {
+            scheduleMonsterRoll(state)
+          }
         }
       }
     }

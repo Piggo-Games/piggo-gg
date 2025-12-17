@@ -1,9 +1,11 @@
 import {
-  Collider, Debug, Entity, Health, loadTexture,
+  Collider, Debug, Entity, GambaState, Health, loadTexture,
   pixiAnimation, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 
 export const Patrick = (): Entity => {
+
+  let glowing = false
 
   const patrick = Entity<Health>({
     id: "patrick",
@@ -22,9 +24,15 @@ export const Patrick = (): Entity => {
         interpolate: true,
         scaleMode: "nearest",
         animationSelect: () => "idle",
-        onTick: ({ world}) => {
-          if (world.tick % 40 === 0) {
-            patrick.components.health.data.hp -= 1
+        onTick: ({ world, renderable }) => {
+          const state = world.state<GambaState>()
+
+          if (!glowing && state.turnPhase === "monster") {
+            renderable.setGlow({ color: 0xffffff, outerStrength: 3 })
+            glowing = true
+          } else if (glowing && (state.turnPhase !== "monster")) {
+            renderable.setGlow()
+            glowing = false
           }
         },
         setup: async (r) => {
