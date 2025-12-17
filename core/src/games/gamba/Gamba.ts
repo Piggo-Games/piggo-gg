@@ -6,6 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Gary } from "./Gary"
+import { Dice } from "./Dice"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
@@ -102,6 +103,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       Flag(),
       Patrick(),
       Water2D(),
+      Dice(1),
+      Dice(2),
 
       // DummyPlayer(),
 
@@ -124,7 +127,6 @@ const GambaSystem = SystemBuilder({
 
     let lastScale = 0
     const monsterId = "patrick"
-    const d6: D6[] = [1, 2, 3, 4, 5, 6]
 
     const beginTurn = (state: GambaState, actorId: string | null) => {
       state.shooter = actorId
@@ -180,15 +182,14 @@ const GambaSystem = SystemBuilder({
 
     const maybeAutoRollMonster = (state: GambaState) => {
       if (state.turnPhase !== "monster") return
-      if (!state.shooter) return
+      if (state.shooter !== monsterId) return
       if (state.autoRollAt === null || world.tick < state.autoRollAt) return
 
-      state.rolled = null
       state.autoRollAt = null
 
-      console.log("auto rolling for monster")
-      state.die1 = world.random.choice(d6)
-      state.die2 = world.random.choice(d6)
+      const pointingDelta = { x: -140, y: 0 }
+      world.actions.push(world.tick, "dice-1", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
+      world.actions.push(world.tick, "dice-2", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
     }
 
     const triggerAbility = (_: { state: GambaState, shooterId: string }) => {

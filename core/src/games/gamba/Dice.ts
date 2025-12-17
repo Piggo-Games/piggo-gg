@@ -1,11 +1,17 @@
 import {
-  abs, Actions, Collider, D6, Data, Debug, Effects, GambaState, Input,
-  Item, ItemBuilder, ItemEntity, loadTexture, max, min,
-  Networked, NPC, PI, Position, Renderable, Shadow
+  abs, Actions, Collider, D6, Data, Debug, Effects, Entity, GambaState, hypot,
+  loadTexture, max, min, Networked, NPC, PI, Position, Renderable, round, Shadow, XY
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
+type DiceRollParams = {
+  shooterId: string
+  pointingDelta: XY
+}
+
+type DiceComponents = Actions | Collider | Data | Debug | Effects | NPC | Networked | Position | Renderable | Shadow
+
+export const Dice = (order: 1 | 2) => {
 
   const throwSpeed = 100
   const throwUp = 2
@@ -14,64 +20,69 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
   let bounced = false
   let landed = false
   let decided = false
+  let dropped = false
+
+  let lastShooter: string | null = null
 
   let sides: Record<number, Sprite> = {}
 
-  let side = 1
+  let side: D6 = 1
   let sideAcc = 0
 
-  const reset = () => {
+  const reset = (shooterId: string | null) => {
     rolling = false
     sideAcc = 0
     bounced = false
     landed = false
     decided = false
+    dropped = false
 
-    dice.components.item.dropped = false
+    dice.components.data.set("side", side)
+    dice.components.data.set("sideAcc", sideAcc)
+
+    dice.components.position.setVelocity({ x: 0, y: 0, z: 0 }).setRotation(0)
+    dice.components.position.data.follows = shooterId
   }
 
-  const id = `dice-${character.id}-${order}`
+  const id = `dice-${order}`
 
-  const dice = ItemEntity({
+  const dice = Entity<DiceComponents>({
     id,
     components: {
       networked: Networked(),
       debug: Debug(),
       data: Data({ data: { side, sideAcc } }),
       collider: Collider({ shape: "ball", radius: 3, group: "none", restitution: 1 }),
-      position: Position({ follows: character.id, gravity: 0.12 }),
-      item: Item({ name: "Dice" }),
-      input: Input({
-        press: {
-          mb1: ({ hold, world }) => {
-            if (rolling || hold) return
-
-            const { pointingDelta } = character.components.position.data
-
-            const otherDiceId = `dice-${character.id}-${order === 1 ? 2 : 1}`
-
-            world.actions.push(world.tick, otherDiceId, { actionId: "roll", params: { entityId: id, pointingDelta } })
-
-            return { actionId: "roll", params: { entityId: id, pointingDelta } }
-          }
-        }
+      position: Position({
+        gravity: 0.12,
+        offset: { x: order === 1 ? -6 : 6, y: -6 }
       }),
       shadow: Shadow(3.5, 4),
       actions: Actions({
         roll: ({ params, world }) => {
+          const { shooterId, pointingDelta } = params as DiceRollParams
+          const state = world.state<GambaState>()
+
+          if (state.shooter !== shooterId) return
+          if (rolling) return
+
+          const shooter = world.entity(shooterId)
+          const shooterPos = shooter?.components.position
+          if (!shooterPos) return
+
           if (!dice.components.position.data.follows) {
-            dice.components.position.data.follows = character.id
-            reset()
+            reset(shooterId)
             world.actions.push(world.tick + 2, id, { actionId: "roll", params })
             return
           }
 
           rolling = true
+          dropped = true
+          decided = false
+          bounced = false
+          landed = false
+
           world.client?.sound.play({ name: "throw" })
-
-          character.components.renderable?.setAnimation("spike")
-
-          const { pointingDelta } = params
 
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
           const yRatio = pointingDelta.y / (abs(pointingDelta.y) + abs(pointingDelta.x))
@@ -82,12 +93,11 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           const x = throwSpeed * xRatio + strength * xRatio + offset * yRatio * 30
           const y = throwSpeed * yRatio + strength * yRatio + offset * xRatio * 30
 
-          const charZ = character.components.position.data.z
+          const shooterZ = shooterPos.data.z
 
-          dice.components.position.data.z = 0.01 + charZ
-          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - charZ) + offset * 0.2 })
+          dice.components.position.data.z = 0.01 + shooterZ
+          dice.components.position.setVelocity({ x, y, z: max(0, throwUp - shooterZ) + offset * 0.2 })
           dice.components.position.data.follows = null
-          dice.components.item.dropped = true
           dice.components.collider!.setGroup("2")
         }
       }),
@@ -95,10 +105,16 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
         behavior: (_, world) => {
           const state = world.state<GambaState>()
 
-          const { position, collider, item } = dice.components
+          const shooterId = state.shooter
+          if (shooterId !== lastShooter && !rolling) {
+            lastShooter = shooterId
+            reset(shooterId)
+          }
+
+          const { position, collider } = dice.components
 
           // should fly over bad guys
-          collider!.setGroup(!item.dropped ? "none" : (position.data.z > 20) ? "3" : "2")
+          collider!.setGroup(!dropped ? "none" : (position.data.z > 20) ? "3" : "2")
 
           if (dice.components.renderable?.initialized && sides[side]) {
             for (const child of dice.components.renderable!.c.children) {
@@ -126,14 +142,18 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           if (rolling) {
             sideAcc += factor
             state[`die${order}`] = null
-          } else if (!decided && item.dropped) {
+          } else if (!decided && dropped) {
             state[`die${order}`] = side as D6
             decided = true
           }
 
+          // TODO does this fix netcode ?
+          // dice.components.data.set("side", side)
+          // dice.components.data.set("sideAcc", sideAcc)
+
           if (sideAcc > 12) {
             sideAcc = 0
-            side = world.random.choice([1, 2, 3, 4, 5, 6].filter(s => s !== side))
+            side = world.random.choice([1, 2, 3, 4, 5, 6].filter(s => s !== side)) as D6
           }
 
           // rolling logic
@@ -158,6 +178,27 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
               const amount = max(0.09, speed * 0.003)
               position.rotate(amount)
             }
+          }
+
+          if (!dropped && shooterId?.startsWith("gary")) {
+            const shooter = world.entity(shooterId ?? "")
+            if (!shooter) return
+
+            const shooterPos = shooter.components.position
+            if (!shooterPos) return
+
+            const { pointingDelta } = shooterPos?.data
+            const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
+
+            const hyp_x = pointingDelta.x / hypotenuse
+            const hyp_y = pointingDelta.y / hypotenuse
+
+            position.data.offset = {
+              x: round(hyp_x * min(10, abs(pointingDelta.x)), 2),
+              y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
+            }
+          } else {
+            position.data.offset = { x: -12, y: 0 }
           }
         }
       }),
