@@ -80,13 +80,6 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
         setup: async (r) => {
           texture = await load("heart.png")
           texture.source.scaleMode = "nearest"
-
-          // TODO
-          for (let i = 0; i < 5; i++) {
-            const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
-            copy.x = i * 8
-            r.c.addChild(copy)
-          }
         }
       })
     }
