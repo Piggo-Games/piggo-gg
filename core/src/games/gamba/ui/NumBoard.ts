@@ -4,9 +4,15 @@ import { Sprite } from "pixi.js"
 export const NumBoard = (): Entity => {
 
   let digits: Record<string, Sprite> = {}
-  let rendered = 0
+  let rendered: number | null = null
 
-  const displayNumber = (roll: Roll) => {
+  const displayNumber = (roll: Roll | null) => {
+    // hide everything
+    if (roll === null) {
+      for (const digit of values(digits)) digit.visible = false
+      return
+    }
+
     const numStr = roll.toString()
 
     const chars = numStr.length
@@ -78,7 +84,7 @@ export const NumBoard = (): Entity => {
             digits[key] = sprite
           }
 
-          displayNumber(67)
+          displayNumber(null)
         }
       })
     }

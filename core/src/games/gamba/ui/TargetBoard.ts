@@ -4,11 +4,16 @@ import { Sprite } from "pixi.js"
 export const TargetBoard = (): Entity => {
 
   let digits: Record<string, Sprite> = {}
-  let rendered = 0
+  let rendered: number | null = null
 
-  const displayNumber = (roll: Roll) => {
+  const displayNumber = (roll: Roll | null) => {
+    // hide everything
+    if (roll === null) {
+      for (const digit of values(digits)) digit.visible = false
+      return
+    }
+
     const numStr = roll.toString()
-
     const chars = numStr.length
 
     let startX = chars === 1 ? 8 : 0
@@ -44,9 +49,9 @@ export const TargetBoard = (): Entity => {
         anchor: { x: 0.5, y: 0.5 },
         onTick: ({ world }) => {
           const state = world.state<GambaState>()
-          if (state.rolled !== null && state.rolled !== rendered) {
-            displayNumber(state.rolled)
-            rendered = state.rolled
+          if (state.turnTarget !== rendered) {
+            displayNumber(state.turnTarget)
+            rendered = state.turnTarget
           }
         },
         setup: async (r) => {
@@ -71,7 +76,7 @@ export const TargetBoard = (): Entity => {
             digits[key] = sprite
           }
 
-          displayNumber(12)
+          displayNumber(null)
         }
       })
     }
