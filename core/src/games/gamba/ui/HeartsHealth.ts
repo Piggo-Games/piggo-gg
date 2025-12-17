@@ -1,7 +1,7 @@
 import {
   ClientSystemBuilder, Entity, Health, Position, Renderable, entries, load
 } from "@piggo-gg/core"
-import { Sprite } from "pixi.js"
+import { Sprite, Texture } from "pixi.js"
 
 // the HeartsSystem draws hearts above characters with Health
 export const HeartsSystem = () => ClientSystemBuilder({
@@ -51,6 +51,8 @@ export const HeartsSystem = () => ClientSystemBuilder({
 export const Heart = (entity: Entity<Health | Position | Renderable>): Entity => {
   const entityId = entity.id
 
+  let texture: undefined | Texture = undefined
+
   return Entity<Position | Renderable>({
     id: `heart-${entityId}`,
     components: {
@@ -70,12 +72,12 @@ export const Heart = (entity: Entity<Health | Position | Renderable>): Entity =>
           renderable.visible = target.components.renderable?.visible ?? false
         },
         setup: async (r) => {
-          const t = await load("heart.png")
-          t.source.scaleMode = "nearest"
+          texture = await load("heart.png")
+          texture.source.scaleMode = "nearest"
 
           // TODO
           for (let i = 0; i < 5; i++) {
-            const copy = new Sprite({ texture: t, scale: { x: 0.9, y: 0.9 } })
+            const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
             copy.x = i * 8
             r.c.addChild(copy)
           }
