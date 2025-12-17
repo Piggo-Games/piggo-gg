@@ -12,6 +12,7 @@ import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartsSystem } from "./ui/HeartsHealth"
 import { Scroll, ScrollProps } from "./ui/Scroll"
+import { TargetBoard } from "./ui/TargetBoard"
 
 const arenaWidth = 500
 
@@ -105,6 +106,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       // DummyPlayer(),
 
       NumBoard(),
+      TargetBoard(),
       ...scrollAbilities.map((scroll) => Scroll(scroll)),
 
       Cursor(),
