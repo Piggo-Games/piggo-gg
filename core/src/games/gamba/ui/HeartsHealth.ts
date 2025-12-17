@@ -77,14 +77,19 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
             const numThisRow = min(10, numHearts - row * 10)
             console.log("numThisRow", numThisRow, target.id)
 
-            const total = 32
-            const gap = total / (numThisRow - 1)
+            let gap = 32 / (numThisRow - 1)
+
+            let offset = 0
+            if (numThisRow < 5) {
+              gap = 8
+              offset = (32 - (numThisRow - 1) * gap) / 2
+            }
 
             for (let i = 0; i < numThisRow; i++) {
               renderable.c.addChild(new Sprite({
                 texture,
                 scale: { x: 0.9, y: 0.9 },
-                x: i * gap,
+                x: i * gap + offset,
                 y: row * 8
               }))
             }
