@@ -69,6 +69,8 @@ export const Dice = (order: 1 | 2): ItemBuilder => ({ character }) => {
           rolling = true
           world.client?.sound.play({ name: "throw" })
 
+          character.components.renderable?.setAnimation("spike")
+
           const { pointingDelta } = params
 
           const xRatio = pointingDelta.x / (abs(pointingDelta.y) + abs(pointingDelta.x))
