@@ -17,7 +17,7 @@ export const Gary = (player: Player): Character => {
       team: Team(player.components.team.data.team),
       inventory: Inventory([Dice(1), Dice(2)]),
       shadow: Shadow(5),
-      health: Health({ hp: 10, maxHp: 10 }),
+      health: Health({ hp: 5, maxHp: 5 }),
       input: Input({
         press: {
           ...WASDInputMap.press,

@@ -52,7 +52,7 @@ export const HeartsSystem = () => ClientSystemBuilder({
 export const Heart = (target: Entity<Health | Position | Renderable>): Entity => {
 
   let texture: undefined | Texture = undefined
-  let numHearts = 5
+  let numHearts = 0
 
   return Entity<Position | Renderable>({
     id: `heart-${target.id}`,
@@ -75,12 +75,15 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
           let row = 0
           while (numHearts > row * 10) {
             const numThisRow = min(10, numHearts - row * 10)
+            console.log("numThisRow", numThisRow, target.id)
+
+            const gap = numThisRow === 5 ? 8 : 3.5
 
             for (let i = 0; i < numThisRow; i++) {
               renderable.c.addChild(new Sprite({
                 texture,
                 scale: { x: 0.9, y: 0.9 },
-                x: i * 8,
+                x: i * gap,
                 y: row * 8
               }))
             }
