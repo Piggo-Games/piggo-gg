@@ -78,8 +78,11 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
 
             for (let i = 0; i < numThisRow; i++) {
               renderable.c.addChild(new Sprite({
-                texture, scale: { x: 0.9, y: 0.9 }, x: i * 8, y: row * 8 })
-              )
+                texture,
+                scale: { x: 0.9, y: 0.9 },
+                x: i * 8,
+                y: row * 8
+              }))
             }
             row++
           }
