@@ -11,7 +11,7 @@ import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
-import { HeartsSystem } from "./ui/HeartsHealth"
+import { HeartSystem } from "./ui/HeartSystem"
 import { Scroll, ScrollProps } from "./ui/Scroll"
 import { TargetBoard } from "./ui/TargetBoard"
 
@@ -91,7 +91,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       InventorySystem,
       ItemSystem,
       ShadowSystem,
-      HeartsSystem(),
+      HeartSystem(),
       PixiNametagSystem()
     ],
     entities: [

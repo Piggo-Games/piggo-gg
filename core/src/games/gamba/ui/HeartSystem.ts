@@ -4,15 +4,15 @@ import {
 } from "@piggo-gg/core"
 import { Sprite, Texture } from "pixi.js"
 
-// the HeartsSystem draws hearts above characters with Health
-export const HeartsSystem = () => ClientSystemBuilder({
-  id: "HeartsSystem",
+// the HeartSystem draws hearts above characters with Health
+export const HeartSystem = () => ClientSystemBuilder({
+  id: "HeartSystem",
   init: (world) => {
 
     const hearts: Record<string, Entity> = {}
 
     return {
-      id: "HeartsSystem",
+      id: "HeartSystem",
       query: ["health", "position", "renderable"],
       priority: 6,
       skipOnRollback: true,
