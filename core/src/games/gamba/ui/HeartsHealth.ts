@@ -1,5 +1,6 @@
 import {
-  ClientSystemBuilder, Entity, Health, Position, Renderable, entries, load
+  ClientSystemBuilder, Entity, Health, Position, Renderable, entries, load,
+  min
 } from "@piggo-gg/core"
 import { Sprite, Texture } from "pixi.js"
 
@@ -71,10 +72,20 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
 
           renderable.c.removeChildren()
 
-          for (let i = 0; i < hp; i++) {
-            const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
-            copy.x = i * 8
-            renderable.c.addChild(copy)
+          // max 10 per row
+          let row = 0
+
+          while (numHearts > row * 10) {
+            const numThisRow = min(10, numHearts - row * 10)
+            console.log("numThisRow", numThisRow, target.id)
+
+            for (let i = 0; i < numThisRow; i++) {
+              const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
+              copy.x = i * 8
+              copy.y = row * 8
+              renderable.c.addChild(copy)
+            }
+            row++
           }
         },
         setup: async (r) => {
