@@ -52,6 +52,7 @@ export const Heart = (entity: Entity<Health | Position | Renderable>): Entity =>
   const entityId = entity.id
 
   let texture: undefined | Texture = undefined
+  let numHearts = 5
 
   return Entity<Position | Renderable>({
     id: `heart-${entityId}`,
@@ -70,6 +71,20 @@ export const Heart = (entity: Entity<Health | Position | Renderable>): Entity =>
           }
 
           renderable.visible = target.components.renderable?.visible ?? false
+
+          // LOGIC FOR UPDATING HEARTS GOES HERE
+          const { hp } = target.components.health.data
+          if (hp === numHearts || !texture) return
+
+          numHearts = hp
+
+          renderable.c.removeChildren()
+
+          for (let i = 0; i < hp; i++) {
+            const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
+            copy.x = i * 8
+            renderable.c.addChild(copy)
+          }
         },
         setup: async (r) => {
           texture = await load("heart.png")
