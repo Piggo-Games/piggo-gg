@@ -48,34 +48,25 @@ export const HeartsSystem = () => ClientSystemBuilder({
   }
 })
 
-export const Heart = (entity: Entity<Health | Position | Renderable>): Entity => {
-  const entityId = entity.id
+export const Heart = (target: Entity<Health | Position | Renderable>): Entity => {
 
   let texture: undefined | Texture = undefined
   let numHearts = 5
 
   return Entity<Position | Renderable>({
-    id: `heart-${entityId}`,
+    id: `heart-${target.id}`,
     components: {
-      position: Position({ follows: entityId }),
+      position: Position({ follows: target.id }),
       renderable: Renderable({
-        zIndex: entity.components.renderable.zIndex,
+        zIndex: target.components.renderable.zIndex,
         interpolate: true,
-        position: { x: -20, y: entityId.startsWith("gary") ? 8 : 8 },
-        onTick: ({ renderable, world }) => {
-          const target = world.entity(entityId)
-
-          if (!target || !target.components.health) {
-            renderable.visible = false
-            return
-          }
-
+        position: { x: -20, y: 8 },
+        onTick: ({ renderable }) => {
           renderable.visible = target.components.renderable?.visible ?? false
+          if (!renderable.visible) return
 
-          // LOGIC FOR UPDATING HEARTS GOES HERE
           const { hp } = target.components.health.data
           if (hp === numHearts || !texture) return
-
           numHearts = hp
 
           renderable.c.removeChildren()
