@@ -72,12 +72,9 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
 
           renderable.c.removeChildren()
 
-          // max 10 per row
           let row = 0
-
           while (numHearts > row * 10) {
             const numThisRow = min(10, numHearts - row * 10)
-            console.log("numThisRow", numThisRow, target.id)
 
             for (let i = 0; i < numThisRow; i++) {
               const copy = new Sprite({ texture, scale: { x: 0.9, y: 0.9 } })
