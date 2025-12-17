@@ -5,7 +5,7 @@ import {
 
 export const Patrick = (): Entity => {
 
-  const patrick = Entity({
+  const patrick = Entity<Health>({
     id: "patrick",
     components: {
       position: Position({ x: 140 }),
@@ -22,6 +22,11 @@ export const Patrick = (): Entity => {
         interpolate: true,
         scaleMode: "nearest",
         animationSelect: () => "idle",
+        onTick: ({ world}) => {
+          if (world.tick % 40 === 0) {
+            patrick.components.health.data.hp -= 1
+          }
+        },
         setup: async (r) => {
           const t = await loadTexture("patrick.json")
 

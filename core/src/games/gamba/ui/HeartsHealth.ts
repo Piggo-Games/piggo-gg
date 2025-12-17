@@ -77,7 +77,10 @@ export const Heart = (target: Entity<Health | Position | Renderable>): Entity =>
             const numThisRow = min(10, numHearts - row * 10)
             console.log("numThisRow", numThisRow, target.id)
 
-            const gap = numThisRow === 5 ? 8 : 3.5
+            let gap = 8
+            if (numThisRow > 5) {
+              gap -= 0.9 * (numThisRow - 5)
+            }
 
             for (let i = 0; i < numThisRow; i++) {
               renderable.c.addChild(new Sprite({
