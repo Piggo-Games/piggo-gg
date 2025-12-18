@@ -28,6 +28,7 @@ export type GambaState = {
   rollId: number
   handledRollId: number
   autoRollAt: number | null
+  advanceAt: number | null
   shooter: string | null
   die1: D6 | null
   die2: D6 | null
@@ -73,6 +74,7 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
       rollId: 0,
       handledRollId: 0,
       autoRollAt: null,
+      advanceAt: null,
       shooter: null,
       die1: null,
       die2: null,
@@ -158,6 +160,10 @@ const GambaSystem = SystemBuilder({
     }
 
     const advanceTurn = (state: GambaState, characters: { id: string }[]) => {
+      state.rolled = null
+      state.die1 = null
+      state.die2 = null
+
       if (state.turnPhase === "monster") {
         state.round += 1
         state.turnPhase = "players"
@@ -223,6 +229,12 @@ const GambaSystem = SystemBuilder({
 
         const characters = world.characters()
 
+        if (state.advanceAt !== null && world.tick >= state.advanceAt) {
+          state.advanceAt = null
+          advanceTurn(state, characters)
+          return
+        }
+
         if (state.shooter === null) {
           beginPlayerTurn(state, characters)
         } else if (state.turnPhase === "players") {
@@ -263,12 +275,14 @@ const GambaSystem = SystemBuilder({
 
           if (state.rolled === 67 && state.shooter && state.die1 && state.die2) {
             triggerCrit({ state, shooterId: state.shooter, die1: state.die1, die2: state.die2 })
-            advanceTurn(state, characters)
+            world.client?.sound.play({ name: "jingle1" })
+            state.advanceAt = world.tick + 40
             return
           }
 
           if (state.rolled === 7) {
-            advanceTurn(state, characters)
+            world.client?.sound.play({ name: "spike" })
+            state.advanceAt = world.tick + 40
             return
           }
 
@@ -282,9 +296,10 @@ const GambaSystem = SystemBuilder({
 
           if (state.rolled === state.turnTarget) {
             if (state.shooter) {
+              world.client?.sound.play({ name: "jingle1" })
               triggerAbility({ state, shooterId: state.shooter })
             }
-            advanceTurn(state, characters)
+            state.advanceAt = world.tick + 40
             return
           }
 
