@@ -49,9 +49,9 @@ export const NumBoard = (): Entity => {
         anchor: { x: 0.5, y: 0.5 },
         onTick: ({ world }) => {
           const state = world.state<GambaState>()
-          if (state.rolled !== null && state.rolled !== rendered) {
-            displayNumber(state.rolled)
-            rendered = state.rolled
+          if (state.turnTarget !== rendered) {
+            displayNumber(state.turnTarget)
+            rendered = state.turnTarget
           }
         },
         setup: async (r) => {

@@ -158,6 +158,10 @@ const GambaSystem = SystemBuilder({
     }
 
     const advanceTurn = (state: GambaState, characters: { id: string }[]) => {
+      state.rolled = null
+      state.die1 = null
+      state.die2 = null
+
       if (state.turnPhase === "monster") {
         state.round += 1
         state.turnPhase = "players"

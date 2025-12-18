@@ -1,7 +1,7 @@
 import {
   Action, Actions, Character, Collider, Debug, GambaState, Health, Input,
-  Move, Networked, PixiSkins, Player, Point, Position,
-  Renderable, Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY
+  Move, Networked, PixiSkins, Player, Point, Position, Renderable,
+  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY
 } from "@piggo-gg/core"
 
 export const Gary = (player: Player): Character => {
