@@ -286,8 +286,10 @@ const GambaSystem = SystemBuilder({
 
           if (state.rolled === state.turnTarget) {
             if (state.shooter) {
+              world.client?.sound.play({ name: "jingle1" })
               triggerAbility({ state, shooterId: state.shooter })
             }
+            // TODO advance turn later
             advanceTurn(state, characters)
             return
           }
