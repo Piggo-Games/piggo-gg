@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Island, HDiv, Gamba
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build, HDiv, Gamba
 } from "@piggo-gg/core"
 import { World as RapierWorld } from "@dimforge/rapier2d-compat"
 
@@ -79,7 +79,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     entitiesAtTick: {},
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
     games: {
-      "island": Island,
+      "build": Build,
       "craft": Craft,
       "lobby": Lobby,
       "gamba": Gamba,
@@ -331,7 +331,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       }
 
       // pointer lock for certain games
-      if (["craft", "strike", "island"].includes(game.id)) world.client?.pointerLock()
+      if (world.game.renderer === "three") world.client?.pointerLock()
 
       // black out the scene
       if (world.client) {

@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
-  Input, IslandSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
+  Input, BuildSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
@@ -210,7 +210,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           // change block color
           if (world.debug && hit.inside.type === 12) {
-            const { blockColor } = world.settings<IslandSettings>()
+            const { blockColor } = world.settings<BuildSettings>()
             world.blocks.coloring[`${hit.inside.x},${hit.inside.y},${hit.inside.z}`] = blockColor
             world.blocks.invalidate()
           }

@@ -7,24 +7,24 @@ import {
 import { Bob } from "./Bob"
 import { Pig } from "./Pig"
 import { MobileUI } from "../craft/MobileUI"
-import { IslandMap, IslandMapColoring } from "./IslandMap"
+import { BuildMap, BuildMapColoring } from "./BuildMap"
 import { Shork } from "./Shork"
 
-export type IslandSettings = {
+export type BuildSettings = {
   showCrosshair: boolean
   showControls: boolean
   showNametags: boolean
   blockColor: BlockColor
 }
 
-export type IslandState = {
+export type BuildState = {
   doubleJumped: string[]
 }
 
-export const Island: GameBuilder<IslandState, IslandSettings> = {
-  id: "island",
+export const Build: GameBuilder<BuildState, BuildSettings> = {
+  id: "build",
   init: (world) => ({
-    id: "island",
+    id: "build",
     netcode: "rollback",
     renderer: "three",
     settings: {
@@ -42,7 +42,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       BlockPhysicsSystem("local"),
       ThreeCameraSystem(),
       HUDSystem(controls),
-      IslandSystem,
+      BuildSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
@@ -67,24 +67,24 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
   })
 }
 
-const IslandSystem = SystemBuilder({
-  id: "IslandSystem",
+const BuildSystem = SystemBuilder({
+  id: "BuildSystem",
   init: (world) => {
 
-    world.blocks.loadMap(IslandMap)
-    world.blocks.coloring = IslandMapColoring
+    world.blocks.loadMap(BuildMap)
+    world.blocks.coloring = BuildMapColoring
 
     const mobileUI = MobileUI(world)
 
     if (world.client) world.client.controls.localAim.x = PI / 2 * 2.5
 
     return {
-      id: "IslandSystem",
+      id: "BuildSystem",
       query: [],
       priority: 3,
       onTick: () => {
 
-        const state = world.game.state as IslandState
+        const state = world.game.state as BuildState
 
         if (world.client && !world.client.mobile) {
           world.client.menu = document.pointerLockElement === null
