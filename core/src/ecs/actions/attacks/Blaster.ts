@@ -19,7 +19,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
   let cd = -100
 
   const recoilRate = 0.03
-  const spinDuration = 20
+  const spinDuration = 2
   const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
@@ -91,7 +91,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           const { recoil } = character.components.position.data
 
-          if (recoil) aim.y += recoil * 0.1
+          // if (recoil) aim.y += recoil * 0.1
 
           // apply recoil
           character.components.position.data.recoil = min(0.7, recoil + 0.55)
@@ -297,12 +297,12 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           mesh.rotation.y = aim.x
           mesh.rotation.x = aim.y + localRecoil * 0.5
 
-          if (spinUntil && spinUntil > world.tick) {
-            const spinRemaining = spinUntil - world.tick - ratio
-            if (spinRemaining > 0) {
-              mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
-            }
-          }
+          // if (spinUntil && spinUntil > world.tick) {
+          //   const spinRemaining = spinUntil - world.tick - ratio
+          //   if (spinRemaining > 0) {
+          //     mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
+          //   }
+          // }
         }
       })
     },
