@@ -1,6 +1,6 @@
 import { Entity, Position, Renderable, pixiText, values, load, wrapText, Actions } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
-import type { GambaState } from "../Gamba"
+import type { IslandState } from "../Island"
 
 export type ScrollProps = {
   id: string
@@ -25,7 +25,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
       position: Position({ x, y }),
       actions: Actions({
         selectAbility: ({ params, world }) => {
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
           state.selectedAbility = params.abilityId
         }
       }),
@@ -35,7 +35,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
         anchor: { x: 0.53, y: 0.5 },
         scaleMode: "nearest",
         onRender: ({ renderable, world }) => {
-          const selected = world.state<GambaState>().selectedAbility === id
+          const selected = world.state<IslandState>().selectedAbility === id
 
           renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
 

@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build, HDiv, Gamba
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build, HDiv, Island
 } from "@piggo-gg/core"
 import { World as RapierWorld } from "@dimforge/rapier2d-compat"
 
@@ -82,7 +82,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       "build": Build,
       "craft": Craft,
       "lobby": Lobby,
-      "gamba": Gamba,
+      "island": Island,
       "strike": Strike,
       "volley": Volley,
       "volley3d": Volley3d,
@@ -187,7 +187,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.tick += 1
       world.time = now
 
-      if (world.client?.discord) world.setGame("gamba")
+      if (world.client?.discord) world.setGame("island")
       world.client?.discord?.login(world.client)
 
       // store serialized entities

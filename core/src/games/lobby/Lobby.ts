@@ -1,7 +1,7 @@
 import {
   Background, Build, Entity, GameBuilder, getBrowser, HButton,
   HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
-  NPC, piggoVersion, PixiRenderSystem, RefreshableDiv, Strike, Volley, Gamba,
+  NPC, piggoVersion, PixiRenderSystem, RefreshableDiv, Strike, Volley, Island,
   World, canvasAppend, HtmlFpsText, HDiv
 } from "@piggo-gg/core"
 
@@ -248,7 +248,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
 
 const GameLobby = (): Entity => {
 
-  const list: GameBuilder[] = [Build, Volley, Gamba]
+  const list: GameBuilder[] = [Build, Volley, Island]
 
   let gameButtons: HTMLButtonElement[] = []
 

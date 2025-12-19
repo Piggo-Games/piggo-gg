@@ -1,5 +1,5 @@
 import {
-  Collider, Debug, Entity, GambaState, Health, loadTexture,
+  Collider, Debug, Entity, IslandState, Health, loadTexture,
   pixiAnimation, Position, Renderable, Shadow
 } from "@piggo-gg/core"
 
@@ -25,7 +25,7 @@ export const Patrick = (): Entity => {
         scaleMode: "nearest",
         animationSelect: () => "idle",
         onTick: ({ world, renderable }) => {
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
 
           if (!glowing && state.turnPhase === "monster") {
             renderable.setGlow({ color: 0xffffff, outerStrength: 3 })

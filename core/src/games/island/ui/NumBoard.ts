@@ -1,4 +1,4 @@
-import { Entity, GambaState, loadTexture, Position, Renderable, Roll, values } from "@piggo-gg/core"
+import { Entity, IslandState, loadTexture, Position, Renderable, Roll, values } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const NumBoard = (): Entity => {
@@ -48,7 +48,7 @@ export const NumBoard = (): Entity => {
         scaleMode: "nearest",
         anchor: { x: 0.5, y: 0.5 },
         onTick: ({ world }) => {
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
           if (state.turnTarget !== rendered) {
             displayNumber(state.turnTarget)
             rendered = state.turnTarget

@@ -1,4 +1,4 @@
-import { Entity, GambaState, load, loadTexture, Position, Renderable, Roll, values } from "@piggo-gg/core"
+import { Entity, IslandState, load, loadTexture, Position, Renderable, Roll, values } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const TargetBoard = (): Entity => {
@@ -48,7 +48,7 @@ export const TargetBoard = (): Entity => {
         scale: 0.7,
         anchor: { x: 0.5, y: 0.5 },
         onTick: ({ world }) => {
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
           if (state.rolled !== rendered) {
             displayNumber(state.rolled)
             rendered = state.rolled

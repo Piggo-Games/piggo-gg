@@ -1,15 +1,15 @@
 import {
-  Action, Actions, Character, Collider, Debug, GambaState, Health, Input,
+  Action, Actions, Character, Collider, Debug, IslandState, Health, Input,
   Move, Networked, PixiSkins, Player, Point, Position, Renderable,
   Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY
 } from "@piggo-gg/core"
 
-export const Gary = (player: Player): Character => {
+export const Ian = (player: Player): Character => {
 
   let glowing = false
 
-  const gary = Character({
-    id: `gary-${player.id}`,
+  const ian = Character({
+    id: `ian-${player.id}`,
     components: {
       debug: Debug(),
       position: Position({ x: -140, speed: 120, gravity: 0.3, velocityResets: 1 }),
@@ -24,10 +24,10 @@ export const Gary = (player: Player): Character => {
           "mb1": ({ hold, world }) => {
             if (hold) return
 
-            const state = world.state<GambaState>()
-            if (state.shooter !== gary.id) return
+            const state = world.state<IslandState>()
+            if (state.shooter !== ian.id) return
 
-            const { pointingDelta } = gary.components.position.data
+            const { pointingDelta } = ian.components.position.data
             return { actionId: "rollDice", params: { pointingDelta } }
           },
           "t": ({ hold }) => {
@@ -40,7 +40,7 @@ export const Gary = (player: Player): Character => {
             }
           },
           " ": () => {
-            if (!gary.components.position.data.standing || gary.components.position.data.velocity.z > 0) return
+            if (!ian.components.position.data.standing || ian.components.position.data.velocity.z > 0) return
             return { actionId: "jump" }
           },
         },
@@ -58,13 +58,13 @@ export const Gary = (player: Player): Character => {
         move: Move,
         point: Point,
         jump: Action("jump", () => {
-          if (!gary.components.position?.data.standing) return
-          gary.components.position.setVelocity({ z: 5 })
+          if (!ian.components.position?.data.standing) return
+          ian.components.position.setVelocity({ z: 5 })
         }),
         rollDice: Action<{ pointingDelta: XY }>("rollDice", ({ params, world, entity }) => {
           if (!entity) return
 
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
           if (state.shooter !== entity.id) return
 
           world.actions.push(world.tick + 1, "dice-1", { actionId: "roll", params: { shooterId: entity.id, pointingDelta: params.pointingDelta } })
@@ -82,16 +82,16 @@ export const Gary = (player: Player): Character => {
         setup: PixiSkins["dude-white"],
         animationSelect: VolleyCharacterAnimations,
         onTick: ({ world, renderable }) => {
-          const { position } = gary.components
+          const { position } = ian.components
           if (position.data.velocity.x !== 0) {
             renderable.setScale({ x: position.data.facing, y: 1 })
           }
 
-          const state = world.state<GambaState>()
-          if (!glowing && state.turnPhase === "players" && state.shooter === gary.id) {
+          const state = world.state<IslandState>()
+          if (!glowing && state.turnPhase === "players" && state.shooter === ian.id) {
             renderable.setGlow({ color: 0xffffff, outerStrength: 3 })
             glowing = true
-          } else if (glowing && (state.turnPhase !== "players" || state.shooter !== gary.id)) {
+          } else if (glowing && (state.turnPhase !== "players" || state.shooter !== ian.id)) {
             renderable.setGlow()
             glowing = false
           }
@@ -100,5 +100,5 @@ export const Gary = (player: Player): Character => {
     }
   })
 
-  return gary
+  return ian
 }

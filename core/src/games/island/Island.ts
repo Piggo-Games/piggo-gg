@@ -5,7 +5,7 @@ import {
   ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
-import { Gary } from "./Gary"
+import { Ian } from "./Ian"
 import { Dice } from "./Dice"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
@@ -20,7 +20,7 @@ const arenaWidth = 500
 export type D6 = 1 | 2 | 3 | 4 | 5 | 6
 export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
 
-export type GambaState = {
+export type IslandState = {
   round: number
   turnPhase: "players" | "monster"
   turnIndex: number
@@ -36,7 +36,7 @@ export type GambaState = {
   selectedAbility: string | null
 }
 
-export type GambaSettings = {
+export type IslandSettings = {
   showControls: boolean
 }
 
@@ -57,10 +57,10 @@ const scrollAbilities: ScrollProps[] = [
   }
 ]
 
-export const Gamba: GameBuilder<GambaState, GambaSettings> = {
-  id: "gamba",
+export const Island: GameBuilder<IslandState, IslandSettings> = {
+  id: "island",
   init: (world) => ({
-    id: "gamba",
+    id: "island",
     netcode: "rollback",
     renderer: "pixi",
     settings: {
@@ -84,8 +84,8 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
     systems: [
       PhysicsSystem("local"),
       PhysicsSystem("global"),
-      SpawnSystem({ spawner: Gary, pos: { x: 0, y: 0, z: 0 } }),
-      GambaSystem,
+      SpawnSystem({ spawner: Ian, pos: { x: 0, y: 0, z: 0 } }),
+      IslandSystem,
       PixiRenderSystem,
       HUDSystem(controls),
       PixiCameraSystem(),
@@ -123,20 +123,20 @@ export const Gamba: GameBuilder<GambaState, GambaSettings> = {
   })
 }
 
-const GambaSystem = SystemBuilder({
-  id: "GambaSystem",
+const IslandSystem = SystemBuilder({
+  id: "IslandSystem",
   init: (world) => {
 
     let lastScale = 0
     const monsterId = "patrick"
 
-    const beginTurn = (state: GambaState, actorId: string | null) => {
+    const beginTurn = (state: IslandState, actorId: string | null) => {
       state.shooter = actorId
       state.turnTarget = null
       state.autoRollAt = null
     }
 
-    const beginPlayerTurn = (state: GambaState, characters: { id: string }[]) => {
+    const beginPlayerTurn = (state: IslandState, characters: { id: string }[]) => {
       console.log("beginPlayerTurn", state.turnIndex, characters)
 
       state.turnPhase = "players"
@@ -152,14 +152,14 @@ const GambaSystem = SystemBuilder({
       beginTurn(state, characters[state.turnIndex]?.id ?? null)
     }
 
-    const beginMonsterTurn = (state: GambaState) => {
+    const beginMonsterTurn = (state: IslandState) => {
       state.turnPhase = "monster"
       state.turnIndex = 0
       beginTurn(state, monsterId)
       state.autoRollAt = world.tick + 20
     }
 
-    const advanceTurn = (state: GambaState, characters: { id: string }[]) => {
+    const advanceTurn = (state: IslandState, characters: { id: string }[]) => {
       state.rolled = null
       state.die1 = null
       state.die2 = null
@@ -182,11 +182,11 @@ const GambaSystem = SystemBuilder({
       beginPlayerTurn(state, characters)
     }
 
-    const scheduleMonsterRoll = (state: GambaState) => {
+    const scheduleMonsterRoll = (state: IslandState) => {
       state.autoRollAt = world.tick + 20
     }
 
-    const maybeAutoRollMonster = (state: GambaState) => {
+    const maybeAutoRollMonster = (state: IslandState) => {
       if (state.turnPhase !== "monster") return
       if (state.shooter !== monsterId) return
       if (state.autoRollAt === null || world.tick < state.autoRollAt) return
@@ -198,11 +198,11 @@ const GambaSystem = SystemBuilder({
       world.actions.push(world.tick, "dice-2", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
     }
 
-    const triggerAbility = (_: { state: GambaState, shooterId: string }) => {
+    const triggerAbility = (_: { state: IslandState, shooterId: string }) => {
       console.log("ABILITY")
     }
 
-    const triggerCrit = (_: { state: GambaState, shooterId: string, die1: D6, die2: D6 }) => {
+    const triggerCrit = (_: { state: IslandState, shooterId: string, die1: D6, die2: D6 }) => {
       console.log("CRIT")
     }
 
@@ -221,11 +221,11 @@ const GambaSystem = SystemBuilder({
     updateScale()
 
     return {
-      id: "GambaSystem",
+      id: "IslandSystem",
       query: [],
       priority: 6,
       onTick: () => {
-        const state = world.state<GambaState>()
+        const state = world.state<IslandState>()
 
         const characters = world.characters()
 

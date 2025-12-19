@@ -1,5 +1,5 @@
 import {
-  abs, Actions, Collider, D6, Data, Debug, Effects, Entity, GambaState, hypot,
+  abs, Actions, Collider, D6, Data, Debug, Effects, Entity, IslandState, hypot,
   loadTexture, max, min, Networked, NPC, PI, Position, Renderable, round, Shadow, XY
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
@@ -61,7 +61,7 @@ export const Dice = (order: 1 | 2) => {
       actions: Actions({
         roll: ({ params, world }) => {
           const { shooterId, pointingDelta } = params as DiceRollParams
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
 
           if (state.shooter !== shooterId) return
           if (rolling) return
@@ -103,7 +103,7 @@ export const Dice = (order: 1 | 2) => {
       }),
       npc: NPC({
         behavior: (_, world) => {
-          const state = world.state<GambaState>()
+          const state = world.state<IslandState>()
 
           const shooterId = state.shooter
           if (shooterId !== lastShooter && !rolling) {
@@ -180,7 +180,7 @@ export const Dice = (order: 1 | 2) => {
             }
           }
 
-          if (!dropped && shooterId?.startsWith("gary")) {
+          if (!dropped && shooterId?.startsWith("ian")) {
             const shooter = world.entity(shooterId ?? "")
             if (!shooter) return
 
