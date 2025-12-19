@@ -18,7 +18,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
   let cd = -100
 
-  const recoilRate = 0.03
+  const recoilRate = 0.04
   const spinDuration = 2
   const spinRotation = PI * 2
 
@@ -94,7 +94,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           // if (recoil) aim.y += recoil * 0.1
 
           // apply recoil
-          character.components.position.data.recoil = min(0.7, recoil + 0.55)
+          character.components.position.data.recoil = min(0.5, recoil + 0.45)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)
@@ -217,7 +217,7 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
-          // world.blocks.remove(hit.inside)
+          world.blocks.remove(hit.inside)
         }),
       }),
       three: Three({

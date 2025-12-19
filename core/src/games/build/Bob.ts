@@ -362,7 +362,7 @@ export const Bob = (player: Player): Character => {
       three: Three({
         onTick: ({ three, world, client }) => {
 
-          // if (block) block.visible = client.mobile?.horizontal() !== false
+          if (block) block.visible = client.mobile?.horizontal() !== false
 
           if (!wipMesh) return
 
@@ -434,7 +434,7 @@ export const Bob = (player: Player): Character => {
             const { blockColor } = world.settings<BuildSettings>()
             block.material.forEach((mat) => mat.color.set(blockColor))
 
-            block.visible = world.debug
+            // block.visible = world.debug
           }
 
           hitboxes.body?.position.set(interpolated.x, interpolated.z + 0.26, interpolated.y)
