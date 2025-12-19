@@ -1,68 +1,124 @@
 import {
-  BlockColor, BlockMeshSystem, BlockPhysicsSystem, Crosshair, EscapeMenu,
-  GameBuilder, HtmlChat, HtmlFpsText, HtmlLagText, HUDSystem, HUDSystemProps,
-  InventorySystem, PI, Sky, SpawnSystem, Sun, SystemBuilder, ThreeCameraSystem,
-  ParticleSystem, ThreeNametagSystem, ThreeSystem, Water, Hitmarker, DummyPlayer
+  Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
+  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
+  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem,
+  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer
 } from "@piggo-gg/core"
-import { Bob } from "./Bob"
-import { Pig } from "./Pig"
-import { MobileUI } from "../craft/MobileUI"
-import { IslandMap, IslandMapColoring } from "./IslandMap"
-import { Shork } from "./Shork"
+import { Patrick } from "./enemies/Patrick"
+import { Ian } from "./Ian"
+import { Dice } from "./Dice"
+import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
+import { Flag } from "./terrain/Flag"
+import { Pier } from "./terrain/Pier"
+import { NumBoard } from "./ui/NumBoard"
+import { HeartSystem } from "./ui/HeartSystem"
+import { Scroll, ScrollProps } from "./ui/Scroll"
+import { TargetBoard } from "./ui/TargetBoard"
 
-export type IslandSettings = {
-  showCrosshair: boolean
-  showControls: boolean
-  showNametags: boolean
-  blockColor: BlockColor
-}
+const arenaWidth = 500
+
+export type D6 = 1 | 2 | 3 | 4 | 5 | 6
+export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
 
 export type IslandState = {
-  doubleJumped: string[]
+  round: number
+  turnPhase: "players" | "monster"
+  turnIndex: number
+  turnTarget: Roll | null
+  rollId: number
+  handledRollId: number
+  autoRollAt: number | null
+  advanceAt: number | null
+  shooter: string | null
+  die1: D6 | null
+  die2: D6 | null
+  rolled: Roll | null
+  selectedAbility: string | null
 }
+
+export type IslandSettings = {
+  showControls: boolean
+}
+
+const scrollAbilities: ScrollProps[] = [
+  {
+    id: "rally",
+    title: "Rally",
+    description: "allies take 1 less DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 10, y: 96 }
+  },
+  {
+    id: "slice",
+    title: "Slice",
+    description: "enemies take 1D6 extra DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 100, y: 96 }
+  }
+]
 
 export const Island: GameBuilder<IslandState, IslandSettings> = {
   id: "island",
   init: (world) => ({
     id: "island",
     netcode: "rollback",
-    renderer: "three",
+    renderer: "pixi",
     settings: {
-      showCrosshair: true,
-      showControls: true,
-      showNametags: true,
-      blockColor: "white"
+      showControls: true
     },
     state: {
-      doubleJumped: []
+      round: 1,
+      turnPhase: "players",
+      turnIndex: 0,
+      turnTarget: null,
+      rollId: 0,
+      handledRollId: 0,
+      autoRollAt: null,
+      advanceAt: null,
+      shooter: null,
+      die1: null,
+      die2: null,
+      rolled: null,
+      selectedAbility: null
     },
     systems: [
-      SpawnSystem({ spawner: Bob, pos: { x: -6, y: 6.6, z: 2 } }),
-      BlockPhysicsSystem("global"),
-      BlockPhysicsSystem("local"),
-      ThreeCameraSystem(),
-      HUDSystem(controls),
+      PhysicsSystem("local"),
+      PhysicsSystem("global"),
+      SpawnSystem({ spawner: Ian, pos: { x: 0, y: 0, z: 0 } }),
       IslandSystem,
-      ThreeNametagSystem,
-      ThreeSystem,
+      PixiRenderSystem,
+      HUDSystem(controls),
+      PixiCameraSystem(),
+      PixiDebugSystem,
       InventorySystem,
-      BlockMeshSystem,
-      ParticleSystem
+      ItemSystem,
+      ShadowSystem,
+      HeartSystem(),
+      PixiNametagSystem()
     ],
     entities: [
-      Crosshair(),
-      Hitmarker(),
-      // HtmlInventory(),
+      Background({ rays: true }),
+      BeachWall(),
+      OuterBeachWall(),
+      Beach(),
+      Pier(),
+      Flag(),
+      Patrick(),
+      Water2D(),
+      Dice(1),
+      Dice(2),
+
+      // DummyPlayer(),
+
+      NumBoard(),
+      TargetBoard(),
+      ...scrollAbilities.map((scroll) => Scroll(scroll)),
+
+      Cursor(),
       EscapeMenu(world),
       HtmlChat(),
-      Sky(),
-      Water(),
-      Sun(),
       HtmlLagText(),
       HtmlFpsText(),
-      Pig(),
-      Shork(),
-      // DummyPlayer()
     ]
   })
 }
@@ -71,65 +127,198 @@ const IslandSystem = SystemBuilder({
   id: "IslandSystem",
   init: (world) => {
 
-    world.blocks.loadMap(IslandMap)
-    world.blocks.coloring = IslandMapColoring
+    let lastScale = 0
+    const monsterId = "patrick"
 
-    const mobileUI = MobileUI(world)
+    const beginTurn = (state: IslandState, actorId: string | null) => {
+      state.shooter = actorId
+      state.turnTarget = null
+      state.autoRollAt = null
+    }
 
-    if (world.client) world.client.controls.localAim.x = PI / 2 * 2.5
+    const beginPlayerTurn = (state: IslandState, characters: { id: string }[]) => {
+      console.log("beginPlayerTurn", state.turnIndex, characters)
+
+      state.turnPhase = "players"
+      if (characters.length === 0) {
+        beginTurn(state, null)
+        return
+      }
+
+      if (state.turnIndex >= characters.length) {
+        state.turnIndex = 0
+      }
+
+      beginTurn(state, characters[state.turnIndex]?.id ?? null)
+    }
+
+    const beginMonsterTurn = (state: IslandState) => {
+      state.turnPhase = "monster"
+      state.turnIndex = 0
+      beginTurn(state, monsterId)
+      state.autoRollAt = world.tick + 20
+    }
+
+    const advanceTurn = (state: IslandState, characters: { id: string }[]) => {
+      state.rolled = null
+      state.die1 = null
+      state.die2 = null
+
+      if (state.turnPhase === "monster") {
+        state.round += 1
+        state.turnPhase = "players"
+        state.turnIndex = 0
+        beginPlayerTurn(state, characters)
+        return
+      }
+
+      state.turnIndex += 1
+
+      if (state.turnIndex >= characters.length) {
+        beginMonsterTurn(state)
+        return
+      }
+
+      beginPlayerTurn(state, characters)
+    }
+
+    const scheduleMonsterRoll = (state: IslandState) => {
+      state.autoRollAt = world.tick + 20
+    }
+
+    const maybeAutoRollMonster = (state: IslandState) => {
+      if (state.turnPhase !== "monster") return
+      if (state.shooter !== monsterId) return
+      if (state.autoRollAt === null || world.tick < state.autoRollAt) return
+
+      state.autoRollAt = null
+
+      const pointingDelta = { x: -140, y: 0 }
+      world.actions.push(world.tick, "dice-1", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
+      world.actions.push(world.tick, "dice-2", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
+    }
+
+    const triggerAbility = (_: { state: IslandState, shooterId: string }) => {
+      console.log("ABILITY")
+    }
+
+    const triggerCrit = (_: { state: IslandState, shooterId: string, die1: D6, die2: D6 }) => {
+      console.log("CRIT")
+    }
+
+    const updateScale = () => {
+      if (!world.pixi) return
+
+      const { w } = screenWH()
+      const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
+
+      if (Math.abs(zoom - lastScale) > 0.02) {
+        world.pixi.camera.scaleTo(zoom)
+        lastScale = zoom
+      }
+    }
+
+    updateScale()
 
     return {
       id: "IslandSystem",
       query: [],
-      priority: 3,
+      priority: 6,
       onTick: () => {
+        const state = world.state<IslandState>()
 
-        const state = world.game.state as IslandState
+        const characters = world.characters()
 
-        if (world.client && !world.client.mobile) {
-          world.client.menu = document.pointerLockElement === null
+        if (state.advanceAt !== null && world.tick >= state.advanceAt) {
+          state.advanceAt = null
+          advanceTurn(state, characters)
+          return
         }
 
-        mobileUI?.update()
+        if (state.shooter === null) {
+          beginPlayerTurn(state, characters)
+        } else if (state.turnPhase === "players") {
+          const expected = characters[state.turnIndex]?.id ?? null
+          if (state.shooter !== expected) {
+            beginPlayerTurn(state, characters)
+          }
+        } else if (state.turnPhase === "monster" && state.shooter !== monsterId) {
+          beginMonsterTurn(state)
+        }
 
-        const players = world.players()
+        maybeAutoRollMonster(state)
 
-        for (const player of players) {
-          const character = player.components.controlling.getCharacter(world)
-          if (!character) continue
-
-          const { position } = character.components
-          const { standing, z, flying } = position.data
-
-          // handle swimming
-          if (flying) {
-            position.data.swimming = false
-          } else if (z < -0.2) {
-            position.data.swimming = true
-
-            // can't double-jump
-            if (!state.doubleJumped.includes(character.id)) state.doubleJumped.push(character.id)
-          } else if (z >= 0) {
-            position.data.swimming = false
+        if (state.die1 && state.die2 && state.rolled === null) {
+          let result = state.die1 + state.die2
+          if ((state.die1 === 6 && state.die2 === 1) || (state.die1 === 1 && state.die2 === 6)) {
+            result = 67
           }
 
-          // double-jump state cleanup
-          if (standing) {
-            state.doubleJumped = state.doubleJumped.filter(id => id !== character.id)
+          state.rolled = result as Roll
+          state.rollId += 1
+
+          // damage on 7
+          if (state.rolled === 7 && state.shooter) {
+            const character = world.entity(state.shooter)
+            if (character) {
+              // character.components.renderable!.setOverlay({ alpha: 0.7, color: 0xff4444 })
+            }
           }
         }
 
+        if (state.die1 === null || state.die2 === null) {
+          state.rolled = null
+        }
+
+        if (state.rolled !== null && state.rollId !== state.handledRollId) {
+          state.handledRollId = state.rollId
+
+          if (state.rolled === 67 && state.shooter && state.die1 && state.die2) {
+            triggerCrit({ state, shooterId: state.shooter, die1: state.die1, die2: state.die2 })
+            world.client?.sound.play({ name: "jingle1" })
+            state.advanceAt = world.tick + 40
+            return
+          }
+
+          if (state.rolled === 7) {
+            world.client?.sound.play({ name: "spike" })
+            state.advanceAt = world.tick + 40
+            return
+          }
+
+          if (state.turnTarget === null) {
+            state.turnTarget = state.rolled
+            if (state.turnPhase === "monster") {
+              scheduleMonsterRoll(state)
+            }
+            return
+          }
+
+          if (state.rolled === state.turnTarget) {
+            if (state.shooter) {
+              world.client?.sound.play({ name: "jingle1" })
+              triggerAbility({ state, shooterId: state.shooter })
+            }
+            state.advanceAt = world.tick + 40
+            return
+          }
+
+          if (state.turnPhase === "monster") {
+            scheduleMonsterRoll(state)
+          }
+        }
       }
     }
   }
 })
 
 const controls: HUDSystemProps = {
+  direction: "row",
+  from: { top: 26, left: 26 },
   clusters: [
     {
-      label: "shoot",
-      buttons: [["mb1"]],
-      fontSize: "16px"
+      label: "menu",
+      buttons: [["esc"]]
     },
     {
       label: "move",
@@ -139,12 +328,8 @@ const controls: HUDSystemProps = {
       ]
     },
     {
-      label: "jump",
-      buttons: [["spacebar"]]
-    },
-    {
-      label: "menu",
-      buttons: [["esc"]]
+      label: "roll",
+      buttons: [["mb1"]]
     }
   ]
 }

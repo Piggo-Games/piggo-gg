@@ -1,6 +1,6 @@
 import {
   Action, Actions, blockInLine, Character, cos, Effects, Entity, Hitbox,
-  Input, IslandSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
+  Input, BuildSettings, Item, ItemComponents, max, min, modelOffset, Networked, NPC, PI,
   Position, rayBoxIntersect, rotateAroundZ, sin, Three, XY, XYZ, XYZdistance
 } from "@piggo-gg/core"
 import { CylinderGeometry, Mesh, MeshPhongMaterial, Object3D, Vector3 } from "three"
@@ -18,8 +18,8 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
   let cd = -100
 
-  const recoilRate = 0.03
-  const spinDuration = 20
+  const recoilRate = 0.04
+  const spinDuration = 2
   const spinRotation = PI * 2
 
   const item = Entity<ItemComponents>({
@@ -91,10 +91,10 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           const { recoil } = character.components.position.data
 
-          if (recoil) aim.y += recoil * 0.1
+          // if (recoil) aim.y += recoil * 0.1
 
           // apply recoil
-          character.components.position.data.recoil = min(0.7, recoil + 0.55)
+          character.components.position.data.recoil = min(0.5, recoil + 0.45)
 
           const target = new Vector3(
             -sin(aim.x) * cos(aim.y), sin(aim.y), -cos(aim.x) * cos(aim.y)
@@ -210,14 +210,14 @@ export const BlasterItem = ({ character }: { character: Character }) => {
 
           // change block color
           if (world.debug && hit.inside.type === 12) {
-            const { blockColor } = world.settings<IslandSettings>()
+            const { blockColor } = world.settings<BuildSettings>()
             world.blocks.coloring[`${hit.inside.x},${hit.inside.y},${hit.inside.z}`] = blockColor
             world.blocks.invalidate()
           }
 
           if (hit.inside.z === 0 && hit.inside.type !== 12) return
 
-          // world.blocks.remove(hit.inside)
+          world.blocks.remove(hit.inside)
         }),
       }),
       three: Three({
@@ -297,12 +297,12 @@ export const BlasterItem = ({ character }: { character: Character }) => {
           mesh.rotation.y = aim.x
           mesh.rotation.x = aim.y + localRecoil * 0.5
 
-          if (spinUntil && spinUntil > world.tick) {
-            const spinRemaining = spinUntil - world.tick - ratio
-            if (spinRemaining > 0) {
-              mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
-            }
-          }
+          // if (spinUntil && spinUntil > world.tick) {
+          //   const spinRemaining = spinUntil - world.tick - ratio
+          //   if (spinRemaining > 0) {
+          //     mesh.rotation.x = -(spinRotation / spinDuration) * spinRemaining
+          //   }
+          // }
         }
       })
     },
