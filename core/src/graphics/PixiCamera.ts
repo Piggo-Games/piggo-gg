@@ -92,9 +92,13 @@ export const PixiCamera = (app: Application): PixiCamera => {
   return camera
 }
 
+export type  PixiCameraSystemProps = {
+  follow?: Follow
+}
+
 type Follow = (_: XYZ) => XYZ
 
-export const PixiCameraSystem = (follow: Follow = () => ({ x: 0, y: 0, z: 0 })) => ClientSystemBuilder({
+export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }) }: PixiCameraSystemProps = {}) => ClientSystemBuilder({
   id: "PixiCameraSystem",
   init: (world) => {
     const { pixi } = world

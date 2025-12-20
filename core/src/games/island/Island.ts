@@ -206,19 +206,19 @@ const IslandSystem = SystemBuilder({
       console.log("CRIT")
     }
 
-    const updateScale = () => {
-      if (!world.pixi) return
+    // const updateScale = () => {
+    //   if (!world.pixi) return
 
-      const { w } = screenWH()
-      const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
+    //   const { w } = screenWH()
+    //   const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
 
-      if (Math.abs(zoom - lastScale) > 0.02) {
-        world.pixi.camera.scaleTo(zoom)
-        lastScale = zoom
-      }
-    }
+    //   if (Math.abs(zoom - lastScale) > 0.02) {
+    //     world.pixi.camera.scaleTo(zoom)
+    //     lastScale = zoom
+    //   }
+    // }
 
-    updateScale()
+    // updateScale()
 
     return {
       id: "IslandSystem",
