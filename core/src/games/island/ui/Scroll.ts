@@ -1,4 +1,4 @@
-import { Entity, Position, Renderable, pixiText, values, load, wrapText, Actions } from "@piggo-gg/core"
+import { Entity, Position, Renderable, pixiText, values, load, wrapText, Actions, Debug } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 import type { IslandState } from "../Island"
 
@@ -22,6 +22,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
   const scroll = Entity<Renderable>({
     id: `scroll-${id}`,
     components: {
+      debug: Debug(),
       position: Position({ x, y }),
       actions: Actions({
         selectAbility: ({ params, world }) => {
@@ -32,7 +33,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
       renderable: Renderable({
         zIndex: 2,
         scale: 2.2,
-        anchor: { x: 0.53, y: 0.5 },
+        anchor: { x: 0.53, y: 1 },
         scaleMode: "nearest",
         onRender: ({ renderable, world }) => {
           const selected = world.state<IslandState>().selectedAbility === id
@@ -69,21 +70,21 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
 
           const titleText = pixiText({
             text: title,
-            pos: { x: 0, y: -14 },
+            pos: { x: 0, y: -30 },
             anchor: { x: 0.5, y: 0 },
             style: { fontSize: 5, fill: textColor, align: "center", resolution: 16 }
           })
 
           const descriptionText = pixiText({
             text: wrapText(description, 20),
-            pos: { x: 0, y: -2 },
+            pos: { x: 0, y: -20 },
             anchor: { x: 0.5, y: 0 },
             style: { fontSize: 2.8, fill: textColor, align: "center", resolution: 16 }
           })
 
           const manaText = pixiText({
             text: `${manaCost} mana`,
-            pos: { x: 0, y: 12 },
+            pos: { x: 0, y: -6 },
             anchor: { x: 0.5, y: 0 },
             style: { fontSize: 3.5, fill: 0x1c64f2, align: "center", resolution: 16 }
           })

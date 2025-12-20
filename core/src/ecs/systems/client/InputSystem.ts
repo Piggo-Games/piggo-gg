@@ -95,12 +95,9 @@ export const InputSystem = ClientSystemBuilder({
             // @ts-expect-error
             mouse, aim: localAim(), client, entity: pc, world, tick: world.tick, hold: 0, target: event.target?.localName ?? ""
           })
-          client.bufferDown.remove(key)
-          return
         }
       }
 
-      client.bufferDown.remove(key)
       client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0 })
     })
 
@@ -408,7 +405,6 @@ export const InputSystem = ClientSystemBuilder({
               }
             }
           }
-
           bufferDown.remove(inputKey)
         }
       }
@@ -489,6 +485,11 @@ export const InputSystem = ClientSystemBuilder({
           const { networked } = entity.components
           if (!networked) handleInputForUIEntity(entity, world)
         })
+
+        // for every bufferUp, clear the corresponding bufferDown
+        for (const keyPress of client.bufferUp.all()) {
+          client.bufferDown.remove(keyPress.key)
+        }
 
         client.bufferUp.clear()
         client.bufferDown.remove("capslock") // capslock doesn't emit keyup event (TODO bug on windows, have to hit capslock twice)
