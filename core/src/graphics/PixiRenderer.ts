@@ -386,7 +386,7 @@ export const PixiDebugSystem = ClientSystemBuilder({
       const debugEntity = Entity<Position | Renderable>({
         id: `${entity.id}-renderable-debug`,
         components: {
-          position: Position({ follows: entity.id, offset: { x: 0, y: 0 } }),
+          position: Position({ follows: entity.id, offset: { x: 0, y: 0 }, screenFixed: position.screenFixed }),
           renderable: Renderable({
             zIndex: 4,
             interpolate: true,

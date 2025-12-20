@@ -105,7 +105,7 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize
     const { pixi } = world
     if (!pixi) return
 
-    let targetScale = pixi.camera.scale
+    let targetScale = resize ? resize() : pixi.camera.scale
 
     // scroll to zoom
     pixi.canvas?.addEventListener("wheel", (event) => {

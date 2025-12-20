@@ -46,15 +46,15 @@ const scrollAbilities: ScrollProps[] = [
     title: "Rally",
     description: "allies take 1 less DMG per hit until your next turn",
     manaCost: 1,
-    position: { x: 10, y: 96 }
+    position: { x: 10, y: 130 }
   },
-  {
-    id: "slice",
-    title: "Slice",
-    description: "enemies take 1D6 extra DMG per hit until your next turn",
-    manaCost: 1,
-    position: { x: 100, y: 96 }
-  }
+  // {
+  //   id: "slice",
+  //   title: "Slice",
+  //   description: "enemies take 1D6 extra DMG per hit until your next turn",
+  //   manaCost: 1,
+  //   position: { x: 100, y: 96 }
+  // }
 ]
 
 export const Island: GameBuilder<IslandState, IslandSettings> = {
