@@ -1,26 +1,5 @@
 import { Client, Entity, HtmlDiv, min, NPC, pow, sqrt, XY } from "@piggo-gg/core"
 
-export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
-
-  let joystick: HtmlDiv | undefined = undefined
-  let init = false
-
-  return Entity({
-    id: `joystick-${side}`,
-    components: {
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init && world.client) {
-            joystick = HtmlJoystick(world.client, side)
-            document.body.appendChild(joystick)
-            init = true
-          }
-        }
-      })
-    }
-  })
-}
-
 export const HtmlJoystick = (client: Client, side: "left" | "right"): HtmlDiv => {
 
   const idle = side === "left" ? "rgba(200, 60, 200, 0.5)" : "rgba(0, 100, 200, 0.5)"
@@ -77,4 +56,25 @@ export const HtmlJoystick = (client: Client, side: "left" | "right"): HtmlDiv =>
   }
 
   return stick
+}
+
+export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
+
+  let joystick: HtmlDiv | undefined = undefined
+  let init = false
+
+  return Entity({
+    id: `joystick-${side}`,
+    components: {
+      npc: NPC({
+        behavior: (_, world) => {
+          if (!init && world.client) {
+            joystick = HtmlJoystick(world.client, side)
+            document.body.appendChild(joystick)
+            init = true
+          }
+        }
+      })
+    }
+  })
 }
