@@ -31,8 +31,6 @@ export const Ian = (player: Player): Character => {
               x: mouse.x - ian.components.position.data.x,
               y: mouse.y - ian.components.position.data.y
             }
-            console.log("ian rolling dice", pointingDelta)
-            // const { pointingDelta } = ian.components.position.data
             return { actionId: "rollDice", params: { pointingDelta } }
           },
           "t": ({ hold }) => {
