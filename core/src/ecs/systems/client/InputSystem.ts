@@ -1,6 +1,6 @@
 import {
   Actions, Character, ClientSystemBuilder, Entity, Input, World,
-  XY, cos, isMobile, isTypingEvent, max, min, round, screenWH, sin
+  XY, cos, isTypingEvent, max, min, round, screenWH, sin
 } from "@piggo-gg/core"
 
 // handles keyboard/mouse/joystick inputs
@@ -51,14 +51,11 @@ export const InputSystem = ClientSystemBuilder({
           y: min(max(0, client.controls.mouseScreen.y + event.movementY), h)
         }
       } else {
-        client.controls.mouseScreen = {
-          x: event.clientX,
-          y: event.clientY
-        }
+        client.controls.mouseScreen = { x: event.clientX, y: event.clientY }
       }
 
       // mouse
-      if (pixi) {
+      if (pixi?.ready) {
         client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
         mouse = client.controls.mouse
       }
@@ -75,7 +72,14 @@ export const InputSystem = ClientSystemBuilder({
       let key = event.button === 0 ? "mb1" : "mb2"
 
       // mobile mb2
-      if (world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
+      if (world.three?.ready && world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
+
+      // update mouse position
+      client.controls.mouseScreen = { x: event.clientX, y: event.clientY }
+      if (pixi?.ready) {
+        client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
+        mouse = { ...client.controls.mouse }
+      }
 
       client.bufferDown.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: performance.now() - world.time })
     })
@@ -84,7 +88,7 @@ export const InputSystem = ClientSystemBuilder({
       let key = event.button === 0 ? "mb1" : "mb2"
 
       // mobile mb2
-      if (world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
+      if (world.three?.ready && world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
 
       if (key === "mb1") {
         const pc = client.character()
@@ -436,11 +440,6 @@ export const InputSystem = ClientSystemBuilder({
       priority: 1,
       skipOnRollback: true,
       onRender: () => {
-        if (pixi) {
-          client.controls.mouse = pixi.camera.toWorldCoords(client.controls.mouseScreen)
-          mouse = client.controls.mouse
-        }
-
         if (!client.mobile) return
 
         const { power, angle, active } = client.controls.right

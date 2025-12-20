@@ -47,6 +47,7 @@ export type Client = {
     mouseScreen: XY
     localAim: XY
     localHit: { tick: number, headshot: boolean }
+    localPointingDelta: XY
     moveLocal: (xy: XY, flying?: boolean) => void
   }
   discord: Discord | undefined
@@ -137,6 +138,7 @@ export const Client = ({ world }: ClientProps): Client => {
       mouseScreen: { x: 0, y: 0 },
       localAim: { x: 0, y: 0 },
       localHit: { tick: -100, headshot: false },
+      localPointingDelta: { x: 0, y: 0 },
       moveLocal: ({ x, y }: XY) => {
 
         const mouseSensitivity = world.settings<{ mouseSensitivity: number }>().mouseSensitivity

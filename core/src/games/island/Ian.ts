@@ -21,13 +21,18 @@ export const Ian = (player: Player): Character => {
       input: Input({
         press: {
           ...WASDInputMap.press,
-          "mb1": ({ hold, world }) => {
+          "mb1": ({ hold, world, mouse }) => {
             if (hold) return
 
             const state = world.state<IslandState>()
             if (state.shooter !== ian.id) return
 
-            const { pointingDelta } = ian.components.position.data
+            const pointingDelta: XY = {
+              x: mouse.x - ian.components.position.data.x,
+              y: mouse.y - ian.components.position.data.y
+            }
+            console.log("ian rolling dice", pointingDelta)
+            // const { pointingDelta } = ian.components.position.data
             return { actionId: "rollDice", params: { pointingDelta } }
           },
           "t": ({ hold }) => {
