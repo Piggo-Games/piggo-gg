@@ -61,7 +61,13 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       PixiRenderSystem,
       PixiNametagSystem(),
       HUDSystem(controls),
-      PixiCameraSystem(() => ({ x: 225, y: 0, z: 0 })),
+      PixiCameraSystem({
+        follow: () => ({ x: 225, y: 0, z: 0 }),
+        resize: () => {
+          const { w } = screenWH()
+          return Math.min(3.4, w / (600 * 1.1))
+        }
+      }),
       PixiDebugSystem
     ],
     entities: [
@@ -116,12 +122,6 @@ const VolleySystem = SystemBuilder({
       }
 
       for (const bot of values(bots)) world.addEntity(bot)
-    }
-
-    // scale the camera
-    if (world.client) {
-      const desiredScale = screenWH().w / 600 - 0.2
-      world.pixi?.camera.scaleTo(desiredScale)
     }
 
     return {
