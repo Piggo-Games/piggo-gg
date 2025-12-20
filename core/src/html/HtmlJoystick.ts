@@ -68,7 +68,7 @@ export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
     components: {
       npc: NPC({
         behavior: (_, world) => {
-          if (!init && world.client) {
+          if (!init && world.client?.mobile) {
             joystick = HtmlJoystick(world.client, side)
             document.body.appendChild(joystick)
             init = true
