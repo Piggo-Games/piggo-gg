@@ -2,7 +2,7 @@ import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
   HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
   PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min,
-  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer
+  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
@@ -124,6 +124,8 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       HtmlChat(),
       HtmlLagText(),
       HtmlFpsText(),
+
+      HtmlJoystickEntity("left")
     ]
   })
 }
