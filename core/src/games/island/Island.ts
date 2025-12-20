@@ -1,7 +1,7 @@
 import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
   HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
-  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem,
+  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min,
   ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
@@ -88,7 +88,12 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       IslandSystem,
       PixiRenderSystem,
       HUDSystem(controls),
-      PixiCameraSystem(),
+      PixiCameraSystem({
+        resize: () => {
+          const { w } = screenWH()
+          return min(3.4, w / (arenaWidth * 1.1))
+        }
+      }),
       PixiDebugSystem,
       InventorySystem,
       ItemSystem,
@@ -101,7 +106,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       BeachWall(),
       OuterBeachWall(),
       Beach(),
-      Pier(),
+      // Pier(),
       Flag(),
       Patrick(),
       Water2D(),
@@ -127,7 +132,6 @@ const IslandSystem = SystemBuilder({
   id: "IslandSystem",
   init: (world) => {
 
-    let lastScale = 0
     const monsterId = "patrick"
 
     const beginTurn = (state: IslandState, actorId: string | null) => {
@@ -205,20 +209,6 @@ const IslandSystem = SystemBuilder({
     const triggerCrit = (_: { state: IslandState, shooterId: string, die1: D6, die2: D6 }) => {
       console.log("CRIT")
     }
-
-    // const updateScale = () => {
-    //   if (!world.pixi) return
-
-    //   const { w } = screenWH()
-    //   const zoom = Math.min(3.4, Math.max(2, w / (arenaWidth * 1.1)))
-
-    //   if (Math.abs(zoom - lastScale) > 0.02) {
-    //     world.pixi.camera.scaleTo(zoom)
-    //     lastScale = zoom
-    //   }
-    // }
-
-    // updateScale()
 
     return {
       id: "IslandSystem",

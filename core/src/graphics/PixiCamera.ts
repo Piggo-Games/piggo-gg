@@ -78,7 +78,7 @@ export const PixiCamera = (app: Application): PixiCamera => {
   }
 
   const rescale = () => {
-    const min = 2
+    const min = 1.5
     const max = 5
 
     if (camera.scale < min) camera.scale = min
@@ -94,11 +94,12 @@ export const PixiCamera = (app: Application): PixiCamera => {
 
 export type  PixiCameraSystemProps = {
   follow?: Follow
+  resize?: () => number
 }
 
 type Follow = (_: XYZ) => XYZ
 
-export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }) }: PixiCameraSystemProps = {}) => ClientSystemBuilder({
+export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize }: PixiCameraSystemProps = {}) => ClientSystemBuilder({
   id: "PixiCameraSystem",
   init: (world) => {
     const { pixi } = world
@@ -137,7 +138,11 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }) }: Pixi
             }
           }
         }
-        // console.log(`hidden ${numHidden} entities`)
+
+        // adjust camera scale
+        if (pixi.resizedFlag && resize) {
+          targetScale = resize()
+        }
       },
       onRender: (_, delta) => {
         if (!pixi.camera.focus) return
