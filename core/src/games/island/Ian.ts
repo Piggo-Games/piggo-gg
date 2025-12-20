@@ -22,10 +22,13 @@ export const Ian = (player: Player): Character => {
         press: {
           ...WASDInputMap.press,
           "mb1": ({ hold, world }) => {
+            console.log("mb1 press", { hold })
             if (hold) return
 
             const state = world.state<IslandState>()
             if (state.shooter !== ian.id) return
+
+            console.log("mb1 action")
 
             const { pointingDelta } = ian.components.position.data
             return { actionId: "rollDice", params: { pointingDelta } }
