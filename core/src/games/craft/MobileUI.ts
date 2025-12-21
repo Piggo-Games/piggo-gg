@@ -6,8 +6,8 @@ type MobileUI = null | { update: () => void }
 export const MobileUI = (world: World): MobileUI => {
   if (!world.client?.mobile || !world.three) return null
 
-  const leftJoystick = HtmlJoystick(world.client, "left")
-  const rightJoystick = HtmlJoystick(world.client, "right")
+  const leftJoystick = HtmlJoystick({ client: world.client, side: "left" })
+  const rightJoystick = HtmlJoystick({ client: world.client, side: "right" })
 
   const povButton = HtmlButton({
     style: {
