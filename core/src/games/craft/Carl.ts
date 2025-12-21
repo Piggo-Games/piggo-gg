@@ -88,7 +88,6 @@ export const Carl = (player: Player): Character => {
 
               pigMixer?.update(speed * ratio * 0.005 + 0.005)
             } else {
-              console.log(speed)
               pigMixer?.update(speed * ratio * 0.012 + 0.006)
             }
           }
@@ -441,7 +440,7 @@ export const Carl = (player: Player): Character => {
           let factor = 0
 
           if (position.data.flying) {
-            factor = params.sprint ? 0.16 : 0.09
+            factor = params.sprint ? 1 : 0.8
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else {
