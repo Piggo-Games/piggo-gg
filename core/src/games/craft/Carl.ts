@@ -93,7 +93,7 @@ export const Carl = (player: Player): Character => {
           }
 
           if ((three.camera.transition < 125) && player.id === client.playerId()) {
-            console.log(three.camera.mode, player.id === client.playerId())
+            // console.log(three.camera.mode, player.id === client.playerId())
 
             const opacity = three.camera.mode === "first" ? 1 - (three.camera.transition / 100) : three.camera.transition / 100
 

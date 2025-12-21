@@ -2,7 +2,8 @@ import {
   BlockPhysicsSystem, Apple, ThreeCameraSystem, ThreeNametagSystem, logPerf,
   min, UIProfile, Random, randomInt, SpawnSystem, Sky, SystemBuilder,
   XYZdistance, HtmlChat, Crosshair, GameBuilder, spawnTerrain, EscapeMenu,
-  ThreeSystem, InventorySystem, BlockPreview, Sun, BlockMeshSystem, HUDSystem
+  ThreeSystem, InventorySystem, BlockPreview, Sun, BlockMeshSystem, HUDSystem,
+  spawnFlat
 } from "@piggo-gg/core"
 import { Carl } from "./Carl"
 import { MobileUI } from "./MobileUI"
@@ -62,7 +63,7 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSystem
+      BlockMeshSystem({ counts: { grass: 20000, leaf: 1000, oak: 1000, spruce: 1000, marble: 0 } })
     ],
     entities: [
       Crosshair(),
@@ -80,6 +81,7 @@ const CraftSystem = SystemBuilder({
   id: "CraftSystem",
   init: (world) => {
     spawnTerrain(world, 24)
+    // spawnFlat(world, 24)
 
     const mobileUI = MobileUI(world)
 
