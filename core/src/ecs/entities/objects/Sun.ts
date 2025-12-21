@@ -9,6 +9,7 @@ export type SunProps = {
 export const Sun = (props: SunProps = {}) => {
 
   let light: DirectionalLight | undefined = undefined
+  let hemi: HemisphereLight | undefined = undefined
   let target: Object3D | undefined = undefined
 
   const sun = Entity<Three>({
@@ -17,11 +18,13 @@ export const Sun = (props: SunProps = {}) => {
       position: Position(props.pos ?? { x: 200, y: 200, z: 100 }),
       three: Three({
         onTick: ({ client, world }) => {
-          if (!light || !target) return
+          if (!light || !target || !hemi) return
 
           const dayFactor = dayness(world.tick, 0)
 
           light.color.set(lerp(colors.threeNight, colors.threeEvening, dayFactor))
+          // hemi.color.set(lerp(colors.threeNight, colors.threeEvening, dayFactor))
+          hemi.intensity = 3 + dayFactor
 
           const pc = client.character()
           if (!pc) return
@@ -53,7 +56,7 @@ export const Sun = (props: SunProps = {}) => {
           light.position.set(200, 100, 200)
           if (props.pos) light.position.set(props.pos.x, props.pos.y, props.pos.z)
 
-          const hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)
+          hemi = new HemisphereLight(0xaaaabb, colors.evening, 3)
 
           // const helper = new CameraHelper(light.shadow.camera)
           // o.push(helper)

@@ -7,18 +7,17 @@ import {
 import { AnimationAction, AnimationMixer, Mesh, MeshStandardMaterial, Object3D, Vector3 } from "three"
 import { CraftSettings, CraftState } from "./Craft"
 
-const walk = 0.8
-const run = 1.1
-const hop = 0.2
-const leap = 0.26
+const walk = 0.55
+const run = 0.85
+const hop = 0.24
+const leap = 0.32
 
 export const Carl = (player: Player): Character => {
 
   let duck: Object3D = new Object3D()
   let eagle: Object3D = new Object3D()
-  let pig: Object3D = new Object3D()
 
-  let pigMixer: AnimationMixer | undefined
+  let duckMixer: AnimationMixer | undefined
   let eagleMixer: AnimationMixer | undefined
 
   let idleAnimation: AnimationAction | undefined
@@ -50,7 +49,7 @@ export const Carl = (player: Player): Character => {
           const orientation = player.id === client.playerId() ? client.controls.localAim : aim
 
           if (flying) {
-            pig.visible = false
+            duck.visible = false
             eagle.visible = true
 
             // position
@@ -65,19 +64,19 @@ export const Carl = (player: Player): Character => {
             const speed = sqrt(hypot(velocity.x, velocity.y, velocity.z))
             eagleMixer?.update(speed * ratio * 0.01 + 0.01)
           } else {
-            pig.visible = true
+            duck.visible = true
             eagle.visible = false
 
             // position
-            pig.position.set(interpolated.x, interpolated.z  - 0.033, interpolated.y)
+            duck.position.set(interpolated.x, interpolated.z  - 0.033, interpolated.y)
 
             // rotation
-            pig.rotation.y = orientation.x + PI / 2
+            duck.rotation.y = orientation.x + PI / 2
 
             // animation
             const speed = hypot(position.data.velocity.x, position.data.velocity.y)
 
-            if (runAnimation && idleAnimation && pigMixer) {
+            if (runAnimation && idleAnimation && duckMixer) {
               if (speed === 0 && animation === "run") {
                 animation = "idle"
                 runAnimation.crossFadeTo(idleAnimation.reset().play(), 0.2, false)
@@ -86,9 +85,9 @@ export const Carl = (player: Player): Character => {
                 idleAnimation?.crossFadeTo(runAnimation.reset().play(), 0.2, false)
               }
 
-              pigMixer?.update(speed * ratio * 0.005 + 0.005)
+              duckMixer?.update(speed * ratio * 0.005 + 0.005)
             } else {
-              pigMixer?.update(speed * ratio * 0.012 + 0.006)
+              duckMixer?.update(speed * ratio * 0.012 + 0.006)
             }
           }
 
@@ -97,37 +96,37 @@ export const Carl = (player: Player): Character => {
 
             const opacity = three.camera.mode === "first" ? 1 - (three.camera.transition / 100) : three.camera.transition / 100
 
-            pig.traverse((child) => {
+            duck.traverse((child) => {
               if (child instanceof Mesh) {
                 child.material.opacity = opacity
               }
             })
 
-            // eagle.traverse((child) => {
-            //   if (child instanceof Mesh) {
-            //     child.material.opacity = opacity
-            //   }
-            // })
+            eagle.traverse((child) => {
+              if (child instanceof Mesh) {
+                child.material.opacity = opacity
+              }
+            })
           }
         },
         init: async ({ o, world, three }) => {
           three.gLoader.load("ugly-duckling.glb", (gltf) => {
 
-            pig = cloneSkeleton(gltf.scene)
-            pig.animations = gltf.animations
-            pig.frustumCulled = false
-            pig.scale.set(0.1, 0.1, 0.1)
+            duck = cloneSkeleton(gltf.scene)
+            duck.animations = gltf.animations
+            duck.frustumCulled = false
+            duck.scale.set(0.1, 0.1, 0.1)
 
-            copyMaterials(gltf.scene, pig)
+            copyMaterials(gltf.scene, duck)
 
-            pigMixer = new AnimationMixer(pig)
+            duckMixer = new AnimationMixer(duck)
 
-            idleAnimation = pigMixer.clipAction(pig.animations[1])
-            // runAnimation = pigMixer.clipAction(pig.animations[8])
+            idleAnimation = duckMixer.clipAction(duck.animations[1])
+            // runAnimation = duckMixer.clipAction(duck.animations[8])
 
             idleAnimation?.play()
 
-            pig.traverse((child) => {
+            duck.traverse((child) => {
               if (child instanceof Mesh) {
                 child.material.transparent = true
                 child.material.opacity = player.id === world.client!.playerId() ? 0 : 1
@@ -137,7 +136,7 @@ export const Carl = (player: Player): Character => {
               }
             })
 
-            o.push(pig)
+            o.push(duck)
           })
 
           three.gLoader.load("eagle.glb", (gltf) => {
@@ -440,7 +439,7 @@ export const Carl = (player: Player): Character => {
           let factor = 0
 
           if (position.data.flying) {
-            factor = params.sprint ? 1 : 0.8
+            factor = params.sprint ? 0.6 : 0.4
           } else if (position.data.standing) {
             factor = params.sprint ? run : walk
           } else {
