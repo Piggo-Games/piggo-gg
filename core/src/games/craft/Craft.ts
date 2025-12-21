@@ -56,13 +56,13 @@ export const Craft: GameBuilder<CraftState, CraftSettings> = {
       SpawnSystem({ spawner: Carl, pos: { x: 8, y: 8, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
-      ThreeCameraSystem(),
+      ThreeCameraSystem({ height: 0.3, distance: 0.8 }),
       CraftSystem,
       // HUDSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSystem
+      BlockMeshSystem({ counts: { grass: 20000, leaf: 1000, oak: 1000, spruce: 1000, marble: 0 } })
     ],
     entities: [
       Crosshair(),

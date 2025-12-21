@@ -1,8 +1,8 @@
 import {
   Background, Build, Entity, GameBuilder, getBrowser, HButton,
-  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked,
-  NPC, piggoVersion, PixiRenderSystem, RefreshableDiv, Strike, Volley, Island,
-  World, canvasAppend, HtmlFpsText, HDiv
+  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu,
+  Networked, NPC, piggoVersion, PixiRenderSystem, RefreshableDiv,
+  Volley, Island, World, canvasAppend, HtmlFpsText, HDiv
 } from "@piggo-gg/core"
 
 type LobbyState = {

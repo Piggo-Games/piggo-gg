@@ -20,7 +20,7 @@ export const Sky = () => {
           mesh.position.z = pc.components.position.data.y
         },
         onRender: ({ delta, world, three }) => {
-          if (mesh && world.game.id === "island") {
+          if (mesh && world.game.id !== "strike") {
             const mat = mesh.material as ShaderMaterial
 
             mat.uniforms.uTime.value = world.tick + delta / 25

@@ -27,34 +27,40 @@ export const BlocksMesh = (maxCount: number): BlocksMesh => {
   return mesh
 }
 
-export const BlockMeshSystem = ClientSystemBuilder({
+export type BlockMeshMaterials = "grass" | "leaf" | "oak" | "spruce" | "marble"
+
+export type BlockMeshSystemProps = {
+  counts: Record<BlockMeshMaterials, number>
+}
+
+export const BlockMeshSystem = ({ counts }: BlockMeshSystemProps) => ClientSystemBuilder({
   id: "BlockMeshSystem",
   init: (world) => {
     const { three } = world
     if (!three) return
 
-    let grass = BlocksMesh(4000)
-    // let leaf = BlocksMesh(5000)
-    // let oak = BlocksMesh(5000)
-    // let spruce = BlocksMesh(5000)
-    let marble = BlocksMesh(4000)
+    let grass = BlocksMesh(counts.grass)
+    let leaf = BlocksMesh(counts.leaf)
+    let oak = BlocksMesh(counts.oak)
+    let spruce = BlocksMesh(counts.spruce)
+    let marble = BlocksMesh(counts.marble)
 
     GrassTexture(grass.material, three)
-    // LeafTexture(leaf.material, three)
-    // OakTexture(oak.material, three)
-    // SpruceTexture(spruce.material, three)
+    LeafTexture(leaf.material, three)
+    OakTexture(oak.material, three)
+    SpruceTexture(spruce.material, three)
     MarbleTexture(marble.material, three)
 
     let rendered = false
 
-    three.scene.add(grass, marble)
+    three.scene.add(grass, marble, oak, spruce, leaf)
 
     return {
       id: "BlockMeshSystem",
       query: [],
       priority: 10,
       onTick: () => {
-        let playerChunk = { x: 0, y: 0 }
+        let playerChunk = { x: 4, y: 4 }
 
         if (world.blocks.needsUpdate()) rendered = false
 
@@ -80,20 +86,20 @@ export const BlockMeshSystem = ClientSystemBuilder({
             dummy.updateMatrix()
 
             if (type === "spruceLeaf") {
-              // leaf.setColorAt(leafCount, new Color(0x0099aa))
-              // leaf.setMatrixAt(leafCount, dummy.matrix)
+              leaf.setColorAt(leafCount, new Color(0x0099aa))
+              leaf.setMatrixAt(leafCount, dummy.matrix)
               leafCount++
             } else if (type === "oakLeaf") {
-              // leaf.setColorAt(leafCount, new Color(0x33dd77))
-              // leaf.setMatrixAt(leafCount, dummy.matrix)
+              leaf.setColorAt(leafCount, new Color(0x33dd77))
+              leaf.setMatrixAt(leafCount, dummy.matrix)
               leafCount++
             } else if (type === "oak") {
-              // oak.setColorAt(oakCount, new Color(0xffaa99))
-              // oak.setMatrixAt(oakCount, dummy.matrix)
+              oak.setColorAt(oakCount, new Color(0xffaa99))
+              oak.setMatrixAt(oakCount, dummy.matrix)
               oakCount++
             } else if (type === "spruce") {
-              // spruce.setColorAt(spruceCount, new Color(0xbb66ff))
-              // spruce.setMatrixAt(spruceCount, dummy.matrix)
+              spruce.setColorAt(spruceCount, new Color(0xbb66ff))
+              spruce.setMatrixAt(spruceCount, dummy.matrix)
               spruceCount++
             } else if (type === "marble") {
 
@@ -114,20 +120,20 @@ export const BlockMeshSystem = ClientSystemBuilder({
           }
 
           grass.instanceMatrix.needsUpdate = true
-          // spruce.instanceMatrix.needsUpdate = true
-          // oak.instanceMatrix.needsUpdate = true
-          // leaf.instanceMatrix.needsUpdate = true
+          spruce.instanceMatrix.needsUpdate = true
+          oak.instanceMatrix.needsUpdate = true
+          leaf.instanceMatrix.needsUpdate = true
           marble.instanceMatrix.needsUpdate = true
 
-          // if (spruce.instanceColor) spruce.instanceColor.needsUpdate = true
-          // if (oak.instanceColor) oak.instanceColor.needsUpdate = true
-          // if (leaf.instanceColor) leaf.instanceColor.needsUpdate = true
+          if (spruce.instanceColor) spruce.instanceColor.needsUpdate = true
+          if (oak.instanceColor) oak.instanceColor.needsUpdate = true
+          if (leaf.instanceColor) leaf.instanceColor.needsUpdate = true
           if (marble.instanceColor) marble.instanceColor.needsUpdate = true
 
           grass.count = otherCount
-          // leaf.count = leafCount
-          // oak.count = oakCount
-          // spruce.count = spruceCount
+          leaf.count = leafCount
+          oak.count = oakCount
+          spruce.count = spruceCount
           marble.count = marbleCount
 
           rendered = true

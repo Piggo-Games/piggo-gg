@@ -40,13 +40,13 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       SpawnSystem({ spawner: Bob, pos: { x: -6, y: 6.6, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
-      ThreeCameraSystem(),
+      ThreeCameraSystem({ height: 0.5, distance: 1 }),
       HUDSystem(controls),
       BuildSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSystem,
+      BlockMeshSystem({ counts: { grass: 2000, leaf: 0, oak: 0, spruce: 0, marble: 10000 } }),
       ParticleSystem
     ],
     entities: [

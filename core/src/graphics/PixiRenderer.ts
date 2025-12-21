@@ -74,7 +74,7 @@ export const PixiRenderer = (): PixiRenderer => {
       // init pixi.js application
       await app.init({
         canvas: renderer.canvas,
-        resolution: 1,
+        resolution: window.devicePixelRatio,
         antialias: true,
         autoDensity: true,
         backgroundColor: 0x000000,

@@ -187,7 +187,6 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
       world.tick += 1
       world.time = now
 
-      if (world.client?.discord) world.setGame("island")
       world.client?.discord?.login(world.client)
 
       // store serialized entities
@@ -361,7 +360,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   if (systems) world.addSystemBuilders(systems)
 
-  world.setGame(game)
+  world.setGame(world.client?.discord ? "island" : game)
 
   // setup commands
   if (commands) {

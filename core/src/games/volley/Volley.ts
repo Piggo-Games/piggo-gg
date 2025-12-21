@@ -65,7 +65,7 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
         follow: () => ({ x: 225, y: 0, z: 0 }),
         resize: () => {
           const { w } = screenWH()
-          return Math.min(3.4, w / (600 * 1.1))
+          return Math.min(3.4, w / (550 * 1.1))
         }
       }),
       PixiDebugSystem
