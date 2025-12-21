@@ -23,7 +23,6 @@ export const Sun = (props: SunProps = {}) => {
           const dayFactor = dayness(world.tick, 0)
 
           light.color.set(lerp(colors.threeNight, colors.threeEvening, dayFactor))
-          // hemi.color.set(lerp(colors.threeNight, colors.threeEvening, dayFactor))
           hemi.intensity = 3 + dayFactor
 
           const pc = client.character()

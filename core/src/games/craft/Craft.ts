@@ -80,7 +80,6 @@ const CraftSystem = SystemBuilder({
   id: "CraftSystem",
   init: (world) => {
     spawnTerrain(world, 24)
-    // spawnFlat(world, 24)
 
     const mobileUI = MobileUI(world)
 
