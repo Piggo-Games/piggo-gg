@@ -1,25 +1,39 @@
-import { Client, Entity, HtmlDiv, min, NPC, pow, sqrt, XY } from "@piggo-gg/core"
+import { Client, Entity, HDiv, HText, HtmlDiv, min, NPC, pow, sqrt, XY } from "@piggo-gg/core"
 
 export type HtmlJoystickProps = {
   client: Client
   side: "left" | "right"
+  radius?: number
 }
 
-export const HtmlJoystick = ({ client, side }: HtmlJoystickProps): HtmlDiv => {
+export const HtmlJoystick = ({ client, side, radius = 40 }: HtmlJoystickProps): HtmlDiv => {
 
-  const idle = side === "left" ? "rgba(200, 60, 200, 0.5)" : "rgba(0, 100, 200, 0.5)"
-  const active = side === "left" ? "rgba(200, 60, 200, 0.8)" : "rgba(0, 100, 200, 0.8)"
+  const idle = side === "left" ? "rgba(0, 100, 200, 0.5)" : "rgba(200, 60, 200, 0.5)"
+  const active = side === "left" ? "rgba(0, 100, 200, 0.8)" : "rgba(200, 60, 200, 0.8)"
 
-  const stick = HtmlDiv({
-    ...side === "left" ? { left: "15%" } : { right: "15%" },
-    backgroundColor: idle,
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    bottom: "40px",
-    pointerEvents: "auto",
-    border: "2px solid white"
-  })
+  const stick = HDiv({
+    style: {
+      ...side === "left" ? { left: "15%" } : { right: "15%" },
+      backgroundColor: idle,
+      width: `${radius * 2}px`,
+      height: `${radius * 2}px`,
+      borderRadius: "50%",
+      bottom: "40px",
+      pointerEvents: "auto",
+      border: "2px solid white"
+    }
+  },
+    HText({
+      text: side === "left" ? "move" : "",
+      style: {
+        color: "white",
+        bottom: `-4px`,
+        left: `50%`,
+        fontSize: "16px",
+        transform: "translate(-50%, 100%)"
+      }
+    })
+  )
 
   let center: XY = { x: 0, y: 0 }
 
@@ -74,7 +88,7 @@ export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
       npc: NPC({
         behavior: (_, world) => {
           if (!init && world.client?.mobile) {
-            joystick = HtmlJoystick({ client: world.client, side })
+            joystick = HtmlJoystick({ client: world.client, side, radius: 30 })
             document.body.appendChild(joystick)
             init = true
           }
