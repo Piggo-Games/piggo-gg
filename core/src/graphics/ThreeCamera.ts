@@ -72,7 +72,12 @@ export const ThreeCamera = (): ThreeCamera => {
   return ThreeCamera
 }
 
-export const ThreeCameraSystem = () => ClientSystemBuilder({
+export type ThreeCameraSystemProps = {
+  height: number
+  distance: number
+}
+
+export const ThreeCameraSystem = ({ height, distance }: ThreeCameraSystemProps) => ClientSystemBuilder({
   id: "ThreeCameraSystem",
   init: (world) => {
 
@@ -100,11 +105,11 @@ export const ThreeCameraSystem = () => ClientSystemBuilder({
           camera.transition += delta / 25 * 8
         }
 
-        const firstPos = { x: interpolated.x, y: interpolated.y, z: interpolated.z + 0.5 }
+        const firstPos = { x: interpolated.x, y: interpolated.y, z: interpolated.z + height }
 
         // const right = new Vector3().crossVectors(offset, new Vector3(0, 1, 0)).normalize()
 
-        const offset = new Vector3(-sin(x) * cos(y), sin(y), -cos(x) * cos(y)).multiplyScalar(1)
+        const offset = new Vector3(-sin(x) * cos(y), sin(y), -cos(x) * cos(y)).multiplyScalar(distance)
         const thirdPos = { x: interpolated.x - offset.x, y: interpolated.y - offset.z, z: interpolated.z + 0.4 - offset.y }
 
         const diff = XYZsub(firstPos, thirdPos)
@@ -140,7 +145,7 @@ export const ThreeCameraSystem = () => ClientSystemBuilder({
 
           camera.c.lookAt(
             interpolated.x + offset.x * 0.2,
-            interpolated.z + 0.5 + percent * -0.1,
+            interpolated.z + height + percent * -0.1,
             interpolated.y + offset.z * 0.2
           )
         }

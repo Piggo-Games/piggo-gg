@@ -69,7 +69,7 @@ export const Carl = (player: Player): Character => {
             eagle.visible = false
 
             // position
-            pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
+            pig.position.set(interpolated.x, interpolated.z  - 0.033, interpolated.y)
 
             // rotation
             pig.rotation.y = orientation.x + PI / 2
@@ -88,7 +88,8 @@ export const Carl = (player: Player): Character => {
 
               pigMixer?.update(speed * ratio * 0.005 + 0.005)
             } else {
-              pigMixer?.update(speed * ratio * 0.005 + 0.005)
+              console.log(speed)
+              pigMixer?.update(speed * ratio * 0.012 + 0.006)
             }
           }
 
@@ -116,7 +117,7 @@ export const Carl = (player: Player): Character => {
             pig = cloneSkeleton(gltf.scene)
             pig.animations = gltf.animations
             pig.frustumCulled = false
-            pig.scale.set(0.16, 0.18, 0.16)
+            pig.scale.set(0.1, 0.1, 0.1)
 
             copyMaterials(gltf.scene, pig)
 
