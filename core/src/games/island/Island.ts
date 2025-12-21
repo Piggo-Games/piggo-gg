@@ -125,7 +125,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       HtmlLagText(),
       HtmlFpsText(),
 
-      HtmlJoystickEntity("left")
+      HtmlJoystickEntity("left", "move")
     ]
   })
 }

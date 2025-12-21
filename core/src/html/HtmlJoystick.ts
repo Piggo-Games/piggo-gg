@@ -4,9 +4,10 @@ export type HtmlJoystickProps = {
   client: Client
   side: "left" | "right"
   radius?: number
+  label?: string
 }
 
-export const HtmlJoystick = ({ client, side, radius = 40 }: HtmlJoystickProps): HtmlDiv => {
+export const HtmlJoystick = ({ client, side, radius = 40, label }: HtmlJoystickProps): HtmlDiv => {
 
   const idle = side === "left" ? "rgba(0, 100, 200, 0.5)" : "rgba(200, 60, 200, 0.5)"
   const active = side === "left" ? "rgba(0, 100, 200, 0.8)" : "rgba(200, 60, 200, 0.8)"
@@ -24,7 +25,7 @@ export const HtmlJoystick = ({ client, side, radius = 40 }: HtmlJoystickProps): 
     }
   },
     HText({
-      text: side === "left" ? "move" : "",
+      text: label || "",
       style: {
         color: "white",
         bottom: `-4px`,
@@ -77,7 +78,7 @@ export const HtmlJoystick = ({ client, side, radius = 40 }: HtmlJoystickProps): 
   return stick
 }
 
-export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
+export const HtmlJoystickEntity = (side: "left" | "right", label?: string): Entity => {
 
   let joystick: HtmlDiv | undefined = undefined
   let init = false
@@ -88,7 +89,7 @@ export const HtmlJoystickEntity = (side: "left" | "right"): Entity => {
       npc: NPC({
         behavior: (_, world) => {
           if (!init && world.client?.mobile) {
-            joystick = HtmlJoystick({ client: world.client, side, radius: 30 })
+            joystick = HtmlJoystick({ client: world.client, side, radius: 30, label: label ?? "" })
             document.body.appendChild(joystick)
             init = true
           }
