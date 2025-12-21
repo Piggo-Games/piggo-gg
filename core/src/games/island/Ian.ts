@@ -1,7 +1,7 @@
 import {
   Action, Actions, Character, Collider, Debug, IslandState, Health, Input,
   Move, Networked, PixiSkins, Player, Point, Position, Renderable,
-  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY
+  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY, cos, sin
 } from "@piggo-gg/core"
 
 export const Ian = (player: Player): Character => {
@@ -19,6 +19,13 @@ export const Ian = (player: Player): Character => {
       shadow: Shadow(5),
       health: Health({ hp: 5, maxHp: 5 }),
       input: Input({
+        joystick: ({ client }) => {
+          const { power, angle } = client.controls.left
+
+          const dir: XY = { x: cos(angle), y: sin(angle) }
+
+          return { actionId: "moveAnalog", params: { dir, power, angle } }
+        },
         press: {
           ...WASDInputMap.press,
           "mb1": ({ hold, world, mouse }) => {
@@ -59,6 +66,25 @@ export const Ian = (player: Player): Character => {
       }),
       actions: Actions({
         move: Move,
+        moveAnalog: Action<{ dir: XY, power: number, angle: number }>("moveAnalog", ({ entity, params }) => {
+          if (!entity) return
+
+          const { position } = entity.components
+          if (!position) return
+
+          const power = params.power ?? 0
+          if (power <= 0) return
+
+          const dir = params.dir ?? { x: 0, y: 0 }
+
+          if (dir.x > 0) position.data.facing = 1
+          if (dir.x < 0) position.data.facing = -1
+
+          position.setVelocity({
+            x: dir.x * power * position.data.speed,
+            y: dir.y * power * position.data.speed
+          })
+        }),
         point: Point,
         jump: Action("jump", () => {
           if (!ian.components.position?.data.standing) return
