@@ -248,7 +248,7 @@ const PlayersOnline = (world: World): RefreshableDiv => ({
 
 const GameLobby = (): Entity => {
 
-  const list: GameBuilder[] = [Craft, Build, Volley, Island]
+  const list: GameBuilder[] = [Build, Volley, Island]
 
   let gameButtons: HTMLButtonElement[] = []
 
