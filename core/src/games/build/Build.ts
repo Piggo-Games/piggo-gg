@@ -46,7 +46,7 @@ export const Build: GameBuilder<BuildState, BuildSettings> = {
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSystem,
+      BlockMeshSystem({ counts: { grass: 2000, leaf: 0, oak: 0, spruce: 0, marble: 10000 } }),
       ParticleSystem
     ],
     entities: [

@@ -4,7 +4,7 @@ import {
   PI, Place, Player, Point, Position, Ready, setActiveItemIndex,
   sin, sqrt, Team, Three, upAndDir, XYZ, XZ
 } from "@piggo-gg/core"
-import { AnimationAction, AnimationMixer, Mesh, Object3D, Vector3 } from "three"
+import { AnimationAction, AnimationMixer, Mesh, MeshStandardMaterial, Object3D, Vector3 } from "three"
 import { CraftSettings, CraftState } from "./Craft"
 
 const walk = 0.8
@@ -72,7 +72,7 @@ export const Carl = (player: Player): Character => {
             pig.position.set(interpolated.x, interpolated.z + 0, interpolated.y)
 
             // rotation
-            pig.rotation.y = orientation.x + PI
+            pig.rotation.y = orientation.x + PI / 2
 
             // animation
             const speed = hypot(position.data.velocity.x, position.data.velocity.y)
@@ -111,7 +111,7 @@ export const Carl = (player: Player): Character => {
           }
         },
         init: async ({ o, world, three }) => {
-          three.gLoader.load("cowboy.glb", (gltf) => {
+          three.gLoader.load("ugly-duckling.glb", (gltf) => {
 
             pig = cloneSkeleton(gltf.scene)
             pig.animations = gltf.animations
@@ -122,8 +122,8 @@ export const Carl = (player: Player): Character => {
 
             pigMixer = new AnimationMixer(pig)
 
-            idleAnimation = pigMixer.clipAction(pig.animations[2])
-            runAnimation = pigMixer.clipAction(pig.animations[8])
+            idleAnimation = pigMixer.clipAction(pig.animations[1])
+            // runAnimation = pigMixer.clipAction(pig.animations[8])
 
             idleAnimation?.play()
 
@@ -140,34 +140,34 @@ export const Carl = (player: Player): Character => {
             o.push(pig)
           })
 
-          // three.gLoader.load("eagle.glb", (gltf) => {
-          //   eagle = gltf.scene
-          //   eagle.animations = gltf.animations
-          //   eagle.scale.set(0.05, 0.05, 0.05)
-          //   eagle.frustumCulled = false
+          three.gLoader.load("eagle.glb", (gltf) => {
+            eagle = gltf.scene
+            eagle.animations = gltf.animations
+            eagle.scale.set(0.05, 0.05, 0.05)
+            eagle.frustumCulled = false
 
-          //   eagle.rotation.order = "YXZ"
+            eagle.rotation.order = "YXZ"
 
-          //   eagleMixer = new AnimationMixer(eagle)
-          //   eagleMixer.clipAction(eagle.animations[0]).play()
+            eagleMixer = new AnimationMixer(eagle)
+            eagleMixer.clipAction(eagle.animations[0]).play()
 
-          //   const colors: Record<string, number> = {
-          //     Cylinder: 0x5C2421,
-          //     Cylinder_1: 0xE7C41C,
-          //     Cylinder_2: 0xffffff,
-          //     Cylinder_3: 0x632724
-          //   }
+            const colors: Record<string, number> = {
+              Cylinder: 0x5C2421,
+              Cylinder_1: 0xE7C41C,
+              Cylinder_2: 0xffffff,
+              Cylinder_3: 0x632724
+            }
 
-          //   eagle.traverse((child) => {
-          //     if (child instanceof Mesh) {
-          //       child.material = new MeshStandardMaterial({ color: colors[child.name], transparent: true, opacity: 1 })
-          //       child.castShadow = true
-          //       child.receiveShadow = true
-          //     }
-          //   })
+            eagle.traverse((child) => {
+              if (child instanceof Mesh) {
+                child.material = new MeshStandardMaterial({ color: colors[child.name], transparent: true, opacity: 1 })
+                child.castShadow = true
+                child.receiveShadow = true
+              }
+            })
 
-          //   entity.components.three.o.push(eagle)
-          // })
+            carl.components.three!.o.push(eagle)
+          })
         }
       }),
       input: Input({
@@ -281,10 +281,10 @@ export const Carl = (player: Player): Character => {
           },
 
           // transform
-          // "e": ({ hold }) => {
-          //   if (hold) return
-          //   return { actionId: "transform" }
-          // },
+          "e": ({ hold }) => {
+            if (hold) return
+            return { actionId: "transform" }
+          },
 
           // debug
           "g": ({ world, hold }) => {
@@ -323,16 +323,16 @@ export const Carl = (player: Player): Character => {
       actions: Actions({
         ready: Ready,
         point: Point,
-        // transform: Action("transform", ({ entity, world }) => {
-        //   const { position } = entity?.components ?? {}
-        //   if (!position) return
+        transform: Action("transform", ({ entity, world }) => {
+          const { position } = entity?.components ?? {}
+          if (!position) return
 
-        //   const state = world.game.state as CraftState
-        //   if (state.phase === "play") return
-        //   if (state.hit[entity?.id ?? ""]) return
+          const state = world.game.state as CraftState
+          if (state.phase === "play") return
+          // if (state.hit[entity?.id ?? ""]) return
 
-        //   position.data.flying = !position.data.flying
-        // }),
+          position.data.flying = !position.data.flying
+        }),
         place: Place,
         setActiveItemIndex,
         jump: Action("jump", ({ entity, world, params }) => {

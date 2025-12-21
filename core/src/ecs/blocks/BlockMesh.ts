@@ -30,20 +30,20 @@ export const BlocksMesh = (maxCount: number): BlocksMesh => {
 export type BlockMeshMaterials = "grass" | "leaf" | "oak" | "spruce" | "marble"
 
 export type BlockMeshSystemProps = {
-  counts?: Record<BlockMeshMaterials, number>
+  counts: Record<BlockMeshMaterials, number>
 }
 
-export const BlockMeshSystem = ({ counts }: BlockMeshSystemProps = {}) => ClientSystemBuilder({
+export const BlockMeshSystem = ({ counts }: BlockMeshSystemProps) => ClientSystemBuilder({
   id: "BlockMeshSystem",
   init: (world) => {
     const { three } = world
     if (!three) return
 
-    let grass = BlocksMesh(counts?.grass ?? 4000)
-    let leaf = BlocksMesh(counts?.leaf ?? 5000)
-    let oak = BlocksMesh(counts?.oak ?? 5000)
-    let spruce = BlocksMesh(counts?.spruce ?? 5000)
-    let marble = BlocksMesh(counts?.marble ?? 4000)
+    let grass = BlocksMesh(counts.grass)
+    let leaf = BlocksMesh(counts.leaf)
+    let oak = BlocksMesh(counts.oak)
+    let spruce = BlocksMesh(counts.spruce)
+    let marble = BlocksMesh(counts.marble)
 
     GrassTexture(grass.material, three)
     LeafTexture(leaf.material, three)
