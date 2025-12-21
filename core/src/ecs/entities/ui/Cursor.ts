@@ -9,8 +9,12 @@ export const Cursor = (): Entity => {
       position: Position({ x: 2000, y: 2000, screenFixed: true }),
       renderable: Renderable({
         interpolate: true,
-        onRender: ({ client, renderable }) => {
-          renderable.visible = client.menu ? false : true
+        onRender: ({ world, client, renderable }) => {
+          if (client.mobile) {
+            renderable.visible = world.debug ? true : false
+          } else {
+            renderable.visible = client.menu ? false : true
+          }
 
           document.body.style.cursor = client.menu ? "auto" : "none"
           document.documentElement.style.cursor = client.menu ? "auto" : "none"

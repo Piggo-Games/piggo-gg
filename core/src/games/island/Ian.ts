@@ -1,7 +1,7 @@
 import {
   Action, Actions, Character, Collider, Debug, IslandState, Health, Input,
   Move, Networked, PixiSkins, Player, Point, Position, Renderable,
-  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY
+  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY, cos, sin
 } from "@piggo-gg/core"
 
 export const Ian = (player: Player): Character => {
@@ -19,15 +19,25 @@ export const Ian = (player: Player): Character => {
       shadow: Shadow(5),
       health: Health({ hp: 5, maxHp: 5 }),
       input: Input({
+        joystick: ({ client }) => {
+          const { power, angle } = client.controls.left
+
+          const dir: XY = { x: cos(angle), y: sin(angle) }
+
+          return { actionId: "moveAnalog", params: { dir, power, angle } }
+        },
         press: {
           ...WASDInputMap.press,
-          "mb1": ({ hold, world }) => {
+          "mb1": ({ hold, world, mouse }) => {
             if (hold) return
 
             const state = world.state<IslandState>()
             if (state.shooter !== ian.id) return
 
-            const { pointingDelta } = ian.components.position.data
+            const pointingDelta: XY = {
+              x: mouse.x - ian.components.position.data.x,
+              y: mouse.y - ian.components.position.data.y
+            }
             return { actionId: "rollDice", params: { pointingDelta } }
           },
           "t": ({ hold }) => {
@@ -56,6 +66,25 @@ export const Ian = (player: Player): Character => {
       }),
       actions: Actions({
         move: Move,
+        moveAnalog: Action<{ dir: XY, power: number, angle: number }>("moveAnalog", ({ entity, params }) => {
+          if (!entity) return
+
+          const { position } = entity.components
+          if (!position) return
+
+          const power = params.power ?? 0
+          if (power <= 0) return
+
+          const dir = params.dir ?? { x: 0, y: 0 }
+
+          if (dir.x > 0) position.data.facing = 1
+          if (dir.x < 0) position.data.facing = -1
+
+          position.setVelocity({
+            x: dir.x * power * position.data.speed,
+            y: dir.y * power * position.data.speed
+          })
+        }),
         point: Point,
         jump: Action("jump", () => {
           if (!ian.components.position?.data.standing) return
