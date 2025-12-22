@@ -14,7 +14,7 @@ export const Player = ({ id, name, team, leader }: PlayerProps): Player => Entit
   persists: true,
   components: {
     networked: Networked(),
-    pc: PC({ name: name ?? "noob", leader: leader ?? false }),
+    pc: PC({ name: name ?? `noob${window.devicePixelRatio}`, leader: leader ?? false }),
     controlling: Controlling(),
     actions: Actions({ SwitchTeam }),
     team: Team(team ?? 1)

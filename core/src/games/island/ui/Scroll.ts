@@ -86,7 +86,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
             text: `${manaCost} mana`,
             pos: { x: 0, y: -6 },
             anchor: { x: 0.5, y: 0 },
-            style: { fontSize: 3.5, fill: 0x1c64f2, align: "center", resolution: 16 }
+            style: { fontSize: 3.5, fill: 0x1c64f2, align: "center", resolution: 16, dropShadow: true }
           })
 
           r.c.addChild(titleText, descriptionText, manaText)
