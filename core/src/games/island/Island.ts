@@ -9,10 +9,9 @@ import { Ian } from "./Ian"
 import { Dice } from "./Dice"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
-import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
-import { RallyScroll, Scroll, ScrollProps, SliceScroll } from "./ui/Scroll"
+import { RallyScroll, SliceScroll } from "./ui/Scroll"
 import { TargetBoard } from "./ui/TargetBoard"
 
 const arenaWidth = 500
@@ -91,7 +90,6 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       BeachWall(),
       OuterBeachWall(),
       Beach(),
-      // Pier(),
       Flag(),
       Patrick(),
       Water2D(),
