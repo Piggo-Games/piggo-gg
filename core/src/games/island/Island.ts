@@ -2,7 +2,8 @@ import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
   HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
   PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min,
-  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity
+  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity,
+  randomInt
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
@@ -139,21 +140,6 @@ const IslandSystem = SystemBuilder({
     const monsterId = "patrick"
     const monsterPointingDelta = { x: -140, y: 0 }
 
-    const resolvePointingDelta = (shooterId: string) => {
-      const shooter = world.entity(shooterId)
-      const pointingDelta = shooter?.components.position?.data.pointingDelta
-
-      if (!pointingDelta
-        || !Number.isFinite(pointingDelta.x)
-        || !Number.isFinite(pointingDelta.y)
-        || (pointingDelta.x === 0 && pointingDelta.y === 0)
-      ) {
-        return { ...monsterPointingDelta }
-      }
-
-      return { x: pointingDelta.x, y: pointingDelta.y }
-    }
-
     const queueDiceRoll = (shooterId: string, pointingDelta: { x: number, y: number }, delay = 1) => {
       const shooter = world.entity(shooterId)
       world.actions.push(world.tick + delay, "dice-1", { actionId: "roll", params: { shooterId, pointingDelta } })
@@ -231,7 +217,7 @@ const IslandSystem = SystemBuilder({
       }
 
       if (state.turnPhase === "players" && state.selectedAbility) {
-        const pointingDelta = resolvePointingDelta(shooterId)
+        const pointingDelta = { x: randomInt(100) + 50, y: 0 }
         queueDiceRoll(shooterId, pointingDelta)
         state.rollQueued = true
       }
