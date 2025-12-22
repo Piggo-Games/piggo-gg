@@ -96,3 +96,23 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
   })
   return scroll
 }
+
+const GunnerAbilities: ScrollProps[] = [
+  {
+    id: "rally",
+    title: "Rally",
+    description: "allies take 1 less DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: -46, y: 130 }
+  },
+  {
+    id: "slice",
+    title: "Slice",
+    description: "enemies take 1D6 extra DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 46, y: 130 }
+  }
+]
+
+export const RallyScroll = () => Scroll(GunnerAbilities[0])
+export const SliceScroll = () => Scroll(GunnerAbilities[1])

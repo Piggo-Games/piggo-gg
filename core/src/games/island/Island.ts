@@ -1,9 +1,8 @@
 import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
-  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
-  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min,
-  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity,
-  randomInt
+  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem, PhysicsSystem,
+  PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min, ShadowSystem, SpawnSystem,
+  SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity, randomInt
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
@@ -13,7 +12,7 @@ import { Flag } from "./terrain/Flag"
 import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
-import { Scroll, ScrollProps } from "./ui/Scroll"
+import { RallyScroll, Scroll, ScrollProps, SliceScroll } from "./ui/Scroll"
 import { TargetBoard } from "./ui/TargetBoard"
 
 const arenaWidth = 500
@@ -41,23 +40,6 @@ export type IslandState = {
 export type IslandSettings = {
   showControls: boolean
 }
-
-const scrollAbilities: ScrollProps[] = [
-  {
-    id: "rally",
-    title: "Rally",
-    description: "allies take 1 less DMG per hit until your next turn",
-    manaCost: 1,
-    position: { x: -46, y: 130 }
-  },
-  {
-    id: "slice",
-    title: "Slice",
-    description: "enemies take 1D6 extra DMG per hit until your next turn",
-    manaCost: 1,
-    position: { x: 46, y: 130 }
-  }
-]
 
 export const Island: GameBuilder<IslandState, IslandSettings> = {
   id: "island",
@@ -120,7 +102,8 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
 
       NumBoard(),
       TargetBoard(),
-      ...scrollAbilities.map((scroll) => Scroll(scroll)),
+      RallyScroll(),
+      SliceScroll(),
 
       Cursor(),
       EscapeMenu(world),
