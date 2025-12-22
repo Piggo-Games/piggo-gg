@@ -63,6 +63,10 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
             hovering = false
           }
           r.c.onpointerdown = () => {
+            const state = world.state<IslandState>()
+            if (state.shooter !== world.client!.character()?.id) return
+            if (state.rollQueued) return
+
             world.actions.push(world.tick + 1, scroll.id, { actionId: "selectAbility", params: { abilityId: id } })
 
             world.client!.clickThisFrame.set(world.tick)
@@ -86,7 +90,7 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
             text: `${manaCost} mana`,
             pos: { x: 0, y: -6 },
             anchor: { x: 0.5, y: 0 },
-            style: { fontSize: 3.5, fill: 0x1c64f2, align: "center", resolution: 16, dropShadow: true }
+            style: { fontSize: 3.5, fill: 0x1c64f2, align: "center", resolution: 16 }
           })
 
           r.c.addChild(titleText, descriptionText, manaText)

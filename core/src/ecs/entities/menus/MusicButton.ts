@@ -1,6 +1,6 @@
 import { HButton, HDiv, HImg, RefreshableDiv, World } from "@piggo-gg/core"
 
-export const MusicButton = (world: World): RefreshableDiv => {
+export const MusicButton = (world: World, radius: number = 36): RefreshableDiv => {
 
   const setVisual = (button: HTMLElement) => {
     const enabled = world.client?.sound.musicPlaying()
@@ -15,7 +15,7 @@ export const MusicButton = (world: World): RefreshableDiv => {
       height: "100%",
       borderRadius: "10px",
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
-      top: "-2px",
+      top: "0px",
       left: "-2px",
       border: "2px solid #ffffff",
       transition: "transform 0.3s ease, box-shadow 0.2s ease"
@@ -36,10 +36,9 @@ export const MusicButton = (world: World): RefreshableDiv => {
   const button = HButton({
     style: {
       position: "relative",
-      width: "36px",
-      height: "36px",
+      width: `${radius}px`,
+      height: `${radius}px`,
       borderRadius: "10px",
-      justifyContent: "center",
       background: "none"
     },
     onClick: () => {

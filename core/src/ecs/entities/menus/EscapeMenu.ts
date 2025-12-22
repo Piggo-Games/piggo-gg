@@ -50,7 +50,7 @@ export const EscapeMenu = (world: World): Entity => {
     style: {
       position: "relative",
       left: "50%",
-      transform: "translate(-50%)",
+      transform: "translate(-75%)",
       width: "158px",
       height: "158px",
       borderRadius: "12px",
@@ -160,7 +160,7 @@ export const EscapeMenu = (world: World): Entity => {
     }
   })
 
-  const musicButton = MusicButton(world)
+  const musicButton = MusicButton(world, 40)
 
   if (!world.client?.mobile) topRowDiv.appendChild(musicButton.div)
   if (!world.client?.mobile) topRowDiv.appendChild(art)
