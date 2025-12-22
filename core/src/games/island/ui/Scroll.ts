@@ -35,14 +35,16 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
         scale: 2.2,
         anchor: { x: 0.53, y: 1 },
         scaleMode: "nearest",
-        onRender: ({ renderable, world }) => {
-          const selected = world.state<IslandState>().selectedAbility === id
+        onRender: ({ renderable, world, client }) => {
+          const state = world.state<IslandState>()
 
+          const selected = state.selectedAbility === id
           renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
-
           if (selected) return
 
-          if (hovering) {
+          console.log("hovering", hovering, state.shooter, client.character(), state.rollQueued)
+
+          if (hovering && (state.shooter === client.character()?.id && !state.rollQueued)) {
             renderable.setOverlay({ color: 0xffffaa, alpha: 0.2 })
           } else {
             delete renderable.filters["overlay"]
