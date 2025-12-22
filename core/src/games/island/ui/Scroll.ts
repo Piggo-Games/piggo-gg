@@ -42,8 +42,6 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
           renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
           if (selected) return
 
-          console.log("hovering", hovering, state.shooter, client.character(), state.rollQueued)
-
           if (hovering && (state.shooter === client.character()?.id && !state.rollQueued)) {
             renderable.setOverlay({ color: 0xffffaa, alpha: 0.2 })
           } else {
