@@ -20,13 +20,13 @@ export const Whack = (sound: ValidSounds, damage: DamageCalculation) => Action<K
     const { position } = entity.components
     if (!position) return
 
-    if (position.data.pointingDelta.x > 0) {
+    if (characterEntity.components.position.data.pointingDelta.x > 0) {
       position.rotate(1)
     } else {
       position.rotate(-1)
     }
 
-    const angle = Math.atan2(position.data.pointingDelta.y, position.data.pointingDelta.x)
+    // const angle = Math.atan2(position.data.pointingDelta.y, position.data.pointingDelta.x)
 
     // const hitboxParams: HitboxProps = {
     //   pos: {

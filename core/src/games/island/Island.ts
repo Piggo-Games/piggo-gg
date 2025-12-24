@@ -198,7 +198,7 @@ const IslandSystem = SystemBuilder({
       }
 
       if (state.turnPhase === "players" && state.selectedAbility) {
-        const pointingDelta = { x: randomInt(100) + 50, y: 0 }
+        const pointingDelta = { x: randomInt(100) + 100, y: 0 }
         queueDiceRoll(shooterId, pointingDelta)
         state.rollQueued = true
       }
