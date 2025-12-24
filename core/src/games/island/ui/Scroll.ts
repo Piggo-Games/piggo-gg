@@ -35,14 +35,16 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
         scale: 2.2,
         anchor: { x: 0.53, y: 1 },
         scaleMode: "nearest",
-        onRender: ({ renderable, world }) => {
-          const selected = world.state<IslandState>().selectedAbility === id
+        onRender: ({ renderable, world, client }) => {
+          const state = world.state<IslandState>()
 
+          if (world.client!.menu) hovering = false
+
+          const selected = state.selectedAbility === id
           renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
-
           if (selected) return
 
-          if (hovering) {
+          if (hovering && (state.shooter === client.character()?.id && !state.rollQueued)) {
             renderable.setOverlay({ color: 0xffffaa, alpha: 0.2 })
           } else {
             delete renderable.filters["overlay"]
@@ -57,12 +59,20 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
           r.c.eventMode = "dynamic"
 
           r.c.onmouseenter = () => {
+            if (world.client!.menu) return
             hovering = true
           }
           r.c.onmouseleave = () => {
+            if (world.client!.menu) return
             hovering = false
           }
           r.c.onpointerdown = () => {
+            const state = world.state<IslandState>()
+            if (state.shooter !== world.client!.character()?.id) return
+            if (state.rollQueued) return
+
+            if (world.client!.menu) return
+
             world.actions.push(world.tick + 1, scroll.id, { actionId: "selectAbility", params: { abilityId: id } })
 
             world.client!.clickThisFrame.set(world.tick)
@@ -96,3 +106,23 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
   })
   return scroll
 }
+
+const GunnerAbilities: ScrollProps[] = [
+  {
+    id: "rally",
+    title: "Rally",
+    description: "allies take 1 less DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: -46, y: 130 }
+  },
+  {
+    id: "slice",
+    title: "Slice",
+    description: "enemies take 1D6 extra DMG per hit until your next turn",
+    manaCost: 1,
+    position: { x: 46, y: 130 }
+  }
+]
+
+export const RallyScroll = () => Scroll(GunnerAbilities[0])
+export const SliceScroll = () => Scroll(GunnerAbilities[1])

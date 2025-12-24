@@ -1,4 +1,3 @@
-
 export * from "./src/utils/BlockUtils"
 export * from "./src/utils/ColorUtils"
 export * from "./src/utils/LogUtils"
@@ -58,6 +57,7 @@ export * from "./src/ecs/entities/characters/Skelly"
 export * from "./src/ecs/entities/characters/PixiSkins"
 export * from "./src/ecs/entities/menus/EscapeMenu"
 export * from "./src/ecs/entities/menus/LobbiesMenu"
+export * from "./src/ecs/entities/menus/MusicButton"
 export * from "./src/ecs/entities/menus/PixiMenu"
 export * from "./src/ecs/entities/menus/SettingsMenu"
 export * from "./src/ecs/entities/menus/SkinsMenu"

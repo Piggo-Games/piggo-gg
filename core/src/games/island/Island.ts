@@ -1,18 +1,17 @@
 import {
   Background, Cursor, EscapeMenu, GameBuilder, HUDSystem, HUDSystemProps, HtmlChat,
-  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem,
-  PhysicsSystem, PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min,
-  ShadowSystem, SpawnSystem, SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity
+  HtmlFpsText, HtmlLagText, InventorySystem, ItemSystem, PixiNametagSystem, PhysicsSystem,
+  PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, min, ShadowSystem, SpawnSystem,
+  SystemBuilder, Water2D, screenWH, DummyPlayer, HtmlJoystickEntity, randomInt
 } from "@piggo-gg/core"
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
 import { Dice } from "./Dice"
 import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
-import { Pier } from "./terrain/Pier"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
-import { Scroll, ScrollProps } from "./ui/Scroll"
+import { RallyScroll, SliceScroll } from "./ui/Scroll"
 import { TargetBoard } from "./ui/TargetBoard"
 
 const arenaWidth = 500
@@ -27,6 +26,7 @@ export type IslandState = {
   turnTarget: Roll | null
   rollId: number
   handledRollId: number
+  rollQueued: boolean
   autoRollAt: number | null
   advanceAt: number | null
   shooter: string | null
@@ -39,23 +39,6 @@ export type IslandState = {
 export type IslandSettings = {
   showControls: boolean
 }
-
-const scrollAbilities: ScrollProps[] = [
-  {
-    id: "rally",
-    title: "Rally",
-    description: "allies take 1 less DMG per hit until your next turn",
-    manaCost: 1,
-    position: { x: -46, y: 130 }
-  },
-  {
-    id: "slice",
-    title: "Slice",
-    description: "enemies take 1D6 extra DMG per hit until your next turn",
-    manaCost: 1,
-    position: { x: 46, y: 130 }
-  }
-]
 
 export const Island: GameBuilder<IslandState, IslandSettings> = {
   id: "island",
@@ -73,6 +56,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       turnTarget: null,
       rollId: 0,
       handledRollId: 0,
+      rollQueued: false,
       autoRollAt: null,
       advanceAt: null,
       shooter: null,
@@ -106,7 +90,6 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       BeachWall(),
       OuterBeachWall(),
       Beach(),
-      // Pier(),
       Flag(),
       Patrick(),
       Water2D(),
@@ -117,7 +100,8 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
 
       NumBoard(),
       TargetBoard(),
-      ...scrollAbilities.map((scroll) => Scroll(scroll)),
+      RallyScroll(),
+      SliceScroll(),
 
       Cursor(),
       EscapeMenu(world),
@@ -135,11 +119,20 @@ const IslandSystem = SystemBuilder({
   init: (world) => {
 
     const monsterId = "patrick"
+    const monsterPointingDelta = { x: -140, y: 0 }
+
+    const queueDiceRoll = (shooterId: string, pointingDelta: { x: number, y: number }, delay = 1) => {
+      const shooter = world.entity(shooterId)
+      world.actions.push(world.tick + delay, "dice-1", { actionId: "roll", params: { shooterId, pointingDelta } })
+      world.actions.push(world.tick + delay, "dice-2", { actionId: "roll", params: { shooterId, pointingDelta } })
+      shooter?.components.renderable?.setAnimation("spike")
+    }
 
     const beginTurn = (state: IslandState, actorId: string | null) => {
       state.shooter = actorId
       state.turnTarget = null
       state.autoRollAt = null
+      state.rollQueued = false
     }
 
     const beginPlayerTurn = (state: IslandState, characters: { id: string }[]) => {
@@ -169,6 +162,8 @@ const IslandSystem = SystemBuilder({
       state.rolled = null
       state.die1 = null
       state.die2 = null
+      state.turnTarget = null
+      state.selectedAbility = null
 
       if (state.turnPhase === "monster") {
         state.round += 1
@@ -188,24 +183,29 @@ const IslandSystem = SystemBuilder({
       beginPlayerTurn(state, characters)
     }
 
-    const scheduleMonsterRoll = (state: IslandState) => {
-      state.autoRollAt = world.tick + 20
-    }
-
-    const maybeAutoRollMonster = (state: IslandState) => {
-      if (state.turnPhase !== "monster") return
-      if (state.shooter !== monsterId) return
+    const maybeAutoRoll = (state: IslandState) => {
       if (state.autoRollAt === null || world.tick < state.autoRollAt) return
 
+      const shooterId = state.shooter
       state.autoRollAt = null
 
-      const pointingDelta = { x: -140, y: 0 }
-      world.actions.push(world.tick, "dice-1", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
-      world.actions.push(world.tick, "dice-2", { actionId: "roll", params: { shooterId: monsterId, pointingDelta } })
+      if (!shooterId) return
+
+      if (state.turnPhase === "monster") {
+        queueDiceRoll(shooterId, monsterPointingDelta, 0)
+        state.rollQueued = true
+        return
+      }
+
+      if (state.turnPhase === "players" && state.selectedAbility) {
+        const pointingDelta = { x: randomInt(100) + 50, y: 0 }
+        queueDiceRoll(shooterId, pointingDelta)
+        state.rollQueued = true
+      }
     }
 
-    const triggerAbility = (_: { state: IslandState, shooterId: string }) => {
-      console.log("ABILITY")
+    const triggerAbility = (payload: { state: IslandState, shooterId: string, abilityId: string, roll: Roll }) => {
+      console.log("ABILITY", payload.abilityId, payload.roll)
     }
 
     const triggerCrit = (_: { state: IslandState, shooterId: string, die1: D6, die2: D6 }) => {
@@ -238,7 +238,19 @@ const IslandSystem = SystemBuilder({
           beginMonsterTurn(state)
         }
 
-        maybeAutoRollMonster(state)
+        if (state.turnPhase === "players"
+          && state.shooter
+          && state.selectedAbility
+          && state.autoRollAt === null
+          && !state.rollQueued
+          && state.die1 === null
+          && state.die2 === null
+          && state.rolled === null
+        ) {
+          state.autoRollAt = world.tick
+        }
+
+        maybeAutoRoll(state)
 
         if (state.die1 && state.die2 && state.rolled === null) {
           let result = state.die1 + state.die2
@@ -278,26 +290,18 @@ const IslandSystem = SystemBuilder({
             return
           }
 
-          if (state.turnTarget === null) {
-            state.turnTarget = state.rolled
-            if (state.turnPhase === "monster") {
-              scheduleMonsterRoll(state)
-            }
-            return
+          if (state.turnPhase === "players" && state.shooter && state.selectedAbility) {
+            world.client?.sound.play({ name: "jingle1" })
+            triggerAbility({
+              state,
+              shooterId: state.shooter,
+              abilityId: state.selectedAbility,
+              roll: state.rolled
+            })
           }
 
-          if (state.rolled === state.turnTarget) {
-            if (state.shooter) {
-              world.client?.sound.play({ name: "jingle1" })
-              triggerAbility({ state, shooterId: state.shooter })
-            }
-            state.advanceAt = world.tick + 40
-            return
-          }
-
-          if (state.turnPhase === "monster") {
-            scheduleMonsterRoll(state)
-          }
+          state.advanceAt = world.tick + 40
+          return
         }
       }
     }
@@ -318,10 +322,6 @@ const controls: HUDSystemProps = {
         ["A", "S", "D"],
         ["W"]
       ]
-    },
-    {
-      label: "roll",
-      buttons: [["mb1"]]
     }
   ]
 }

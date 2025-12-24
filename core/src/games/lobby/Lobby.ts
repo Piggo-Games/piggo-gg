@@ -2,7 +2,8 @@ import {
   Background, Build, Entity, GameBuilder, getBrowser, HButton,
   HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu,
   Networked, NPC, piggoVersion, PixiRenderSystem, RefreshableDiv,
-  Volley, Island, World, canvasAppend, HtmlFpsText, HDiv
+  Volley, Island, World, canvasAppend, HtmlFpsText, HDiv,
+  MusicButton
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -35,37 +36,16 @@ const GameButton = (game: GameBuilder, world: World) => {
 
   const state = world.game.state as LobbyState
 
-  return HButton({
+  const inner = HButton({
     style: {
-      width: "min(20vw, 180px)",
-      height: "min(19.4vw, 170px)",
+      width: "100%",
+      height: "100%",
       borderRadius: "12px",
-      fontSize: "24px",
-      position: "relative",
+      top: "0px",
+      left: "0px",
       transition: "transform 0.5s ease, box-shadow 0.2s ease",
       border: "3px solid transparent",
-      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
-    },
-    onClick: (button) => {
-      button.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
-
-      if (!world.client?.isLeader()) return
-      if (state.starting) return
-
-      world.client?.sound.play({ name: "bubble" })
-      world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
-      state.starting = true
-    },
-    onHover: (button) => {
-      if (state.starting) return
-
-      button.style.transform = "translate(0%, -16px)"
-      button.style.boxShadow = "0 0 10px 4px white"
-    },
-    onHoverOut: (button) => {
-      if (state.starting) return
-      button.style.boxShadow = "none"
-      button.style.transform = "translate(0%, 0%)"
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)"
     }
   },
     HImg({
@@ -87,6 +67,40 @@ const GameButton = (game: GameBuilder, world: World) => {
         fontWeight: "bold"
       }
     })
+  )
+
+  return HButton({
+    style: {
+      width: "min(20vw, 180px)",
+      height: "min(19.4vw, 170px)",
+      borderRadius: "12px",
+      fontSize: "24px",
+      position: "relative",
+      background: "none"
+    },
+    onClick: () => {
+      inner.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
+
+      if (!world.client?.isLeader()) return
+      if (state.starting) return
+
+      world.client?.sound.play({ name: "bubble" })
+      world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
+      state.starting = true
+    },
+    onHover: () => {
+      if (state.starting) return
+
+      inner.style.transform = "translate(0%, -16px)"
+      inner.style.boxShadow = "0 0 10px 4px white"
+    },
+    onHoverOut: () => {
+      if (state.starting) return
+      inner.style.boxShadow = "none"
+      inner.style.transform = "translate(0%, 0%)"
+    }
+  },
+    inner
   )
 }
 
@@ -169,57 +183,6 @@ const Profile = (world: World): RefreshableDiv => {
   }
 }
 
-const MusicToggle = (world: World): RefreshableDiv => {
-
-  const setVisual = (button: HTMLButtonElement) => {
-    const enabled = world.client?.sound.musicPlaying()
-    button.style.boxShadow = enabled ? "0 0 10px 2px #6cf" : "none"
-    button.style.opacity = enabled ? "1" : "0.7"
-  }
-
-  const button = HButton({
-    style: {
-      position: "relative",
-      width: "36px",
-      height: "36px",
-      borderRadius: "10px",
-      display: "flex",
-      justifyContent: "center",
-      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, #ffffff, 85%, #8aa7ff)",
-      border: "2px solid #ffffff",
-      transition: "transform 0.3s ease, box-shadow 0.2s ease"
-    },
-    onClick: () => {
-      const enabled = world.client?.sound.musicPlaying()
-      if (!enabled) {
-        world.client?.sound.stopMusic()
-        world.client?.sound.play({ name: "track1", fadeIn: 0 })
-      } else {
-        world.client?.sound.stopMusic()
-      }
-    },
-    onHover: (btn) => btn.style.transform = "translate(0, -4px)",
-    onHoverOut: (btn) => btn.style.transform = "translate(0, 0)"
-  },
-    HImg({
-      src: "music.svg",
-      style: {
-        width: "22px",
-        height: "22px",
-        left: "48%",
-        top: "50%",
-        transform: "translate(-50%, -50%)",
-        transition: "transform 0.5s ease, box-shadow 0.2s ease"
-      }
-    })
-  )
-
-  return {
-    div: button,
-    update: () => setVisual(button)
-  }
-}
-
 const Version = () => HtmlText({
   text: `v${piggoVersion}`,
   style: {
@@ -254,7 +217,7 @@ const GameLobby = (): Entity => {
 
   let lobbiesMenu: RefreshableDiv | undefined = undefined
   let profile: RefreshableDiv | undefined = undefined
-  let musicToggle: RefreshableDiv | undefined = undefined
+  let music: RefreshableDiv | undefined = undefined
   let playersOnline: RefreshableDiv | undefined = undefined
 
   if (getBrowser() === "safari") {
@@ -281,7 +244,7 @@ const GameLobby = (): Entity => {
             canvasAppend(playersOnline.div)
 
             profile = Profile(world)
-            musicToggle = MusicToggle(world)
+            music = MusicButton(world)
 
             const profileRow = HDiv({
               style: {
@@ -294,7 +257,7 @@ const GameLobby = (): Entity => {
               }
             },
               profile.div,
-              musicToggle.div
+              music.div
             )
 
             canvasAppend(profileRow)
@@ -349,7 +312,7 @@ const GameLobby = (): Entity => {
           if (world.client) {
             lobbiesMenu?.update()
             profile?.update()
-            musicToggle?.update()
+            music?.update()
             playersOnline?.update()
           }
         }

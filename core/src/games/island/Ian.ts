@@ -28,18 +28,6 @@ export const Ian = (player: Player): Character => {
         },
         press: {
           ...WASDInputMap.press,
-          "mb1": ({ hold, world, mouse }) => {
-            if (hold) return
-
-            const state = world.state<IslandState>()
-            if (state.shooter !== ian.id) return
-
-            const pointingDelta: XY = {
-              x: mouse.x - ian.components.position.data.x,
-              y: mouse.y - ian.components.position.data.y
-            }
-            return { actionId: "rollDice", params: { pointingDelta } }
-          },
           "t": ({ hold }) => {
             if (hold) return
             return { actionId: "SwitchTeam" }
