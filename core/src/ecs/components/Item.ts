@@ -11,6 +11,7 @@ export type Item = Component<"item"> & {
   equipped: boolean
   flips: boolean
   stackable: boolean
+  distance: number
   onTick: undefined | ((world: World) => void)
 }
 
@@ -28,16 +29,18 @@ export type ItemProps = {
   dropped?: boolean
   equipped?: boolean
   stackable?: boolean
+  distance?: number
   onTick?: (world: World) => void
 }
 
-export const Item = ({ name, dropped, equipped, stackable, onTick, flips }: ItemProps): Item => ({
+export const Item = ({ name, dropped, equipped, stackable, onTick, flips, distance }: ItemProps): Item => ({
   name,
   type: "item",
   dropped: dropped ?? false,
   equipped: equipped ?? false,
   flips: flips ?? false,
   stackable: stackable ?? false,
+  distance: distance ?? 10,
   onTick
 })
 
@@ -84,7 +87,7 @@ export const ItemSystem = SystemBuilder({
           const hyp_y = pointingDelta.y / hypotenuse
 
           position.data.offset = {
-            x: round(hyp_x * min(10, abs(pointingDelta.x)), 2),
+            x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
             y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
           }
         }
@@ -126,7 +129,7 @@ export const Tool = (
       actions: Actions({
         whack: Whack(sound, 10)
       }),
-      item: Item({ name, flips: true }),
+      item: Item({ name, flips: true, distance: 16 }),
       effects: Effects(),
       // clickable: Clickable({
       //   width: 20, height: 20, active: false, anchor: { x: 0.5, y: 0.5 }
