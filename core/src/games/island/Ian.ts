@@ -2,8 +2,7 @@ import {
   Action, Actions, Character, Collider, Debug, IslandState, Health, Input,
   Move, Networked, PixiSkins, Player, Point, Position, Renderable,
   Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY, cos, sin,
-  Inventory,
-  Axe
+  Inventory, Sword
 } from "@piggo-gg/core"
 
 export const Ian = (player: Player): Character => {
@@ -19,7 +18,7 @@ export const Ian = (player: Player): Character => {
       networked: Networked(),
       team: Team(player.components.team.data.team),
       shadow: Shadow(5),
-      inventory: Inventory([Axe]),
+      inventory: Inventory([Sword]),
       health: Health({ hp: 5, maxHp: 5 }),
       input: Input({
         joystick: ({ client }) => {
