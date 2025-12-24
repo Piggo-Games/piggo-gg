@@ -42,6 +42,7 @@ export const Dice = (order: 1 | 2) => {
 
     dice.components.position.setVelocity({ x: 0, y: 0, z: 0 }).setRotation(0)
     dice.components.position.data.follows = shooterId
+    dice.components.renderable.visible = false
   }
 
   const id = `dice-${order}`
@@ -99,6 +100,8 @@ export const Dice = (order: 1 | 2) => {
           dice.components.position.setVelocity({ x, y, z: max(0, throwUp - shooterZ) + offset * 0.2 })
           dice.components.position.data.follows = null
           dice.components.collider!.setGroup("2")
+
+          dice.components.renderable.visible = true
         }
       }),
       npc: NPC({

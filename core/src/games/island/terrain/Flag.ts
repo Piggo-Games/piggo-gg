@@ -5,7 +5,7 @@ export const Flag = (): Entity => {
   const flag = Entity({
     id: "flag",
     components: {
-      position: Position({ x: 176, y: -36 }),
+      position: Position({ x: 136, y: -36 }),
       debug: Debug(),
       collider: Collider({
         shape: "ball", radius: 2, isStatic: true, group: "2"
