@@ -12,7 +12,6 @@ import { Flag } from "./terrain/Flag"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
 import { RallyScroll, SliceScroll } from "./ui/Scroll"
-import { TargetBoard } from "./ui/TargetBoard"
 
 export type D6 = 1 | 2 | 3 | 4 | 5 | 6
 export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
@@ -97,7 +96,6 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       // DummyPlayer(),
 
       NumBoard(),
-      TargetBoard(),
       RallyScroll(),
       SliceScroll(),
 

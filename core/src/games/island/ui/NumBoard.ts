@@ -49,9 +49,9 @@ export const NumBoard = (): Entity => {
         anchor: { x: 0.5, y: 0.5 },
         onTick: ({ world }) => {
           const state = world.state<IslandState>()
-          if (state.turnTarget !== rendered) {
-            displayNumber(state.turnTarget)
-            rendered = state.turnTarget
+          if (state.rolled !== rendered) {
+            displayNumber(state.rolled)
+            rendered = state.rolled
           }
         },
         setup: async (r) => {
