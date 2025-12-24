@@ -38,6 +38,8 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
         onRender: ({ renderable, world, client }) => {
           const state = world.state<IslandState>()
 
+          if (world.client!.menu) hovering = false
+
           const selected = state.selectedAbility === id
           renderable.setOutline({ color: 0x8aff8a, thickness: selected ? 2 : 0 })
           if (selected) return
@@ -57,15 +59,19 @@ export const Scroll = ({ id, title, description, manaCost, position }: ScrollPro
           r.c.eventMode = "dynamic"
 
           r.c.onmouseenter = () => {
+            if (world.client!.menu) return
             hovering = true
           }
           r.c.onmouseleave = () => {
+            if (world.client!.menu) return
             hovering = false
           }
           r.c.onpointerdown = () => {
             const state = world.state<IslandState>()
             if (state.shooter !== world.client!.character()?.id) return
             if (state.rollQueued) return
+
+            if (world.client!.menu) return
 
             world.actions.push(world.tick + 1, scroll.id, { actionId: "selectAbility", params: { abilityId: id } })
 
