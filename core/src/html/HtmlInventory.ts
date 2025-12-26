@@ -1,26 +1,21 @@
-import { Client, Entity, HtmlDiv, HtmlImg, NPC, RefreshableDiv } from "@piggo-gg/core"
+import { Client, Entity, Html, HtmlDiv, HtmlImg, RefreshableDiv } from "@piggo-gg/core"
 
 export const HtmlInventory = () => {
 
   let hInv: RefreshableDiv | undefined = undefined
-  let init = false
 
   return Entity({
     id: "HtmlInventory",
     components: {
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!world.client) return
-
-
-          if (!init) {
-            init = true
-
-            hInv = HInv(world.client)
-            document.body.appendChild(hInv.div)
-          }
-
+      html: Html({
+        onTick: () => {
           hInv?.update()
+        },
+        init: (world) => {
+          if (!world.client) return null
+
+          hInv = HInv(world.client)
+          return hInv.div
         }
       })
     }

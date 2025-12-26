@@ -1,4 +1,4 @@
-import { Entity, HText, NPC, Position, round } from "@piggo-gg/core"
+import { Entity, HText, Html, NPC, Position, round } from "@piggo-gg/core"
 
 export const HtmlFpsText = () => {
   let init = false
@@ -19,24 +19,29 @@ export const HtmlFpsText = () => {
     id: "htmlFpsText",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            document.getElementById("canvas-parent")?.appendChild(div)
-            init = true
-          }
-
-          if (!world.debug) {
-            div.style.visibility = "hidden"
-            return
-          }
-
-          div.style.visibility = "visible"
-
-          const fps = round(world.client?.fps ?? 0)
-          div.textContent = `fps: ${fps}`
+      html: Html({
+        init: (world) => {
+          return div
         }
       })
+      // npc: NPC({
+      //   behavior: (_, world) => {
+      //     if (!init) {
+      //       document.getElementById("canvas-parent")?.appendChild(div)
+      //       init = true
+      //     }
+
+      //     if (!world.debug) {
+      //       div.style.visibility = "hidden"
+      //       return
+      //     }
+
+      //     div.style.visibility = "visible"
+
+      //     const fps = round(world.client?.fps ?? 0)
+      //     div.textContent = `fps: ${fps}`
+      //   }
+      // })
     }
   })
 }

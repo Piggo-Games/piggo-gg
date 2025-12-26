@@ -8,9 +8,9 @@ export type Html = Component<"html"> & {
   element: HTMLElement | undefined
   initialized: boolean
   initializing: boolean
-  rendered: boolean
   setup: HtmlSetup | undefined
   init: HtmlElementBuilder | undefined
+  onTick: undefined | ((world: World) => void)
   cleanup: () => void
   _init: (world: World) => Promise<void>
 }
@@ -19,6 +19,7 @@ export type HtmlProps = {
   element?: HTMLElement
   init?: HtmlElementBuilder
   setup?: HtmlSetup
+  onTick?: (world: World) => void
 }
 
 export const Html = (props: HtmlProps = {}): Html => {
@@ -27,14 +28,13 @@ export const Html = (props: HtmlProps = {}): Html => {
     element: props.element,
     initialized: false,
     initializing: false,
-    rendered: false,
     setup: props.setup,
     init: props.init,
+    onTick: props.onTick,
     cleanup: () => {
       if (html.element?.parentElement) {
         html.element.parentElement.removeChild(html.element)
       }
-      html.rendered = false
     },
     _init: async (world: World) => {
       if (html.initialized || html.initializing) return
@@ -76,21 +76,17 @@ export const HtmlSystem = ClientSystemBuilder({
           const { html } = entity.components
           tracked[entity.id] = html
 
-          if (!html.initialized) {
-            html._init(world)
+          if (!html.initialized && !html.initializing) {
+            html._init(world).then(() => {
+              const parent = document.getElementById("canvas-parent") ?? document.body
+
+              if (html.element) parent.appendChild(html.element)
+            })
           }
 
-          if (!html.initialized || !html.element || html.rendered) continue
-
-          if (html.element.parentElement) {
-            html.rendered = true
-            continue
+          if (html.onTick) {
+            html.onTick(world)
           }
-
-          const parent = document.getElementById("canvas-parent") ?? document.body
-
-          parent.appendChild(html.element)
-          html.rendered = true
         }
 
         for (const [id, html] of entries(tracked)) {
