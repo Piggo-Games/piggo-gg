@@ -1,47 +1,43 @@
 import { Entity, HText, Html, NPC, Position, round } from "@piggo-gg/core"
 
 export const HtmlFpsText = () => {
-  let init = false
 
-  const div = HText({
-    style: {
-      right: "16px",
-      top: "16px",
-      color: "#dddd00",
-      textShadow: "none",
-      visibility: "hidden",
-      fontSize: "16px"
-    },
-    text: "fps: 0"
-  })
+  let div: undefined | HTMLDivElement = undefined
 
   return Entity({
     id: "htmlFpsText",
     components: {
       position: Position(),
       html: Html({
-        init: (world) => {
+        onTick: (world) => {
+          if (!div) return
+
+          if (!world.debug) {
+            div.style.visibility = "hidden"
+            return
+          }
+
+          div.style.visibility = "visible"
+
+          const fps = round(world.client?.fps ?? 0)
+          div.textContent = `fps: ${fps}`
+        },
+        init: () => {
+          div = HText({
+            style: {
+              right: "16px",
+              top: "16px",
+              color: "#dddd00",
+              textShadow: "none",
+              visibility: "hidden",
+              fontSize: "16px"
+            },
+            text: "fps: 0"
+          })
+
           return div
         }
       })
-      // npc: NPC({
-      //   behavior: (_, world) => {
-      //     if (!init) {
-      //       document.getElementById("canvas-parent")?.appendChild(div)
-      //       init = true
-      //     }
-
-      //     if (!world.debug) {
-      //       div.style.visibility = "hidden"
-      //       return
-      //     }
-
-      //     div.style.visibility = "visible"
-
-      //     const fps = round(world.client?.fps ?? 0)
-      //     div.textContent = `fps: ${fps}`
-      //   }
-      // })
     }
   })
 }
