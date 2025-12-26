@@ -101,10 +101,11 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     trees: [],
     addEntity: (entity: Entity) => {
       const oldEntity = world.entities[entity.id]
-      if (oldEntity?.components.renderable || oldEntity?.components.three) {
+      if (oldEntity?.components.renderable || oldEntity?.components.three || oldEntity?.components.html) {
         oldEntity.removed = true
         oldEntity.components.renderable?.cleanup()
         oldEntity.components.three?.cleanup(world)
+        oldEntity.components.html?.cleanup()
       }
 
       world.entities[entity.id] = entity
@@ -122,6 +123,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
         delete world.entities[id]
         entity.components.renderable?.cleanup()
         entity.components.three?.cleanup(world)
+        entity.components.html?.cleanup()
         entity.components.inventory?.cleanup(world)
 
         entity.removed = true
