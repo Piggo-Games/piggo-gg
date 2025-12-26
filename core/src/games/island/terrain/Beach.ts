@@ -1,10 +1,10 @@
 import { Entity, LineWall, loadTexture, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-const arenaWidth = 500
-const arenaHeight = 100
-const w2 = arenaWidth / 2
-const h2 = arenaHeight / 2
+export const beachWidth = 400
+const beachHeight = 100
+const w2 = beachWidth / 2
+const h2 = beachHeight / 2
 const offset = 60
 
 export const Beach = () => Entity({

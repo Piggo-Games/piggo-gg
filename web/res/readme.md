@@ -12,6 +12,8 @@ lofi music | https://freemusicarchive.org/music/holiznacc0/
 
 ### assets
 
+flintlock | https://opengameart.org/content/flintlock-pistol | license: attribution
+
 treasure hunters sprites | https://pixelfrog-assets.itch.io/treasure-hunters | license: CC0
 
 beach spritesheet | https://srtoasty.itch.io/islands | license: CC0

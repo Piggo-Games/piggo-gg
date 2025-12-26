@@ -10,7 +10,7 @@ export const Patrick = (): Entity => {
   const patrick = Entity<Health>({
     id: "patrick",
     components: {
-      position: Position({ x: 140 }),
+      position: Position({ x: 100 }),
       debug: Debug(),
       collider: Collider({
         shape: "ellipse", radius: 7, length: 10, isStatic: true, group: "2"

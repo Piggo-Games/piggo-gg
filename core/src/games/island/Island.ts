@@ -7,14 +7,11 @@ import {
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
 import { Dice } from "./Dice"
-import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
+import { Beach, BeachWall, beachWidth, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
 import { RallyScroll, SliceScroll } from "./ui/Scroll"
-import { TargetBoard } from "./ui/TargetBoard"
-
-const arenaWidth = 500
 
 export type D6 = 1 | 2 | 3 | 4 | 5 | 6
 export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
@@ -75,7 +72,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       PixiCameraSystem({
         resize: () => {
           const { w } = screenWH()
-          return min(3.4, w / (arenaWidth * 1.1))
+          return min(3.4, w / (beachWidth * 1.2))
         }
       }),
       PixiDebugSystem,
@@ -99,7 +96,6 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       // DummyPlayer(),
 
       NumBoard(),
-      TargetBoard(),
       RallyScroll(),
       SliceScroll(),
 
@@ -198,7 +194,7 @@ const IslandSystem = SystemBuilder({
       }
 
       if (state.turnPhase === "players" && state.selectedAbility) {
-        const pointingDelta = { x: randomInt(100) + 50, y: 0 }
+        const pointingDelta = { x: randomInt(100) + 100, y: 0 }
         queueDiceRoll(shooterId, pointingDelta)
         state.rollQueued = true
       }

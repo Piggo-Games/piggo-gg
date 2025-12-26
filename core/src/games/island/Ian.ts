@@ -1,7 +1,8 @@
 import {
   Action, Actions, Character, Collider, Debug, IslandState, Health, Input,
   Move, Networked, PixiSkins, Player, Point, Position, Renderable,
-  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY, cos, sin
+  Shadow, Team, VolleyCharacterAnimations, WASDInputMap, XY, cos, sin,
+  Inventory, Sword, Gunner
 } from "@piggo-gg/core"
 
 export const Ian = (player: Player): Character => {
@@ -12,11 +13,12 @@ export const Ian = (player: Player): Character => {
     id: `ian-${player.id}`,
     components: {
       debug: Debug(),
-      position: Position({ x: -140, speed: 120, gravity: 0.3, velocityResets: 1 }),
+      position: Position({ x: -100, speed: 120, gravity: 0.3, velocityResets: 1 }),
       collider: Collider({ shape: "ball", radius: 6, group: "notme2" }),
       networked: Networked(),
       team: Team(player.components.team.data.team),
       shadow: Shadow(5),
+      inventory: Inventory([Gunner]),
       health: Health({ hp: 5, maxHp: 5 }),
       input: Input({
         joystick: ({ client }) => {
