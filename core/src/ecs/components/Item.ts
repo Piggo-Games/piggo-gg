@@ -12,6 +12,7 @@ export type Item = Component<"item"> & {
   flips: boolean
   stackable: boolean
   distance: number
+  direction: 1 | -1
   onTick: undefined | ((world: World) => void)
 }
 
@@ -30,10 +31,11 @@ export type ItemProps = {
   equipped?: boolean
   stackable?: boolean
   distance?: number
+  direction?: 1 | -1
   onTick?: (world: World) => void
 }
 
-export const Item = ({ name, dropped, equipped, stackable, onTick, flips, distance }: ItemProps): Item => ({
+export const Item = ({ name, dropped, equipped, stackable, onTick, flips, distance, direction }: ItemProps): Item => ({
   name,
   type: "item",
   dropped: dropped ?? false,
@@ -41,6 +43,7 @@ export const Item = ({ name, dropped, equipped, stackable, onTick, flips, distan
   flips: flips ?? false,
   stackable: stackable ?? false,
   distance: distance ?? 10,
+  direction: direction ?? 1,
   onTick
 })
 
@@ -102,10 +105,12 @@ export type ToolProps = {
   name: string
   sound: ValidSounds
   damage: ElementToDamage
+  direction: 1 | -1
+  anchor?: number
 }
 
 export const Tool = (
-  { name, sound, damage }: ToolProps
+  { name, sound, damage, direction, anchor }: ToolProps
 ): ItemBuilder => ({ character, id }): ItemEntity => {
 
   let cd = -100
@@ -129,16 +134,13 @@ export const Tool = (
       actions: Actions({
         whack: Whack(sound, 10)
       }),
-      item: Item({ name, flips: true, distance: 16 }),
+      item: Item({ name, flips: true, distance: 16, direction }),
       effects: Effects(),
-      // clickable: Clickable({
-      //   width: 20, height: 20, active: false, anchor: { x: 0.5, y: 0.5 }
-      // }),
       renderable: Renderable({
         scaleMode: "nearest",
         zIndex: 4,
         scale: 2.5,
-        anchor: { x: 0.5, y: 0.5 },
+        anchor: { x: anchor ?? 0.5, y: 0.5 },
         interpolate: true,
         visible: true,
         rotates: true,
@@ -158,6 +160,7 @@ export const Tool = (
   return entity
 }
 
-export const Axe = Tool({ name: "axe", sound: "thud", damage: { flesh: 15, wood: 25, rock: 10 } })
-export const Sword = Tool({ name: "sword", sound: "slash", damage: { flesh: 25, wood: 10, rock: 10 } })
-export const Pickaxe = Tool({ name: "pickaxe", sound: "clink", damage: { flesh: 10, wood: 10, rock: 25 } })
+export const Axe = Tool({ name: "axe", direction: 1, sound: "thud", damage: { flesh: 15, wood: 25, rock: 10 } })
+export const Sword = Tool({ name: "sword", direction: 1, sound: "slash", damage: { flesh: 25, wood: 10, rock: 10 } })
+export const Pickaxe = Tool({ name: "pickaxe", direction: 1, sound: "clink", damage: { flesh: 10, wood: 10, rock: 25 } })
+export const Gunner = Tool({ name: "flintlock", direction: -1, anchor: 0.2, sound: "clink", damage: { flesh: 10, wood: 10, rock: 25 } })

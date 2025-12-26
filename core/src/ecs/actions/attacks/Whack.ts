@@ -17,13 +17,13 @@ export const Whack = (sound: ValidSounds, damage: DamageCalculation) => Action<K
     const characterEntity = world.entities[character] as Character
     if (!characterEntity || !characterEntity.components.team) return
 
-    const { position } = entity.components
-    if (!position) return
+    const { position, item } = entity.components
+    if (!position || !item) return
 
     if (characterEntity.components.position.data.pointingDelta.x > 0) {
-      position.rotate(1)
+      position.rotate(item.direction)
     } else {
-      position.rotate(-1)
+      position.rotate(-item.direction)
     }
 
     // const angle = Math.atan2(position.data.pointingDelta.y, position.data.pointingDelta.x)
