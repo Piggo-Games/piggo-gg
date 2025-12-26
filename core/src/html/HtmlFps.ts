@@ -2,7 +2,7 @@ import { Entity, HText, Html, NPC, Position, round } from "@piggo-gg/core"
 
 export const HtmlFpsText = () => {
 
-  let div: undefined | HTMLDivElement = undefined
+  let div: HTMLDivElement | undefined = undefined
 
   return Entity({
     id: "htmlFpsText",
@@ -49,29 +49,16 @@ export const HtmlLagText = () => {
   let last = 0
   let lastTick = 0
 
-  const div = HText({
-    style: {
-      right: "16px",
-      top: "16px",
-      color: "#00dd00",
-      textShadow: "none",
-      visibility: "hidden",
-      fontSize: "16px"
-    },
-    text: "ms: 0"
-  })
+  let div: HTMLDivElement | undefined = undefined
 
   return Entity({
     id: "htmlLagText",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            document.getElementById("canvas-parent")?.appendChild(div)
-            init = true
-          }
-
+      html: Html({
+        onTick: (world) => {
+          if (!div) return
+          
           const lag = round(world.client?.net.ms ?? 0)
           div.style.visibility = world.client?.net.synced ? "visible" : "hidden"
 
@@ -81,6 +68,21 @@ export const HtmlLagText = () => {
 
             div.textContent = `ms: ${lag}`
           }
+        },
+        init: () => {
+          div = HText({
+            style: {
+              right: "16px",
+              top: "36px",
+              color: "#00dd00",
+              textShadow: "none",
+              visibility: "hidden",
+              fontSize: "16px"
+            },
+            text: "ms: 0"
+          })
+
+          return div
         }
       })
     }
