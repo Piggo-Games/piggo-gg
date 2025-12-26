@@ -1,4 +1,4 @@
-import { Client, Entity, HDiv, HText, HtmlDiv, min, NPC, pow, sqrt, XY } from "@piggo-gg/core"
+import { Client, Entity, HDiv, HText, Html, HtmlDiv, min, pow, sqrt, XY } from "@piggo-gg/core"
 
 export type HtmlJoystickProps = {
   client: Client
@@ -79,20 +79,14 @@ export const HtmlJoystick = ({ client, side, radius = 40, label }: HtmlJoystickP
 }
 
 export const HtmlJoystickEntity = (side: "left" | "right", label?: string): Entity => {
-
-  let joystick: HtmlDiv | undefined = undefined
-  let init = false
-
   return Entity({
     id: `joystick-${side}`,
     components: {
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init && world.client?.mobile) {
-            joystick = HtmlJoystick({ client: world.client, side, radius: 30, label: label ?? "" })
-            document.body.appendChild(joystick)
-            init = true
-          }
+      html: Html({
+        init: (world) => {
+          if (!world.client?.mobile) return null
+
+          return HtmlJoystick({ client: world.client, side, radius: 30, label: label ?? "" })
         }
       })
     }

@@ -1,7 +1,7 @@
 import { ClientSystemBuilder, Component, Entity, World, entries } from "@piggo-gg/core"
 
 export type HtmlSetup = (html: Html, world: World) => Promise<void> | void
-export type HtmlElementBuilder = (world: World) => Promise<HTMLElement> | HTMLElement
+export type HtmlElementBuilder = (world: World) => Promise<HTMLElement | null> | HTMLElement | null
 export type HtmlAppendTarget = HTMLElement | ((world: World) => HTMLElement | null)
 
 export type Html = Component<"html"> & {
@@ -10,14 +10,14 @@ export type Html = Component<"html"> & {
   initializing: boolean
   rendered: boolean
   setup: HtmlSetup | undefined
-  setElement: HtmlElementBuilder | undefined
+  init: HtmlElementBuilder | undefined
   cleanup: () => void
   _init: (world: World) => Promise<void>
 }
 
 export type HtmlProps = {
   element?: HTMLElement
-  setElement?: HtmlElementBuilder
+  init?: HtmlElementBuilder
   setup?: HtmlSetup
 }
 
@@ -29,7 +29,7 @@ export const Html = (props: HtmlProps = {}): Html => {
     initializing: false,
     rendered: false,
     setup: props.setup,
-    setElement: props.setElement,
+    init: props.init,
     cleanup: () => {
       if (html.element?.parentElement) {
         html.element.parentElement.removeChild(html.element)
@@ -40,11 +40,13 @@ export const Html = (props: HtmlProps = {}): Html => {
       if (html.initialized || html.initializing) return
       html.initializing = true
 
-      if (!html.element && html.setElement) {
-        html.element = await html.setElement(world)
+      if (!html.element && html.init) {
+        const element = await html.init(world)
+        if (element) html.element = element
       }
 
       if (!html.element) {
+        html.initialized = true
         html.initializing = false
         return
       }
