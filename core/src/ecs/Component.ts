@@ -1,13 +1,13 @@
 import {
   Actions, Collider, Controlling, Data, Debug, Effects, Expires,
-  Gun, Health, Hitbox, Input, NPC, Networked, PC, Position, Renderable,
+  Gun, Health, Hitbox, Html, Input, NPC, Networked, PC, Position, Renderable,
   Team, Money, XY, entries, Inventory, Food, Element, Item, Shadow, Three
 } from "@piggo-gg/core"
 
 export type ComponentTypes =
   Actions | Collider | Controlling | Element | Three |
   Data | Debug | Effects | Expires | Health | Food |
-  Hitbox | Input | Team | Networked | NPC | PC | Shadow |
+  Hitbox | Html | Input | Team | Networked | NPC | PC | Shadow |
   Position | Renderable | Gun | Money | Inventory | Item
 
 export type ValidComponents = ComponentTypes["type"]
