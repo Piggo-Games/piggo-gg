@@ -18,7 +18,7 @@ export type CSS = Partial<{
   boxSizing: "border-box" | "content-box"
   clipPath: string
   color: LexColor
-  cursor: "pointer" | "default" | "not-allowed"
+  cursor: "pointer" | "default" | "not-allowed" | "none"
   display: "block" | "inline-block" | "flex" | "inline-flex" | "none"
   flex: number | `${number} ${number} auto`
   flexDirection: "row" | "column" | "row-reverse" | "column-reverse"
@@ -63,7 +63,8 @@ export type CSS = Partial<{
   textShadow: "none" | `${number}px ${number}px ${number}px rgba(${number}, ${number}, ${number}, ${number})`
   top: `${number}%` | `${number}px` | `${number}dvh` | `calc(${string})`
   touchAction: "none" | "pan-x" | "pan-y" | "pan-x pan-y" | "manipulation"
-  transform: `translate(${number}%)` | `translate(${number}%, ${number}%)` | `rotate(${number}deg)`
+  transform: `translate(${number}%)` | `translate(${number}%, ${number}%)` | `rotate(${number}deg)` | `scale(${number}) rotate(${number}deg)` | `${number}% ${number}%`
+  transformOrigin: `${number}% ${number}%`
   transition: string
   userSelect: "none" | "auto" | "text" | "all"
   visibility: "visible" | "hidden"

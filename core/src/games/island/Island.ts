@@ -70,6 +70,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
       PixiRenderSystem,
       HUDSystem(controls),
       PixiCameraSystem({
+        follow: () => ({ x: 0, y: -10, z: 0 }),
         resize: () => {
           const { w } = screenWH()
           return min(3.4, w / (beachWidth * 1.2))
