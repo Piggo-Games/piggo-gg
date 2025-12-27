@@ -21,7 +21,7 @@ export const Lobby: GameBuilder<LobbyState> = {
     },
     systems: [PixiRenderSystem],
     entities: [
-      Background({ moving: true, rays: true }),
+      Background({ move: 0.5, rays: true }),
       GameLobby(),
       HtmlLagText(),
       HtmlFpsText()
