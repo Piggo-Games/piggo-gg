@@ -1,4 +1,5 @@
-import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiRenderSystem } from "@piggo-gg/core"
+import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem } from "@piggo-gg/core"
+import { Beach } from "../island/terrain/Beach"
 
 export type MarsState = {
   money: number
@@ -17,12 +18,15 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       money: 0
     },
     systems: [
-      PixiRenderSystem
+      PixiRenderSystem,
+      PixiCameraSystem()
     ],
     entities: [
       Background({ moving: true, rays: true }),
       EscapeMenu(world),
-      HtmlFpsText()
+      HtmlFpsText(),
+
+      Beach({ width: 1000, height: 200})
     ]
   })
 }
