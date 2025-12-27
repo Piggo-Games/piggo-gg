@@ -3,13 +3,15 @@ import {
   load, pixiText, values, wrapText
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
-import type { IslandState } from "../Island"
+import type { IslandState, Roll } from "../Island"
 
 export type ScrollProps = {
   id: string
   title: string
   description: string
   manaCost: number
+  diceAmount: number
+  action: (payload: { state: IslandState, shooterId: string, roll: Roll }) => void
   position?: { x?: number, y?: number }
 }
 
@@ -116,6 +118,8 @@ const GunnerAbilities: ScrollProps[] = [
     title: "Rally",
     description: "allies take 1 less DMG per hit until your next turn",
     manaCost: 1,
+    diceAmount: 2,
+    action: () => {},
     position: { x: -46, y: 130 }
   },
   {
@@ -123,6 +127,8 @@ const GunnerAbilities: ScrollProps[] = [
     title: "Slice",
     description: "enemies take 1D6 extra DMG per hit until your next turn",
     manaCost: 1,
+    diceAmount: 2,
+    action: () => {},
     position: { x: 46, y: 130 }
   }
 ]
