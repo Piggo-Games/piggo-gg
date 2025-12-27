@@ -74,7 +74,7 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
     messages: TickBuffer(),
     client: undefined,
     commands: {},
-    debug: true,
+    debug: false,
     entities: {},
     entitiesAtTick: {},
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
