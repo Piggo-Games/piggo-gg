@@ -1,5 +1,5 @@
 import { Entity, MusicSounds, pixiGraphics, Position, Renderable, sin } from "@piggo-gg/core"
-import { Graphics } from "pixi.js/lib"
+import { Graphics } from "pixi.js"
 
 export const MusicBox = (): Entity => {
 

@@ -1,5 +1,5 @@
 import { Entity, load, Position, Renderable, Shadow } from "@piggo-gg/core"
-import { Sprite } from "pixi.js/lib"
+import { Sprite } from "pixi.js"
 
 export const Rocket = (): Entity => {
   return Entity({
