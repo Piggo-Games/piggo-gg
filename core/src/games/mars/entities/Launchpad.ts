@@ -1,5 +1,4 @@
 import { Entity, load, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
-import { Sprite } from "pixi.js/lib"
 
 export const Launchpad = (): Entity => {
   return Entity({
@@ -22,14 +21,6 @@ export const Launchpad = (): Entity => {
             .fill({ color: 0x555555 })
 
           r.c.addChild(g)
-
-          const rail = await load("rail.png")
-          rail.source.scaleMode = "nearest"
-          const railSprite = new Sprite({ texture: rail, scale: 2 })
-          railSprite.anchor.set(0, 1)
-          railSprite.position.set(-20, 0)
-
-          r.c.addChild(railSprite)
         }
       })
     }

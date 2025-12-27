@@ -1,7 +1,8 @@
-import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, Water2D } from "@piggo-gg/core"
+import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, ShadowSystem, Water2D } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { Rocket } from "./entities/Rocket"
 import { Launchpad } from "./entities/Launchpad"
+import { Rail } from "./entities/Rail"
 
 export type MarsState = {
   money: number
@@ -21,7 +22,8 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     },
     systems: [
       PixiRenderSystem,
-      PixiCameraSystem()
+      PixiCameraSystem(),
+      ShadowSystem
     ],
     entities: [
       Background({ move: 0.2, rays: true }),
@@ -32,6 +34,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       Water2D({ pos: { x: 0, y: 90 } }),
 
       Launchpad(),
+      Rail(),
 
       Rocket()
     ]
