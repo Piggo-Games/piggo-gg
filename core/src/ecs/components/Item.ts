@@ -1,5 +1,5 @@
 import {
-  Actions, Character, Component, Effects, ElementKinds, Entity, Input, ItemBuilder,
+  Actions, Component, Effects, ElementKinds, Entity, Input, ItemBuilder,
   Networked, Position, ProtoEntity, Renderable, SystemBuilder, ValidSounds,
   Whack, World, XY, abs, hypot, loadTexture, min, pickupItem, round
 } from "@piggo-gg/core"
@@ -83,17 +83,19 @@ export const ItemSystem = SystemBuilder({
           }
         }
 
-        if (!item.dropped) {
-          const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
+        position.data.offset = { x: 14, y: -4 }
 
-          const hyp_x = pointingDelta.x / hypotenuse
-          const hyp_y = pointingDelta.y / hypotenuse
+        // if (!item.dropped) {
+        //   const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
 
-          position.data.offset = {
-            x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
-            y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
-          }
-        }
+        //   const hyp_x = pointingDelta.x / hypotenuse
+        //   const hyp_y = pointingDelta.y / hypotenuse
+
+          // position.data.offset = {
+          //   x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
+          //   y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
+          // }
+        // }
       }
     }
   })
@@ -134,7 +136,7 @@ export const Tool = (
       actions: Actions({
         whack: Whack(sound, 10)
       }),
-      item: Item({ name, flips: true, distance: 16, direction }),
+      item: Item({ name, flips: false, distance: 16, direction }),
       effects: Effects(),
       renderable: Renderable({
         scaleMode: "nearest",
