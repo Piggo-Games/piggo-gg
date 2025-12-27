@@ -145,11 +145,15 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize
         }
       },
       onRender: (_, delta) => {
-        if (!pixi.camera.focus) return
-
         if (targetScale !== pixi.camera.scale) {
           const diff = targetScale - pixi.camera.scale
           pixi.camera.scaleBy(diff * 0.1)
+        }
+
+        if (!pixi.camera.focus) {
+          const { x, y, z } = follow({ x: 0, y: 0, z: 0 })
+          pixi.camera.moveTo({ x, y: y - z })
+          return
         }
 
         const { position, renderable } = pixi.camera.focus.components

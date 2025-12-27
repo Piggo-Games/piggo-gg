@@ -12,6 +12,8 @@ lofi music | https://freemusicarchive.org/music/holiznacc0/
 
 ### assets
 
+falcon rockets | Dylan Semrau | license: attribution
+
 flintlock | https://opengameart.org/content/flintlock-pistol | license: attribution
 
 treasure hunters sprites | https://pixelfrog-assets.itch.io/treasure-hunters | license: CC0

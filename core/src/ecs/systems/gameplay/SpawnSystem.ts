@@ -1,8 +1,8 @@
-import { Character, Controlling, Player, SystemBuilder } from "@piggo-gg/core"
+import { Character, Controlling, Player, SystemBuilder, XYZ } from "@piggo-gg/core"
 
 export type SpawnSystemProps = {
   spawner: (player: Player) => Character
-  pos: { x: number, y: number, z: number }
+  pos: XYZ
 }
 
 export const SpawnSystem = ({ spawner, pos }: SpawnSystemProps) => SystemBuilder<"SpawnSystem">({

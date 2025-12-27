@@ -55,7 +55,7 @@ export type PositionProps = {
   y?: number
   z?: number
   aim?: XY
-  velocity?: { x: number, y: number }
+  velocity?: XY
   gravity?: number
   facing?: -1 | 1
   friction?: boolean

@@ -6,11 +6,11 @@ export type BackgroundProps = {
   img?: string
   json?: { path: string, img: string }
   rays?: boolean
-  moving?: boolean
+  move?: number
   follow?: boolean
 }
 
-export const Background = ({ img, json, rays, moving, follow }: BackgroundProps = {}) => Entity({
+export const Background = ({ img, json, rays, move, follow }: BackgroundProps = {}) => Entity({
   id: "background",
   components: {
     position: Position(),
@@ -18,9 +18,9 @@ export const Background = ({ img, json, rays, moving, follow }: BackgroundProps 
       zIndex: -2,
       interpolate: true,
       onRender: ({ renderable, since }) => {
-        if (moving) {
+        if (move) {
           const tile = renderable.c as TilingSprite
-          tile.tilePosition.x += since / 25 * 0.5
+          tile.tilePosition.x += since / 25 * move
         }
       },
       onTick: ({ renderable, world, entity }) => {

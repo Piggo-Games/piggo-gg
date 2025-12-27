@@ -1,20 +1,24 @@
-import { Entity, LineWall, loadTexture, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
+import { Entity, LineWall, loadTexture, pixiGraphics, Position, Renderable, XY } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
-export const beachWidth = 400
-const beachHeight = 100
-const w2 = beachWidth / 2
-const h2 = beachHeight / 2
-const offset = 60
+export type BeachProps = {
+  width: number
+  height: number
+  pos?: XY
+}
 
-export const Beach = () => Entity({
+export const Beach = ({ width, height, pos }: BeachProps) => Entity({
   id: `beach`,
   components: {
-    position: Position(),
+    position: Position(pos),
     renderable: Renderable({
       zIndex: 2,
       setup: async (r) => {
         const texture = await loadTexture("beach.json")
+
+        const w2 = width / 2
+        const h2 = height / 2
+        const offset = 60
 
         const maskPoints = [
           -w2 + offset, -h2,
@@ -33,12 +37,14 @@ export const Beach = () => Entity({
         r.c.addChild(mask)
         r.c.mask = mask
 
-        for (let j = 0; j < 3; j++) {
-          for (let i = 0; i < 13; i++) {
+        const JH = height / 37
+        const IW = width / 44
+        for (let j = 0; j < JH; j++) {
+          for (let i = -IW; i < IW; i++) {
             const copy = new Sprite(texture["0"])
             copy.anchor.set(0.5, 0.5)
-            copy.x = -260 + i * 44
-            copy.y = -45 + j * 37
+            copy.x = -w2 + offset + i * 44
+            copy.y = -h2 + j * 37
 
             r.c.addChild(copy)
           }
@@ -48,24 +54,30 @@ export const Beach = () => Entity({
   }
 })
 
+export const BeachWall = ({ width, height }: BeachProps): Entity => {
+  const w2 = width / 2
+  const h2 = height / 2
+  const offset = 60
 
-export const BeachWall = (): Entity => LineWall({
-  id: "beach-wall", points: [
-    -w2 + offset, -h2 - 1,
-    w2 - offset, -h2 - 1,
-    w2, h2 - 3,
-    -w2, h2 - 3,
-    -w2 + offset, -h2 - 1
-  ],
-  // fill: 0x0000ff,
-  // visible: true,
-  group: "1"
-})
+  return LineWall({
+    id: "beach-wall", points: [
+      -w2 + offset, -h2 - 1,
+      w2 - offset, -h2 - 1,
+      w2, h2 - 3,
+      -w2, h2 - 3,
+      -w2 + offset, -h2 - 1
+    ],
+    // fill: 0x0000ff,
+    // visible: true,
+    group: "1"
+  })
+}
 
-export const OuterBeachWall = (): Entity => {
+export const OuterBeachWall = ({ width, height }: BeachProps): Entity => {
 
-  const w = w2 + 2
-  const h = h2 + 2
+  const w = width / 2 + 2
+  const h = height / 2 + 2
+  const offset = 60
 
   return LineWall({
     id: "outer-beach-wall", points: [
