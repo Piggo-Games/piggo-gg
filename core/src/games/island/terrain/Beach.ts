@@ -1,15 +1,16 @@
-import { Entity, LineWall, loadTexture, pixiGraphics, Position, Renderable } from "@piggo-gg/core"
+import { Entity, LineWall, loadTexture, pixiGraphics, Position, Renderable, XY } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export type BeachProps = {
   width: number
   height: number
+  pos?: XY
 }
 
-export const Beach = ({ width, height }: BeachProps) => Entity({
+export const Beach = ({ width, height, pos }: BeachProps) => Entity({
   id: `beach`,
   components: {
-    position: Position(),
+    position: Position(pos),
     renderable: Renderable({
       zIndex: 2,
       setup: async (r) => {
