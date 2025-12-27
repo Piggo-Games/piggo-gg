@@ -37,16 +37,29 @@ export const Beach = ({ width, height, pos }: BeachProps) => Entity({
         r.c.addChild(mask)
         r.c.mask = mask
 
-        for (let j = 0; j < 3; j++) {
-          for (let i = 0; i < 13; i++) {
+        const JH = height / 37
+        const IW = width / 44
+        for (let j = 0; j < JH; j++) {
+          for (let i = -IW; i < IW; i++) {
             const copy = new Sprite(texture["0"])
             copy.anchor.set(0.5, 0.5)
-            copy.x = -260 + i * 44
-            copy.y = -45 + j * 37
+            copy.x = -w2 + offset + i * 44
+            copy.y = -h2 + j * 37
 
             r.c.addChild(copy)
           }
         }
+
+        // for (let j = 0; j < 3; j++) {
+        //   for (let i = -10; i < 20; i++) {
+        //     const copy = new Sprite(texture["0"])
+        //     copy.anchor.set(0.5, 0.5)
+        //     copy.x = -260 + i * 44
+        //     copy.y = -45 + j * 37
+
+        //     r.c.addChild(copy)
+        //   }
+        // }
       }
     })
   }

@@ -26,7 +26,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       EscapeMenu(world),
       HtmlFpsText(),
 
-      Beach({ width: 1000, height: 200})
+      Beach({ width: 2000, height: 400, pos: { x: 0, y: 250 } })
     ]
   })
 }
