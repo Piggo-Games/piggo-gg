@@ -1,7 +1,11 @@
-import { Entity, pixiRect, Position, Renderable } from "@piggo-gg/core"
+import { Entity, pixiRect, Position, Renderable, XY } from "@piggo-gg/core"
 import { Assets, BlurFilter, DisplacementFilter, FillGradient, Geometry, Sprite, TilingSprite } from "pixi.js"
 
-export const Water2D = (): Entity => {
+export type Water2DProps = {
+  pos?: XY
+}
+
+export const Water2D = ({ pos }: Water2DProps = {}): Entity => {
 
   const geometry = new Geometry()
 
@@ -20,7 +24,7 @@ export const Water2D = (): Entity => {
   const water2D = Entity({
     id: `water2D`,
     components: {
-      position: Position(),
+      position: Position(pos),
       renderable: Renderable({
         anchor: { x: 0, y: 0 },
         zIndex: 0,
@@ -42,11 +46,13 @@ export const Water2D = (): Entity => {
           dMap = new Sprite(await Assets.load("displacement_map.png"))
           dMap.texture.source.addressMode = "repeat"
 
+          r.c.addChild(dMap, area)
+
           const night = Sprite.from(await Assets.load("night.png"))
           const stars = new TilingSprite({
             texture: night.texture, width: 2000, height: 2000, alpha: 0.6,
             position: { x: -1000, y: -60 },
-            tilePosition: { x: 207, y: -40 }
+            tilePosition: { x: 207, y: -50 }
           })
 
           stars.filters = [
@@ -54,7 +60,7 @@ export const Water2D = (): Entity => {
             new BlurFilter({ strength: 1 })
           ]
 
-          r.c.addChild(dMap, area, stars)
+          r.c.addChild(stars)
         }
       })
     }

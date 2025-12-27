@@ -1,7 +1,7 @@
 import {
   Action, Actions, Character, Effects, Entity, Health, Hitbox, Input,
   Item, ItemComponents, PI, Position, Three, XY, cos, max, modelOffset,
-  Networked, NPC, rotateAroundZ, sin, sphereBoxIntersect
+  Networked, NPC, rotateAroundZ, sin, sphereBoxIntersect, XYZ
 } from "@piggo-gg/core"
 import { Mesh, MeshBasicMaterial, Object3D, SphereGeometry } from "three"
 
@@ -14,7 +14,7 @@ export const DaggerItem = ({ character }: { character: Character }) => {
   let mesh: Object3D | undefined = undefined
   let cd = -100
   let debugSphere: Mesh | undefined = undefined
-  let lastSwing: { tick: number, center: { x: number, y: number, z: number } } | undefined = undefined
+  let lastSwing: { tick: number, center: XYZ } | undefined = undefined
 
   const swingRadius = 0.35
   const swingDistance = 0.75

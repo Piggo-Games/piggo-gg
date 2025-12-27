@@ -7,7 +7,7 @@ import {
 import { Patrick } from "./enemies/Patrick"
 import { Ian } from "./Ian"
 import { Dice } from "./Dice"
-import { Beach, BeachWall, beachWidth, OuterBeachWall } from "./terrain/Beach"
+import { Beach, BeachWall, OuterBeachWall } from "./terrain/Beach"
 import { Flag } from "./terrain/Flag"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
@@ -36,6 +36,8 @@ export type IslandState = {
 export type IslandSettings = {
   showControls: boolean
 }
+
+const beach = { width: 400, height: 100 }
 
 export const Island: GameBuilder<IslandState, IslandSettings> = {
   id: "island",
@@ -73,7 +75,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
         follow: () => ({ x: 0, y: -10, z: 0 }),
         resize: () => {
           const { w } = screenWH()
-          return min(3.4, w / (beachWidth * 1.2))
+          return min(3.4, w / (beach.width * 1.2))
         }
       }),
       PixiDebugSystem,
@@ -85,9 +87,9 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
     ],
     entities: [
       Background({ rays: true }),
-      BeachWall(),
-      OuterBeachWall(),
-      Beach(),
+      BeachWall(beach),
+      OuterBeachWall(beach),
+      Beach(beach),
       Flag(),
       Patrick(),
       Water2D(),
