@@ -11,7 +11,7 @@ export const Rocket = (): Entity => {
         zIndex: 5,
         scale: 0.3,
         setup: async (r) => {
-          const f9 = await load("f9.png")
+          const f9 = await load("flamin-9.png")
 
           r.c = new Sprite(f9)
         }
