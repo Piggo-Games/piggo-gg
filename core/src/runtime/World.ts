@@ -363,7 +363,17 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   if (systems) world.addSystemBuilders(systems)
 
-  world.setGame(world.client?.discord ? "island" : game)
+
+  // check if there was a query param for the game
+  if (world.client) {
+    let gameId = world.client.discord ? "island" : "lobby" 
+    const param = new URLSearchParams(window.location.search).get("game")
+    if (param && param in world.games) gameId = param
+
+    world.setGame(gameId as GameTitle)
+  } else {
+    world.setGame(game)
+  }
 
   // setup commands
   if (commands) {
