@@ -67,7 +67,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     systems: [
       PixiRenderSystem,
       PixiCameraSystem({
-        resize: () => screenWH().h / 936 * 2.5
+        resize: () => screenWH().h / 936 * 2.6
       }),
       ShadowSystem,
       MarsSystem
