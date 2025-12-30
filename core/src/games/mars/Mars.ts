@@ -1,10 +1,10 @@
 import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, ShadowSystem, SystemBuilder, Water2D } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
-import { DateDisplay } from "./DateDisplay"
-import { MoneyDisplay } from "./MoneyDisplay"
-import { Rocket } from "./entities/Rocket"
-import { Launchpad } from "./entities/Launchpad"
-import { Rail } from "./entities/Rail"
+import { DateDisplay } from "./ui/DateDisplay"
+import { MoneyDisplay } from "./ui/MoneyDisplay"
+import { Rocket } from "./things/Rocket"
+import { Launchpad } from "./things/Launchpad"
+import { Rail } from "./things/Rail"
 
 export type MarsState = {
   money: number

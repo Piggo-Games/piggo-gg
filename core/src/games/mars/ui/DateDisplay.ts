@@ -1,5 +1,5 @@
 import { Entity, Html, HText, Position } from "@piggo-gg/core"
-import type { MarsState } from "./Mars"
+import type { MarsState } from "../Mars"
 
 const months = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -32,8 +32,6 @@ export const DateDisplay = (): Entity => {
               top: "54px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
-              // backgroundColor: "rgba(0, 0, 0, 0.35)",
-              // border: "1px solid rgba(255, 255, 255, 0.35)",
               padding: "6px",
               paddingLeft: "12px",
               paddingRight: "12px",

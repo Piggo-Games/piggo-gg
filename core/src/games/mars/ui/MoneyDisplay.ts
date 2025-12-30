@@ -1,5 +1,5 @@
 import { abs, Entity, Html, HText, Position, round } from "@piggo-gg/core"
-import type { MarsState } from "./Mars"
+import type { MarsState } from "../Mars"
 
 export const MoneyDisplay = (): Entity => {
   let moneyText: HTMLDivElement | undefined
@@ -38,8 +38,6 @@ export const MoneyDisplay = (): Entity => {
               top: "16px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
-              // backgroundColor: "rgba(0, 0, 0, 0.45)",
-              // border: "2px solid rgba(255, 255, 255, 0.35)",
               padding: "6px",
               paddingLeft: "12px",
               paddingRight: "12px",
