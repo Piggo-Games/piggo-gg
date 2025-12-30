@@ -8,36 +8,43 @@ import { Rail } from "./entities/Rail"
 
 export type MarsState = {
   money: number
+  day: number
   month: number
   year: number
 }
 
 export type MarsSettings = {}
 
-const ticksPerMonth = 400
+const daysPerMonth = 30
+const ticksPerDay = 12
 
 const MarsSystem = SystemBuilder({
   id: "MarsSystem",
   init: (world) => {
-    let nextMonthTick = world.tick + ticksPerMonth
+
+    let lastDayTick = world.tick
 
     return {
       id: "MarsSystem",
       query: [],
       priority: 2,
       onTick: () => {
-        if (world.tick < nextMonthTick) return
-
         const state = world.state<MarsState>()
 
-        while (world.tick >= nextMonthTick) {
-          state.month += 1
-          if (state.month > 11) {
-            state.month = 0
-            state.year += 1
-          }
+        if (world.tick - lastDayTick >= ticksPerDay) {
+          lastDayTick = world.tick
 
-          nextMonthTick += ticksPerMonth
+          state.day += 1
+
+          if (state.day > daysPerMonth) {
+            state.day = 1
+            state.month += 1
+
+            if (state.month > 11) {
+              state.month = 0
+              state.year += 1
+            }
+          }
         }
       }
     }
@@ -53,6 +60,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     settings: {},
     state: {
       money: 0,
+      day: 1,
       month: 11,
       year: 2015
     },

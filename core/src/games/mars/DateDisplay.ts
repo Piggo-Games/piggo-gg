@@ -8,6 +8,7 @@ const months = [
 
 export const DateDisplay = (): Entity => {
   let dateText: HTMLDivElement | undefined
+  let lastDay = -1
   let lastMonth = -1
   let lastYear = -1
 
@@ -17,14 +18,15 @@ export const DateDisplay = (): Entity => {
       position: Position(),
       html: Html({
         init: (world) => {
-          const { month, year } = world.state<MarsState>()
+          const { day, month, year } = world.state<MarsState>()
           const monthName = months[month] ?? "???"
 
+          lastDay = day
           lastMonth = month
           lastYear = year
 
           dateText = HText({
-            text: `${monthName} ${year}`,
+            text: `${monthName} ${day}, ${year}`,
             style: {
               left: "16px",
               top: "54px",
@@ -47,14 +49,15 @@ export const DateDisplay = (): Entity => {
         onTick: (world) => {
           if (!dateText) return
 
-          const { month, year } = world.state<MarsState>()
-          if (month === lastMonth && year === lastYear) return
+          const { day, month, year } = world.state<MarsState>()
+          if (day === lastDay && month === lastMonth && year === lastYear) return
 
+          lastDay = day
           lastMonth = month
           lastYear = year
 
           const monthName = months[month] ?? "???"
-          dateText.textContent = `${monthName} ${year}`
+          dateText.textContent = `${monthName} ${day}, ${year}`
         }
       })
     }
