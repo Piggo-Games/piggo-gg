@@ -18,12 +18,11 @@ export type ServerWorld = {
 export type ServerWorldProps = {
   clients?: Record<string, WS>
   creator: WS
-  game: GameTitle
 }
 
-export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): ServerWorld => {
+export const ServerWorld = ({ clients = {}, creator }: ServerWorldProps): ServerWorld => {
 
-  const world = DefaultWorld({ mode: "server", game })
+  const world = DefaultWorld({ mode: "server" })
   const latestClientMessages: Record<string, GameData[]> = {}
   const latestClientLag: Record<string, number> = {}
   const latestClientDiff: Record<string, number> = {}
@@ -88,7 +87,7 @@ export const ServerWorld = ({ clients = {}, creator, game }: ServerWorldProps): 
         const diff = msg.tick - world.tick
         latestClientDiff[msg.playerId] = diff
 
-        if ((diff < 1 || world.tick % 200 === 0) && game !== "lobby") {
+        if ((diff < 1 || world.tick % 200 === 0) && world.game.id !== "lobby") {
           console.log(`diff:${diff} lag:${latestClientLag[msg.playerId]}ms player:${ws.data.playerId} name:${ws.data.playerName}`)
         }
       }

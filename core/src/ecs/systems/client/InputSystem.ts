@@ -23,7 +23,6 @@ export const InputSystem = ClientSystemBuilder({
     let backspace = 0
 
     window.addEventListener("wheel", (event) => {
-
       const amount = event.deltaY
       if (amount > 0.5) {
         client.bufferScroll += amount

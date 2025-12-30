@@ -91,7 +91,7 @@ export const Api = (): Api => {
         }
 
         // create world
-        api.worlds[lobbyId] = ServerWorld({ creator: ws, game: data.game })
+        api.worlds[lobbyId] = ServerWorld({ creator: ws })
 
         // set world id for this client
         ws.data.worldId = lobbyId
@@ -375,6 +375,7 @@ export const Api = (): Api => {
             const fileContent = await file.bytes()
             const contentType = file.type
 
+            // @ts-expect-error (TODO not sure what happened here)
             return new Response(fileContent, { headers: { 'Content-Type': contentType } })
           } else {
             console.error("404", path)

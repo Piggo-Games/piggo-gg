@@ -1,4 +1,4 @@
-import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, ShadowSystem, SystemBuilder, Water2D } from "@piggo-gg/core"
+import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, screenWH, ShadowSystem, SystemBuilder, Water2D } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
 import { MoneyDisplay } from "./ui/MoneyDisplay"
@@ -66,7 +66,9 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     },
     systems: [
       PixiRenderSystem,
-      PixiCameraSystem(),
+      PixiCameraSystem({
+        resize: () => screenWH().h / 936 * 2.6
+      }),
       ShadowSystem,
       MarsSystem
     ],

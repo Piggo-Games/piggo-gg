@@ -52,7 +52,6 @@ export type WorldBuilder = (_: WorldProps) => World
 
 export type WorldProps = {
   commands?: Command[]
-  game: GameTitle
   systems?: SystemBuilder[]
   three?: ThreeRenderer
   pixi?: PixiRenderer | undefined
@@ -60,7 +59,7 @@ export type WorldProps = {
 }
 
 // World manages all runtime state
-export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps): World => {
+export const World = ({ commands, systems, pixi, mode, three }: WorldProps): World => {
 
   const scheduleOnTick = () => setTimeout(() => world.onTick({ isRollback: false }), 3)
 
@@ -363,7 +362,16 @@ export const World = ({ commands, game, systems, pixi, mode, three }: WorldProps
 
   if (systems) world.addSystemBuilders(systems)
 
-  world.setGame(world.client?.discord ? "island" : game)
+  // check if there was a query param for the game
+  if (world.client) {
+    let gameId = world.client.discord ? "island" : world.client.mobile ? "mars" : "lobby" 
+    const param = new URLSearchParams(window.location.search).get("game")
+    if (param && param in world.games) gameId = param
+
+    world.setGame(gameId as GameTitle)
+  } else {
+    world.setGame("lobby")
+  }
 
   // setup commands
   if (commands) {
