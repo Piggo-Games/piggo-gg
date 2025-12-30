@@ -14,6 +14,8 @@ export const Rocket = (): Entity => {
           const f9 = await load("flamin-9.png")
 
           r.c = new Sprite(f9)
+
+          console.log(r.c.getBounds().height)
         }
       })
     }
