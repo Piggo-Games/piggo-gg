@@ -59,8 +59,8 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     renderer: "pixi",
     settings: {},
     state: {
-      money: 0,
-      day: 1,
+      money: 1000,
+      day: 22,
       month: 11,
       year: 2015
     },

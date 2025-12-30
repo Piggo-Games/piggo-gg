@@ -54,7 +54,7 @@ export const DateDisplay = (): Entity => {
           lastMonth = month
           lastYear = year
 
-          const monthName = months[month] ?? "???"
+          const monthName = months[month]
           dateText.textContent = `${monthName} ${day}, ${year}`
         }
       })
