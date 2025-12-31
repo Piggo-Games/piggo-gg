@@ -71,6 +71,7 @@ export const MoneyDisplay = (): Entity => {
               // cursor: "pointer"
             },
             onClick: () => {
+              if (world.client!.menu) return
               infoOpen = !infoOpen
               if (infoPanel) {
                 infoPanel.style.display = infoOpen ? "flex" : "none"
@@ -78,6 +79,8 @@ export const MoneyDisplay = (): Entity => {
               if (moneyButton) {
                 moneyButton.style.boxShadow = infoOpen ? "0 0 10px 2px rgba(255, 255, 255, 0.35)" : "none"
               }
+
+              world.client!.busy = infoOpen
             }
           })
           moneyButton.style.color = state.money < 0 ? "#ff6b6b" : "#6dff6d"
