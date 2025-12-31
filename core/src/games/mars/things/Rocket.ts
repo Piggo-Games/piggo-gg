@@ -11,6 +11,7 @@ export const Rocket = (): Entity => {
       renderable: Renderable({
         zIndex: 5,
         scale: 0.3,
+        interpolate: true,
         setup: async (r) => {
           const f9 = await load("flamin-9.png")
 
