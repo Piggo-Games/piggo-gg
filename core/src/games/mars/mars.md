@@ -28,6 +28,7 @@ Update this first, then align code with the design.
 [x] implement money display
 [x] implement date ticker
 [x] add controls UI
+[x] make the money display clickable. it opens an information tab including: current income from FarLink satellites, total earned from contract satellites, total spent on rocket components.
 [ ] implement launchpad carousel
 [ ] implement pad status card
 [ ] implement rocket management button

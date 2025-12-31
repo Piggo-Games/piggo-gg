@@ -11,6 +11,9 @@ export type MarsState = {
   day: number
   month: number
   year: number
+  farLinkIncome: number
+  contractRevenue: number
+  rocketComponentSpend: number
 }
 
 export type MarsSettings = {
@@ -66,7 +69,10 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       money: 1000,
       day: 22,
       month: 11,
-      year: 2015
+      year: 2015,
+      farLinkIncome: 0,
+      contractRevenue: 0,
+      rocketComponentSpend: 0
     },
     systems: [
       PixiRenderSystem,
