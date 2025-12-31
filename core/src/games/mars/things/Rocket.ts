@@ -1,5 +1,5 @@
 import { Collider, Debug, Entity, load, MarsState, NPC, Position, Renderable, Shadow } from "@piggo-gg/core"
-import { Container, Sprite } from "pixi.js"
+import { Sprite } from "pixi.js"
 import { Emitter } from "@sosuisen/particle-emitter"
 
 const speed = 20
@@ -38,16 +38,20 @@ export const Rocket = (): Entity => {
         zIndex: 5,
         scale: 0.3,
         interpolate: true,
-        onRender: () => {
+        onRender: ({ world }) => {
           if (!emitter) return
-          console.log("emitting")
-          emitter.update(0.01)
-          emitter.emit = true
+
+          const { launching } = world.state<MarsState>()
+          if (launching) {
+            emitter.update(0.01)
+          } else {
+            emitter.cleanup()
+          }
         },
         setup: async (r, renderer) => {
           const f9 = await load("flamin-9.png")
 
-          // r.c = new Sprite(f9)
+          r.c = new Sprite(f9)
 
           renderer.camera.focus = rocket
 
@@ -64,7 +68,7 @@ export const Rocket = (): Entity => {
               addAtBack: false,
               pos: {
                 x: 0,
-                y: 0
+                y: 490
               },
               behaviors: [
                 {
@@ -139,7 +143,7 @@ export const Rocket = (): Entity => {
                 {
                   type: "textureRandom",
                   config: {
-                    
+
                     textures: [
                       await load("particle.png"),
                       await load("fire.png")
