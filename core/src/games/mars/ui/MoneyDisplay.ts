@@ -61,25 +61,17 @@ export const MoneyDisplay = (): Entity => {
               fontSize: "26px",
               whiteSpace: "nowrap",
               background: "none",
-              // backgroundColor: "transparent",
               backgroundImage: "none",
               border: "none",
-              borderRadius: "0px",
+              borderRadius: "8px",
               textShadow: "2px 2px 1px rgba(0, 0, 0, 0.5)",
               transform: "translate(0%, 0%)",
               transition: "transform 0.12s ease, color 0.2s ease, box-shadow 0.2s ease",
-              // cursor: "pointer"
             },
             onClick: () => {
               if (world.client!.menu) return
-              infoOpen = !infoOpen
-              if (infoPanel) {
-                infoPanel.style.display = infoOpen ? "flex" : "none"
-              }
-              if (moneyButton) {
-                moneyButton.style.boxShadow = infoOpen ? "0 0 10px 2px rgba(255, 255, 255, 0.35)" : "none"
-              }
 
+              infoOpen = !infoOpen
               world.client!.busy = infoOpen
             }
           })
@@ -114,7 +106,7 @@ export const MoneyDisplay = (): Entity => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: "18px",
+                paddingBottom: "6px",
                 width: "100%"
               }
             }, labelText, valueText)
@@ -123,16 +115,13 @@ export const MoneyDisplay = (): Entity => {
           }
 
           const header = HText({
-            text: "Finances",
+            text: "Financials",
             style: {
               position: "relative",
               fontSize: "16px",
-              // left: "8px",
               left: "50%",
-              transform: "translate(-10%, 0%)",
-              // letterSpacing: "0.12em",
-              // textTransform: "uppercase",
-              opacity: "0.7",
+              width: "max-content",
+              transform: "translate(-50%, 0%)",
               paddingTop: "4px",
               marginBottom: "4px"
             }
@@ -158,10 +147,8 @@ export const MoneyDisplay = (): Entity => {
               position: "absolute",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
-              minWidth: "220px",
-              // display: "flex",
               width: "80%",
-              // height: "80%",
+              maxWidth: "320px",
               display: "none",
               flexDirection: "column",
               gap: "6px",
@@ -184,6 +171,16 @@ export const MoneyDisplay = (): Entity => {
         },
         onTick: (world) => {
           if (!moneyButton) return
+
+          if (infoOpen && !world.client!.busy) {
+            infoOpen = false
+          }
+
+          if (infoPanel) {
+            infoPanel.style.display = infoOpen ? "flex" : "none"
+          }
+
+          moneyButton.style.boxShadow = infoOpen ? "0 0 10px 2px rgba(255, 255, 255, 0.5)" : "none"
 
           const { money, farLinkIncome, contractRevenue, rocketComponentSpend } = world.state<MarsState>()
 
