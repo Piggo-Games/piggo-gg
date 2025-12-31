@@ -45,9 +45,9 @@ export const Ian = (player: Player): Character => {
           },
         },
         release: {
-          "escape": ({ client }) => {
-            client.menu = !client.menu
-          },
+          // "escape": ({ client }) => {
+          //   client.menu = !client.menu
+          // },
           "mb1": ({ client, target }) => {
             if (target !== "canvas") return
             if (client.menu) client.menu = false

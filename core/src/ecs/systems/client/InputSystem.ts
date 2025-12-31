@@ -380,7 +380,7 @@ export const InputSystem = ClientSystemBuilder({
       }
     }
 
-    const handleInputForUIEntity = (entity: Entity<Input | Actions>, world: World) => {
+    const handleInputForUIEntity = (entity: Entity<Input>, world: World) => {
       // copy the input buffer
       let bufferDown = client.bufferDown.copy()
       let bufferUp = client.bufferUp.copy()
@@ -399,7 +399,7 @@ export const InputSystem = ClientSystemBuilder({
             const invocation = controllerInput({
               aim: localAim(), mouse, entity, world, client, hold, tick
             })
-            if (invocation && actions.actionMap[invocation.actionId]) {
+            if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
               if (invocation.offline) {
                 world.actions.push(world.tick, entity.id, invocation)
@@ -420,7 +420,7 @@ export const InputSystem = ClientSystemBuilder({
             const invocation = controllerInput({
               aim: localAim(), mouse, entity, world, client, hold: 0
             })
-            if (invocation && actions.actionMap[invocation.actionId]) {
+            if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
               world.actions.push(world.tick, entity.id, invocation)
             }
@@ -435,7 +435,7 @@ export const InputSystem = ClientSystemBuilder({
 
     return {
       id: "InputSystem",
-      query: ["input", "actions", "position"],
+      query: ["input"],
       priority: 1,
       skipOnRollback: true,
       onRender: () => {
@@ -459,7 +459,7 @@ export const InputSystem = ClientSystemBuilder({
           y: power * sin(angle) * delta / 400
         })
       },
-      onTick: (enitities: Entity<Input | Actions>[]) => {
+      onTick: (entities: Entity<Input>[]) => {
         client.bufferDown.updateHold(world.tick)
 
         // clear buffer if the window is not focused
@@ -478,11 +478,10 @@ export const InputSystem = ClientSystemBuilder({
           client.chat.inputBuffer = client.chat.inputBuffer.slice(0, -1)
         }
 
-        // handle UI input (todo why networked ?)
-        enitities.forEach((entity) => {
-          const { networked } = entity.components
-          if (!networked) handleInputForUIEntity(entity, world)
-        })
+        // handle UI input (non-networked)
+        for (const entity of entities) {
+          if (!entity.components.networked) handleInputForUIEntity(entity, world)
+        }
 
         // for every bufferUp, clear the corresponding bufferDown
         for (const keyPress of client.bufferUp.all()) {

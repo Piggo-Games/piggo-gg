@@ -1,5 +1,5 @@
 import {
-  CSS, Entity, HButton, HDiv, HImg, HtmlButton, HtmlDiv, LobbiesMenu,
+  CSS, Entity, HButton, HDiv, HImg, HtmlButton, HtmlDiv, Input, LobbiesMenu,
   MusicButton, NPC, Position, SettingsMenu, SkinsMenu, World, styleButton
 } from "@piggo-gg/core"
 
@@ -174,6 +174,13 @@ export const EscapeMenu = (world: World): Entity => {
     id: "EscapeMenu",
     components: {
       position: Position({ x: 0, y: 0, z: 0 }),
+      input: Input({
+        release: {
+          "escape": ({ client }) => {
+            client.menu = !client.menu
+          }
+        }
+      }),
       npc: NPC({
         behavior: (_, world) => {
           if (world.mode === "server") return
