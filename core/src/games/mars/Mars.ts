@@ -1,7 +1,7 @@
 import {
   Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
-  HUDSystemProps, nextDay, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
-  screenWH, ShadowSystem, SystemBuilder, Water2D
+  HUDSystemProps, nextDay, PhysicsSystem, PixiCameraSystem, PixiRenderSystem,
+  Position, Renderable, screenWH, ShadowSystem, SystemBuilder, Water2D
 } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
@@ -48,7 +48,7 @@ const MarsSystem = SystemBuilder({
         }
 
         if (state.launching) {
-          const rocket = world.entity<Position>("rocket")
+          const rocket = world.entity<Position | Renderable>("rocket")
           if (!rocket) {
             state.launching = false
             return
@@ -57,12 +57,14 @@ const MarsSystem = SystemBuilder({
           const { position } = rocket.components
           if (state.launching && position.data.velocity.z === 0) {
             position.setVelocity({ z: launchSpeed })
+            world.pixi!.camera.focus = rocket
           }
 
           if (position.data.z >= launchMaxZ) {
             state.launching = false
             position.setVelocity({ z: 0 })
             position.setPosition({ z: 0 })
+            world.pixi!.camera.focus = undefined
           }
         }
       }
@@ -92,14 +94,15 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       PhysicsSystem("global"),
       PhysicsSystem("local"),
       PixiCameraSystem({
-        resize: () => screenWH().h / 936 * 2.6
+        resize: () => screenWH().h / 936 * 2.6,
+        follow: (xyz) => xyz
       }),
       ShadowSystem,
       MarsSystem,
       HUDSystem(controls)
     ],
     entities: [
-      Background({ move: 0.2, rays: true, follow: true }),
+      Background({ move: 0.2, rays: true, follow: false }),
       Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
       Water2D({ pos: { x: 0, y: 90 } }),
       Launchpad(),
