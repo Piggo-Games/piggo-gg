@@ -1,7 +1,7 @@
 import {
   Actions, Collider, Controlling, Data, Debug, Effects, Expires,
   Gun, Health, Hitbox, Html, Input, NPC, Networked, PC, Position, Renderable,
-  Team, Money, XY, entries, Inventory, Food, Element, Item, Shadow, Three
+  Team, Money, XY, entries, Inventory, Food, Element, Item, Shadow, Three, Date
 } from "@piggo-gg/core"
 
 export type ComponentTypes =
@@ -15,7 +15,7 @@ export type ValidComponents = ComponentTypes["type"]
 export type NetworkedComponentData = Record<string,
   null | boolean | string | number |
   string[] | number[] |
-  (string[] | undefined)[] | XY
+  (string[] | undefined)[] | XY | Date
 >
 
 // a Component is an atomic bundle of data attached to an entity

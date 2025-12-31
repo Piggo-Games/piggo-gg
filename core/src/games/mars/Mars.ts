@@ -1,4 +1,8 @@
-import { Background, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem, HUDSystemProps, PixiCameraSystem, PixiRenderSystem, screenWH, ShadowSystem, SystemBuilder, Water2D } from "@piggo-gg/core"
+import {
+  Background, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
+  HUDSystemProps, nextDay, PixiCameraSystem, PixiRenderSystem,
+  screenWH, ShadowSystem, SystemBuilder, Water2D
+} from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
 import { MoneyDisplay } from "./ui/MoneyDisplay"
@@ -8,9 +12,7 @@ import { Rail } from "./things/Rail"
 
 export type MarsState = {
   money: number
-  day: number
-  month: number
-  year: number
+  date: Date
   farLinkIncome: number
   contractRevenue: number
   rocketComponentSpend: number
@@ -20,7 +22,6 @@ export type MarsSettings = {
   showControls: boolean
 }
 
-const daysPerMonth = 30
 const ticksPerDay = 12
 
 const MarsSystem = SystemBuilder({
@@ -39,17 +40,7 @@ const MarsSystem = SystemBuilder({
         if (world.tick - lastDayTick >= ticksPerDay) {
           lastDayTick = world.tick
 
-          state.day += 1
-
-          if (state.day > daysPerMonth) {
-            state.day = 1
-            state.month += 1
-
-            if (state.month > 11) {
-              state.month = 0
-              state.year += 1
-            }
-          }
+          state.date = nextDay(state.date)
         }
       }
     }
@@ -67,9 +58,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     },
     state: {
       money: 1000,
-      day: 22,
-      month: 11,
-      year: 2015,
+      date: { day: 1, month: "Jan", year: 2026 },
       farLinkIncome: 0,
       contractRevenue: 0,
       rocketComponentSpend: 0
