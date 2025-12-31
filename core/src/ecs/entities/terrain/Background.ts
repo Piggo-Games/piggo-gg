@@ -13,7 +13,7 @@ export type BackgroundProps = {
 export const Background = ({ img, json, rays, move, follow }: BackgroundProps = {}) => Entity({
   id: "background",
   components: {
-    position: Position(),
+    position: Position({ y: -3000 }),
     renderable: Renderable({
       zIndex: -2,
       interpolate: true,
@@ -67,7 +67,7 @@ export const Background = ({ img, json, rays, move, follow }: BackgroundProps = 
           texture: texture,
           tilePosition: { x: 207, y: 117 },
           width: 6000,
-          height: 6000
+          height: 12000
         })
 
         if (rays) renderable.setRays({ gain: 0.45, alpha: 0.45, lacunarity: 2 })

@@ -22,15 +22,15 @@ Update this first, then align code with the design.
 - Research button: opens R&D (Starboat unlocks, refuel tech, manufacturing efficiency).
 - Orbit panel: satellites in orbit, FarLink count, revenue contribution.
 - Progress strip: Mars mission checklist + readiness meter.
-- 
+
 ## Tickets
 
 [x] implement money display
 [x] implement date ticker
 [x] add controls UI
 [x] make the money display clickable. it opens an information tab including: current income from FarLink satellites, total earned from contract satellites, total spent on rocket components.
-[ ] implement launch button
-  [ ] track the rocket while it's flying (set CameraSystem.follow)
+[x] implement launch button
+  [x] track the rocket while it's flying (set CameraSystem.follow)
 [ ] implement launchpad carousel
 [ ] implement pad status card
 [ ] implement rocket management button
