@@ -28,8 +28,8 @@ export const DateDisplay = (): Entity => {
           dateText = HText({
             text: `${monthName} ${day}, ${year}`,
             style: {
-              left: "16px",
-              top: "54px",
+              right: "2px",
+              top: "8px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
               padding: "6px",
