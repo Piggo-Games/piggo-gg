@@ -41,19 +41,21 @@ export const Rocket = (): Entity => {
         onRender: () => {
           if (!emitter) return
           console.log("emitting")
-          emitter.update(1 / 60)
+          emitter.update(0.01)
           emitter.emit = true
         },
         setup: async (r, renderer) => {
           const f9 = await load("flamin-9.png")
+          
+          // r.c = new Sprite(f9)
 
-          r.c = new Sprite(f9)
+          renderer.camera.focus = rocket
 
           emitter = new Emitter(r.c, {
             emit: true,
             lifetime: {
-              min: 0.1,
-              max: 0.75
+              min: 0,
+              max: 1000000
             },
             frequency: 0.001,
             emitterLifetime: 0,
@@ -157,8 +159,6 @@ export const Rocket = (): Entity => {
               }
             ]
           })
-
-          renderer.camera.focus = rocket
         }
       })
     }
