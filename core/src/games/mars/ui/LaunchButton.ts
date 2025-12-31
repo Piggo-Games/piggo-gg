@@ -22,10 +22,10 @@ export const LaunchButton = (): Entity => {
           console.log("init launch button")
           launchButton = HButton({
             style: {
-              left: "90%",
-              top: "50%",
+              left: "50%",
+              bottom: "8px",
               marginBottom: "env(safe-area-inset-bottom)",
-              transform: "translate(-50%, -50%)",
+              transform: "translate(-50%, 0%)",
               width: "60px",
               height: "60px",
               borderRadius: "999px",
@@ -34,7 +34,14 @@ export const LaunchButton = (): Entity => {
               backgroundImage: "linear-gradient(180deg, #64e36f 0%, #2fbb4c 100%)",
               border: "3px solid #0f7d2f",
               color: "#ffffff",
-              pointerEvents: "auto"
+              pointerEvents: "auto",
+              transition: "opacity 0.2s ease, box-shadow 0.2s ease, filter 0.3s ease"
+            },
+            onHover: () => {
+              launchButton!.style.boxShadow = "0 0 10px 4px #64e36f"
+            },
+            onHoverOut: () => {
+              launchButton!.style.boxShadow = "none"
             },
             onClick: () => {
               if (world.client?.menu) return
