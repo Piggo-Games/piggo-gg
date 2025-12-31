@@ -25,13 +25,13 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
     const wrapper = HDiv({
       style: {
         bottom: "20px",
-        left: props.direction === "row" ? "50%" : "120px",
+        left: props.direction === "row" ? "50%" : "20px",
         display: "flex",
         flexDirection: props.direction || "column",
         width: "fit-content",
         height: "fit-content",
         alignItems: props.direction === "row" ? "flex-end" : "center",
-        transform: "translate(-50%)",
+        transform: props.direction === "row" ? "translate(-50%)" : "translate(0%)",
         gap: "3vh",
         // border: "1px solid red"
       }
@@ -122,6 +122,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
         if (down) {
           for (const btn of buttonElements) {
             let check = [btn.key]
+            if (btn.key === "esc") check = ["escape"]
             if (btn.key === "spacebar") check = [" "]
             if (btn.key === "mb3") check = ["scrolldown", "scrollup"]
 
