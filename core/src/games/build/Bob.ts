@@ -72,15 +72,14 @@ export const Bob = (player: Player): Character => {
           "mb1": ({ world, target, client }) => {
             if (target !== "canvas") return
 
-            if (client.mobile && client.menu) {
-              client.menu = false
-              return
-            }
+            // if (client.mobile && client.menu) {
+            //   client.menu = false
+            //   return
+            // }
 
             if (client.mobile) return
 
             world.client?.pointerLock()
-            return
           }
         },
         press: {

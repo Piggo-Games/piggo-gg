@@ -1,5 +1,5 @@
 import {
-  Actions, Character, ClientSystemBuilder, Entity, Input, World,
+  Character, ClientSystemBuilder, Entity, Input, World,
   XY, cos, isTypingEvent, max, min, round, screenWH, sin
 } from "@piggo-gg/core"
 
@@ -274,7 +274,7 @@ export const InputSystem = ClientSystemBuilder({
             }
 
             // remove each key from the buffer
-            inputKeys.forEach((key) => buffer.remove(key))
+            for (const key of inputKeys) buffer.remove(key)
           }
         } else if (keyMouse) {
 
