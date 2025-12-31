@@ -7,7 +7,7 @@ import { Application, Container } from "pixi.js"
 export type PixiCamera = {
   angle: 0 | 1 | 2 | 3
   root: Container
-  focus: Character | undefined
+  focus: Entity<Position | Renderable> | undefined
   scale: number
   add: (r: Renderable) => void
   remove: (r: Renderable) => void
@@ -121,6 +121,8 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize
       onTick: (entities: Entity<Renderable | Position>[]) => {
         // camera focus on player's character
         const character = world.client?.character()
+
+        // @ts-expect-error (exact optional properties)
         if (character) pixi.camera.focus = character
 
         // cull far away entities

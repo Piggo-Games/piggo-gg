@@ -1,5 +1,5 @@
 import {
-  Actions, Character, ClientSystemBuilder, Entity, Input, World,
+  Character, ClientSystemBuilder, Entity, Input, World,
   XY, cos, isTypingEvent, max, min, round, screenWH, sin
 } from "@piggo-gg/core"
 
@@ -101,7 +101,8 @@ export const InputSystem = ClientSystemBuilder({
         }
       }
 
-      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0 })
+      // @ts-expect-error
+      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0, target: event.target?.localName ?? ""})
     })
 
     document.addEventListener("keyup", (event: KeyboardEvent) => {
@@ -128,7 +129,7 @@ export const InputSystem = ClientSystemBuilder({
               mouse, aim: localAim(), entity: pc, world, tick: world.tick, hold: down.hold, client
             })
             client.bufferDown.remove(key)
-            return
+            // return
           }
         }
 
@@ -273,7 +274,7 @@ export const InputSystem = ClientSystemBuilder({
             }
 
             // remove each key from the buffer
-            inputKeys.forEach((key) => buffer.remove(key))
+            for (const key of inputKeys) buffer.remove(key)
           }
         } else if (keyMouse) {
 
@@ -380,7 +381,7 @@ export const InputSystem = ClientSystemBuilder({
       }
     }
 
-    const handleInputForUIEntity = (entity: Entity<Input | Actions>, world: World) => {
+    const handleInputForUIEntity = (entity: Entity<Input>, world: World) => {
       // copy the input buffer
       let bufferDown = client.bufferDown.copy()
       let bufferUp = client.bufferUp.copy()
@@ -397,9 +398,9 @@ export const InputSystem = ClientSystemBuilder({
           const controllerInput = input.inputMap.press[inputKey]
           if (controllerInput != null) {
             const invocation = controllerInput({
-              aim: localAim(), mouse, entity, world, client, hold, tick
+              aim: localAim(), mouse, entity, world, client, hold, tick, target: keyMouse.target ?? ""
             })
-            if (invocation && actions.actionMap[invocation.actionId]) {
+            if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
               if (invocation.offline) {
                 world.actions.push(world.tick, entity.id, invocation)
@@ -414,13 +415,14 @@ export const InputSystem = ClientSystemBuilder({
 
       for (const keyUp in input.inputMap.release) {
 
-        if (bufferUp.get(keyUp)) {
+        const keyMouse = bufferUp.get(keyUp)
+        if (keyMouse) {
           const controllerInput = input.inputMap.release[keyUp]
           if (controllerInput != null) {
             const invocation = controllerInput({
-              aim: localAim(), mouse, entity, world, client, hold: 0
+              aim: localAim(), mouse, entity, world, client, hold: 0, target: keyMouse.target ?? ""
             })
-            if (invocation && actions.actionMap[invocation.actionId]) {
+            if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
               world.actions.push(world.tick, entity.id, invocation)
             }
@@ -435,7 +437,7 @@ export const InputSystem = ClientSystemBuilder({
 
     return {
       id: "InputSystem",
-      query: ["input", "actions", "position"],
+      query: ["input"],
       priority: 1,
       skipOnRollback: true,
       onRender: () => {
@@ -459,7 +461,7 @@ export const InputSystem = ClientSystemBuilder({
           y: power * sin(angle) * delta / 400
         })
       },
-      onTick: (enitities: Entity<Input | Actions>[]) => {
+      onTick: (entities: Entity<Input>[]) => {
         client.bufferDown.updateHold(world.tick)
 
         // clear buffer if the window is not focused
@@ -478,11 +480,10 @@ export const InputSystem = ClientSystemBuilder({
           client.chat.inputBuffer = client.chat.inputBuffer.slice(0, -1)
         }
 
-        // handle UI input (todo why networked ?)
-        enitities.forEach((entity) => {
-          const { networked } = entity.components
-          if (!networked) handleInputForUIEntity(entity, world)
-        })
+        // handle UI input (non-networked)
+        for (const entity of entities) {
+          if (!entity.components.networked) handleInputForUIEntity(entity, world)
+        }
 
         // for every bufferUp, clear the corresponding bufferDown
         for (const keyPress of client.bufferUp.all()) {

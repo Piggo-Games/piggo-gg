@@ -13,7 +13,7 @@ Update this first, then align code with the design.
 
 ## UI (Mobile Vertical)
 - Money display: single `$` total that animates up/down; green when >= 0, red when < 0.
-- Date ticker: month/year display that increments over time; starts at Dec 2015.
+- Date ticker: day/month/year display that increments over time; starts at Dec 22 2015.
 - Launchpad carousel: left/right arrows to switch pads; each pad tracks its own rocket, readiness, and payload.
 - Pad status card: rocket type, readiness state, payload summary, next required action.
 - Rocket management button: opens build/repair/upgrade for the selected pad.
@@ -22,3 +22,16 @@ Update this first, then align code with the design.
 - Research button: opens R&D (Starboat unlocks, refuel tech, manufacturing efficiency).
 - Orbit panel: satellites in orbit, FarLink count, revenue contribution.
 - Progress strip: Mars mission checklist + readiness meter.
+
+## Tickets
+
+[x] implement money display
+[x] implement date ticker
+[ ] implement launchpad carousel
+[ ] implement pad status card
+[ ] implement rocket management button
+[ ] implement payload builder button
+[ ] implement launch button
+[ ] implement rocket flying graphic
+[ ] track the rocket while it's flying (CameraSystem.follow)
+[ ] 
