@@ -68,7 +68,7 @@ export const MoneyDisplay = (): Entity => {
               textShadow: "2px 2px 1px rgba(0, 0, 0, 0.5)",
               transform: "translate(0%, 0%)",
               transition: "transform 0.12s ease, color 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
+              // cursor: "pointer"
             },
             onClick: () => {
               infoOpen = !infoOpen
@@ -89,7 +89,8 @@ export const MoneyDisplay = (): Entity => {
                 position: "relative",
                 fontSize: "16px",
                 fontWeight: "bold",
-                opacity: "0.8"
+                opacity: "0.8",
+                paddingLeft: "6px"
               }
             })
 
@@ -97,9 +98,10 @@ export const MoneyDisplay = (): Entity => {
               text: "$0",
               style: {
                 position: "relative",
-                fontSize: "14px",
+                fontSize: "18px",
                 fontWeight: "bold",
-                textAlign: "right"
+                textAlign: "right",
+                paddingRight: "6px"
               }
             })
 
@@ -109,7 +111,7 @@ export const MoneyDisplay = (): Entity => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: "12px",
+                gap: "18px",
                 width: "100%"
               }
             }, labelText, valueText)
@@ -121,24 +123,28 @@ export const MoneyDisplay = (): Entity => {
             text: "Finances",
             style: {
               position: "relative",
-              fontSize: "13px",
+              fontSize: "16px",
+              // left: "8px",
+              left: "50%",
+              transform: "translate(-10%, 0%)",
               // letterSpacing: "0.12em",
               // textTransform: "uppercase",
               opacity: "0.7",
+              paddingTop: "4px",
               marginBottom: "4px"
             }
           })
 
-          const farLinkRow = createInfoRow("FarLink $/day")
-          const contractRow = createInfoRow("contract earnings")
-          const rocketRow = createInfoRow("rocket spend")
+          const contractRow = createInfoRow("total revenue")
+          const farLinkRow = createInfoRow("income $/day")
+          const rocketRow = createInfoRow("expenses")
 
-          farLinkValue = farLinkRow.valueText
           contractValue = contractRow.valueText
+          farLinkValue = farLinkRow.valueText
           rocketSpendValue = rocketRow.valueText
 
-          if (farLinkValue) farLinkValue.textContent = formatMoney(state.farLinkIncome)
           if (contractValue) contractValue.textContent = formatMoney(state.contractRevenue)
+          if (farLinkValue) farLinkValue.textContent = formatMoney(state.farLinkIncome)
           if (rocketSpendValue) rocketSpendValue.textContent = formatMoney(state.rocketComponentSpend)
 
           infoPanel = HDiv({
@@ -150,22 +156,24 @@ export const MoneyDisplay = (): Entity => {
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
               minWidth: "220px",
+              // display: "flex",
+              width: "80%",
+              // height: "80%",
               display: "none",
               flexDirection: "column",
               gap: "6px",
               background: "rgba(0, 0, 0, 0.55)",
-              border: "1px solid rgba(255, 255, 255, 0.25)",
-              borderRadius: "10px",
+              border: "2px solid rgba(255, 255, 255, 0.5)",
+              borderRadius: "8px",
             }
-          }, header, farLinkRow.row, contractRow.row, rocketRow.row)
+          }, header, contractRow.row, farLinkRow.row, rocketRow.row)
 
           const wrapper = HDiv({
             style: {
               left: "0px",
               top: "0px",
               width: "100%",
-              height: "100%",
-              pointerEvents: "auto"
+              height: "100%"
             }
           }, moneyButton, infoPanel)
 
