@@ -5,7 +5,7 @@ const speed = 20
 const maxZ = 3500
 
 export const Rocket = (): Entity => {
-  const rocket = Entity<Position>({
+  const rocket = Entity<Position | Renderable>({
     id: "rocket",
     components: {
       debug: Debug(),
@@ -34,10 +34,12 @@ export const Rocket = (): Entity => {
         zIndex: 5,
         scale: 0.3,
         interpolate: true,
-        setup: async (r) => {
+        setup: async (r, renderer) => {
           const f9 = await load("flamin-9.png")
 
           r.c = new Sprite(f9)
+
+          renderer.camera.focus = rocket
         }
       })
     }

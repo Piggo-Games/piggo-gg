@@ -1,8 +1,7 @@
 import {
-  Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText,
-  HUDSystem, HUDSystemProps, nextDay, PhysicsSystem, PixiCameraSystem,
-  PixiDebugSystem, PixiRenderSystem, Position, Renderable, screenWH,
-  ShadowSystem, SystemBuilder, Water2D
+  Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
+  HUDSystemProps, nextDay, PhysicsSystem, PixiCameraSystem, PixiDebugSystem,
+  PixiRenderSystem, screenWH, ShadowSystem, SystemBuilder, Water2D
 } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
@@ -44,11 +43,6 @@ const MarsSystem = SystemBuilder({
           lastDayTick = world.tick
 
           state.date = nextDay(state.date)
-        }
-
-        const rocket = world.entity<Position | Renderable>("rocket")
-        if (rocket && world.pixi?.ready) {
-          world.pixi.camera.focus = rocket
         }
       }
     }
