@@ -101,7 +101,8 @@ export const InputSystem = ClientSystemBuilder({
         }
       }
 
-      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0 })
+      // @ts-expect-error
+      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0, target: event.target?.localName ?? ""})
     })
 
     document.addEventListener("keyup", (event: KeyboardEvent) => {
@@ -128,7 +129,7 @@ export const InputSystem = ClientSystemBuilder({
               mouse, aim: localAim(), entity: pc, world, tick: world.tick, hold: down.hold, client
             })
             client.bufferDown.remove(key)
-            return
+            // return
           }
         }
 
@@ -397,7 +398,7 @@ export const InputSystem = ClientSystemBuilder({
           const controllerInput = input.inputMap.press[inputKey]
           if (controllerInput != null) {
             const invocation = controllerInput({
-              aim: localAim(), mouse, entity, world, client, hold, tick
+              aim: localAim(), mouse, entity, world, client, hold, tick, target: keyMouse.target ?? ""
             })
             if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()
@@ -414,11 +415,13 @@ export const InputSystem = ClientSystemBuilder({
 
       for (const keyUp in input.inputMap.release) {
 
-        if (bufferUp.get(keyUp)) {
+        const keyMouse = bufferUp.get(keyUp)
+        if (keyMouse) {
+          console.log("UI up", entity.id, keyMouse.key)
           const controllerInput = input.inputMap.release[keyUp]
           if (controllerInput != null) {
             const invocation = controllerInput({
-              aim: localAim(), mouse, entity, world, client, hold: 0
+              aim: localAim(), mouse, entity, world, client, hold: 0, target: keyMouse.target ?? ""
             })
             if (invocation && actions?.actionMap[invocation.actionId]) {
               invocation.playerId = client.playerId()

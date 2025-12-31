@@ -7,6 +7,7 @@ export type KeyMouse = {
   tick: number
   hold: number
   delta: number
+  target?: string
 }
 
 export type KeyBuffer = {

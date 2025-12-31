@@ -59,7 +59,7 @@ export const EscapeMenu = (world: World): Entity => {
       backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)",
     },
     onClick: (button) => {
-      button.style.transform = `translate(-50%, 0%) rotateY(${rotation += 360}deg)`
+      button.style.transform = `translate(-75%, 0%) rotateY(${rotation += 360}deg)`
     },
     onHover: (button) => {
       button.style.boxShadow = "0 0 10px 4px white"
@@ -177,10 +177,10 @@ export const EscapeMenu = (world: World): Entity => {
       input: Input({
         release: {
           "escape": ({ client }) => {
+            console.log("TOGGLING MENU")
             client.menu = !client.menu
           },
           "mb1": ({ client, target }) => {
-            console.log("CLICK TARGET", target)
             if (target !== "canvas") return
             if (client.menu) client.menu = false
           }

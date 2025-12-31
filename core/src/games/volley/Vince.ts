@@ -17,16 +17,16 @@ export const Vince = (player: Player) => Character({
     collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
     team: Team(player.components.team.data.team),
     input: Input({
-      release: {
-        "escape": ({ client }) => {
-          client.menu = !client.menu
-        },
-        "mb1": ({ target, client }) => {
-          if (target !== "canvas") return
+      // release: {
+      //   "escape": ({ client }) => {
+      //     client.menu = !client.menu
+      //   },
+      //   "mb1": ({ target, client }) => {
+      //     if (target !== "canvas") return
 
-          if (client.menu) client.menu = false
-        }
-      },
+      //     if (client.menu) client.menu = false
+      //   }
+      // },
       press: {
         ...WASDInputMap.press,
         " ": ({ hold }) => {

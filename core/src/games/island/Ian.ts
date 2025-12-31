@@ -43,15 +43,6 @@ export const Ian = (player: Player): Character => {
             if (!ian.components.position.data.standing || ian.components.position.data.velocity.z > 0) return
             return { actionId: "jump" }
           },
-        },
-        release: {
-          // "escape": ({ client }) => {
-          //   client.menu = !client.menu
-          // },
-          // "mb1": ({ client, target }) => {
-          //   if (target !== "canvas") return
-          //   if (client.menu) client.menu = false
-          // }
         }
       }),
       actions: Actions({
