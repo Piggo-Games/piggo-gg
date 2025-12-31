@@ -1,6 +1,6 @@
 import {
   ClientSystemBuilder, Entity, Renderable, Position,
-  Character, abs, round, XY, XYZ, sign, sqrt, max, min
+  abs, round, XY, XYZ, sign, sqrt, max, min
 } from "@piggo-gg/core"
 import { Application, Container } from "pixi.js"
 
@@ -171,7 +171,6 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize
         }
 
         pixi?.camera.moveTo({ x: offset.x, y: offset.y - z })
-        console.log("camera move to", { x: offset.x, y: offset.y - z })
       }
     }
   }
