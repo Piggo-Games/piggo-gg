@@ -41,42 +41,29 @@ const MarsSystem = SystemBuilder({
       onTick: () => {
         const state = world.state<MarsState>()
 
-        if (world.tick - lastDayTick >= ticksPerDay) {
+        if (world.tick - lastDayTick >= ticksPerDay && !state.launching) {
           lastDayTick = world.tick
 
           state.date = nextDay(state.date)
         }
-      }
-    }
-  }
-})
 
-const LaunchSystem = SystemBuilder({
-  id: "MarsLaunchSystem",
-  init: (world) => {
-    return {
-      id: "MarsLaunchSystem",
-      query: [],
-      priority: 3,
-      onTick: () => {
-        const state = world.state<MarsState>()
-        if (!state.launching) return
+        if (state.launching) {
+          const rocket = world.entity<Position>("rocket")
+          if (!rocket) {
+            state.launching = false
+            return
+          }
 
-        const rocket = world.entity<Position>("rocket")
-        if (!rocket) {
-          state.launching = false
-          return
-        }
+          const { position } = rocket.components
+          if (state.launching && position.data.velocity.z === 0) {
+            position.setVelocity({ z: launchSpeed })
+          }
 
-        const { position } = rocket.components
-        if (state.launching && position.data.velocity.z === 0) {
-          position.setVelocity({ z: launchSpeed })
-        }
-
-        if (position.data.z >= launchMaxZ) {
-          state.launching = false
-          position.setVelocity({ z: 0 })
-          position.setPosition({ z: 0 })
+          if (position.data.z >= launchMaxZ) {
+            state.launching = false
+            position.setVelocity({ z: 0 })
+            position.setPosition({ z: 0 })
+          }
         }
       }
     }
@@ -105,25 +92,14 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       PhysicsSystem("global"),
       PhysicsSystem("local"),
       PixiCameraSystem({
-        follow: (position) => {
-          const state = world.state<MarsState>()
-          if (!state.launching) return position
-
-          const rocket = world.entity<Position>("rocket")
-          if (!rocket) return position
-
-          const { x, y, z } = rocket.components.position.data
-          return { x, y, z }
-        },
         resize: () => screenWH().h / 936 * 2.6
       }),
       ShadowSystem,
       MarsSystem,
-      LaunchSystem,
       HUDSystem(controls)
     ],
     entities: [
-      Background({ move: 0.2, rays: true }),
+      Background({ move: 0.2, rays: true, follow: true }),
       Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
       Water2D({ pos: { x: 0, y: 90 } }),
       Launchpad(),

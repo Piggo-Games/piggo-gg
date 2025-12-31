@@ -19,7 +19,6 @@ export const LaunchButton = (): Entity => {
       position: Position(),
       html: Html({
         init: (world) => {
-          console.log("init launch button")
           launchButton = HButton({
             style: {
               left: "50%",
