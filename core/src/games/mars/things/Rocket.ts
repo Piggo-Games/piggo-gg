@@ -1,4 +1,4 @@
-import { Entity, load, Position, Renderable, Shadow } from "@piggo-gg/core"
+import { Collider, Entity, load, Position, Renderable, Shadow } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 
 export const Rocket = (): Entity => {
@@ -6,6 +6,7 @@ export const Rocket = (): Entity => {
     id: "rocket",
     components: {
       position: Position({ x: 0, y: 0 }),
+      collider: Collider({ shape: "ball", radius: 0.1, group: "1" }),
       shadow: Shadow(4.5, 139, 0),
       renderable: Renderable({
         zIndex: 5,

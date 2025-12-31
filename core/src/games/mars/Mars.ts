@@ -1,10 +1,11 @@
 import {
   Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
-  HUDSystemProps, nextDay, PixiCameraSystem, PixiRenderSystem,
+  HUDSystemProps, nextDay, PhysicsSystem, PixiCameraSystem, PixiRenderSystem, Position,
   screenWH, ShadowSystem, SystemBuilder, Water2D
 } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
+import { LaunchButton } from "./ui/LaunchButton"
 import { MoneyDisplay } from "./ui/MoneyDisplay"
 import { Rocket } from "./things/Rocket"
 import { Launchpad } from "./things/Launchpad"
@@ -16,6 +17,7 @@ export type MarsState = {
   farLinkIncome: number
   contractRevenue: number
   rocketComponentSpend: number
+  launching: boolean
 }
 
 export type MarsSettings = {
@@ -23,6 +25,8 @@ export type MarsSettings = {
 }
 
 const ticksPerDay = 12
+const launchMaxZ = 3500
+const launchSpeed = 20
 
 const MarsSystem = SystemBuilder({
   id: "MarsSystem",
@@ -47,6 +51,38 @@ const MarsSystem = SystemBuilder({
   }
 })
 
+const LaunchSystem = SystemBuilder({
+  id: "MarsLaunchSystem",
+  init: (world) => {
+    return {
+      id: "MarsLaunchSystem",
+      query: [],
+      priority: 3,
+      onTick: () => {
+        const state = world.state<MarsState>()
+        if (!state.launching) return
+
+        const rocket = world.entity<Position>("rocket")
+        if (!rocket) {
+          state.launching = false
+          return
+        }
+
+        const { position } = rocket.components
+        if (state.launching && position.data.velocity.z === 0) {
+          position.setVelocity({ z: launchSpeed })
+        }
+
+        if (position.data.z >= launchMaxZ) {
+          state.launching = false
+          position.setVelocity({ z: 0 })
+          position.setPosition({ z: 0 })
+        }
+      }
+    }
+  }
+})
+
 export const Mars: GameBuilder<MarsState, MarsSettings> = {
   id: "mars",
   init: (world) => ({
@@ -61,15 +97,29 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       date: { day: 1, month: "Jan", year: 2026 },
       farLinkIncome: 0,
       contractRevenue: 0,
-      rocketComponentSpend: 0
+      rocketComponentSpend: 0,
+      launching: false
     },
     systems: [
       PixiRenderSystem,
+      PhysicsSystem("global"),
+      PhysicsSystem("local"),
       PixiCameraSystem({
+        follow: (position) => {
+          const state = world.state<MarsState>()
+          if (!state.launching) return position
+
+          const rocket = world.entity<Position>("rocket")
+          if (!rocket) return position
+
+          const { x, y, z } = rocket.components.position.data
+          return { x, y, z }
+        },
         resize: () => screenWH().h / 936 * 2.6
       }),
       ShadowSystem,
       MarsSystem,
+      LaunchSystem,
       HUDSystem(controls)
     ],
     entities: [
@@ -85,6 +135,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
 
       MoneyDisplay(),
       DateDisplay(),
+      LaunchButton(),
 
       HtmlFpsText()
     ]

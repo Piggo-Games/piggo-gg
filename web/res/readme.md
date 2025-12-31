@@ -32,6 +32,8 @@ character mesh | https://opengameart.org/content/animated-characters-pack | lice
 
 character mesh 2 | https://quaternius.com/packs/ultimatemodularcharacters.html | license: CC0
 
+rocket icon | https://www.svgrepo.com/svg/446710/launch | license: attribution
+
 health icon | https://www.svgrepo.com/svg/499213/health | license: GPL
 
 scroll down icon | https://www.svgrepo.com/svg/522650/scroll-down | license: attribution
