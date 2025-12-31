@@ -1,6 +1,13 @@
 import { XY } from "@piggo-gg/core"
 
-export type KeyMouse = { key: string, mouse: XY, aim: XY, tick: number, hold: number, delta: number }
+export type KeyMouse = {
+  key: string
+  mouse: XY
+  aim: XY
+  tick: number
+  hold: number
+  delta: number
+}
 
 export type KeyBuffer = {
   all: () => KeyMouse[]

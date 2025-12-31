@@ -48,10 +48,10 @@ export const Ian = (player: Player): Character => {
           // "escape": ({ client }) => {
           //   client.menu = !client.menu
           // },
-          "mb1": ({ client, target }) => {
-            if (target !== "canvas") return
-            if (client.menu) client.menu = false
-          }
+          // "mb1": ({ client, target }) => {
+          //   if (target !== "canvas") return
+          //   if (client.menu) client.menu = false
+          // }
         }
       }),
       actions: Actions({

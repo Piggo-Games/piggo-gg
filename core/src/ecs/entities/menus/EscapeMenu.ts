@@ -178,6 +178,11 @@ export const EscapeMenu = (world: World): Entity => {
         release: {
           "escape": ({ client }) => {
             client.menu = !client.menu
+          },
+          "mb1": ({ client, target }) => {
+            console.log("CLICK TARGET", target)
+            if (target !== "canvas") return
+            if (client.menu) client.menu = false
           }
         }
       }),
