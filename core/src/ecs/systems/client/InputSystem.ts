@@ -417,7 +417,6 @@ export const InputSystem = ClientSystemBuilder({
 
         const keyMouse = bufferUp.get(keyUp)
         if (keyMouse) {
-          console.log("UI up", entity.id, keyMouse.key)
           const controllerInput = input.inputMap.release[keyUp]
           if (controllerInput != null) {
             const invocation = controllerInput({

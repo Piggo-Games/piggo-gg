@@ -177,7 +177,6 @@ export const EscapeMenu = (world: World): Entity => {
       input: Input({
         release: {
           "escape": ({ client }) => {
-            console.log("TOGGLING MENU")
             client.menu = !client.menu
           },
           "mb1": ({ client, target }) => {
