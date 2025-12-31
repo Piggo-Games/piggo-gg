@@ -64,7 +64,6 @@ export const InputSystem = ClientSystemBuilder({
       if (client.busy) {
         // @ts-expect-error
         if (event.target?.tagName === "CANVAS") client.busy = false
-        // console.log(event.target?.tagName)
       }
 
       if (client.busy || client.menu) return
