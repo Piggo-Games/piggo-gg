@@ -21,10 +21,9 @@ export const LaunchButton = (): Entity => {
         init: (world) => {
           launchButton = HButton({
             style: {
-              left: "50%",
-              bottom: "8px",
+              right: "16px",
+              bottom: "16px",
               marginBottom: "env(safe-area-inset-bottom)",
-              transform: "translate(-50%, 0%)",
               width: "60px",
               height: "60px",
               borderRadius: "999px",
