@@ -1,5 +1,5 @@
 import {
-  Background, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
+  Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
   HUDSystemProps, nextDay, PixiCameraSystem, PixiRenderSystem,
   screenWH, ShadowSystem, SystemBuilder, Water2D
 } from "@piggo-gg/core"
@@ -74,18 +74,19 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     ],
     entities: [
       Background({ move: 0.2, rays: true }),
+      Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
+      Water2D({ pos: { x: 0, y: 90 } }),
+      Launchpad(),
+      Rail(),
+      Rocket(),
+
       EscapeMenu(world),
-      HtmlFpsText(),
+      Cursor(),
+
       MoneyDisplay(),
       DateDisplay(),
 
-      Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
-      Water2D({ pos: { x: 0, y: 90 } }),
-
-      Launchpad(),
-      Rail(),
-
-      Rocket()
+      HtmlFpsText()
     ]
   })
 }
@@ -95,7 +96,7 @@ const controls: HUDSystemProps = {
   clusters: [
     {
       label: "menu",
-      buttons: [ ["esc"] ]
+      buttons: [["esc"]]
     }
   ]
 }
