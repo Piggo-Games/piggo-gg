@@ -120,11 +120,11 @@ export const Rocket = (): Entity => {
                       list: [
                         {
                           time: 0,
-                          value: "fff191"
+                          value: "ff724c"
                         },
                         {
                           time: 1,
-                          value: "ff622c"
+                          value: "fff191"
                         }
                       ]
                     }
