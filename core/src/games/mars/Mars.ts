@@ -1,4 +1,8 @@
-import { Background, EscapeMenu, GameBuilder, HtmlFpsText, PixiCameraSystem, PixiRenderSystem, screenWH, ShadowSystem, SystemBuilder, Water2D } from "@piggo-gg/core"
+import {
+  Background, Cursor, Date, EscapeMenu, GameBuilder, HtmlFpsText, HUDSystem,
+  HUDSystemProps, nextDay, PixiCameraSystem, PixiRenderSystem,
+  screenWH, ShadowSystem, SystemBuilder, Water2D
+} from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
 import { DateDisplay } from "./ui/DateDisplay"
 import { MoneyDisplay } from "./ui/MoneyDisplay"
@@ -8,14 +12,16 @@ import { Rail } from "./things/Rail"
 
 export type MarsState = {
   money: number
-  day: number
-  month: number
-  year: number
+  date: Date
+  farLinkIncome: number
+  contractRevenue: number
+  rocketComponentSpend: number
 }
 
-export type MarsSettings = {}
+export type MarsSettings = {
+  showControls: boolean
+}
 
-const daysPerMonth = 30
 const ticksPerDay = 12
 
 const MarsSystem = SystemBuilder({
@@ -34,17 +40,7 @@ const MarsSystem = SystemBuilder({
         if (world.tick - lastDayTick >= ticksPerDay) {
           lastDayTick = world.tick
 
-          state.day += 1
-
-          if (state.day > daysPerMonth) {
-            state.day = 1
-            state.month += 1
-
-            if (state.month > 11) {
-              state.month = 0
-              state.year += 1
-            }
-          }
+          state.date = nextDay(state.date)
         }
       }
     }
@@ -57,12 +53,15 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
     id: "mars",
     netcode: "delay",
     renderer: "pixi",
-    settings: {},
+    settings: {
+      showControls: true
+    },
     state: {
       money: 1000,
-      day: 22,
-      month: 11,
-      year: 2015
+      date: { day: 1, month: "Jan", year: 2026 },
+      farLinkIncome: 0,
+      contractRevenue: 0,
+      rocketComponentSpend: 0
     },
     systems: [
       PixiRenderSystem,
@@ -70,22 +69,34 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
         resize: () => screenWH().h / 936 * 2.6
       }),
       ShadowSystem,
-      MarsSystem
+      MarsSystem,
+      HUDSystem(controls)
     ],
     entities: [
       Background({ move: 0.2, rays: true }),
+      Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
+      Water2D({ pos: { x: 0, y: 90 } }),
+      Launchpad(),
+      Rail(),
+      Rocket(),
+
       EscapeMenu(world),
-      HtmlFpsText(),
+      Cursor(),
+
       MoneyDisplay(),
       DateDisplay(),
 
-      Beach({ width: 2000, height: 400, pos: { x: 0, y: 270 } }),
-      Water2D({ pos: { x: 0, y: 90 } }),
-
-      Launchpad(),
-      Rail(),
-
-      Rocket()
+      HtmlFpsText()
     ]
   })
+}
+
+
+const controls: HUDSystemProps = {
+  clusters: [
+    {
+      label: "menu",
+      buttons: [["esc"]]
+    }
+  ]
 }

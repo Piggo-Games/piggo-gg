@@ -1,16 +1,9 @@
 import { Entity, Html, HText, Position } from "@piggo-gg/core"
 import type { MarsState } from "../Mars"
 
-const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-]
-
 export const DateDisplay = (): Entity => {
   let dateText: HTMLDivElement | undefined
-  let lastDay = -1
-  let lastMonth = -1
-  let lastYear = -1
+  let lastDate = { day: 1, month: "January", year: 2025 }
 
   return Entity({
     id: "marsDateDisplay",
@@ -18,18 +11,13 @@ export const DateDisplay = (): Entity => {
       position: Position(),
       html: Html({
         init: (world) => {
-          const { day, month, year } = world.state<MarsState>()
-          const monthName = months[month] ?? "???"
-
-          lastDay = day
-          lastMonth = month
-          lastYear = year
+          const { date } = world.state<MarsState>()
 
           dateText = HText({
-            text: `${monthName} ${day}, ${year}`,
+            text: `${date.day} ${date.month} ${date.year}`,
             style: {
-              left: "16px",
-              top: "54px",
+              right: "2px",
+              top: "8px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
               padding: "6px",
@@ -47,15 +35,13 @@ export const DateDisplay = (): Entity => {
         onTick: (world) => {
           if (!dateText) return
 
-          const { day, month, year } = world.state<MarsState>()
-          if (day === lastDay && month === lastMonth && year === lastYear) return
+          const { date } = world.state<MarsState>()
 
-          lastDay = day
-          lastMonth = month
-          lastYear = year
+          if (date.day === lastDate.day && date.month === lastDate.month && date.year === lastDate.year) return
 
-          const monthName = months[month]
-          dateText.textContent = `${monthName} ${day}, ${year}`
+          lastDate = { ...date }
+
+          dateText.textContent = `${date.day} ${date.month} ${date.year}`
         }
       })
     }

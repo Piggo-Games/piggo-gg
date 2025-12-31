@@ -61,6 +61,11 @@ export const InputSystem = ClientSystemBuilder({
     })
 
     document.addEventListener("pointerdown", (event) => {
+      if (client.busy) {
+        // @ts-expect-error
+        if (event.target?.tagName === "CANVAS") client.busy = false
+      }
+
       if (client.busy || client.menu) return
       if (world.tick <= client.clickThisFrame.value) return
 

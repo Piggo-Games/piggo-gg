@@ -1,5 +1,6 @@
 export * from "./src/utils/BlockUtils"
 export * from "./src/utils/ColorUtils"
+export * from "./src/utils/DateUtils"
 export * from "./src/utils/LogUtils"
 export * from "./src/utils/MathUtils"
 export * from "./src/utils/NetUtils"
