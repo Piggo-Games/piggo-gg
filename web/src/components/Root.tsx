@@ -16,7 +16,16 @@ export const Root = () => {
   }, [world])
 
   return (
-    <div>
+    <div onPointerDown={() => {
+      if (!world) return
+
+      const audioElement = document.getElementById("sound") as HTMLAudioElement
+      audioElement.play().catch(() => { })
+
+      console.log("Sound unlocked")
+
+      if (world.client) world.client.sound.ready = true
+    }}>
       <audio id="sound">
         <source src="/silent.mp3" type="audio/mp3" />
       </audio>
@@ -24,14 +33,7 @@ export const Root = () => {
         <source src="data:audio/wav;base64,UklGRqxYAQBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYhYAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/wav" />
       </audio> */}
       <Toaster position="bottom-center" containerStyle={{ fontFamily: "sans-serif" }} />
-      <div onPointerDown={() => {
-        if (!world) return
-
-        const audioElement = document.getElementById("sound") as HTMLAudioElement
-        audioElement.play().catch(() => { })
-
-        if (world.client) world.client.sound.ready = true
-      }}>
+      <div>
         <Canvas setWorld={setWorld} />
         {/* <div style={{ width: "fit-content", display: "block", marginLeft: "auto", marginRight: "auto" }}> */}
         {/* {isMobile() ? null : <Title loginState={loginState} setLoginState={setLoginState} world={world} />} */}

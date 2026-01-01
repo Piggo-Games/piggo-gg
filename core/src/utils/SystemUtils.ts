@@ -38,6 +38,7 @@ export const screenWH = () => {
 
 export const getBrowser = () => {
   const userAgent = navigator.userAgent
+  if (userAgent.indexOf("iPhone")) return undefined
   if (userAgent.indexOf("Chrome") > -1) return "chrome"
   if (userAgent.indexOf("Safari") > -1) return "safari"
   if (userAgent.indexOf("Firefox") > -1) return "firefox"
