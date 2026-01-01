@@ -58,7 +58,7 @@ export const MoneyDisplay = (): Entity => {
               paddingRight: "12px",
               display: "inline-flex",
               alignItems: "center",
-              fontSize: "26px",
+              fontSize: "20px",
               whiteSpace: "nowrap",
               background: "none",
               backgroundImage: "none",
@@ -84,7 +84,6 @@ export const MoneyDisplay = (): Entity => {
                 position: "relative",
                 fontSize: "16px",
                 fontWeight: "bold",
-                opacity: "0.8",
                 paddingLeft: "6px"
               }
             })
@@ -123,7 +122,8 @@ export const MoneyDisplay = (): Entity => {
               width: "max-content",
               transform: "translate(-50%, 0%)",
               paddingTop: "4px",
-              marginBottom: "4px"
+              marginBottom: "4px",
+              opacity: "0.9",
             }
           })
 
@@ -152,7 +152,7 @@ export const MoneyDisplay = (): Entity => {
               display: "none",
               flexDirection: "column",
               gap: "6px",
-              background: "rgba(0, 0, 0, 0.55)",
+              background: "rgba(0, 0, 0, 0.45)",
               border: "2px solid rgba(255, 255, 255, 0.5)",
               borderRadius: "8px",
             }

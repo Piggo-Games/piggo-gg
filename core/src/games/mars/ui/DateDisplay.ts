@@ -17,7 +17,7 @@ export const DateDisplay = (): Entity => {
             text: `${date.day} ${date.month} ${date.year}`,
             style: {
               right: "2px",
-              top: "8px",
+              top: "4px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
               padding: "6px",
@@ -25,7 +25,7 @@ export const DateDisplay = (): Entity => {
               paddingRight: "12px",
               display: "inline-flex",
               alignItems: "center",
-              fontSize: "18px",
+              fontSize: "20px",
               whiteSpace: "nowrap"
             }
           })
