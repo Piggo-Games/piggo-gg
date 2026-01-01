@@ -46,10 +46,18 @@ export const getBrowser = () => {
 }
 
 export const replaceCanvas = (): HTMLCanvasElement => {
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement | undefined
+  const piggoCanvas = document.getElementById("piggo-canvas") as HTMLCanvasElement | undefined
+  const canvas = piggoCanvas ?? document.getElementById("canvas") as HTMLCanvasElement | undefined
 
   const newCanvas = document.createElement("canvas")
-  newCanvas.id = "canvas"
+  newCanvas.id = canvas?.id ?? "canvas"
+
+  if (canvas) {
+    Array.from(canvas.attributes).forEach((attribute) => {
+      if (attribute.name === "id") return
+      newCanvas.setAttribute(attribute.name, attribute.value)
+    })
+  }
 
   if (isMobile()) newCanvas.style.border = "none"
 
