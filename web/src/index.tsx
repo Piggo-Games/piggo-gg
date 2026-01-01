@@ -1,11 +1,4 @@
-import { Root } from "./components/Root"
-import { createRoot } from "react-dom/client"
+import { Lobby } from "@piggo-gg/core"
+import { PiggoGG } from "./PiggoGG"
 
-const App = () => (
-  <div className="App">
-    <Root />
-  </div>
-)
-
-const domContainer = document.querySelector("#root")
-createRoot(domContainer!).render(<App />)
+PiggoGG({ gameBuilder: Lobby })

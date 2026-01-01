@@ -83,11 +83,8 @@ export const PiggoGG: PiggoGG = ({ gameBuilder, options }) => {
   // const useThree = renderer !== "pixi"
 
   const world = DefaultWorld({
-    three: ThreeRenderer(), pixi: PixiRenderer()
+    three: ThreeRenderer(), pixi: PixiRenderer(), 
   })
-
-  world.games[gameBuilder.id] = gameBuilder
-  world.setGame(gameBuilder.id)
 
   if (options?.exposeWorld ?? true) {
     (window as { world?: World }).world = world
