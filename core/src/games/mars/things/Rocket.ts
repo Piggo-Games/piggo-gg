@@ -59,16 +59,14 @@ export const Rocket = (): Entity => {
             emitter = new Emitter(r.c, {
               emit: true,
               lifetime: {
-                min: 0.75,
-                max: 1
+                min: 0, max: 1
               },
               frequency: 0.001,
               emitterLifetime: 0,
               maxParticles: 1000,
               addAtBack: false,
               pos: {
-                x: 0,
-                y: 490
+                x: 0, y: 490
               },
               behaviors: [
                 {
@@ -76,14 +74,8 @@ export const Rocket = (): Entity => {
                   config: {
                     alpha: {
                       list: [
-                        {
-                          time: 0,
-                          value: 0.62
-                        },
-                        {
-                          time: 1,
-                          value: 0
-                        }
+                        { time: 0, value: 0.62 },
+                        { time: 1, value: 0 }
                       ]
                     }
                   }
@@ -100,14 +92,8 @@ export const Rocket = (): Entity => {
                   config: {
                     scale: {
                       list: [
-                        {
-                          time: 0,
-                          value: 0.25
-                        },
-                        {
-                          time: 1,
-                          value: 0.75
-                        }
+                        { time: 0, value: 0.25 },
+                        { time: 1, value: 0.75 }
                       ]
                     },
                     minMult: 1
@@ -118,14 +104,8 @@ export const Rocket = (): Entity => {
                   config: {
                     color: {
                       list: [
-                        {
-                          time: 0,
-                          value: "ff724c"
-                        },
-                        {
-                          time: 1,
-                          value: "fff191"
-                        }
+                        { time: 0, value: "ff724c" },
+                        { time: 1, value: "fff191" }
                       ]
                     }
                   }
@@ -143,7 +123,6 @@ export const Rocket = (): Entity => {
                 {
                   type: "textureRandom",
                   config: {
-
                     textures: [
                       await load("particle.png"),
                       await load("fire.png")
