@@ -18,19 +18,26 @@ export const Rocket = (): Entity => {
       shadow: Shadow(4.5, 139, 0),
       npc: NPC({
         behavior: (_, world) => {
-          const { launching } = world.state<MarsState>()
+          const { readiness } = world.state<MarsState>()
 
           const { position } = rocket.components
 
-          if (launching && position.data.velocity.z === 0) {
+          if (readiness === "firing" && position.data.velocity.z === 0) {
             position.setVelocity({ z: speed })
+            world.client?.sound.play({ name: "f9", volume: 0.9 })
           }
 
-          if (position.data.z >= maxZ) {
-            position.setVelocity({ z: 0 })
-            position.setPosition({ z: 0 })
+          if (readiness !== "floating" && position.data.z >= maxZ) {
+            position.data.gravity = 0.1
 
-            world.state<MarsState>().launching = false
+            world.state<MarsState>().readiness = "floating"
+            world.client?.sound.stop("f9")
+          }
+
+          if (position.data.z === 0 && position.data.gravity > 0) {
+            position.data.gravity = 0
+            position.setVelocity({ z: 0 })
+            world.state<MarsState>().readiness = "ready"
           }
         }
       }),
@@ -41,8 +48,8 @@ export const Rocket = (): Entity => {
         onRender: ({ world }) => {
           if (!emitter) return
 
-          const { launching } = world.state<MarsState>()
-          if (launching) {
+          const { readiness } = world.state<MarsState>()
+          if (readiness === "firing") {
             emitter.update(0.01)
           } else {
             emitter.cleanup()
@@ -59,16 +66,14 @@ export const Rocket = (): Entity => {
             emitter = new Emitter(r.c, {
               emit: true,
               lifetime: {
-                min: 0.75,
-                max: 1
+                min: 0, max: 1
               },
               frequency: 0.001,
               emitterLifetime: 0,
               maxParticles: 1000,
               addAtBack: false,
               pos: {
-                x: 0,
-                y: 490
+                x: 0, y: 490
               },
               behaviors: [
                 {
@@ -76,14 +81,8 @@ export const Rocket = (): Entity => {
                   config: {
                     alpha: {
                       list: [
-                        {
-                          time: 0,
-                          value: 0.62
-                        },
-                        {
-                          time: 1,
-                          value: 0
-                        }
+                        { time: 0, value: 0.62 },
+                        { time: 1, value: 0 }
                       ]
                     }
                   }
@@ -100,14 +99,8 @@ export const Rocket = (): Entity => {
                   config: {
                     scale: {
                       list: [
-                        {
-                          time: 0,
-                          value: 0.25
-                        },
-                        {
-                          time: 1,
-                          value: 0.75
-                        }
+                        { time: 0, value: 0.25 },
+                        { time: 1, value: 0.75 }
                       ]
                     },
                     minMult: 1
@@ -118,14 +111,8 @@ export const Rocket = (): Entity => {
                   config: {
                     color: {
                       list: [
-                        {
-                          time: 0,
-                          value: "ff724c"
-                        },
-                        {
-                          time: 1,
-                          value: "fff191"
-                        }
+                        { time: 0, value: "ff724c" },
+                        { time: 1, value: "fff191" }
                       ]
                     }
                   }
@@ -143,7 +130,6 @@ export const Rocket = (): Entity => {
                 {
                   type: "textureRandom",
                   config: {
-
                     textures: [
                       await load("particle.png"),
                       await load("fire.png")

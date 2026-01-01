@@ -82,7 +82,7 @@ export const MoneyDisplay = (): Entity => {
               text: label,
               style: {
                 position: "relative",
-                fontSize: "16px",
+                fontSize: "22px",
                 fontWeight: "bold",
                 paddingLeft: "6px"
               }
@@ -92,7 +92,7 @@ export const MoneyDisplay = (): Entity => {
               text: "$0",
               style: {
                 position: "relative",
-                fontSize: "18px",
+                fontSize: "20px",
                 fontWeight: "bold",
                 textAlign: "right",
                 paddingRight: "6px"
@@ -117,7 +117,7 @@ export const MoneyDisplay = (): Entity => {
             text: "Financials",
             style: {
               position: "relative",
-              fontSize: "16px",
+              fontSize: "20px",
               left: "50%",
               width: "max-content",
               transform: "translate(-50%, 0%)",

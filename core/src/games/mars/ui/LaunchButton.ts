@@ -4,13 +4,13 @@ import type { MarsState } from "../Mars"
 export const LaunchButton = (): Entity => {
   let launchButton: HTMLButtonElement | undefined
 
-  const syncButton = (launching: boolean) => {
+  const syncButton = (ready: boolean) => {
     if (!launchButton) return
 
-    launchButton.disabled = launching
-    launchButton.style.opacity = launching ? "0" : "1"
-    launchButton.style.pointerEvents = launching ? "none" : "auto"
-    launchButton.style.filter = launching ? "grayscale(0.2)" : "none"
+    launchButton.disabled = !ready
+    launchButton.style.opacity = ready ? "1" : "0"
+    launchButton.style.pointerEvents = ready ? "auto" : "none"
+    launchButton.style.filter = ready ? "none" : "grayscale(0.2)"
   }
 
   return Entity({
@@ -45,30 +45,24 @@ export const LaunchButton = (): Entity => {
               if (world.client?.menu) return
 
               const state = world.state<MarsState>()
-              if (state.launching) return
+              if (state.readiness !== "ready") return
 
-              const rocket = world.entity("rocket")?.components.position
-              rocket?.setPosition({ z: 0 })
-
-              state.launching = true
-              syncButton(true)
+              state.readiness = "firing"
             }
           }, HImg({
             src: "launch.svg",
             style: { left: "calc(50% - 1px)", top: "50%", height: "60px" }
           }))
 
-          syncButton(world.state<MarsState>().launching)
+          syncButton(world.state<MarsState>().readiness === "ready")
 
           return launchButton
         },
         onTick: (world) => {
           if (!launchButton) return
 
-          const { launching } = world.state<MarsState>()
-          if (launchButton.disabled !== launching) {
-            syncButton(launching)
-          }
+          const { readiness } = world.state<MarsState>()
+          syncButton(readiness === "ready")
         }
       })
     }
