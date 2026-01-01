@@ -32,9 +32,6 @@ export const Root = () => {
       <audio id="sound">
         <source src="/silent.mp3" type="audio/mp3" />
       </audio>
-      {/* <audio id="sound">
-        <source src="data:audio/wav;base64,UklGRqxYAQBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYhYAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/wav" />
-      </audio> */}
       <Toaster position="bottom-center" containerStyle={{ fontFamily: "sans-serif" }} />
       <div>
         <Canvas setWorld={setWorld} />

@@ -41,7 +41,7 @@ export const MusicButton = (world: World, radius: number = 36): RefreshableDiv =
       borderRadius: "10px",
       background: "none"
     },
-    onClick: () => {
+    onRelease: () => {
       const enabled = world.client?.sound.musicPlaying()
       if (!enabled) {
         world.client?.sound.stopMusic()
