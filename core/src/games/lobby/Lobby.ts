@@ -78,7 +78,7 @@ const GameButton = (game: GameBuilder, world: World) => {
       position: "relative",
       background: "none"
     },
-    onClick: () => {
+    onRelease: () => {
       inner.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
 
       if (!world.client?.isLeader()) return

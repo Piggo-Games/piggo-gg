@@ -2,15 +2,15 @@ import { Entity, HButton, HImg, Html, Position } from "@piggo-gg/core"
 import type { MarsState } from "../Mars"
 
 export const LaunchButton = (): Entity => {
-  let launchButton: HTMLButtonElement | undefined
+  let button: HTMLButtonElement | undefined
 
   const syncButton = (ready: boolean) => {
-    if (!launchButton) return
+    if (!button) return
 
-    launchButton.disabled = !ready
-    launchButton.style.opacity = ready ? "1" : "0"
-    launchButton.style.pointerEvents = ready ? "auto" : "none"
-    launchButton.style.filter = ready ? "none" : "grayscale(0.2)"
+    button.disabled = !ready
+    button.style.opacity = ready ? "1" : "0"
+    button.style.pointerEvents = ready ? "auto" : "none"
+    button.style.filter = ready ? "none" : "grayscale(0.2)"
   }
 
   return Entity({
@@ -19,7 +19,8 @@ export const LaunchButton = (): Entity => {
       position: Position(),
       html: Html({
         init: (world) => {
-          launchButton = HButton({
+
+          button = HButton({
             style: {
               right: "16px",
               bottom: "16px",
@@ -36,12 +37,12 @@ export const LaunchButton = (): Entity => {
               transition: "opacity 0.2s ease, box-shadow 0.2s ease, filter 0.3s ease"
             },
             onHover: () => {
-              launchButton!.style.boxShadow = "0 0 10px 4px #64e36f"
+              button!.style.boxShadow = "0 0 10px 4px #64e36f"
             },
             onHoverOut: () => {
-              launchButton!.style.boxShadow = "none"
+              button!.style.boxShadow = "none"
             },
-            onClick: () => {
+            onRelease: () => {
               if (world.client?.menu) return
 
               const state = world.state<MarsState>()
@@ -56,10 +57,10 @@ export const LaunchButton = (): Entity => {
 
           syncButton(world.state<MarsState>().readiness === "ready")
 
-          return launchButton
+          return button
         },
         onTick: (world) => {
-          if (!launchButton) return
+          if (!button) return
 
           const { readiness } = world.state<MarsState>()
           syncButton(readiness === "ready")

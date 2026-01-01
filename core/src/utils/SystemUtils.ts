@@ -1,4 +1,4 @@
-export const piggoVersion: `0.${number}.${number}` = "0.54.8"
+export const piggoVersion: `0.${number}.${number}` = "0.55.1"
 
 export const isMobile = (): boolean => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -38,6 +38,7 @@ export const screenWH = () => {
 
 export const getBrowser = () => {
   const userAgent = navigator.userAgent
+  if (userAgent.indexOf("iPhone")) return undefined
   if (userAgent.indexOf("Chrome") > -1) return "chrome"
   if (userAgent.indexOf("Safari") > -1) return "safari"
   if (userAgent.indexOf("Firefox") > -1) return "firefox"

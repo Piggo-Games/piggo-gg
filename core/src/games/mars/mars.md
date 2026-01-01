@@ -31,6 +31,8 @@ Update this first, then align code with the design.
 [x] make the money display clickable. it opens an information tab including: current income from FarLink satellites, total earned from contract satellites, total spent on rocket components.
 [x] implement launch button
   [x] track the rocket while it's flying (set CameraSystem.follow)
+[x] add a sound effect for the rocket
+[x] add a particle effect for the rocket
 
 
 

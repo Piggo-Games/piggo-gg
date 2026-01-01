@@ -175,7 +175,7 @@ export const Sound = (world: World): Sound => {
           if (volume) {
             const gain = new Gain(dbToGain(tone.volume.value) * (volume ?? 1)).toDestination()
             const player = new Player(tone.buffer).connect(gain)
-            player.fadeOut = 1
+            player.fadeOut = 0.7
 
             players[name] = player
 

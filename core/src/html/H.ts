@@ -8,6 +8,7 @@ type HParams = {
   src?: string
   text?: string
   onClick?: (button: HTMLButtonElement) => void
+  onRelease?: (button: HTMLButtonElement) => void
   onHover?: (button: HTMLButtonElement) => void
   onHoverOut?: (button: HTMLButtonElement) => void
 }
@@ -24,12 +25,13 @@ export const HText = ({ id, style, text }: HParams = {}, child1?: HTMLElement): 
   return d
 }
 
-export const HButton = ({ id, style, onClick, onHover, onHoverOut, text }: HParams = {},
+export const HButton = ({ id, style, onClick, onRelease, onHover, onHoverOut, text }: HParams = {},
   child1?: HTMLElement, child2?: HTMLElement, child3?: HTMLElement, child4?: HTMLElement, child5?: HTMLElement
 ): HTMLButtonElement => {
   const b = HtmlButton({
     style: style ?? {},
     onClick: () => { onClick?.(b) },
+    onRelease: () => { onRelease?.(b) },
     onHover: () => { onHover?.(b) },
     onHoverOut: () => { onHoverOut?.(b) }
   })

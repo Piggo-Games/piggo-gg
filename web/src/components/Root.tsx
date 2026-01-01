@@ -1,5 +1,5 @@
-import { World, isMobile } from "@piggo-gg/core"
-import { Canvas, Title } from "@piggo-gg/web"
+import { World } from "@piggo-gg/core"
+import { Canvas } from "@piggo-gg/web"
 import { useEffect, useState } from "react"
 import { Toaster } from "react-hot-toast"
 
@@ -15,23 +15,25 @@ export const Root = () => {
     (window as any).world = world
   }, [world])
 
+  const rootDiv = document.getElementById("root")
+  if (rootDiv) {
+    rootDiv.addEventListener("pointerup", () => {
+      if (!world) return
+      const audioElement = document.getElementById("sound") as HTMLAudioElement
+      audioElement.play().then(() => {
+        if (world.client) world.client.sound.ready = true
+      })
+
+    }, { capture: true, once: true })
+  }
+
   return (
     <div>
       <audio id="sound">
         <source src="/silent.mp3" type="audio/mp3" />
       </audio>
-      {/* <audio id="sound">
-        <source src="data:audio/wav;base64,UklGRqxYAQBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYhYAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/wav" />
-      </audio> */}
       <Toaster position="bottom-center" containerStyle={{ fontFamily: "sans-serif" }} />
-      <div onPointerDown={() => {
-        if (!world) return
-
-        const audioElement = document.getElementById("sound") as HTMLAudioElement
-        audioElement.play().catch(() => { })
-
-        if (world.client) world.client.sound.ready = true
-      }}>
+      <div>
         <Canvas setWorld={setWorld} />
         {/* <div style={{ width: "fit-content", display: "block", marginLeft: "auto", marginRight: "auto" }}> */}
         {/* {isMobile() ? null : <Title loginState={loginState} setLoginState={setLoginState} world={world} />} */}
