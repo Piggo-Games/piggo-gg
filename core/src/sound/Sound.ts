@@ -1,7 +1,7 @@
 import { entries, GunNames, randomChoice, World, XY, XYdistance } from "@piggo-gg/core"
 import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from "tone"
 
-export type BubbleSounds = "bubble" | "hitmarker" | "dice1" | "dice2" | "throw" | "jingle1"
+export type BubbleSounds = "bubble" | "hitmarker" | "dice1" | "dice2" | "throw" | "jingle1" | "f9"
 export type MusicSounds = "track1"
 export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
 export type ToolSounds = "whiff" | "thud" | "slash"
@@ -60,6 +60,8 @@ export const Sound = (world: World): Sound => {
   // unmute when window is focused
   window.addEventListener("focus", () => sound.muted = false)
 
+  const players: Partial<Record<ValidSounds, Tone>> = {}
+
   const sound: Sound = {
     music: "track1",
     muted: false,
@@ -67,6 +69,7 @@ export const Sound = (world: World): Sound => {
     ready: false,
     tones: {
       // birdsong1: load("birdsong1.mp3", -20),
+      f9: load("f9.mp3", -5),
       jingle1: load("jingle1.mp3", -5),
       dice1: load("dice1.mp3", -5),
       dice2: load("dice2.mp3", -5),
@@ -101,7 +104,12 @@ export const Sound = (world: World): Sound => {
       const tone = sound.tones[name]
       if (tone) {
         try {
-          tone.stop()
+          const player = players[name]
+          if (player) {
+            player.stop()
+          } else {
+            tone.stop()
+          }
         }
         catch (e) {
           console.error(`error while stopping sound ${tone}`)
@@ -167,6 +175,9 @@ export const Sound = (world: World): Sound => {
           if (volume) {
             const gain = new Gain(dbToGain(tone.volume.value) * (volume ?? 1)).toDestination()
             const player = new Player(tone.buffer).connect(gain)
+            player.fadeOut = 1
+
+            players[name] = player
 
             player.start(fadeIn, start)
           } else {

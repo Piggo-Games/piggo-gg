@@ -17,7 +17,7 @@ export type MarsState = {
   farLinkIncome: number
   contractRevenue: number
   rocketComponentSpend: number
-  launching: boolean
+  readiness: "unready" | "ready" | "firing" | "floating"
 }
 
 export type MarsSettings = {
@@ -39,7 +39,7 @@ const MarsSystem = SystemBuilder({
       onTick: () => {
         const state = world.state<MarsState>()
 
-        if (world.tick - lastDayTick >= ticksPerDay && !state.launching) {
+        if (world.tick - lastDayTick >= ticksPerDay && state.readiness !== "firing") {
           lastDayTick = world.tick
 
           state.date = nextDay(state.date)
@@ -64,7 +64,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       farLinkIncome: 0,
       contractRevenue: 0,
       rocketComponentSpend: 0,
-      launching: false
+      readiness: "ready"
     },
     systems: [
       PixiRenderSystem,

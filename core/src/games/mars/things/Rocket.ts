@@ -18,19 +18,29 @@ export const Rocket = (): Entity => {
       shadow: Shadow(4.5, 139, 0),
       npc: NPC({
         behavior: (_, world) => {
-          const { launching } = world.state<MarsState>()
+          const { readiness } = world.state<MarsState>()
 
           const { position } = rocket.components
 
-          if (launching && position.data.velocity.z === 0) {
+          if (readiness === "firing" && position.data.velocity.z === 0) {
             position.setVelocity({ z: speed })
+            world.client?.sound.play({ name: "f9", volume: 0.9 })
           }
 
-          if (position.data.z >= maxZ) {
+          if (readiness !== "floating" && position.data.z >= maxZ) {
+            position.data.gravity = 0.1
+
+            world.state<MarsState>().readiness = "floating"
+            world.client?.sound.stop("f9")
+            // console.log("SOFT")
+          }
+
+          if (position.data.z >= maxZ + 4000) {
+            // console.log("HARD")
             position.setVelocity({ z: 0 })
             position.setPosition({ z: 0 })
 
-            world.state<MarsState>().launching = false
+            world.state<MarsState>().readiness = "ready"
           }
         }
       }),
@@ -41,8 +51,8 @@ export const Rocket = (): Entity => {
         onRender: ({ world }) => {
           if (!emitter) return
 
-          const { launching } = world.state<MarsState>()
-          if (launching) {
+          const { readiness } = world.state<MarsState>()
+          if (readiness === "firing") {
             emitter.update(0.01)
           } else {
             emitter.cleanup()
