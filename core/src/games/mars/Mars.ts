@@ -39,7 +39,7 @@ const MarsSystem = SystemBuilder({
       onTick: () => {
         const state = world.state<MarsState>()
 
-        if (world.tick - lastDayTick >= ticksPerDay && state.readiness !== "firing") {
+        if (world.tick - lastDayTick >= ticksPerDay && ["ready", "unready"].includes(state.readiness)) {
           lastDayTick = world.tick
 
           state.date = nextDay(state.date)

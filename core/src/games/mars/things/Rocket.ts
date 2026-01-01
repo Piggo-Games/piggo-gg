@@ -32,14 +32,11 @@ export const Rocket = (): Entity => {
 
             world.state<MarsState>().readiness = "floating"
             world.client?.sound.stop("f9")
-            // console.log("SOFT")
           }
 
-          if (position.data.z >= maxZ + 4000) {
-            // console.log("HARD")
+          if (position.data.z === 0 && position.data.gravity > 0) {
+            position.data.gravity = 0
             position.setVelocity({ z: 0 })
-            position.setPosition({ z: 0 })
-
             world.state<MarsState>().readiness = "ready"
           }
         }

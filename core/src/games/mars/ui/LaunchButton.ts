@@ -47,11 +47,7 @@ export const LaunchButton = (): Entity => {
               const state = world.state<MarsState>()
               if (state.readiness !== "ready") return
 
-              const rocket = world.entity("rocket")?.components.position
-              rocket?.setPosition({ z: 0 })
-
               state.readiness = "firing"
-              syncButton(true)
             }
           }, HImg({
             src: "launch.svg",
