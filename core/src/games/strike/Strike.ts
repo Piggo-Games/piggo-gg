@@ -48,7 +48,7 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       SpawnSystem({ spawner: Sarge, pos: { x: 8, y: 8, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
-      ThreeCameraSystem({ height: 0.4, distance: 0.8 }),
+      ThreeCameraSystem({ height: 0.5, distance: 0.8 }),
       StrikeSystem,
       ThreeNametagSystem,
       ThreeSystem,
