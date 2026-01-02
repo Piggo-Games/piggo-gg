@@ -1,31 +1,23 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Monorepo managed by Bun workspaces: `core` (engine, shared game logic), `web` (React front end served from `web/res`), `server` (API + matchmaking, Prisma-backed), and `docs` (static bundle for GitHub Pages).
+- Monorepo managed by Bun workspaces: `core` (engine, shared game logic), `web` (front end served from `web/res`), `server` (API + matchmaking, Prisma-backed), and `docs` (static bundle for GitHub Pages).
 - Shared TypeScript config lives at `tsconfig.json`; Assets (SVG/audio) sit under `web/res` and are copied into `docs` for production pages.
 - Server-side database schema and migrations live in `server/src/db`.
 
 ## Workspace Map & Entrypoints
 - `core/` — ECS engine and game content. Entrypoint `main.ts`; key dirs: `src/runtime` (World loop/DefaultWorld), `src/ecs` (components, systems, entities, actions, commands, renderables), `src/games/*` (GameBuilder configs), `src/net` (Client + syncers), `src/graphics` (Three/Pixi renderers + shaders), `src/html` (DOM overlays), `src/sound`.
-- `web/` — React website running Piggo client. `src/components/Canvas.tsx` initializes a `World` with Pixi + Three. `Root` mounts to `#root`. `bun dev-compile` outputs to `res/` alongside static assets that flow into `docs/`.
+- `web/` — website running Piggo client. `src/components/Canvas.tsx` initializes a `World` with Pixi + Three. `Root` mounts to `#root`. `bun dev-compile` outputs to `res/` alongside static assets that flow into `docs/`.
 - `server/` — Bun websocket + HTTP API in `src/Api.ts` (msgpack). Each lobby has a `ServerWorld` (`src/ServerWorld.ts`) running a `World` in server mode with `NetServerSystem`. Prisma schema + migrations live under `src/db`.
 - `docs/` — generated static bundle (`bun pages`) copied from `web/res` (keeps `docs/CNAME`).
 - `electron/` — desktop wrapper in `electron/src/main.ts` that runs the Piggo client.
 
-## Build, Test, and Development Commands
-- Install deps once: `bun install`.
-- Full dev stack: `bun dev` (starts `web` dev server and `server` watcher). HTTPS variant: `bun dev-https`.
-- Production-ish run: `bun prod` (generates Prisma client then starts server) or separately `bun --cwd server start`.
-- Web only: `bun --cwd web dev` to watch+serve, `bun --cwd web dev-https` for SSL.
-- Server only: `bun --cwd server dev` (uses local Postgres at `postgresql://postgres@localhost:5432/piggo`).
-- Prisma workflows: `bun gen` (generate client), `bun db` (local migrate dev), `bun --cwd server prisma:deploy` (apply migrations).
-- Static site build: `bun pages` (rebuilds `docs/`, preserves `docs/CNAME`).
-
 ## Coding Style & Naming Conventions
-- TypeScript-first, ESNext targets; strict null checks and `noImplicitAny` enabled. Avoid `any`; prefer explicit types and discriminated unions.
-- Two-space indentation; named exports are common (see `core/src/runtime/World.ts`).
-- Import shared modules via workspace aliases like `@piggo-gg/core`. File names PascalCase.
-- favor pure helpers in `core/src/utils`.
+- TypeScript-first, ESNext targets; strict null checks and `noImplicitAny` enabled. Avoid `any`; prefer explicit types and discriminated unions
+- Two-space indentation; named exports (no default export)
+- Import shared modules via workspace aliases like `@piggo-gg/core`
+- File names PascalCase
+- pure helper functions in `core/src/utils`
 - never use JS `class`, instead declare a type and function with the same name returning an instance of the type
 
 ## Engine Architecture Cheatsheet
@@ -42,7 +34,3 @@
 - Recent history favors short, versioned summaries (e.g., `v0.49.3 better Lobby UI (#522)`). Use imperative mood for non-release work and include scope + PR/issue reference when available.
 - PRs should include: what/why, how to verify (commands or lobby steps), and screenshots/video for UI changes. Link issues or Notion tickets when relevant.
 - Keep changes cohesive; prefer a focused commit or two over large mixed updates. Run relevant build steps (`bun pages` for docs changes, `bun prod` sanity for server changes) before requesting review.
-
-## Security & Configuration Tips
-- Do not commit secrets. Local SSL certs in `web/` are for development only. Set `DATABASE_URL` via environment, not checked-in files.
-- When touching auth or matchmaking paths, note whether the change affects both `web` and `server`; coordinate schema changes with regenerated Prisma client (`bun gen`).

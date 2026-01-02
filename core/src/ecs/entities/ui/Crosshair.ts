@@ -1,10 +1,8 @@
-import { CraftSettings, Entity, HtmlDiv, NPC, Position } from "@piggo-gg/core"
+import { CraftSettings, Entity, Html, HtmlDiv, Position } from "@piggo-gg/core"
 
 export const Crosshair = () => {
 
-  let init = false
-
-  const div = HtmlDiv({
+  let div = HtmlDiv({
     left: "50%",
     top: "50%",
     transform: "translate(-50%, -50%)",
@@ -19,8 +17,13 @@ export const Crosshair = () => {
     id: "crosshair",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
+      html: Html({
+        init: () => {
+          return div
+        },
+        onTick: (world) => {
+          if (!div) return
+
           const settings = world.settings<CraftSettings>()
           if (!world.client || !world.three) return
 
@@ -30,11 +33,6 @@ export const Crosshair = () => {
           const fpsCamera = world.three?.camera.mode === "first"
 
           div.style.visibility = (locked && item && settings.showCrosshair && fpsCamera && !world.client.bufferDown.get("tab")) ? "visible" : "hidden"
-
-          if (!init) {
-            world.three?.append(div)
-            init = true
-          }
         }
       })
     }

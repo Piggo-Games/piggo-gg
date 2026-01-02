@@ -1,8 +1,18 @@
-import { Entity, HText, Html, NPC, Position, round } from "@piggo-gg/core"
+import { Entity, HText, Html, Position, round } from "@piggo-gg/core"
 
 export const HtmlFpsText = () => {
 
-  let div: HTMLDivElement | undefined = undefined
+  const div = HText({
+    style: {
+      right: "16px",
+      top: "16px",
+      color: "#dddd00",
+      textShadow: "none",
+      visibility: "hidden",
+      fontSize: "16px"
+    },
+    text: "fps: 0"
+  })
 
   return Entity({
     id: "htmlFpsText",
@@ -10,8 +20,6 @@ export const HtmlFpsText = () => {
       position: Position(),
       html: Html({
         onTick: (world) => {
-          if (!div) return
-
           if (!world.debug) {
             div.style.visibility = "hidden"
             return
@@ -23,18 +31,6 @@ export const HtmlFpsText = () => {
           div.textContent = `fps: ${fps}`
         },
         init: () => {
-          div = HText({
-            style: {
-              right: "16px",
-              top: "16px",
-              color: "#dddd00",
-              textShadow: "none",
-              visibility: "hidden",
-              fontSize: "16px"
-            },
-            text: "fps: 0"
-          })
-
           return div
         }
       })
@@ -43,13 +39,20 @@ export const HtmlFpsText = () => {
 }
 
 export const HtmlLagText = () => {
-
-  let init = false
-
   let last = 0
   let lastTick = 0
 
-  let div: HTMLDivElement | undefined = undefined
+  const div = HText({
+    style: {
+      right: "16px",
+      top: "36px",
+      color: "#00dd00",
+      textShadow: "none",
+      visibility: "hidden",
+      fontSize: "16px"
+    },
+    text: "ms: 0"
+  })
 
   return Entity({
     id: "htmlLagText",
@@ -57,8 +60,6 @@ export const HtmlLagText = () => {
       position: Position(),
       html: Html({
         onTick: (world) => {
-          if (!div) return
-          
           const lag = round(world.client?.net.ms ?? 0)
           div.style.visibility = world.client?.net.synced ? "visible" : "hidden"
 
@@ -70,18 +71,6 @@ export const HtmlLagText = () => {
           }
         },
         init: () => {
-          div = HText({
-            style: {
-              right: "16px",
-              top: "36px",
-              color: "#00dd00",
-              textShadow: "none",
-              visibility: "hidden",
-              fontSize: "16px"
-            },
-            text: "ms: 0"
-          })
-
           return div
         }
       })

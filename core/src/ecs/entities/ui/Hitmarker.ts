@@ -1,8 +1,6 @@
-import { Entity, HtmlDiv, max, NPC, Position, Three } from "@piggo-gg/core"
+import { Entity, Html, HtmlDiv, max, Position, Three } from "@piggo-gg/core"
 
 export const Hitmarker = () => {
-  let init = false
-
   const wrapper = HtmlDiv({
     position: "absolute",
     left: "50%",
@@ -33,15 +31,11 @@ export const Hitmarker = () => {
     id: "hitmarker",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!world.client || !world.three) return
+      html: Html({
+        init: () => {
+          wrapper.append(topLeft, topRight, bottomLeft, bottomRight)
 
-          if (!init) {
-            wrapper.append(topLeft, topRight, bottomLeft, bottomRight)
-            world.three?.append(wrapper)
-            init = true
-          }
+          return wrapper
         }
       }),
       three: Three({

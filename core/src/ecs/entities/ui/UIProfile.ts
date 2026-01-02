@@ -1,8 +1,6 @@
-import { Entity, HtmlDiv, HtmlText, NPC, Position } from "@piggo-gg/core"
+import { Entity, Html, HtmlDiv, HtmlText, Position } from "@piggo-gg/core"
 
 export const UIProfile = (): Entity => {
-
-  let init = false
 
   const container = HtmlDiv({
     backgroundColor: "rgba(0, 0, 0, 0.3)",
@@ -29,14 +27,13 @@ export const UIProfile = (): Entity => {
     id: "UIProfile",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            world.three?.append(container)
-            container.style.visibility = world.client?.mobile ? "hidden" : "visible"
-            init = true
-          }
+      html: Html({
+        init: (world) => {
+          container.style.visibility = world.client?.mobile ? "hidden" : "visible"
 
+          return container
+        },
+        onTick: (world) => {
           const playerName = world.client?.playerName()
           if (playerName && playerName !== name.textContent) {
             if (world.tick < 20) return

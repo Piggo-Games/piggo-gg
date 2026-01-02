@@ -1,8 +1,7 @@
-import { Entity, entries, HtmlDiv, HtmlText, NPC, Position } from "@piggo-gg/core";
+import { Entity, entries, Html, HtmlDiv, HtmlText, Position } from "@piggo-gg/core";
 
 export const HtmlChat = (): Entity => {
 
-  let init = false
   let inputText = ""
 
   let opened = false
@@ -70,14 +69,14 @@ export const HtmlChat = (): Entity => {
     id: "html-chat",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!world.client || world.client.mobile) return
+      html: Html({
+        init: (world) => {
+          if (!world.client || world.client.mobile) return null
 
-          if (!init) {
-            init = true
-            world.three?.append(wrapper)
-          }
+          return wrapper
+        },
+        onTick: (world) => {
+          if (!world.client || world.client.mobile) return
 
           const { inputBuffer, isOpen } = world.client.chat
 

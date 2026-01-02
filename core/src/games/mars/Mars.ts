@@ -59,7 +59,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       showControls: true
     },
     state: {
-      money: 1000,
+      money: 0,
       date: { day: 1, month: "Jan", year: 2026 },
       farLinkIncome: 0,
       contractRevenue: 0,
@@ -91,7 +91,7 @@ export const Mars: GameBuilder<MarsState, MarsSettings> = {
       Cursor(),
 
       MoneyDisplay(),
-      DateDisplay(),
+      // DateDisplay(),
       LaunchButton(),
 
       HtmlFpsText()

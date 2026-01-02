@@ -1,14 +1,9 @@
-import { Entity, HDiv, HText, NPC } from "@piggo-gg/core"
+import { Entity, HDiv, HText, Html } from "@piggo-gg/core"
 
 export const ScorePanel = () => {
 
-  let init = false
-
-  const div = HDiv({
-    style: {
-      display: "flex", left: "50%", top: "6px", transform: "translate(-50%)", gap: "8px"
-    }
-  })
+  let left: HTMLDivElement | undefined
+  let right: HTMLDivElement | undefined
 
   const ScoreBlock = (color: `#${string}`) => HText({
     text: "0",
@@ -25,22 +20,26 @@ export const ScorePanel = () => {
     }
   })
 
-  const left = ScoreBlock("#ffaacccc")
-  const right = ScoreBlock("#00ccffcc")
-
   return Entity({
     id: "scorepanel",
     components: {
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!world.client) return
+      html: Html({
+        init: () => {
+          const div = HDiv({
+            style: {
+              display: "flex", left: "50%", top: "6px", transform: "translate(-50%)", gap: "8px"
+            }
+          })
 
-          if (!init) {
-            div.append(left, right)
-            document.getElementById("canvas-parent")?.appendChild(div)
+          left = ScoreBlock("#ffaacccc")
+          right = ScoreBlock("#00ccffcc")
 
-            init = true
-          }
+          div.append(left, right)
+
+          return div
+        },
+        onTick: (world) => {
+          if (!left || !right) return
 
           const { scoreLeft, scoreRight } = world.game.state as { scoreLeft: number, scoreRight: number }
 

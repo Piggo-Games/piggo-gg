@@ -2,7 +2,6 @@ import {
   colors, Entity, Friend, keys, PixiButton, pixiContainer,
   pixiGraphics, pixiText, Position, Renderable, values
 } from "@piggo-gg/core"
-import toast from "react-hot-toast"
 import { Container, ContainerChild } from "pixi.js"
 
 type FriendCard = Container<ContainerChild>
@@ -223,7 +222,7 @@ export const Friends = (): Entity => {
             onClick: () => {
               const name = addFriendInputText.trim()
               world.client?.friendsAdd(name, (response) => {
-                toast.success("Friend request sent")
+                // toast.success("Friend request sent")
                 close()
               })
             },

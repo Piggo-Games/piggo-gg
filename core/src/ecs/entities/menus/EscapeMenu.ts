@@ -1,11 +1,10 @@
 import {
   CSS, Entity, HButton, HDiv, HImg, HtmlButton, HtmlDiv, Input, LobbiesMenu,
-  MusicButton, NPC, Position, SettingsMenu, SkinsMenu, World, styleButton
+  MusicButton, Html, Position, SettingsMenu, SkinsMenu, World, styleButton
 } from "@piggo-gg/core"
 
 export const EscapeMenu = (world: World): Entity => {
 
-  let init = false
   let activeMenu: "lobbies" | "skins" | "settings" = "lobbies"
 
   const bg = HtmlDiv({
@@ -186,14 +185,14 @@ export const EscapeMenu = (world: World): Entity => {
           }
         }
       }),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (world.mode === "server") return
+      html: Html({
+        init: () => {
+          bg.appendChild(wrapper)
 
-          if (!init) {
-            world.three?.append(bg, wrapper)
-            init = true
-          }
+          return bg
+        },
+        onTick: (world) => {
+          if (world.mode === "server") return
 
           // overall visibility
           if (world.client) {

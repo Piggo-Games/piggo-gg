@@ -1,4 +1,4 @@
-import { Entity, HDiv, HText, KDAstring, NPC, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
+import { Entity, HDiv, HText, Html, KDAstring, Position, StrikeState, TeamNumber, values } from "@piggo-gg/core"
 
 type RowData = {
   row: HTMLDivElement
@@ -8,51 +8,52 @@ type RowData = {
 }
 
 export const Scoreboard = () => {
-
-  let init = false
-
   const playerData: Record<string, RowData> = {}
 
-  const team1 = HDiv({
-    style: {
-      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%"
-    }
-  })
-
-  const team2 = HDiv({
-    style: {
-      width: "96%", left: "50%", transform: "translate(-50%)", height: "46%", top: "50%"
-    }
-  })
-
-  const wrapper = HDiv({
-    style: {
-      left: "50%",
-      top: "50%",
-      width: "520px",
-      height: "400px",
-      transform: "translate(-50%, -50%)",
-      display: "flex",
-      flexDirection: "column",
-      border: "2px solid white",
-      backgroundColor: "rgba(0, 0, 0, 0.3)",
-      visibility: "hidden"
-    }
-  },
-    team1,
-    team2
-  )
+  let team1: HTMLDivElement | undefined
+  let team2: HTMLDivElement | undefined
+  let wrapper: HTMLDivElement | undefined
 
   const scoreboard = Entity({
     id: "scoreboard",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            init = true
-            document.getElementById("canvas-parent")?.append(wrapper)
-          }
+      html: Html({
+        init: () => {
+          team1 = HDiv({
+            style: {
+              width: "96%", left: "50%", transform: "translate(-50%)", height: "46%"
+            }
+          })
+
+          team2 = HDiv({
+            style: {
+              width: "96%", left: "50%", transform: "translate(-50%)", height: "46%", top: "50%"
+            }
+          })
+
+          wrapper = HDiv({
+            style: {
+              left: "50%",
+              top: "50%",
+              width: "520px",
+              height: "400px",
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+              flexDirection: "column",
+              border: "2px solid white",
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              visibility: "hidden"
+            }
+          },
+            team1,
+            team2
+          )
+
+          return wrapper
+        },
+        onTick: (world) => {
+          if (!team1 || !team2 || !wrapper) return
 
           const players = world.players()
           const state = world.state<StrikeState>()

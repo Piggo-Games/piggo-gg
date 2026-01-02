@@ -1,4 +1,4 @@
-import { ceil, Entity, HDiv, HText, NPC, round, StrikeState, World } from "@piggo-gg/core"
+import { ceil, Entity, HDiv, HText, Html, StrikeState, World } from "@piggo-gg/core"
 
 const textMap: Record<StrikeState["phase"], (world: World, state: StrikeState) => string> = {
   "warmup": (world, { phaseChange }) => phaseChange ? `starting in ${ceil((phaseChange - world.tick) / 40)}` : "warmup",
@@ -9,8 +9,6 @@ const textMap: Record<StrikeState["phase"], (world: World, state: StrikeState) =
 }
 
 export const PhaseBanner = () => {
-
-  let init = false
 
   let readyText = HText({ text: "", style: { position: "relative", width: "200px", textAlign: "center" } })
   let phaseText = HText({ text: "warmup", style: { fontSize: "32px", position: "relative" } })
@@ -27,13 +25,11 @@ export const PhaseBanner = () => {
   return Entity({
     id: "PhaseBanner",
     components: {
-      npc: NPC({
-        behavior: (_, world) => {
-
-          if (!init) {
-            init = true
-            document.body.appendChild(wrapper)
-          }
+      html: Html({
+        init: () => {
+          return wrapper
+        },
+        onTick: (world) => {
 
           const visible = Boolean(world.client?.net.lobbyId)
 

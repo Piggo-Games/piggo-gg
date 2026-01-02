@@ -15,7 +15,6 @@ export type ThreeRenderer = {
   scene: Scene
   tLoader: TextureLoader
   particles: Particle[]
-  append: (...elements: HTMLElement[]) => void
   activate: (world: World) => Promise<void>
   spawnParticles: (pos: XYZ, world: World, type?: ParticleType) => void
   deactivate: () => void
@@ -43,10 +42,6 @@ export const ThreeRenderer = (): ThreeRenderer => {
     gLoader: new GLTFLoader(),
     tLoader: new TextureLoader(),
     particles: [],
-    append: (...elements: HTMLElement[]) => {
-      const parent = document.getElementById("canvas-parent")
-      if (parent) parent.append(...elements)
-    },
     resize: () => {
       if (!webgl || !renderer.ready) return
 
