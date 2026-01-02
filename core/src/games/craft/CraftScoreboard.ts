@@ -1,11 +1,9 @@
 import {
-  canvasAppend, CraftState, Entity, HtmlDiv, HtmlText, NPC,
+  CraftState, Entity, Html, HtmlDiv, HtmlText,
   Player, Position, RefreshableDiv, World
 } from "@piggo-gg/core"
 
 export const CraftScoreboard = (): Entity => {
-
-  let init = false
 
   let numPlayers = 0
   let phase = "warmup"
@@ -40,8 +38,11 @@ export const CraftScoreboard = (): Entity => {
     id: "CraftScoreboard",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
+      html: Html({
+        init: () => {
+          return container
+        },
+        onTick: (world) => {
           if (world.mode === "server") return
 
           if (!world.client?.net.synced || (world.client.mobile && world.client?.menu)) {
@@ -50,11 +51,6 @@ export const CraftScoreboard = (): Entity => {
           }
 
           container.style.visibility = "visible"
-
-          if (!init) {
-            init = true
-            canvasAppend(container)
-          }
 
           const state = world.state<CraftState>()
           const players = world.players()

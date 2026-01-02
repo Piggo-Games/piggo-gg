@@ -1,10 +1,8 @@
-import { Entity, entries, HButton, HDiv, HImg, HText, NPC, Player, Position, Three } from "@piggo-gg/core"
+import { Entity, entries, HButton, HDiv, HImg, HText, Html, Player, Position, Three } from "@piggo-gg/core"
 
 type FeedKey = `${number}-${string}-${string}-${boolean}`
 
 export const HtmlFeed = (): Entity => {
-  let init = false
-
   const feedRecord: Record<FeedKey, number> = {}
   const duration = 120
 
@@ -23,12 +21,11 @@ export const HtmlFeed = (): Entity => {
     id: "htmlFeed",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            document.body.appendChild(wrapper)
-            init = true
-          }
+      html: Html({
+        init: () => {
+          return wrapper
+        },
+        onTick: (world) => {
 
           for (const player of world.players()) {
             const character = player.components.controlling.getCharacter(world)

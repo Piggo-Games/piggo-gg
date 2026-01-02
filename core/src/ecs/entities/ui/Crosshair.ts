@@ -2,27 +2,23 @@ import { CraftSettings, Entity, Html, HtmlDiv, Position } from "@piggo-gg/core"
 
 export const Crosshair = () => {
 
-  let div: HTMLDivElement | undefined
+  let div = HtmlDiv({
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "5px",
+    height: "5px",
+    backgroundColor: "rgba(0, 255, 255, 1)",
+    borderRadius: "50%",
+    pointerEvents: "none"
+  })
 
   const crosshair = Entity({
     id: "crosshair",
     components: {
       position: Position(),
       html: Html({
-        init: (world) => {
-          if (!world.client) return null
-
-          div = HtmlDiv({
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "5px",
-            height: "5px",
-            backgroundColor: "rgba(0, 255, 255, 1)",
-            borderRadius: "50%",
-            pointerEvents: "none"
-          })
-
+        init: () => {
           return div
         },
         onTick: (world) => {

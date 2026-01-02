@@ -29,15 +29,11 @@ export const UIProfile = (): Entity => {
       position: Position(),
       html: Html({
         init: (world) => {
-          if (!world.client) return null
-
           container.style.visibility = world.client?.mobile ? "hidden" : "visible"
 
           return container
         },
         onTick: (world) => {
-          if (!world.client) return
-
           const playerName = world.client?.playerName()
           if (playerName && playerName !== name.textContent) {
             if (world.tick < 20) return

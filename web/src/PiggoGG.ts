@@ -61,6 +61,7 @@ const setupAudioUnlock = (world: World, target: HTMLElement) => {
 
   target.addEventListener("pointerup", () => {
     if (!world.client) return
+
     audioElement.play().then(() => {
       world.client!.sound.ready = true
     }).catch(() => {})

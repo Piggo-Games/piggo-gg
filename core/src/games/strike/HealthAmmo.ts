@@ -1,8 +1,6 @@
-import { Entity, HDiv, HImg, HText, NPC, Position } from "@piggo-gg/core"
+import { Entity, HDiv, HImg, HText, Html, Position } from "@piggo-gg/core"
 
 export const HealthAmmo = (): Entity => {
-  let init = false
-
   const ammoText = HText({
     style: { fontSize: "34px", position: "relative", marginLeft: "6px", textAlign: "center" }
   })
@@ -30,13 +28,11 @@ export const HealthAmmo = (): Entity => {
     id: "healthAmmo",
     components: {
       position: Position(),
-      npc: NPC({
-        behavior: (_, world) => {
-          if (!init) {
-            document.body.appendChild(wrapper)
-            init = true
-          }
-
+      html: Html({
+        init: () => {
+          return wrapper
+        },
+        onTick: (world) => {
           const pc = world.client?.character()
           if (!pc) return
 
@@ -53,7 +49,7 @@ export const HealthAmmo = (): Entity => {
 
           wrapper.style.visibility = world.client?.mobile?.horizontal() === false || world.client?.menu ? "hidden" : "visible"
         }
-      }),
+      })
     }
   })
 }

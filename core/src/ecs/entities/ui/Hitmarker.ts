@@ -32,9 +32,7 @@ export const Hitmarker = () => {
     components: {
       position: Position(),
       html: Html({
-        init: (world) => {
-          if (!world.client) return null
-
+        init: () => {
           wrapper.append(topLeft, topRight, bottomLeft, bottomRight)
 
           return wrapper

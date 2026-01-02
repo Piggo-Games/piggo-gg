@@ -186,9 +186,7 @@ export const EscapeMenu = (world: World): Entity => {
         }
       }),
       html: Html({
-        init: (world) => {
-          if (!world.client) return null
-
+        init: () => {
           bg.appendChild(wrapper)
 
           return bg

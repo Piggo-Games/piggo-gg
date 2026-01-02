@@ -24,9 +24,7 @@ export const ScorePanel = () => {
     id: "scorepanel",
     components: {
       html: Html({
-        init: (world) => {
-          if (!world.client) return null
-
+        init: () => {
           const div = HDiv({
             style: {
               display: "flex", left: "50%", top: "6px", transform: "translate(-50%)", gap: "8px"

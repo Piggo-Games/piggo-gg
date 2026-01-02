@@ -19,9 +19,7 @@ export const Scoreboard = () => {
     components: {
       position: Position(),
       html: Html({
-        init: (world) => {
-          if (!world.client) return null
-
+        init: () => {
           team1 = HDiv({
             style: {
               width: "96%", left: "50%", transform: "translate(-50%)", height: "46%"
