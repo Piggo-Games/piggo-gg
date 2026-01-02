@@ -48,12 +48,12 @@ export const Strike: GameBuilder<StrikeState, StrikeSettings> = {
       SpawnSystem({ spawner: Sarge, pos: { x: 8, y: 8, z: 2 } }),
       BlockPhysicsSystem("global"),
       BlockPhysicsSystem("local"),
-      ThreeCameraSystem(),
+      ThreeCameraSystem({ height: 0.4, distance: 0.8 }),
       StrikeSystem,
       ThreeNametagSystem,
       ThreeSystem,
       InventorySystem,
-      BlockMeshSystem,
+      BlockMeshSystem({ counts: { marble: 10000, grass: 0, leaf: 0, oak: 0, spruce: 0 }}),
       HUDSystem(controls)
     ],
     entities: [
