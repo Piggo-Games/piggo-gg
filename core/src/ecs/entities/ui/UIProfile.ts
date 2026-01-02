@@ -1,4 +1,4 @@
-import { Entity, HtmlDiv, HtmlText, NPC, Position } from "@piggo-gg/core"
+import { canvasAppend, Entity, HtmlDiv, HtmlText, NPC, Position } from "@piggo-gg/core"
 
 export const UIProfile = (): Entity => {
 
@@ -32,7 +32,7 @@ export const UIProfile = (): Entity => {
       npc: NPC({
         behavior: (_, world) => {
           if (!init) {
-            world.three?.append(container)
+            canvasAppend(container)
             container.style.visibility = world.client?.mobile ? "hidden" : "visible"
             init = true
           }
