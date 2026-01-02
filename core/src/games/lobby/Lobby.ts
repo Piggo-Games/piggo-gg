@@ -33,6 +33,7 @@ export const Lobby: GameBuilder<LobbyState> = {
 const GameButton = (game: GameBuilder, world: World) => {
 
   let rotation = 0
+  let intent = false
 
   const state = world.game.state as LobbyState
 
@@ -78,7 +79,12 @@ const GameButton = (game: GameBuilder, world: World) => {
       position: "relative",
       background: "none"
     },
+    onClick: () => {
+      intent = true
+    },
     onRelease: () => {
+      if (!intent) return
+
       inner.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
 
       if (!world.client?.isLeader()) return
