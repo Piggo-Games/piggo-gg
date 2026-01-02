@@ -46,8 +46,7 @@ export const getBrowser = () => {
 }
 
 export const replaceCanvas = (): HTMLCanvasElement => {
-  const piggoCanvas = document.getElementById("piggo-canvas") as HTMLCanvasElement | undefined
-  const canvas = piggoCanvas ?? document.getElementById("canvas") as HTMLCanvasElement | undefined
+  const canvas = document.getElementById("piggo-canvas") as HTMLCanvasElement | undefined
 
   const newCanvas = document.createElement("canvas")
   newCanvas.id = canvas?.id ?? "canvas"
