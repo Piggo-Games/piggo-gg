@@ -15,7 +15,7 @@
     "db": "bun --cwd server prisma:local",
     "branch": "git checkout main && git pull && git branch -D $(whoami) ; git checkout -b $(whoami)",
     "pages": "rm -r ./docs && mkdir docs && git restore docs/CNAME && ENV=production bun pages-compile",
-    "pages-compile": "cp -r web/res/* docs/ && bun build web/src/index.tsx --outdir docs --minify",
+    "pages-compile": "cp -r web/res/* docs/ && bun build web/src/index.ts --outdir docs --minify",
     "ship": "bun pages && git add . && git commit -m 'ship' && git push",
     "b": "bun branch",
     "s": "bun ship 2>/dev/null"
