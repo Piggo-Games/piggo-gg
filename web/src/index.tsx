@@ -1,4 +1,4 @@
-import { Lobby } from "@piggo-gg/core"
+import { Lobby, Mars } from "@piggo-gg/core"
 import { PiggoGG } from "./PiggoGG"
 
-PiggoGG({ gameBuilder: Lobby })
+PiggoGG({ gameBuilder: Mars })
