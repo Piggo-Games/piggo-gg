@@ -2,10 +2,7 @@ import {
   DefaultWorld, GameBuilder, isMobile, PixiRenderer, ThreeRenderer, World
 } from "@piggo-gg/core"
 
-export type PiggoGGOptions = {
-  exposeWorld?: boolean
-  onWorldReady?: (world: World) => void
-}
+export type PiggoGGOptions = {}
 
 export type PiggoGGProps = {
   gameBuilder: GameBuilder
@@ -13,6 +10,28 @@ export type PiggoGGProps = {
 }
 
 export type PiggoGG = (props: PiggoGGProps) => void
+
+
+export const PiggoGG: PiggoGG = ({ gameBuilder, options }) => {
+  const canvas = document.getElementById("piggo-canvas") as HTMLCanvasElement | null
+  if (!canvas) {
+    throw new Error('PiggoGG requires <canvas id="piggo-canvas"> in the document')
+  }
+
+  canvas.ontouchend = (event) => event.preventDefault()
+  if (isMobile()) canvas.style.border = "none"
+
+  ensureCanvasParent(canvas)
+
+  const world = DefaultWorld({
+    three: ThreeRenderer(), pixi: PixiRenderer(),
+  })
+
+  // @ts-expect-error
+  window.world = world
+
+  setupAudioUnlock(world, canvas)
+}
 
 const ensureCanvasParent = (canvas: HTMLCanvasElement): HTMLDivElement => {
   let canvasParent = document.getElementById("canvas-parent") as HTMLDivElement | null
@@ -64,34 +83,6 @@ const setupAudioUnlock = (world: World, target: HTMLElement) => {
 
     audioElement.play().then(() => {
       world.client!.sound.ready = true
-    }).catch(() => {})
+    }).catch(() => { })
   }, { capture: true, once: true })
-}
-
-export const PiggoGG: PiggoGG = ({ gameBuilder, options }) => {
-  const canvas = document.getElementById("piggo-canvas") as HTMLCanvasElement | null
-  if (!canvas) {
-    throw new Error('PiggoGG requires <canvas id="piggo-canvas"> in the document.')
-  }
-
-  canvas.ontouchend = (event) => event.preventDefault()
-  if (isMobile()) canvas.style.border = "none"
-
-  const canvasParent = ensureCanvasParent(canvas)
-
-  // const renderer = options?.renderer ?? "both"
-  // const usePixi = renderer !== "three"
-  // const useThree = renderer !== "pixi"
-
-  const world = DefaultWorld({
-    three: ThreeRenderer(), pixi: PixiRenderer(), 
-  })
-
-  if (options?.exposeWorld ?? true) {
-    (window as { world?: World }).world = world
-  }
-
-  setupAudioUnlock(world, canvas)
-
-  options?.onWorldReady?.(world)
 }
