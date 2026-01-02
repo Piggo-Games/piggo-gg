@@ -69,7 +69,7 @@ export const MobileUI = (world: World): MobileUI => {
     }
   })
 
-  world.three?.append(povButton, jumpButton, leftJoystick, rightJoystick)
+  canvasAppend(povButton, jumpButton, leftJoystick, rightJoystick)
 
   const menuButton = HtmlButton({
     text: "menu",

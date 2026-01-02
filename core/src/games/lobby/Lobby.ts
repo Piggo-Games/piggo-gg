@@ -246,8 +246,7 @@ const GameLobby = (): Entity => {
 
             playersOnline = PlayersOnline(world)
 
-            canvasAppend(Version())
-            canvasAppend(playersOnline.div)
+            canvasAppend(Version(), playersOnline.div)
 
             profile = Profile(world)
             music = MusicButton(world)

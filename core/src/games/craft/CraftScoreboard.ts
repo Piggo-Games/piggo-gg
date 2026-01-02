@@ -1,5 +1,5 @@
 import {
-  CraftState, Entity, HtmlDiv, HtmlText, NPC,
+  canvasAppend, CraftState, Entity, HtmlDiv, HtmlText, NPC,
   Player, Position, RefreshableDiv, World
 } from "@piggo-gg/core"
 
@@ -53,7 +53,7 @@ export const CraftScoreboard = (): Entity => {
 
           if (!init) {
             init = true
-            world.three?.append(container)
+            canvasAppend(container)
           }
 
           const state = world.state<CraftState>()

@@ -1,5 +1,6 @@
 import {
-  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv, HImg
+  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv, HImg,
+  canvasAppend
 } from "@piggo-gg/core"
 
 type Cluster = {
@@ -44,7 +45,7 @@ export const HUDSystem = (props: HUDSystemProps) => ClientSystemBuilder({
       wrapper.style.transform = "translate(0%)"
     }
 
-    document.getElementById("canvas-parent")?.append(wrapper)
+    canvasAppend(wrapper)
 
     let buttonElements: { element: HTMLElement, key: string }[] = []
 

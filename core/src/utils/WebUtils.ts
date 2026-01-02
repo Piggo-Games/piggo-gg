@@ -70,11 +70,9 @@ export const replaceCanvas = (): HTMLCanvasElement => {
   return newCanvas
 }
 
-export const canvasAppend = (element: HTMLElement) => {
+export const canvasAppend = (...elements: HTMLElement[]) => {
   const canvasParent = document.getElementById("canvas-parent") as HTMLCanvasElement | undefined
-  if (canvasParent) {
-    canvasParent.appendChild(element)
-  }
+  if (canvasParent) canvasParent.append(...elements)
 }
 
 export const dummyPromise = async (ms: number = 1) => {
