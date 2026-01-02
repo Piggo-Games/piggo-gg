@@ -90,7 +90,7 @@ export const PiggoGG: PiggoGG = ({ gameBuilder, options }) => {
     (window as { world?: World }).world = world
   }
 
-  setupAudioUnlock(world, canvasParent)
+  setupAudioUnlock(world, canvas)
 
   options?.onWorldReady?.(world)
 }
