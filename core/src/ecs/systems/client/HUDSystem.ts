@@ -1,6 +1,5 @@
 import {
-  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv, HImg,
-  canvasAppend
+  HtmlButton, HtmlText, ClientSystemBuilder, ogButtonStyle, HDiv, HImg, canvasAppend
 } from "@piggo-gg/core"
 
 type Cluster = {
