@@ -7,16 +7,5 @@
     "dev-compile": "bun build --watch src/index.ts --outdir res",
     "dev-serve": "bun x serve -L -p 8000 res",
     "dev-serve-https": "bun x serve -L -p 8000 res --ssl-cert ./localhost+2.pem --ssl-key ./localhost+2-key.pem"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-modal": "3.16.1"
-  },
-  "devDependencies": {
-    "@types/google.accounts": "^0.0.15",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@types/react-modal": "3.16.1"
   }
 }

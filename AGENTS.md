@@ -1,13 +1,13 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Monorepo managed by Bun workspaces: `core` (engine, shared game logic), `web` (React front end served from `web/res`), `server` (API + matchmaking, Prisma-backed), and `docs` (static bundle for GitHub Pages).
+- Monorepo managed by Bun workspaces: `core` (engine, shared game logic), `web` (front end served from `web/res`), `server` (API + matchmaking, Prisma-backed), and `docs` (static bundle for GitHub Pages).
 - Shared TypeScript config lives at `tsconfig.json`; Assets (SVG/audio) sit under `web/res` and are copied into `docs` for production pages.
 - Server-side database schema and migrations live in `server/src/db`.
 
 ## Workspace Map & Entrypoints
 - `core/` — ECS engine and game content. Entrypoint `main.ts`; key dirs: `src/runtime` (World loop/DefaultWorld), `src/ecs` (components, systems, entities, actions, commands, renderables), `src/games/*` (GameBuilder configs), `src/net` (Client + syncers), `src/graphics` (Three/Pixi renderers + shaders), `src/html` (DOM overlays), `src/sound`.
-- `web/` — React website running Piggo client. `src/components/Canvas.tsx` initializes a `World` with Pixi + Three. `Root` mounts to `#root`. `bun dev-compile` outputs to `res/` alongside static assets that flow into `docs/`.
+- `web/` — website running Piggo client. `src/components/Canvas.tsx` initializes a `World` with Pixi + Three. `Root` mounts to `#root`. `bun dev-compile` outputs to `res/` alongside static assets that flow into `docs/`.
 - `server/` — Bun websocket + HTTP API in `src/Api.ts` (msgpack). Each lobby has a `ServerWorld` (`src/ServerWorld.ts`) running a `World` in server mode with `NetServerSystem`. Prisma schema + migrations live under `src/db`.
 - `docs/` — generated static bundle (`bun pages`) copied from `web/res` (keeps `docs/CNAME`).
 - `electron/` — desktop wrapper in `electron/src/main.ts` that runs the Piggo client.
