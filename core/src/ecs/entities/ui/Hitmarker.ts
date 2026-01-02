@@ -1,4 +1,4 @@
-import { Entity, HtmlDiv, max, NPC, Position, Three } from "@piggo-gg/core"
+import { canvasAppend, Entity, HtmlDiv, max, NPC, Position, Three } from "@piggo-gg/core"
 
 export const Hitmarker = () => {
   let init = false
@@ -39,7 +39,7 @@ export const Hitmarker = () => {
 
           if (!init) {
             wrapper.append(topLeft, topRight, bottomLeft, bottomRight)
-            world.three?.append(wrapper)
+            canvasAppend(wrapper)
             init = true
           }
         }

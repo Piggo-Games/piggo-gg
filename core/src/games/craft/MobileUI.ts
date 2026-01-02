@@ -1,4 +1,4 @@
-import { HtmlButton, HtmlJoystick, World } from "@piggo-gg/core"
+import { canvasAppend, HtmlButton, HtmlJoystick, World } from "@piggo-gg/core"
 
 type MobileUI = null | { update: () => void }
 
@@ -89,7 +89,7 @@ export const MobileUI = (world: World): MobileUI => {
     }
   })
 
-  world.three.append(menuButton)
+  canvasAppend(menuButton)
 
   return {
     update: () => {
