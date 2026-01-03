@@ -24,6 +24,7 @@ export const SHOT_UP_MAX = 3.6
 export const SHOT_UP_SCALE = 180
 export const SHOT_CHARGE_TICKS = 12
 export const SHOT_CHARGE_MAX = 1.3
+export const SHOT_CHARGE_Z = 3.6
 export const SHOT_CHARGE_LINE_MAX = 45
 export const SHOT_CHARGE_LINE_OFFSET = 8
 

@@ -8,7 +8,7 @@ import {
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
-  DRIBBLE_GRAVITY, SCORE_RESET_TICKS
+  DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
 import { Ball, Centerline, Court, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
@@ -208,8 +208,23 @@ const HoopsSystem = SystemBuilder({
             ballPos.data.offset = offset
 
             if (charging) {
-              ballPos.data.follows = owner.id
-              ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0)
+              ballPos.data.follows = null
+              ballPos.setGravity(0)
+              ballPos.setVelocity({
+                x: ownerPos.data.velocity.x,
+                y: ownerPos.data.velocity.y,
+                z: 0
+              })
+              ballPos.setPosition({
+                x: ownerPos.data.x + offset.x,
+                y: ownerPos.data.y + offset.y,
+                z: SHOT_CHARGE_Z
+              })
+              ballPos.localVelocity = {
+                x: ownerPos.localVelocity.x,
+                y: ownerPos.localVelocity.y,
+                z: 0
+              }
             } else {
               ballPos.data.follows = null
               ballPos.setGravity(DRIBBLE_GRAVITY)
@@ -226,6 +241,8 @@ const HoopsSystem = SystemBuilder({
                 ballPos.setPosition({ z: 0 })
                 ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
               }
+
+              console.log("carrying ball", ballPos.data.z)
 
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
