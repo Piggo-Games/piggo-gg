@@ -5,9 +5,9 @@ import {
   max, min, velocityToPoint
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, HOOP_OFFSET_X,
-  PASS_GRAVITY, PASS_UP, SHOT_CHARGE_MAX, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
-  SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
+  COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
+  PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN,
+  SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import { addShotCharging, getDashUntil, removeShotCharging, setDashEntry } from "./HoopsStateUtils"
@@ -31,9 +31,8 @@ export const Howard = (player: Player) => {
       shadow: Shadow(5, 1),
       input: Input({
         release: {
-          "mb1": ({ hold, mouse }) => {
-            if (!mouse) return
-            return { actionId: "shoot", params: { target: mouse, hold } }
+          "mb1": ({ hold }) => {
+            return { actionId: "shoot", params: { hold } }
           }
         },
         press: {
@@ -99,12 +98,15 @@ export const Howard = (player: Player) => {
   })
 }
 
-type ThrowParams = {
+type PassParams = {
   target: XY
+}
+
+type ShootParams = {
   hold?: number
 }
 
-const passBall = Action<ThrowParams>("pass", ({ entity, world, params }) => {
+const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   if (!entity || !params?.target) return
 
   const state = world.game.state as HoopsState
@@ -138,7 +140,7 @@ const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
   state.shotCharging = addShotCharging(state.shotCharging, entity.id)
 })
 
-const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
+const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   if (!entity) return
 
   const state = world.game.state as HoopsState
@@ -150,30 +152,23 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
-  const { position, team } = entity.components
-  if (!position || !team) return
+  const { position } = entity.components
+  if (!position) return
 
-  const hoopX = team.data.team === 1 ? COURT_WIDTH - HOOP_OFFSET_X : HOOP_OFFSET_X
-  const hoopY = 0
+  const { pointingDelta } = position.data
+  if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) return
 
-  const { pointingDelta, x, y } = position.data
-  const target = params?.target ?? (
-    Number.isFinite(pointingDelta.x) && Number.isFinite(pointingDelta.y)
-      ? { x: x + pointingDelta.x, y: y + pointingDelta.y }
-      : { x: hoopX, y: hoopY }
-  )
+  const magnitude = hypot(pointingDelta.x, pointingDelta.y)
+  if (!magnitude) return
+
+  const dirX = pointingDelta.x / magnitude
+  const dirY = pointingDelta.y / magnitude
 
   const hold = max(0, params?.hold ?? 0)
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
-  const power = 0.1 + charge * (SHOT_CHARGE_MAX - 1) * 3
-  console.log("Shooting with power:", power, charge)
-
-  const dx = target.x - x
-  const dy = target.y - y
-  const poweredTarget = { x: x + dx * power, y: y + dy * power }
-
-  const distance = hypot(dx, dy) * power
-  const up = min(SHOT_UP_MAX, SHOT_UP_MIN + distance / SHOT_UP_SCALE)
+  const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
+  const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
+  console.log("Shooting with speed:", speed, charge)
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
@@ -183,10 +178,7 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   ballPos.setPosition({ z: Math.max(1.5, ballPos.data.z) })
   ballPos.setGravity(SHOT_GRAVITY)
 
-  const v = velocityToPoint(ballPos.data, poweredTarget, SHOT_GRAVITY, up)
-  const scale = 1000 / world.tickrate
-
-  ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: up })
+  ballPos.setVelocity({ x: dirX * speed, y: dirY * speed, z: up })
 })
 
 const dash = Action("dash", ({ entity, world }) => {
