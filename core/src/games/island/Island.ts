@@ -135,7 +135,7 @@ const IslandSystem = SystemBuilder({
     }
 
     const beginPlayerTurn = (state: IslandState, characters: { id: string }[]) => {
-      console.log("beginPlayerTurn", state.turnIndex, characters)
+      // console.log("beginPlayerTurn", state.turnIndex, characters)
 
       state.turnPhase = "players"
       if (characters.length === 0) {

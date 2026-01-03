@@ -15,6 +15,7 @@ export type World = {
   debug: boolean
   entities: Record<string, Entity>
   entitiesAtTick: Record<number, Record<string, SerializedEntity>>
+  flag: "red" | "green"
   game: Game & { started: number }
   games: Record<GameTitle, GameBuilder>
   lastTick: DOMHighResTimeStamp
@@ -37,7 +38,7 @@ export type World = {
   authoritative: () => boolean
   characters: () => Character[]
   entity: <T extends ComponentTypes>(id: string) => Entity<T> | undefined
-  onTick: (_: { isRollback: boolean }) => void
+  onTick: (_: { isRollback: boolean, force?: boolean }) => void
   onRender: () => void
   players: () => Player[]
   queryEntities: <T extends ComponentTypes>(query: ValidComponents[], filter?: (entity: Entity<T>) => boolean) => Entity<T>[]
@@ -76,6 +77,7 @@ export const World = ({ commands, systems, pixi, mode, three }: WorldProps): Wor
     debug: false,
     entities: {},
     entitiesAtTick: {},
+    flag: "green",
     game: { id: "", renderer: "three", entities: [], settings: {}, systems: [], netcode: "delay", state: {}, started: 0 },
     games: {
       "build": Build,
@@ -163,13 +165,15 @@ export const World = ({ commands, systems, pixi, mode, three }: WorldProps): Wor
     entity: <T extends ComponentTypes>(id: string) => {
       return world.entities[id] as Entity<T>
     },
-    onTick: ({ isRollback }) => {
+    onTick: ({ isRollback, force }) => {
+      if (!force && world.flag === "red") return
+
       const now = performance.now()
 
       if (world.tick > 120 && world.players().length === 0) return
 
       // check if it's time to run the next tick
-      if (!isRollback && ((world.lastTick + world.tickrate) > now)) {
+      if (!isRollback && !force && ((world.lastTick + world.tickrate) > now)) {
         scheduleOnTick()
         return
       }

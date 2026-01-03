@@ -67,6 +67,7 @@ export const ItemSystem = SystemBuilder({
       for (const entity of entities) {
         const { position, item, renderable } = entity.components
         const { follows } = position.data
+        console.log("adjusting item position", entity.id)
 
         const character = world.entity<Position>(follows ?? "")
         if (!character) continue
@@ -85,17 +86,17 @@ export const ItemSystem = SystemBuilder({
 
         position.data.offset = { x: 14, y: -4 }
 
-        // if (!item.dropped) {
-        //   const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
+        if (!item.dropped) {
+          const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
 
-        //   const hyp_x = pointingDelta.x / hypotenuse
-        //   const hyp_y = pointingDelta.y / hypotenuse
+          const hyp_x = pointingDelta.x / hypotenuse
+          const hyp_y = pointingDelta.y / hypotenuse
 
-          // position.data.offset = {
-          //   x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
-          //   y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
-          // }
-        // }
+          position.data.offset = {
+            x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
+            y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
+          }
+        }
       }
     }
   })
