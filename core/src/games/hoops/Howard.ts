@@ -130,6 +130,15 @@ export const Howard = (player: Player) => {
             if (hold) return
             return { actionId: "dash" }
           },
+          " ": ({ hold }) => {
+            if (hold) return
+            return { actionId: "jump" }
+          },
+          "g": ({ world, hold }) => {
+            if (hold === 5) {
+              world.debug = !world.debug
+            }
+          },
           "mb1": ({ hold, mouse }) => {
             if (hold || !mouse) return
             return { actionId: "shoot", params: { target: mouse } }
@@ -149,7 +158,12 @@ export const Howard = (player: Player) => {
         point: Point,
         pass: passBall,
         shoot: shootBall,
-        dash
+        dash,
+        jump: Action("jump", ({ entity }) => {
+          const { position } = entity?.components ?? {}
+          if (!position?.data.standing) return
+          position.setVelocity({ z: 5 })
+        })
       }),
       shadow: Shadow(5),
       renderable: Renderable({
