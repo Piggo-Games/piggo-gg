@@ -67,7 +67,8 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
 
   const hold = max(0, params?.hold ?? 0)
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
-  const power = 1 + charge * (SHOT_CHARGE_MAX - 1)
+  const power = 0.1 + charge * (SHOT_CHARGE_MAX - 1) * 3
+  console.log("Shooting with power:", power, charge)
 
   const dx = target.x - x
   const dy = target.y - y

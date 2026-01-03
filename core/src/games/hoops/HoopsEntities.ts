@@ -1,10 +1,11 @@
 import {
   Collider, Debug, Entity, LineWall, Networked, Position, Renderable,
-  Shadow, loadTexture, pixiGraphics
+  Shadow, hypot, loadTexture, min, pixiGraphics
 } from "@piggo-gg/core"
-import { Texture } from "pixi.js"
+import { Graphics, Texture } from "pixi.js"
 import {
-  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z
+  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
+  SHOT_CHARGE_LINE_MAX, SHOT_CHARGE_LINE_OFFSET, SHOT_CHARGE_TICKS
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -57,6 +58,87 @@ export const Centerline = () => LineWall({
   visible: true,
   strokeAlpha: 0.5,
   group: "none"
+})
+
+export const ShotChargeLine = () => Entity({
+  id: "shot-charge-line",
+  components: {
+    position: Position(),
+    renderable: Renderable({
+      zIndex: 3.5,
+      setContainer: async () => pixiGraphics(),
+      onTick: ({ container, entity, world, renderable }) => {
+        const g = container as Graphics
+        const client = world.client
+        const linePos = entity.components.position
+
+        if (!client) {
+          renderable.visible = false
+          g.clear()
+          return
+        }
+
+        const character = client.character()
+        const position = character?.components.position
+        if (!character || !position) {
+          renderable.visible = false
+          g.clear()
+          if (linePos.data.follows) linePos.data.follows = null
+          return
+        }
+
+        if (linePos.data.follows !== character.id) {
+          linePos.data.follows = character.id
+          linePos.data.offset = { x: 0, y: 0 }
+          linePos.setPosition({ x: position.data.x, y: position.data.y, z: position.data.z })
+        }
+
+        const state = world.game.state as HoopsState
+        const hold = client.bufferDown.get("mb1")?.hold ?? 0
+
+        if (hold <= 0 || state.phase !== "play" || state.ballOwner !== character.id) {
+          renderable.visible = false
+          g.clear()
+          return
+        }
+
+        const { pointingDelta } = position.data
+        if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
+          renderable.visible = false
+          g.clear()
+          return
+        }
+
+        const magnitude = hypot(pointingDelta.x, pointingDelta.y)
+        if (!magnitude) {
+          renderable.visible = false
+          g.clear()
+          return
+        }
+
+        const charge = min(1, hold / SHOT_CHARGE_TICKS)
+        const length = SHOT_CHARGE_LINE_MAX * charge
+
+        if (length <= 0) {
+          renderable.visible = false
+          g.clear()
+          return
+        }
+
+        const dirX = pointingDelta.x / magnitude
+        const dirY = pointingDelta.y / magnitude
+        const startX = dirX * SHOT_CHARGE_LINE_OFFSET
+        const startY = dirY * SHOT_CHARGE_LINE_OFFSET
+        const endX = dirX * (SHOT_CHARGE_LINE_OFFSET + length)
+        const endY = dirY * (SHOT_CHARGE_LINE_OFFSET + length)
+
+        renderable.visible = true
+        g.clear().setStrokeStyle({ width: 2, color: 0xffffff, alpha: 0.8 })
+        g.moveTo(startX, startY).lineTo(endX, endY)
+        g.stroke()
+      }
+    })
+  }
 })
 
 type HoopProps = {

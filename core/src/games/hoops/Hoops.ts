@@ -9,7 +9,7 @@ import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, SCORE_RESET_TICKS
 } from "./HoopsConstants"
-import { Ball, Centerline, Court, HoopSet } from "./HoopsEntities"
+import { Ball, Centerline, Court, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
 import { getDashUntil, pruneDashEntries } from "./HoopsStateUtils"
 
@@ -70,6 +70,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
     entities: [
       Background({ rays: true }),
       Cursor(),
+      ShotChargeLine(),
       Ball(),
       Court(),
       Centerline(),

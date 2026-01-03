@@ -19,8 +19,10 @@ export const SHOT_GRAVITY = 0.09
 export const SHOT_UP_MIN = 2.2
 export const SHOT_UP_MAX = 3.6
 export const SHOT_UP_SCALE = 180
-export const SHOT_CHARGE_TICKS = 18
-export const SHOT_CHARGE_MAX = 1.35
+export const SHOT_CHARGE_TICKS = 12
+export const SHOT_CHARGE_MAX = 1.3
+export const SHOT_CHARGE_LINE_MAX = 45
+export const SHOT_CHARGE_LINE_OFFSET = 8
 
 export const DASH_COOLDOWN_TICKS = 30
 export const DASH_ACTIVE_TICKS = 8
