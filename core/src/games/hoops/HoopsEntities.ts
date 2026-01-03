@@ -63,10 +63,11 @@ type HoopProps = {
   id: string
   x: number
   y: number
+  facing: "left" | "right"
   scoringTeam: 1 | 2
 }
 
-export const Hoop = ({ id, x, y, scoringTeam }: HoopProps) => Entity({
+export const Hoop = ({ id, x, y, facing, scoringTeam }: HoopProps) => Entity({
   id,
   components: {
     position: Position({ x, y }),
@@ -106,6 +107,8 @@ export const Hoop = ({ id, x, y, scoringTeam }: HoopProps) => Entity({
     renderable: Renderable({
       zIndex: 3.6,
       setup: async (renderable) => {
+        renderable.c.rotation = facing === "right" ? -Math.PI / 2 : Math.PI / 2
+
         const ring = pixiGraphics()
           .circle(0, 0, HOOP_RADIUS)
           .stroke({ color: 0xff8c1a, width: 3, alpha: 0.9 })
@@ -123,6 +126,6 @@ export const Hoop = ({ id, x, y, scoringTeam }: HoopProps) => Entity({
 })
 
 export const HoopSet = () => [
-  Hoop({ id: "hoop-left", x: HOOP_OFFSET_X, y: 0, scoringTeam: 2 }),
-  Hoop({ id: "hoop-right", x: COURT_WIDTH - HOOP_OFFSET_X, y: 0, scoringTeam: 1 })
+  Hoop({ id: "hoop-left", x: HOOP_OFFSET_X, y: 0, facing: "right", scoringTeam: 2 }),
+  Hoop({ id: "hoop-right", x: COURT_WIDTH - HOOP_OFFSET_X, y: 0, facing: "left", scoringTeam: 1 })
 ]
