@@ -162,7 +162,7 @@ export const Howard = (player: Player) => {
         jump: Action("jump", ({ entity }) => {
           const { position } = entity?.components ?? {}
           if (!position?.data.standing) return
-          position.setVelocity({ z: 5 })
+          position.setVelocity({ z: 4 })
         })
       }),
       shadow: Shadow(5),
