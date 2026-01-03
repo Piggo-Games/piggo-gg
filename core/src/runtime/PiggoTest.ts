@@ -8,20 +8,15 @@ export type PiggoTestProps = {
 export type PiggoTest = (props: PiggoTestProps) => boolean
 
 export const PiggoTest: PiggoTest = ({ game }) => {
-  try {
-    const world = DefaultWorld({ mode: "server" })
-    world.flag = "red"
-    world.setGame(game)
+  const world = DefaultWorld({ mode: "server" })
+  world.flag = "red"
+  world.setGame(game)
 
-    for (let i = 0; i < 2; i += 1) {
-      world.onTick({ force: true, isRollback: false })
-    }
-
-    return true
-  } catch (error) {
-    console.error("PiggoTest error:", error)
-    return false
+  for (let i = 0; i < 2; i += 1) {
+    world.onTick({ force: true, isRollback: false })
   }
+
+  return true
 }
 
 global.window = {

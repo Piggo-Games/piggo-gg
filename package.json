@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "prod": "bun gen && bun --cwd server start",
+    "tests": "bun run -r server/boilerplate.ts core/src/runtime/PiggoTest.ts",
     "dev": "bun --cwd web dev & bun --cwd server dev && fg",
     "dev-https": "bun --cwd web dev-https & bun --cwd server dev && fg",
     "gen": "bun --cwd server prisma:generate",
