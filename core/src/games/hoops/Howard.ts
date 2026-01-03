@@ -12,6 +12,93 @@ import {
 import type { HoopsState } from "./Hoops"
 import { addShotCharging, getDashUntil, removeShotCharging, setDashEntry } from "./HoopsStateUtils"
 
+export const Howard = (player: Player) => {
+  const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const yOffset = (seed % 3 - 1) * 14
+  const spawnX = player.components.team.data.team === 1 ? 80 : COURT_WIDTH - 80
+
+  return Character({
+    id: `howard-${player.id}`,
+    components: {
+      debug: Debug(),
+      position: Position({
+        x: spawnX, y: yOffset,
+        velocityResets: 1, speed: 135, gravity: 0.25
+      }),
+      networked: Networked(),
+      collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
+      team: Team(player.components.team.data.team),
+      shadow: Shadow(5, 1),
+      input: Input({
+        release: {
+          "mb1": ({ hold, mouse }) => {
+            if (!mouse) return
+            return { actionId: "shoot", params: { target: mouse, hold } }
+          }
+        },
+        press: {
+          ...WASDInputMap.press,
+          "mb1": ({ hold }) => {
+            if (hold) return
+            return { actionId: "startShotCharge" }
+          },
+          "shift": ({ hold }) => {
+            if (hold) return
+            return { actionId: "dash" }
+          },
+          " ": ({ hold }) => {
+            if (hold) return
+            return { actionId: "jump" }
+          },
+          "g": ({ world, hold }) => {
+            if (hold === 5) {
+              world.debug = !world.debug
+            }
+          },
+          "mb2": ({ hold, mouse }) => {
+            if (hold || !mouse) return
+            return { actionId: "pass", params: { target: mouse } }
+          },
+          "t": ({ hold, world }) => {
+            if (hold) return
+            world.actions.push(world.tick + 2, player.id, { actionId: "SwitchTeam" })
+          }
+        }
+      }),
+      actions: Actions({
+        move: Move,
+        point: Point,
+        pass: passBall,
+        shoot: shootBall,
+        startShotCharge,
+        dash,
+        jump: Action("jump", ({ entity, world }) => {
+          const { position } = entity?.components ?? {}
+          if (!position?.data.standing) return
+          position.setVelocity({ z: 4 })
+
+          const state = world.game.state as HoopsState
+          if (state.ballOwner === entity?.id) {
+            state.dribbleLocked = true
+          }
+        })
+      }),
+      renderable: Renderable({
+        anchor: { x: 0.55, y: 0.9 },
+        scale: 1.2,
+        zIndex: 4,
+        interpolate: true,
+        scaleMode: "nearest",
+        setup: async (r) => {
+          await PixiSkins["dude-white"](r)
+        },
+        animationSelect: VolleyCharacterAnimations,
+        onTick: VolleyCharacterDynamic
+      })
+    }
+  })
+}
+
 type ThrowParams = {
   target: XY
   hold?: number
@@ -30,6 +117,7 @@ const passBall = Action<ThrowParams>("pass", ({ entity, world, params }) => {
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
+  state.dribbleLocked = false
 
   ballPos.data.follows = null
   ballPos.setPosition({ z: Math.max(1, ballPos.data.z) })
@@ -89,6 +177,7 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
+  state.dribbleLocked = false
 
   ballPos.data.follows = null
   ballPos.setPosition({ z: Math.max(1.5, ballPos.data.z) })
@@ -128,85 +217,3 @@ const dash = Action("dash", ({ entity, world }) => {
 
   position.impulse({ x: (dx / magnitude) * DASH_SPEED, y: (dy / magnitude) * DASH_SPEED })
 })
-
-export const Howard = (player: Player) => {
-  const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
-  const yOffset = (seed % 3 - 1) * 14
-  const spawnX = player.components.team.data.team === 1 ? 80 : COURT_WIDTH - 80
-
-  return Character({
-    id: `howard-${player.id}`,
-    components: {
-      debug: Debug(),
-      position: Position({
-        x: spawnX, y: yOffset,
-        velocityResets: 1, speed: 135, gravity: 0.25
-      }),
-      networked: Networked(),
-      collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
-      team: Team(player.components.team.data.team),
-      input: Input({
-        release: {
-          "mb1": ({ hold, mouse }) => {
-            if (!mouse) return
-            return { actionId: "shoot", params: { target: mouse, hold } }
-          }
-        },
-        press: {
-          ...WASDInputMap.press,
-          "mb1": ({ hold }) => {
-            if (hold) return
-            return { actionId: "startShotCharge" }
-          },
-          "shift": ({ hold }) => {
-            if (hold) return
-            return { actionId: "dash" }
-          },
-          " ": ({ hold }) => {
-            if (hold) return
-            return { actionId: "jump" }
-          },
-          "g": ({ world, hold }) => {
-            if (hold === 5) {
-              world.debug = !world.debug
-            }
-          },
-          "mb2": ({ hold, mouse }) => {
-            if (hold || !mouse) return
-            return { actionId: "pass", params: { target: mouse } }
-          },
-          "t": ({ hold, world }) => {
-            if (hold) return
-            world.actions.push(world.tick + 2, player.id, { actionId: "SwitchTeam" })
-          }
-        }
-      }),
-      actions: Actions({
-        move: Move,
-        point: Point,
-        pass: passBall,
-        shoot: shootBall,
-        startShotCharge,
-        dash,
-        jump: Action("jump", ({ entity }) => {
-          const { position } = entity?.components ?? {}
-          if (!position?.data.standing) return
-          position.setVelocity({ z: 4 })
-        })
-      }),
-      shadow: Shadow(5),
-      renderable: Renderable({
-        anchor: { x: 0.55, y: 0.9 },
-        scale: 1.2,
-        zIndex: 4,
-        interpolate: true,
-        scaleMode: "nearest",
-        setup: async (r) => {
-          await PixiSkins["dude-white"](r)
-        },
-        animationSelect: VolleyCharacterAnimations,
-        onTick: VolleyCharacterDynamic
-      })
-    }
-  })
-}

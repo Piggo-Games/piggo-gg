@@ -15,7 +15,7 @@ export const Ball = () => Entity({
     debug: Debug(),
     position: Position({ x: COURT_CENTER.x, y: COURT_CENTER.y, gravity: 0.1 }),
     collider: Collider({ shape: "ball", radius: 4, restitution: 0.6, group: "2" }),
-    shadow: Shadow(3, 3),
+    shadow: Shadow(2.5, 3),
     networked: Networked(),
     renderable: Renderable({
       zIndex: 4,
@@ -183,6 +183,7 @@ export const Hoop = ({ id, x, y, facing, scoringTeam }: HoopProps) => Entity({
         state.scoredTick = world.tick
         state.ballOwner = ""
         state.ballOwnerTeam = 0
+        state.dribbleLocked = false
         return true
       }
     }),

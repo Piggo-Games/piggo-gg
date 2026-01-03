@@ -24,6 +24,7 @@ export type HoopsState = {
   scoredTick: number
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
+  dribbleLocked: boolean
   dashReady: string[]
   dashActive: string[]
   shotCharging: string[]
@@ -50,6 +51,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       scoredTick: 0,
       ballOwner: "",
       ballOwnerTeam: 0,
+      dribbleLocked: false,
       dashReady: [],
       dashActive: [],
       shotCharging: []
@@ -106,7 +108,7 @@ const HoopsSystem = SystemBuilder({
 
       return {
         x: round(hypX * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.x)), 2),
-        y: round(hypY * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.y)) - 2, 2)
+        y: round(hypY * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.y)) / 2, 2)
       }
     }
 
@@ -140,6 +142,7 @@ const HoopsSystem = SystemBuilder({
       const state = world.game.state as HoopsState
       state.ballOwner = playerId
       state.ballOwnerTeam = team
+      state.dribbleLocked = false
 
       ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0)
       ballPos.data.follows = playerId
@@ -176,6 +179,7 @@ const HoopsSystem = SystemBuilder({
           state.scoredTick = 0
           state.ballOwner = ""
           state.ballOwnerTeam = 0
+          state.dribbleLocked = false
           resetBall()
         }
 
@@ -183,11 +187,13 @@ const HoopsSystem = SystemBuilder({
         if (state.ballOwner && !world.entities[state.ballOwner]) {
           state.ballOwner = ""
           state.ballOwnerTeam = 0
+          state.dribbleLocked = false
         }
 
         if (!isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
           state.ballOwner = ""
           state.ballOwnerTeam = 0
+          state.dribbleLocked = false
           resetBall()
         }
 
@@ -200,30 +206,33 @@ const HoopsSystem = SystemBuilder({
           if (!ownerPos || !ownerTeam) {
             state.ballOwner = ""
             state.ballOwnerTeam = 0
+            state.dribbleLocked = false
           } else {
             state.ballOwnerTeam = ownerTeam.data.team
             const offset = orbitOffset(ownerPos.data.pointingDelta)
             const charging = isShotCharging(state.shotCharging, owner.id)
+            const shouldDribble = !charging && !state.dribbleLocked && ownerPos.data.standing
+            const carryZ = ownerPos.data.z + SHOT_CHARGE_Z
 
             ballPos.data.offset = offset
 
-            if (charging) {
+            if (!shouldDribble) {
               ballPos.data.follows = null
               ballPos.setGravity(0)
               ballPos.setVelocity({
                 x: ownerPos.data.velocity.x,
                 y: ownerPos.data.velocity.y,
-                z: 0
+                // z: 0
               })
               ballPos.setPosition({
                 x: ownerPos.data.x + offset.x,
                 y: ownerPos.data.y + offset.y,
-                z: SHOT_CHARGE_Z
+                z: carryZ
               })
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
                 y: ownerPos.localVelocity.y,
-                z: 0
+                z: ownerPos.localVelocity.z
               }
             } else {
               ballPos.data.follows = null
