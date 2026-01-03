@@ -67,7 +67,6 @@ export const ItemSystem = SystemBuilder({
       for (const entity of entities) {
         const { position, item, renderable } = entity.components
         const { follows } = position.data
-        console.log("adjusting item position", entity.id)
 
         const character = world.entity<Position>(follows ?? "")
         if (!character) continue
@@ -137,7 +136,7 @@ export const Tool = (
       actions: Actions({
         whack: Whack(sound, 10)
       }),
-      item: Item({ name, flips: false, distance: 16, direction }),
+      item: Item({ name, flips: true, distance: 16, direction }),
       effects: Effects(),
       renderable: Renderable({
         scaleMode: "nearest",

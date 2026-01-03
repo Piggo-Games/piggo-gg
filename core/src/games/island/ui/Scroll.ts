@@ -1,6 +1,5 @@
 import {
-  Actions, Debug, Entity, Position, Renderable,
-  load, pixiText, values, wrapText
+  Actions, Debug, Entity, Position, Renderable, load, pixiText, values, wrapText
 } from "@piggo-gg/core"
 import { Sprite } from "pixi.js"
 import type { IslandState, Roll } from "../Island"

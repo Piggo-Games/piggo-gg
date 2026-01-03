@@ -149,12 +149,12 @@ export const World = ({ commands, systems, pixi, mode, three }: WorldProps): Wor
       })
     },
     addSystemBuilders: (systemBuilders: SystemBuilder[]) => {
-      systemBuilders.forEach((systemBuilder) => {
+      for (const systemBuilder of systemBuilders) {
         if (!world.systems[systemBuilder.id]) {
           const system = systemBuilder.init(world)
           if (system) world.addSystems([system])
         }
-      })
+      }
     },
     announce: (message: string) => {
       world.messages.set(world.tick + 1, "game", [message])
