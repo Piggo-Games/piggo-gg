@@ -2,17 +2,19 @@ import {
   Action, Actions, Character, Collider, Debug, Input, Move, Networked,
   PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
   VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap, XY, hypot,
-  min, velocityToPoint
+  max, min, velocityToPoint
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, HOOP_OFFSET_X,
-  PASS_GRAVITY, PASS_UP, SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
+  PASS_GRAVITY, PASS_UP, SHOT_CHARGE_MAX, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
+  SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import { getDashUntil, setDashEntry } from "./HoopsStateUtils"
 
 type ThrowParams = {
   target: XY
+  hold?: number
 }
 
 const passBall = Action<ThrowParams>("pass", ({ entity, world, params }) => {
@@ -63,7 +65,15 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
       : { x: hoopX, y: hoopY }
   )
 
-  const distance = hypot(position.data.x - target.x, position.data.y - target.y)
+  const hold = max(0, params?.hold ?? 0)
+  const charge = min(1, hold / SHOT_CHARGE_TICKS)
+  const power = 1 + charge * (SHOT_CHARGE_MAX - 1)
+
+  const dx = target.x - x
+  const dy = target.y - y
+  const poweredTarget = { x: x + dx * power, y: y + dy * power }
+
+  const distance = hypot(dx, dy) * power
   const up = min(SHOT_UP_MAX, SHOT_UP_MIN + distance / SHOT_UP_SCALE)
 
   state.ballOwner = ""
@@ -73,7 +83,7 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   ballPos.setPosition({ z: Math.max(1.5, ballPos.data.z) })
   ballPos.setGravity(SHOT_GRAVITY)
 
-  const v = velocityToPoint(ballPos.data, target, SHOT_GRAVITY, up)
+  const v = velocityToPoint(ballPos.data, poweredTarget, SHOT_GRAVITY, up)
   const scale = 1000 / world.tickrate
 
   ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: up })
@@ -125,6 +135,12 @@ export const Howard = (player: Player) => {
       collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
       team: Team(player.components.team.data.team),
       input: Input({
+        release: {
+          "mb1": ({ hold, mouse }) => {
+            if (!mouse) return
+            return { actionId: "shoot", params: { target: mouse, hold } }
+          }
+        },
         press: {
           ...WASDInputMap.press,
           "shift": ({ hold }) => {
@@ -139,10 +155,6 @@ export const Howard = (player: Player) => {
             if (hold === 5) {
               world.debug = !world.debug
             }
-          },
-          "mb1": ({ hold, mouse }) => {
-            if (hold || !mouse) return
-            return { actionId: "shoot", params: { target: mouse } }
           },
           "mb2": ({ hold, mouse }) => {
             if (hold || !mouse) return
