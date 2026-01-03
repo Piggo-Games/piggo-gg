@@ -3,7 +3,7 @@ import {
   Game, GameBuilder, InvokedAction, Networked, Player, Random, PixiRenderer,
   SerializedEntity, System, SystemBuilder, SystemEntity, TickBuffer,
   ValidComponents, XYZ, keys, logPerf, values, ThreeRenderer, filterEntities,
-  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build, HDiv, Island, Mars
+  Lobby, Volley, Craft, Strike, GameTitle, Volley3d, Build, HDiv, Island, Mars, Hoops
 } from "@piggo-gg/core"
 import { World as RapierWorld } from "@dimforge/rapier2d-compat"
 
@@ -88,6 +88,7 @@ export const World = ({ commands, systems, pixi, mode, three }: WorldProps): Wor
       "volley": Volley,
       "volley3d": Volley3d,
       "mars": Mars,
+      "hoops": Hoops,
       "": Lobby
     },
     lastTick: 0,
