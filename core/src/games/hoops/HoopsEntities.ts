@@ -4,7 +4,7 @@ import {
 } from "@piggo-gg/core"
 import { Texture } from "pixi.js"
 import {
-  COURT_CENTER, COURT_HEIGHT, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z
+  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -39,8 +39,8 @@ export const Court = () => LineWall({
   points: [
     0, 0,
     COURT_WIDTH, 0,
-    COURT_WIDTH, COURT_HEIGHT,
-    0, COURT_HEIGHT,
+    COURT_WIDTH + COURT_SPLAY, COURT_HEIGHT,
+    -COURT_SPLAY, COURT_HEIGHT,
     0, 0
   ],
   visible: true,

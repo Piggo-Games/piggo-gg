@@ -1,5 +1,6 @@
 export const COURT_WIDTH = 450
 export const COURT_HEIGHT = 150
+export const COURT_SPLAY = 50
 export const COURT_CENTER = { x: COURT_WIDTH / 2, y: 0 }
 
 export const HOOP_OFFSET_X = 22

@@ -5,7 +5,7 @@ Update this first, then align code with the design.
 ## Draft v0
 - Goal: score by getting the ball through the opponent hoop; first to 11 resets the match.
 - Teams: 2v2; team 1 defends the left hoop and scores on the right hoop (and vice versa).
-- Court: rectangular court with a hoop on each end; ball spawns at center on reset.
+- Court: parallelogram court with a hoop on each end; ball spawns at center on reset.
 - Possession: ball attaches to the handler and orbits around them with mouse movement (Item-style control).
 - Controls: WASD move, MB1 shoot, MB2 pass, Shift dash, Esc menu.
 - Pass: low arc to the cursor target; ball becomes loose for anyone to collect.
