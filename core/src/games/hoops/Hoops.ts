@@ -7,7 +7,7 @@ import {
 } from "@piggo-gg/core"
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
-  COURT_CENTER, SCORE_RESET_TICKS
+  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, SCORE_RESET_TICKS
 } from "./HoopsConstants"
 import { Ball, Centerline, Court, HoopSet } from "./HoopsEntities"
 import { Howard } from "./Howard"
@@ -86,6 +86,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
 const HoopsSystem = SystemBuilder({
   id: "HoopsSystem",
   init: (world) => {
+    const halfCourtHeight = COURT_HEIGHT / 2
     const orbitOffset = (pointingDelta: XY) => {
       if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
         return { x: BALL_ORBIT_DISTANCE, y: 0 }
@@ -101,6 +102,17 @@ const HoopsSystem = SystemBuilder({
         x: round(hypX * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.x)), 2),
         y: round(hypY * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.y)) - 2, 2)
       }
+    }
+
+    const isInCourtBounds = (x: number, y: number): boolean => {
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return false
+      if (y < -halfCourtHeight || y > halfCourtHeight) return false
+
+      const t = (y + halfCourtHeight) / COURT_HEIGHT
+      const leftEdge = -COURT_SPLAY * t
+      const rightEdge = COURT_WIDTH + COURT_SPLAY * t
+
+      return x >= leftEdge && x <= rightEdge
     }
 
     const resetBall = () => {
@@ -164,6 +176,12 @@ const HoopsSystem = SystemBuilder({
         if (state.ballOwner && !world.entities[state.ballOwner]) {
           state.ballOwner = ""
           state.ballOwnerTeam = 0
+        }
+
+        if (!isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
+          state.ballOwner = ""
+          state.ballOwnerTeam = 0
+          resetBall()
         }
 
         // ball carry
