@@ -242,8 +242,6 @@ const HoopsSystem = SystemBuilder({
                 ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
               }
 
-              console.log("carrying ball", ballPos.data.z)
-
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
                 y: ownerPos.localVelocity.y,
