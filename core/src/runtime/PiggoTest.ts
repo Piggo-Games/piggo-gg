@@ -17,5 +17,6 @@ export const PiggoTest: PiggoTest = (game) => {
 PiggoTest("mars")
 PiggoTest("island")
 PiggoTest("volley")
+PiggoTest("hoops")
 PiggoTest("lobby")
 PiggoTest("build")
