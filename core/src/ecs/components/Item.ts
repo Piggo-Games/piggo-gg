@@ -75,27 +75,27 @@ export const ItemSystem = SystemBuilder({
 
         // if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
 
-        if (item.flips) {
-          if (pointingDelta.x < 0) {
-            renderable.c.scale.x = -abs(renderable.c.scale.x)
-          } else {
-            renderable.c.scale.x = abs(renderable.c.scale.x)
-          }
-        }
+        // if (item.flips) {
+        //   if (pointingDelta.x < 0) {
+        //     renderable.c.scale.x = -abs(renderable.c.scale.x)
+        //   } else {
+        //     renderable.c.scale.x = abs(renderable.c.scale.x)
+        //   }
+        // }
 
         position.data.offset = { x: 14, y: -4 }
 
-        if (!item.dropped) {
-          const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
+        // if (!item.dropped) {
+        //   const hypotenuse = hypot(pointingDelta.x, pointingDelta.y)
 
-          const hyp_x = pointingDelta.x / hypotenuse
-          const hyp_y = pointingDelta.y / hypotenuse
+        //   const hyp_x = pointingDelta.x / hypotenuse
+        //   const hyp_y = pointingDelta.y / hypotenuse
 
-          position.data.offset = {
-            x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
-            y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
-          }
-        }
+        //   position.data.offset = {
+        //     x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
+        //     y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
+        //   }
+        // }
       }
     }
   })
