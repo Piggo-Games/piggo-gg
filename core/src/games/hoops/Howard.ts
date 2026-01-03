@@ -10,7 +10,7 @@ import {
   SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
-import { getDashUntil, setDashEntry } from "./HoopsStateUtils"
+import { addShotCharging, getDashUntil, removeShotCharging, setDashEntry } from "./HoopsStateUtils"
 
 type ThrowParams = {
   target: XY
@@ -41,10 +41,20 @@ const passBall = Action<ThrowParams>("pass", ({ entity, world, params }) => {
   ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: PASS_UP })
 })
 
+const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
+  if (!entity) return
+
+  const state = world.game.state as HoopsState
+  if (state.phase !== "play") return
+
+  state.shotCharging = addShotCharging(state.shotCharging, entity.id)
+})
+
 const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   if (!entity) return
 
   const state = world.game.state as HoopsState
+  state.shotCharging = removeShotCharging(state.shotCharging, entity.id)
   if (state.phase !== "play") return
   if (state.ballOwner !== entity.id) return
 
@@ -144,6 +154,10 @@ export const Howard = (player: Player) => {
         },
         press: {
           ...WASDInputMap.press,
+          "mb1": ({ hold }) => {
+            if (hold) return
+            return { actionId: "startShotCharge" }
+          },
           "shift": ({ hold }) => {
             if (hold) return
             return { actionId: "dash" }
@@ -172,6 +186,7 @@ export const Howard = (player: Player) => {
         point: Point,
         pass: passBall,
         shoot: shootBall,
+        startShotCharge,
         dash,
         jump: Action("jump", ({ entity }) => {
           const { position } = entity?.components ?? {}

@@ -7,11 +7,14 @@ import {
 } from "@piggo-gg/core"
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
-  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, SCORE_RESET_TICKS
+  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
+  DRIBBLE_GRAVITY, SCORE_RESET_TICKS
 } from "./HoopsConstants"
 import { Ball, Centerline, Court, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
-import { getDashUntil, pruneDashEntries } from "./HoopsStateUtils"
+import {
+  getDashUntil, isShotCharging, pruneDashEntries, pruneShotCharging
+} from "./HoopsStateUtils"
 
 export type HoopsState = {
   phase: "play" | "score"
@@ -23,6 +26,7 @@ export type HoopsState = {
   ballOwnerTeam: 0 | 1 | 2
   dashReady: string[]
   dashActive: string[]
+  shotCharging: string[]
 }
 
 export type HoopsSettings = {
@@ -47,7 +51,8 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       ballOwner: "",
       ballOwnerTeam: 0,
       dashReady: [],
-      dashActive: []
+      dashActive: [],
+      shotCharging: []
     },
     systems: [
       PhysicsSystem("local"),
@@ -157,6 +162,7 @@ const HoopsSystem = SystemBuilder({
         const exists = (id: string) => Boolean(world.entities[id])
         state.dashReady = pruneDashEntries(state.dashReady, world.tick, exists, (until, now) => until > now)
         state.dashActive = pruneDashEntries(state.dashActive, world.tick, exists, (until, now) => until >= now)
+        state.shotCharging = pruneShotCharging(state.shotCharging, exists)
 
         // reset after score
         if (state.phase === "score" && (world.tick - state.scoredTick) > SCORE_RESET_TICKS) {
@@ -196,9 +202,37 @@ const HoopsSystem = SystemBuilder({
             state.ballOwnerTeam = 0
           } else {
             state.ballOwnerTeam = ownerTeam.data.team
-            ballPos.data.offset = orbitOffset(ownerPos.data.pointingDelta)
-            ballPos.data.follows = owner.id
-            ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0)
+            const offset = orbitOffset(ownerPos.data.pointingDelta)
+            const charging = isShotCharging(state.shotCharging, owner.id)
+
+            ballPos.data.offset = offset
+
+            if (charging) {
+              ballPos.data.follows = owner.id
+              ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0)
+            } else {
+              ballPos.data.follows = null
+              ballPos.setGravity(DRIBBLE_GRAVITY)
+              ballPos.setVelocity({
+                x: ownerPos.data.velocity.x,
+                y: ownerPos.data.velocity.y
+              })
+              ballPos.setPosition({
+                x: ownerPos.data.x + offset.x,
+                y: ownerPos.data.y + offset.y
+              })
+
+              if (ballPos.data.z <= 0 && ballPos.data.velocity.z <= 0) {
+                ballPos.setPosition({ z: 0 })
+                ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
+              }
+
+              ballPos.localVelocity = {
+                x: ownerPos.localVelocity.x,
+                y: ownerPos.localVelocity.y,
+                z: ballPos.data.velocity.z
+              }
+            }
 
             if (ball?.components.collider) ball.components.collider.setGroup("none")
           }

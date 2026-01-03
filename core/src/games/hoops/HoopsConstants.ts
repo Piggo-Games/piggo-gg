@@ -12,6 +12,9 @@ export const BALL_PICKUP_RANGE = 12
 export const BALL_PICKUP_Z = 6
 export const BALL_STEAL_RANGE = 10
 
+export const DRIBBLE_GRAVITY = 0.2
+export const DRIBBLE_BOUNCE = 1.1
+
 export const PASS_GRAVITY = 0.12
 export const PASS_UP = 2.2
 
