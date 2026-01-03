@@ -369,6 +369,7 @@ export const World = ({ commands, systems, pixi, mode, three }: WorldProps): Wor
   // check if there was a query param for the game
   if (world.client) {
     let gameId = world.client.discord ? "island" : world.client.mobile ? "mars" : "lobby" 
+
     const param = new URLSearchParams(window.location.search).get("game")
     if (param && param in world.games) gameId = param
 
