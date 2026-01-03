@@ -75,13 +75,13 @@ export const ItemSystem = SystemBuilder({
 
         // if (rotation) position.rotate(rotation > 0 ? -0.1 : 0.1, true)
 
-        // if (item.flips) {
-        //   if (pointingDelta.x < 0) {
-        //     renderable.c.scale.x = -abs(renderable.c.scale.x)
-        //   } else {
-        //     renderable.c.scale.x = abs(renderable.c.scale.x)
-        //   }
-        // }
+        if (item.flips) {
+          if (pointingDelta.x < 0) {
+            renderable.c.scale.x = -abs(renderable.c.scale.x)
+          } else {
+            renderable.c.scale.x = abs(renderable.c.scale.x)
+          }
+        }
 
         position.data.offset = { x: 14, y: -4 }
 
@@ -136,7 +136,7 @@ export const Tool = (
       actions: Actions({
         whack: Whack(sound, 10)
       }),
-      item: Item({ name, flips: true, distance: 16, direction }),
+      item: Item({ name, flips: false, distance: 16, direction }),
       effects: Effects(),
       renderable: Renderable({
         scaleMode: "nearest",
