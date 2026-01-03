@@ -28,7 +28,7 @@
 - Rendering/UI: `core/src/graphics` holds `ThreeRenderer`, `PixiRenderer`, cameras, shaders; drawables sit under `core/src/ecs/renderables` and UI entities under `core/src/ecs/entities/ui`. DOM overlays live in `core/src/html` components (HDiv/HButton/HtmlText/etc.) attached in game definitions.
 
 ## Testing Guidelines
-- No automated test suite is currently present.
+- Use `bun tests` after source code changes to catch compilation/runtime errors.
 
 ## Commit & Pull Request Guidelines
 - Recent history favors short, versioned summaries (e.g., `v0.49.3 better Lobby UI (#522)`). Use imperative mood for non-release work and include scope + PR/issue reference when available.

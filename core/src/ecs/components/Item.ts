@@ -91,10 +91,10 @@ export const ItemSystem = SystemBuilder({
         //   const hyp_x = pointingDelta.x / hypotenuse
         //   const hyp_y = pointingDelta.y / hypotenuse
 
-          // position.data.offset = {
-          //   x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
-          //   y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
-          // }
+        //   position.data.offset = {
+        //     x: round(hyp_x * min(item.distance, abs(pointingDelta.x)), 2),
+        //     y: round(hyp_y * min(10, abs(pointingDelta.y)) - 2, 2)
+        //   }
         // }
       }
     }

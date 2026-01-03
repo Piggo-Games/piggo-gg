@@ -1,3 +1,5 @@
+import { mocks } from 'mock-browser'
+
 // for pixi-filters & discord
 global.window = {
   innerWidth: 1920,
@@ -7,3 +9,6 @@ global.window = {
     origin: 'http://localhost'
   }
 }
+
+const mock = new mocks.MockBrowser()
+global.document = mock.getDocument()
