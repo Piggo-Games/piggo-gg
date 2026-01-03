@@ -2,7 +2,7 @@ import {
   Action, Actions, Character, Collider, Debug, Input, Move, Networked,
   PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
   VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap, XY, hypot,
-  min, minmax, velocityToPoint
+  min, velocityToPoint
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, HOOP_OFFSET_X,
@@ -56,14 +56,15 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   const hoopX = team.data.team === 1 ? COURT_WIDTH - HOOP_OFFSET_X : HOOP_OFFSET_X
   const hoopY = 0
 
-  const distance = hypot(position.data.x - hoopX, position.data.y - hoopY)
-  const up = min(SHOT_UP_MAX, SHOT_UP_MIN + distance / SHOT_UP_SCALE)
+  const { pointingDelta, x, y } = position.data
+  const target = params?.target ?? (
+    Number.isFinite(pointingDelta.x) && Number.isFinite(pointingDelta.y)
+      ? { x: x + pointingDelta.x, y: y + pointingDelta.y }
+      : { x: hoopX, y: hoopY }
+  )
 
-  const target = params?.target ?? { x: hoopX, y: hoopY }
-  const aim = {
-    x: hoopX + minmax(target.x - hoopX, -12, 12),
-    y: hoopY + minmax(target.y - hoopY, -12, 12)
-  }
+  const distance = hypot(position.data.x - target.x, position.data.y - target.y)
+  const up = min(SHOT_UP_MAX, SHOT_UP_MIN + distance / SHOT_UP_SCALE)
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
@@ -72,7 +73,7 @@ const shootBall = Action<ThrowParams>("shoot", ({ entity, world, params }) => {
   ballPos.setPosition({ z: Math.max(1.5, ballPos.data.z) })
   ballPos.setGravity(SHOT_GRAVITY)
 
-  const v = velocityToPoint(ballPos.data, aim, SHOT_GRAVITY, up)
+  const v = velocityToPoint(ballPos.data, target, SHOT_GRAVITY, up)
   const scale = 1000 / world.tickrate
 
   ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: up })
