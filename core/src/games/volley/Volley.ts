@@ -6,7 +6,7 @@ import {
 } from "@piggo-gg/core"
 import { Bot } from "./Bot"
 import { Ball, Bounds, Centerline, Court, Net, PostBottom, PostTop } from "./entities"
-import { TargetSystem } from "./Target"
+import { Target } from "./Target"
 import { Vince } from "./Vince"
 
 export const range = 32
@@ -57,7 +57,6 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       SpawnSystem({ spawner: Vince, pos: { x: 8, y: 8, z: 2 } }),
       VolleySystem,
       ShadowSystem,
-      TargetSystem,
       PixiRenderSystem,
       PixiNametagSystem(),
       HUDSystem(controls),
@@ -82,6 +81,7 @@ export const Volley: GameBuilder<VolleyState, VolleySettings> = {
       Net(),
       Bounds("2"),
       Bounds("3"),
+      Target(),
 
       ScorePanel(),
       HtmlChat(),

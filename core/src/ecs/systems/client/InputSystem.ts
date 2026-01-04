@@ -93,6 +93,8 @@ export const InputSystem = ClientSystemBuilder({
 
       // mobile mb2
       if (world.three?.ready && world.client?.mobile && event.clientX < screenWH().w / 2) key = "mb2"
+      const down = client.bufferDown.get(key)
+      const hold = down?.hold ?? 0
 
       if (key === "mb1") {
         const pc = client.character()
@@ -101,13 +103,13 @@ export const InputSystem = ClientSystemBuilder({
         if (pc && release) {
           release({
             // @ts-expect-error
-            mouse, aim: localAim(), client, entity: pc, world, tick: world.tick, hold: 0, target: event.target?.localName ?? ""
+            mouse, aim: localAim(), client, entity: pc, world, tick: world.tick, hold, target: event.target?.localName ?? ""
           })
         }
       }
 
       // @ts-expect-error
-      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold: 0, delta: 0, target: event.target?.localName ?? ""})
+      client.bufferUp.push({ key, mouse, aim: localAim(), tick: world.tick, hold, delta: 0, target: event.target?.localName ?? ""})
     })
 
     document.addEventListener("keyup", (event: KeyboardEvent) => {

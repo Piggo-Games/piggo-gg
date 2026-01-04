@@ -1,0 +1,11 @@
+{
+  "frames": {
+    "0": { "frame": { "x": 0, "y": 0, "w": 17, "h": 17 } }
+  },
+  "meta": {
+    "image": "bball.png",
+    "format": "RGBA8888",
+    "size": { "w": 17, "h": 17 },
+    "scale": "1"
+  }
+}

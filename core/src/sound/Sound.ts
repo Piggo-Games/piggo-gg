@@ -1,6 +1,7 @@
 import { entries, GunNames, randomChoice, World, XY, XYdistance } from "@piggo-gg/core"
 import { dbToGain, Gain, getContext, getTransport, Player, Player as Tone } from "tone"
 
+export type BounceSounds = "bounce1" | "bounce2" | "bounce3" | "bounce4"
 export type BubbleSounds = "bubble" | "hitmarker" | "dice1" | "dice2" | "throw" | "jingle1" | "f9"
 export type MusicSounds = "track1"
 export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cassetteStop" | "reload" | "clink"
@@ -10,7 +11,7 @@ export type VolleySounds = "spike"
 export type LaserSounds = "laser1"
 
 export type ValidSounds =
-  BubbleSounds | ClickSounds | MusicSounds | ToolSounds |
+  BounceSounds | BubbleSounds | ClickSounds | MusicSounds | ToolSounds |
   GunNames | EatSounds | VolleySounds | LaserSounds
 
 const load = (url: string, volume: number): Tone => {
@@ -68,6 +69,10 @@ export const Sound = (world: World): Sound => {
     state: "closed",
     ready: false,
     tones: {
+      bounce1: load("bounce1.mp3", 0),
+      bounce2: load("bounce2.mp3", 0),
+      bounce3: load("bounce3.mp3", 0),
+      bounce4: load("bounce4.mp3", 0),
       // birdsong1: load("birdsong1.mp3", -20),
       f9: load("f9.mp3", -5),
       jingle1: load("jingle1.mp3", -5),
