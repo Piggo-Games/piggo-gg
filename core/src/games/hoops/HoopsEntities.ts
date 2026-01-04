@@ -145,7 +145,7 @@ export const CourtLines = () => Entity({
         // Free throw circles
         console.log({ freeThrowCircleRadiusY })
         arc(leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
-        // arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
+        arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
         // 3-point lines
         const threeTopEdges = edgeAtY(-THREE_POINT_SIDE_Y)

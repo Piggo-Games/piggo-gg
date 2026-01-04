@@ -343,10 +343,10 @@ const controls: HUDSystemProps = {
       label: "pass",
       buttons: [["mb2"]]
     },
-    {
-      label: "dash",
-      buttons: [["shift"]]
-    },
+    // {
+    //   label: "dash",
+    //   buttons: [["shift"]]
+    // },
     {
       label: "menu",
       buttons: [["esc"]]

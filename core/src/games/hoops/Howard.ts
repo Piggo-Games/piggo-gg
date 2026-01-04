@@ -44,10 +44,10 @@ export const Howard = (player: Player) => {
             if (hold) return
             return { actionId: "startShotCharge" }
           },
-          "shift": ({ hold }) => {
-            if (hold) return
-            return { actionId: "dash" }
-          },
+          // "shift": ({ hold }) => {
+          //   if (hold) return
+          //   return { actionId: "dash" }
+          // },
           " ": ({ hold }) => {
             if (hold) return
             return { actionId: "jump" }
