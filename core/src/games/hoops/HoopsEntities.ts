@@ -4,8 +4,9 @@ import {
 } from "@piggo-gg/core"
 import { Graphics, Texture } from "pixi.js"
 import {
-  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
-  SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
+  COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY,
+  COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
+  SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -46,7 +47,7 @@ export const Court = () => LineWall({
   ],
   visible: true,
   fill: 0xc48a5a,
-  strokeAlpha: 0.8
+  strokeAlpha: 0.9
 })
 
 export const Centerline = () => LineWall({
@@ -56,8 +57,23 @@ export const Centerline = () => LineWall({
     COURT_WIDTH / 2, COURT_HEIGHT
   ],
   visible: true,
-  strokeAlpha: 0.5,
+  strokeAlpha: 1,
   group: "none"
+})
+
+export const CenterCircle = () => Entity({
+  id: "center-circle",
+  components: {
+    position: Position({ x: COURT_CENTER.x, y: 0 }),
+    renderable: Renderable({
+      zIndex: 3.1,
+      setup: async (renderable) => {
+        renderable.c = pixiGraphics()
+          .ellipse(0, 0, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y)
+          .stroke({ width: 2, color: 0xffffff, alpha: 1 })
+      }
+    })
+  }
 })
 
 export const ShotChargeLine = () => Entity({
