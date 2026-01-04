@@ -135,7 +135,7 @@ export const ShotChargeLine = () => Entity({
 
           const origin = { x: ballPos.data.x, y: ballPos.data.y, z: originZ }
           const velocity = { x: dirX * speed, y: dirY * speed }
-          const tickDelta = 1 / world.tickrate
+          const tickSeconds = world.tickrate / 1000
 
           let posX = origin.x
           let posY = origin.y
@@ -146,8 +146,8 @@ export const ShotChargeLine = () => Entity({
           const maxSteps = 90
 
           for (let step = 0; step < maxSteps; step += 1) {
-            posX += velocity.x * tickDelta
-            posY += velocity.y * tickDelta
+            posX += velocity.x * tickSeconds
+            posY += velocity.y * tickSeconds
             posZ += velZ
 
             if (posZ <= 0) {
