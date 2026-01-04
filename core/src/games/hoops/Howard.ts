@@ -4,13 +4,12 @@ import {
   VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
-  PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX,
-  SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
+  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS,
+  SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import {
-  addShotCharging, getDashUntil, isShotCharging, removeShotCharging, setDashEntry
+  addShotCharging, isShotCharging, removeShotCharging
 } from "./HoopsStateUtils"
 
 export const HOWARD_SPEED = 135
@@ -44,10 +43,6 @@ export const Howard = (player: Player) => {
             if (hold) return
             return { actionId: "startShotCharge" }
           },
-          // "shift": ({ hold }) => {
-          //   if (hold) return
-          //   return { actionId: "dash" }
-          // },
           " ": ({ hold }) => {
             if (hold) return
             return { actionId: "jump" }
@@ -73,7 +68,6 @@ export const Howard = (player: Player) => {
         pass: passBall,
         shoot: shootBall,
         startShotCharge,
-        dash,
         jump: jumpHoward
       }),
       renderable: Renderable({
@@ -215,7 +209,6 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
   const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
   const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
-  console.log("Shooting with speed:", speed, charge)
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
@@ -243,36 +236,4 @@ const jumpHoward = Action("jump", ({ entity, world }) => {
   if (state.ballOwner === entity.id) {
     state.dribbleLocked = true
   }
-})
-
-const dash = Action("dash", ({ entity, world }) => {
-  if (!entity) return
-
-  const state = world.game.state as HoopsState
-  const { position } = entity.components
-  if (!position) return
-
-  if (isMovementLocked(state, entity.id, position)) return
-  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
-
-  const readyAt = getDashUntil(state.dashReady, entity.id) ?? 0
-  if (world.tick < readyAt) return
-
-  state.dashReady = setDashEntry(state.dashReady, entity.id, world.tick + DASH_COOLDOWN_TICKS)
-  state.dashActive = setDashEntry(state.dashActive, entity.id, world.tick + DASH_ACTIVE_TICKS)
-
-  const { pointingDelta, velocity } = position.data
-
-  let dx = velocity.x
-  let dy = velocity.y
-
-  if (!dx && !dy) {
-    dx = Number.isFinite(pointingDelta.x) ? pointingDelta.x : 0
-    dy = Number.isFinite(pointingDelta.y) ? pointingDelta.y : 0
-  }
-
-  const magnitude = hypot(dx, dy)
-  if (!magnitude) return
-
-  position.impulse({ x: (dx / magnitude) * DASH_SPEED, y: (dy / magnitude) * DASH_SPEED })
 })
