@@ -122,9 +122,9 @@ export const CourtLines = () => Entity({
           }
         }
 
-        line(leftFreeThrowX, -laneHalf, leftFreeThrowX, laneHalf)
-        line(rightFreeThrowX, -laneHalf, rightFreeThrowX, laneHalf)
+        const offset = 8
 
+        // Free throw lane
         const laneTopEdges = edgeAtY(-laneHalf)
         const laneBottomEdges = edgeAtY(laneHalf)
         line(laneTopEdges.left, -laneHalf, leftFreeThrowX, -laneHalf)
@@ -132,6 +132,11 @@ export const CourtLines = () => Entity({
         line(rightFreeThrowX, -laneHalf, laneTopEdges.right, -laneHalf)
         line(rightFreeThrowX, laneHalf, laneBottomEdges.right, laneHalf)
 
+        // free throw line
+        line(leftFreeThrowX - offset, laneHalf, leftFreeThrowX, -laneHalf)
+        line(rightFreeThrowX - offset, -laneHalf, rightFreeThrowX, laneHalf)
+
+        // Free throw circles
         arc(leftFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
         arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
@@ -139,6 +144,8 @@ export const CourtLines = () => Entity({
         const threeBottomEdges = edgeAtY(THREE_POINT_SIDE_Y)
         line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, -THREE_POINT_SIDE_Y)
         line(threeBottomEdges.left, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, THREE_POINT_SIDE_Y)
+
+        // 3-point lines
         line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, threeTopEdges.right, -THREE_POINT_SIDE_Y)
         line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, threeBottomEdges.right, THREE_POINT_SIDE_Y)
 
