@@ -1,5 +1,5 @@
 export const COURT_WIDTH = 450
-export const COURT_HEIGHT = 150
+export const COURT_HEIGHT = 180
 export const COURT_SPLAY = 50
 export const COURT_CENTER = { x: COURT_WIDTH / 2, y: 0 }
 export const COURT_CENTER_CIRCLE_RADIUS_X = 30
@@ -8,7 +8,7 @@ export const COURT_LINE_Y_SCALE = COURT_CENTER_CIRCLE_RADIUS_Y / COURT_CENTER_CI
 export const COURT_LINE_WIDTH = 1.5
 
 export const THREE_POINT_RADIUS = 120
-export const THREE_POINT_SIDE_Y = 52
+export const THREE_POINT_SIDE_Y = 70
 export const FREE_THROW_DISTANCE = 70
 export const FREE_THROW_LANE_WIDTH = 48
 export const FREE_THROW_CIRCLE_RADIUS = 40
