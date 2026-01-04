@@ -65,8 +65,11 @@ export const LineWall = (
         },
         setContainer: async () => {
           const g = new Graphics()
-          for (let i = 2; i < newPoints.length; i += 2) {
-            g.lineTo(newPoints[i], newPoints[i + 1])
+          if (newPoints.length >= 2) {
+            g.moveTo(newPoints[0], newPoints[1])
+            for (let i = 2; i < newPoints.length; i += 2) {
+              g.lineTo(newPoints[i], newPoints[i + 1])
+            }
           }
 
           g.stroke({ width: 2, color: 0xffffff, alpha: strokeAlpha ?? 1 })

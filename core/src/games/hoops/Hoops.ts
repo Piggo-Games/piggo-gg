@@ -80,7 +80,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       ShotChargeLine(),
       Ball(),
       Court(),
-      // Centerline(),
+      Centerline(),
       // ...HoopSet(),
       ScorePanel(),
       HtmlChat(),
