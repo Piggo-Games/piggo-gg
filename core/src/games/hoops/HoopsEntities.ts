@@ -15,7 +15,7 @@ export const Ball = () => Entity({
   id: "ball",
   components: {
     debug: Debug(),
-    position: Position({ x: COURT_CENTER.x, y: COURT_CENTER.y, gravity: 0.1 }),
+    position: Position({ x: COURT_CENTER.x, gravity: 0.1 }),
     collider: Collider({ shape: "ball", radius: 4, restitution: 0.6, group: "2" }),
     shadow: Shadow(2.5, 3),
     networked: Networked(),
