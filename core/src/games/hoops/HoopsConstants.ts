@@ -4,6 +4,14 @@ export const COURT_SPLAY = 50
 export const COURT_CENTER = { x: COURT_WIDTH / 2, y: 0 }
 export const COURT_CENTER_CIRCLE_RADIUS_X = 30
 export const COURT_CENTER_CIRCLE_RADIUS_Y = 18 // 0.6 ratio
+export const COURT_LINE_Y_SCALE = COURT_CENTER_CIRCLE_RADIUS_Y / COURT_CENTER_CIRCLE_RADIUS_X
+export const COURT_LINE_WIDTH = 1.5
+
+export const THREE_POINT_RADIUS = 120
+export const THREE_POINT_SIDE_Y = 52
+export const FREE_THROW_DISTANCE = 70
+export const FREE_THROW_LANE_WIDTH = 48
+export const FREE_THROW_CIRCLE_RADIUS = 40
 
 export const HOOP_OFFSET_X = 22
 export const HOOP_RADIUS = 8

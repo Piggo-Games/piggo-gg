@@ -5,8 +5,9 @@ import {
 import { Graphics, Texture } from "pixi.js"
 import {
   COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY,
-  COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
-  SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
+  COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS, FREE_THROW_DISTANCE,
+  FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
+  SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -72,6 +73,70 @@ export const CenterCircle = () => Entity({
         renderable.c = pixiGraphics()
           .ellipse(0, 0, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y)
           .stroke({ width: 1.5, color: 0xffffff, alpha: 1 })
+      }
+    })
+  }
+})
+
+export const CourtLines = () => Entity({
+  id: "court-lines",
+  components: {
+    position: Position(),
+    renderable: Renderable({
+      zIndex: 3.2,
+      setup: async (renderable) => {
+        const g = pixiGraphics()
+        const laneHalf = FREE_THROW_LANE_WIDTH / 2
+        const freeThrowCircleRadiusY = FREE_THROW_CIRCLE_RADIUS * COURT_LINE_Y_SCALE
+        const threePointRadiusY = THREE_POINT_RADIUS * COURT_LINE_Y_SCALE
+
+        const leftHoopX = HOOP_OFFSET_X
+        const rightHoopX = COURT_WIDTH - HOOP_OFFSET_X
+        const leftFreeThrowX = leftHoopX + FREE_THROW_DISTANCE
+        const rightFreeThrowX = rightHoopX - FREE_THROW_DISTANCE
+
+        const threePointSideRatio = 1 - (THREE_POINT_SIDE_Y * THREE_POINT_SIDE_Y)
+          / (threePointRadiusY * threePointRadiusY)
+        const threePointSideX = THREE_POINT_RADIUS * Math.sqrt(max(0, threePointSideRatio))
+        const threePointTheta = Math.asin(min(1, THREE_POINT_SIDE_Y / threePointRadiusY))
+
+        const line = (x1: number, y1: number, x2: number, y2: number) => {
+          g.moveTo(x1, y1)
+          g.lineTo(x2, y2)
+        }
+
+        const arc = (cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
+          const step = (end - start) / steps
+          for (let i = 0; i <= steps; i += 1) {
+            const angle = start + step * i
+            const x = cx + Math.cos(angle) * rx
+            const y = cy + Math.sin(angle) * ry
+            if (i === 0) g.moveTo(x, y)
+            else g.lineTo(x, y)
+          }
+        }
+
+        line(leftFreeThrowX, -laneHalf, leftFreeThrowX, laneHalf)
+        line(rightFreeThrowX, -laneHalf, rightFreeThrowX, laneHalf)
+
+        line(0, -laneHalf, leftFreeThrowX, -laneHalf)
+        line(0, laneHalf, leftFreeThrowX, laneHalf)
+        line(rightFreeThrowX, -laneHalf, COURT_WIDTH, -laneHalf)
+        line(rightFreeThrowX, laneHalf, COURT_WIDTH, laneHalf)
+
+        arc(leftFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
+        arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
+
+        line(0, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, -THREE_POINT_SIDE_Y)
+        line(0, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, THREE_POINT_SIDE_Y)
+        line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, COURT_WIDTH, -THREE_POINT_SIDE_Y)
+        line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, COURT_WIDTH, THREE_POINT_SIDE_Y)
+
+        arc(leftHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, -threePointTheta, threePointTheta)
+        arc(rightHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, Math.PI - threePointTheta, Math.PI + threePointTheta)
+
+        g.stroke({ width: COURT_LINE_WIDTH, color: 0xffffff, alpha: 1 })
+        renderable.c = g
       }
     })
   }
