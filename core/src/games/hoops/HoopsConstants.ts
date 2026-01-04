@@ -19,6 +19,7 @@ export const DRIBBLE_BOUNCE = 1.1
 
 export const PASS_GRAVITY = 0.12
 export const PASS_UP = 2.2
+export const PASS_SPEED = 120
 
 export const SHOT_GRAVITY = 0.09
 export const SHOT_UP_MIN = 2.2

@@ -1,12 +1,12 @@
 import {
   Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
   Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
-  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min, velocityToPoint
+  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
-  PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN,
-  SHOT_UP_MAX, SHOT_UP_MIN
+  PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX,
+  SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import {
@@ -163,10 +163,18 @@ const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   ballPos.setPosition({ z: Math.max(1, ballPos.data.z) })
   ballPos.setGravity(PASS_GRAVITY)
 
-  const v = velocityToPoint(ballPos.data, params.target, PASS_GRAVITY, PASS_UP)
-  const scale = 1000 / world.tickrate
+  const dx = params.target.x - ballPos.data.x
+  const dy = params.target.y - ballPos.data.y
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
 
-  ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: PASS_UP })
+  const magnitude = hypot(dx, dy)
+  if (!magnitude) return
+
+  ballPos.setVelocity({
+    x: (dx / magnitude) * PASS_SPEED,
+    y: (dy / magnitude) * PASS_SPEED,
+    z: PASS_UP
+  })
 })
 
 const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
