@@ -3,7 +3,7 @@ export const COURT_HEIGHT = 150
 export const COURT_SPLAY = 50
 export const COURT_CENTER = { x: COURT_WIDTH / 2, y: 0 }
 export const COURT_CENTER_CIRCLE_RADIUS_X = 30
-export const COURT_CENTER_CIRCLE_RADIUS_Y = 15
+export const COURT_CENTER_CIRCLE_RADIUS_Y = 18 // 0.6 ratio
 
 export const HOOP_OFFSET_X = 22
 export const HOOP_RADIUS = 8

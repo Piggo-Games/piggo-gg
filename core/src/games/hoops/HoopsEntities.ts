@@ -71,7 +71,7 @@ export const CenterCircle = () => Entity({
       setup: async (renderable) => {
         renderable.c = pixiGraphics()
           .ellipse(0, 0, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y)
-          .stroke({ width: 2, color: 0xffffff, alpha: 1 })
+          .stroke({ width: 1.5, color: 0xffffff, alpha: 1 })
       }
     })
   }
