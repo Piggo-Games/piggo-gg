@@ -43,11 +43,12 @@ export const Court = () => LineWall({
     COURT_WIDTH, 0,
     COURT_WIDTH + COURT_SPLAY, COURT_HEIGHT,
     -COURT_SPLAY, COURT_HEIGHT,
-    0, 0
+    0, 0,
+    1, 0,
   ],
   visible: true,
   fill: 0xc48a5a,
-  strokeAlpha: 0.9
+  strokeAlpha: 1
 })
 
 export const Centerline = () => LineWall({
