@@ -137,6 +137,8 @@ export const ShotChargeLine = () => Entity({
           const velocity = { x: dirX * speed, y: dirY * speed }
           const tickSeconds = world.tickrate / 1000
 
+          const gap = 1
+
           let posX = origin.x
           let posY = origin.y
           let posZ = origin.z
@@ -146,9 +148,9 @@ export const ShotChargeLine = () => Entity({
           const maxSteps = 90
 
           for (let step = 0; step < maxSteps; step += 1) {
-            posX += velocity.x * tickSeconds
-            posY += velocity.y * tickSeconds
-            posZ += velZ
+            posX += velocity.x * tickSeconds * gap
+            posY += velocity.y * tickSeconds * gap
+            posZ += velZ * gap
 
             if (posZ <= 0) {
               posZ = 0
@@ -161,7 +163,7 @@ export const ShotChargeLine = () => Entity({
 
             if (posZ <= 0) break
 
-            velZ -= SHOT_GRAVITY
+            velZ -= SHOT_GRAVITY * gap
           }
 
           renderable.visible = true
