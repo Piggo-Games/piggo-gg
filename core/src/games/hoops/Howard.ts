@@ -115,10 +115,7 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
 
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
-  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) {
-    position.setVelocity({ x: 0, y: 0 })
-    return
-  }
+  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
 
   if (!Number.isFinite(params.x) || !Number.isFinite(params.y)) return
 
@@ -178,9 +175,6 @@ const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
   const state = world.game.state as HoopsState
   if (state.phase !== "play") return
   if (state.ballOwner !== entity.id) return
-
-  const { position } = entity.components
-  if (position) position.setVelocity({ x: 0, y: 0 })
 
   state.shotCharging = addShotCharging(state.shotCharging, entity.id)
 })
