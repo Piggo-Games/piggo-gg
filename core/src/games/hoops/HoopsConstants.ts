@@ -30,6 +30,9 @@ export const SHOT_CHARGE_Z = 3.6
 export const SHOT_CHARGE_LINE_MAX = 45
 export const SHOT_CHARGE_LINE_OFFSET = 8
 
+export const HOWARD_SPEED = 135
+export const HOWARD_ACCEL = 30
+
 export const DASH_COOLDOWN_TICKS = 30
 export const DASH_ACTIVE_TICKS = 8
 export const DASH_SPEED = 240

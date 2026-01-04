@@ -6,7 +6,7 @@ import {
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
   PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN,
-  SHOT_UP_MAX, SHOT_UP_MIN
+  SHOT_UP_MAX, SHOT_UP_MIN, HOWARD_ACCEL, HOWARD_SPEED
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import {
@@ -23,8 +23,7 @@ export const Howard = (player: Player) => {
     components: {
       debug: Debug(),
       position: Position({
-        x: spawnX, y: yOffset,
-        velocityResets: 1, speed: 135, gravity: 0.25
+        x: spawnX, y: yOffset, speed: HOWARD_SPEED, gravity: 0.25, friction: true
       }),
       networked: Networked(),
       collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
@@ -118,14 +117,32 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
     return
   }
 
+  if (!Number.isFinite(params.x) || !Number.isFinite(params.y)) return
+
   if (params.x > 0) position.data.facing = 1
   if (params.x < 0) position.data.facing = -1
 
-  position.setHeading({ x: NaN, y: NaN })
-  position.setVelocity({
-    ...((params.x !== undefined) ? { x: params.x } : {}),
-    ...((params.y !== undefined) ? { y: params.y } : {})
+  position.clearHeading()
+
+  const magnitude = hypot(params.x, params.y)
+  if (!magnitude) return
+
+  const inputScale = min(1, magnitude / position.data.speed)
+  const accel = HOWARD_ACCEL * inputScale
+
+  position.impulse({
+    x: (params.x / magnitude) * accel,
+    y: (params.y / magnitude) * accel
   })
+
+  // const speed = hypot(position.data.velocity.x, position.data.velocity.y)
+  // if (speed > position.data.speed) {
+  //   const scale = position.data.speed / speed
+  //   position.setVelocity({
+  //     x: position.data.velocity.x * scale,
+  //     y: position.data.velocity.y * scale
+  //   })
+  // }
 })
 
 const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
