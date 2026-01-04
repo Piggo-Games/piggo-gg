@@ -1,6 +1,6 @@
 import {
   Collider, Debug, Entity, LineWall, Networked, Position, Renderable,
-  Shadow, hypot, loadTexture, max, min, pixiGraphics
+  Shadow, XY, asin, cos, hypot, loadTexture, max, min, pixiGraphics, sin, sqrt
 } from "@piggo-gg/core"
 import { Graphics, Texture } from "pixi.js"
 import {
@@ -96,10 +96,9 @@ export const CourtLines = () => Entity({
         const leftFreeThrowX = leftHoopX + FREE_THROW_DISTANCE
         const rightFreeThrowX = rightHoopX - FREE_THROW_DISTANCE
 
-        const threePointSideRatio = 1 - (THREE_POINT_SIDE_Y * THREE_POINT_SIDE_Y)
-          / (threePointRadiusY * threePointRadiusY)
-        const threePointSideX = THREE_POINT_RADIUS * Math.sqrt(max(0, threePointSideRatio))
-        const threePointTheta = Math.asin(min(1, THREE_POINT_SIDE_Y / threePointRadiusY))
+        const threePointSideRatio = 1 - (THREE_POINT_SIDE_Y * THREE_POINT_SIDE_Y) / (threePointRadiusY * threePointRadiusY)
+        const threePointSideX = THREE_POINT_RADIUS * sqrt(max(0, threePointSideRatio))
+        const threePointTheta = asin(min(1, THREE_POINT_SIDE_Y / threePointRadiusY))
 
         const edgeAtY = (y: number) => {
           const t = (y + halfCourtHeight) / COURT_HEIGHT
@@ -111,12 +110,19 @@ export const CourtLines = () => Entity({
           g.lineTo(x2, y2)
         }
 
+        const arc2 = (p1: XY, p2: XY, roundness: number) => {
+          const mx = (p1.x + p2.x) / 2 + 10000
+          const my = (p1.y + p2.y) / 2
+          g.moveTo(p1.x, p1.y)
+          g.arcTo(mx, my, p2.x, p2.y, 51.96)
+        }
+
         const arc = (cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
           const step = (end - start) / steps
           for (let i = 0; i <= steps; i += 1) {
             const angle = start + step * i
-            const x = cx + Math.cos(angle) * rx
-            const y = cy + Math.sin(angle) * ry
+            const x = cx + cos(angle) * rx
+            const y = cy + sin(angle) * ry
             if (i === 0) g.moveTo(x, y)
             else g.lineTo(x, y)
           }
@@ -127,8 +133,8 @@ export const CourtLines = () => Entity({
         // Free throw lane
         const laneTopEdges = edgeAtY(-laneHalf)
         const laneBottomEdges = edgeAtY(laneHalf)
-        line(laneTopEdges.left, -laneHalf, leftFreeThrowX, -laneHalf)
-        line(laneBottomEdges.left, laneHalf, leftFreeThrowX, laneHalf)
+        line(laneTopEdges.left, -laneHalf, leftFreeThrowX - offset, -laneHalf)
+        line(laneBottomEdges.left, laneHalf, leftFreeThrowX - offset, laneHalf)
         line(rightFreeThrowX, -laneHalf, laneTopEdges.right, -laneHalf)
         line(rightFreeThrowX, laneHalf, laneBottomEdges.right, laneHalf)
 
@@ -137,20 +143,31 @@ export const CourtLines = () => Entity({
         line(rightFreeThrowX - offset, -laneHalf, rightFreeThrowX, laneHalf)
 
         // Free throw circles
-        arc(leftFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
-        arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
-
-        const threeTopEdges = edgeAtY(-THREE_POINT_SIDE_Y)
-        const threeBottomEdges = edgeAtY(THREE_POINT_SIDE_Y)
-        line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, -THREE_POINT_SIDE_Y)
-        line(threeBottomEdges.left, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, THREE_POINT_SIDE_Y)
+        console.log({ freeThrowCircleRadiusY })
+        arc(leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
+        // arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
         // 3-point lines
-        line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, threeTopEdges.right, -THREE_POINT_SIDE_Y)
-        line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, threeBottomEdges.right, THREE_POINT_SIDE_Y)
+        const threeTopEdges = edgeAtY(-THREE_POINT_SIDE_Y)
+        const threeBottomEdges = edgeAtY(THREE_POINT_SIDE_Y)
+        line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX - offset, -THREE_POINT_SIDE_Y)
+        line(threeBottomEdges.left, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX - offset * 3 - 2, THREE_POINT_SIDE_Y)
 
-        arc(leftHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, -threePointTheta, threePointTheta)
-        arc(rightHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, Math.PI - threePointTheta, Math.PI + threePointTheta)
+        // console.log(threeBottomEdges.left, leftHoopX + threePointSideX - offset * 3 - 2)
+
+        // line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, threeTopEdges.right, -THREE_POINT_SIDE_Y)
+        // line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, threeBottomEdges.right, THREE_POINT_SIDE_Y)
+
+        // 3-point arcs
+        console.log({ threePointRadiusY, threePointTheta })
+        arc2(
+          { x: leftHoopX + threePointSideX - offset * 3 - 2, y: THREE_POINT_SIDE_Y },
+          { x: leftHoopX + threePointSideX - offset, y: -THREE_POINT_SIDE_Y },
+          1
+        )
+        // arc({ x: leftHoopX + offset, y: 0 }, { x: leftHoopX + threePointSideX - offset, y: -THREE_POINT_SIDE_Y }, 1)
+        // arc(leftHoopX - offset, 0, THREE_POINT_RADIUS, threePointRadiusY, -threePointTheta, threePointTheta)
+        // arc(rightHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, Math.PI - threePointTheta, Math.PI + threePointTheta)
 
         g.stroke({ width: COURT_LINE_WIDTH, color: 0xffffff, alpha: 1 })
         renderable.c = g
