@@ -86,6 +86,7 @@ export const CourtLines = () => Entity({
       zIndex: 3.2,
       setup: async (renderable) => {
         const g = pixiGraphics()
+        const halfCourtHeight = COURT_HEIGHT / 2
         const laneHalf = FREE_THROW_LANE_WIDTH / 2
         const freeThrowCircleRadiusY = FREE_THROW_CIRCLE_RADIUS * COURT_LINE_Y_SCALE
         const threePointRadiusY = THREE_POINT_RADIUS * COURT_LINE_Y_SCALE
@@ -99,6 +100,11 @@ export const CourtLines = () => Entity({
           / (threePointRadiusY * threePointRadiusY)
         const threePointSideX = THREE_POINT_RADIUS * Math.sqrt(max(0, threePointSideRatio))
         const threePointTheta = Math.asin(min(1, THREE_POINT_SIDE_Y / threePointRadiusY))
+
+        const edgeAtY = (y: number) => {
+          const t = (y + halfCourtHeight) / COURT_HEIGHT
+          return { left: -COURT_SPLAY * t, right: COURT_WIDTH + COURT_SPLAY * t }
+        }
 
         const line = (x1: number, y1: number, x2: number, y2: number) => {
           g.moveTo(x1, y1)
@@ -119,18 +125,22 @@ export const CourtLines = () => Entity({
         line(leftFreeThrowX, -laneHalf, leftFreeThrowX, laneHalf)
         line(rightFreeThrowX, -laneHalf, rightFreeThrowX, laneHalf)
 
-        line(0, -laneHalf, leftFreeThrowX, -laneHalf)
-        line(0, laneHalf, leftFreeThrowX, laneHalf)
-        line(rightFreeThrowX, -laneHalf, COURT_WIDTH, -laneHalf)
-        line(rightFreeThrowX, laneHalf, COURT_WIDTH, laneHalf)
+        const laneTopEdges = edgeAtY(-laneHalf)
+        const laneBottomEdges = edgeAtY(laneHalf)
+        line(laneTopEdges.left, -laneHalf, leftFreeThrowX, -laneHalf)
+        line(laneBottomEdges.left, laneHalf, leftFreeThrowX, laneHalf)
+        line(rightFreeThrowX, -laneHalf, laneTopEdges.right, -laneHalf)
+        line(rightFreeThrowX, laneHalf, laneBottomEdges.right, laneHalf)
 
         arc(leftFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
         arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
-        line(0, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, -THREE_POINT_SIDE_Y)
-        line(0, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, THREE_POINT_SIDE_Y)
-        line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, COURT_WIDTH, -THREE_POINT_SIDE_Y)
-        line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, COURT_WIDTH, THREE_POINT_SIDE_Y)
+        const threeTopEdges = edgeAtY(-THREE_POINT_SIDE_Y)
+        const threeBottomEdges = edgeAtY(THREE_POINT_SIDE_Y)
+        line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, -THREE_POINT_SIDE_Y)
+        line(threeBottomEdges.left, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX, THREE_POINT_SIDE_Y)
+        line(rightHoopX - threePointSideX, -THREE_POINT_SIDE_Y, threeTopEdges.right, -THREE_POINT_SIDE_Y)
+        line(rightHoopX - threePointSideX, THREE_POINT_SIDE_Y, threeBottomEdges.right, THREE_POINT_SIDE_Y)
 
         arc(leftHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, -threePointTheta, threePointTheta)
         arc(rightHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, Math.PI - threePointTheta, Math.PI + threePointTheta)
