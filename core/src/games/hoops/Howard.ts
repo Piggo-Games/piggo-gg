@@ -6,12 +6,15 @@ import {
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
   PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN,
-  SHOT_UP_MAX, SHOT_UP_MIN, HOWARD_ACCEL, HOWARD_SPEED
+  SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import {
   addShotCharging, getDashUntil, isShotCharging, removeShotCharging, setDashEntry
 } from "./HoopsStateUtils"
+
+export const HOWARD_SPEED = 135
+export const HOWARD_ACCEL = 60
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -23,7 +26,7 @@ export const Howard = (player: Player) => {
     components: {
       debug: Debug(),
       position: Position({
-        x: spawnX, y: yOffset, speed: HOWARD_SPEED, gravity: 0.25, friction: true
+        x: spawnX, y: yOffset, speed: HOWARD_SPEED, gravity: 0.4, friction: true
       }),
       networked: Networked(),
       collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
@@ -127,8 +130,7 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
   const magnitude = hypot(params.x, params.y)
   if (!magnitude) return
 
-  const inputScale = min(1, magnitude / position.data.speed)
-  const accel = HOWARD_ACCEL * inputScale
+  const accel = position.data.z > 0 ? HOWARD_ACCEL * 0.16 : HOWARD_ACCEL
 
   position.impulse({
     x: (params.x / magnitude) * accel,
@@ -234,7 +236,7 @@ const jumpHoward = Action("jump", ({ entity, world }) => {
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
 
-  position.setVelocity({ z: 4 })
+  position.setVelocity({ z: 5 })
 
   if (state.ballOwner === entity.id) {
     state.dribbleLocked = true
