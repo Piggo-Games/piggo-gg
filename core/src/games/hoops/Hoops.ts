@@ -329,6 +329,10 @@ const controls: HUDSystemProps = {
       ]
     },
     {
+      label: "jump",
+      buttons: [["spacebar"]]
+    },
+    {
       label: "shoot",
       buttons: [["mb1"]]
     },

@@ -1,8 +1,7 @@
 import {
-  Action, Actions, Character, Collider, Debug, Input, Move, Networked,
-  PixiSkins, Player, Point, Position, Renderable, Shadow, Team,
-  VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap, XY, hypot,
-  max, min, velocityToPoint
+  Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
+  Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
+  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min, velocityToPoint
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
@@ -65,22 +64,13 @@ export const Howard = (player: Player) => {
         }
       }),
       actions: Actions({
-        move: Move,
+        move: moveHoward,
         point: Point,
         pass: passBall,
         shoot: shootBall,
         startShotCharge,
         dash,
-        jump: Action("jump", ({ entity, world }) => {
-          const { position } = entity?.components ?? {}
-          if (!position?.data.standing) return
-          position.setVelocity({ z: 4 })
-
-          const state = world.game.state as HoopsState
-          if (state.ballOwner === entity?.id) {
-            state.dribbleLocked = true
-          }
-        })
+        jump: jumpHoward
       }),
       renderable: Renderable({
         anchor: { x: 0.55, y: 0.9 },
@@ -105,6 +95,32 @@ type PassParams = {
 type ShootParams = {
   hold?: number
 }
+
+const isMovementLocked = (state: HoopsState, entityId: string, position: Position): boolean => {
+  return state.ballOwner === entityId
+    && state.dribbleLocked
+    && position.data.standing
+    && position.data.velocity.z <= 0
+}
+
+const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
+  if (!entity) return
+
+  const { position } = entity.components
+  if (!position) return
+
+  const state = world.game.state as HoopsState
+  if (isMovementLocked(state, entity.id, position)) return
+
+  if (params.x > 0) position.data.facing = 1
+  if (params.x < 0) position.data.facing = -1
+
+  position.setHeading({ x: NaN, y: NaN })
+  position.setVelocity({
+    ...((params.x !== undefined) ? { x: params.x } : {}),
+    ...((params.y !== undefined) ? { y: params.y } : {})
+  })
+})
 
 const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   if (!entity || !params?.target) return
@@ -181,18 +197,37 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   ballPos.setVelocity({ x: dirX * speed, y: dirY * speed, z: up })
 })
 
+const jumpHoward = Action("jump", ({ entity, world }) => {
+  if (!entity) return
+
+  const { position } = entity.components
+  if (!position) return
+  if (!position.data.standing) return
+
+  const state = world.game.state as HoopsState
+  if (isMovementLocked(state, entity.id, position)) return
+
+  position.setVelocity({ z: 4 })
+
+  if (state.ballOwner === entity.id) {
+    state.dribbleLocked = true
+  }
+})
+
 const dash = Action("dash", ({ entity, world }) => {
   if (!entity) return
 
   const state = world.game.state as HoopsState
+  const { position } = entity.components
+  if (!position) return
+
+  if (isMovementLocked(state, entity.id, position)) return
+
   const readyAt = getDashUntil(state.dashReady, entity.id) ?? 0
   if (world.tick < readyAt) return
 
   state.dashReady = setDashEntry(state.dashReady, entity.id, world.tick + DASH_COOLDOWN_TICKS)
   state.dashActive = setDashEntry(state.dashActive, entity.id, world.tick + DASH_ACTIVE_TICKS)
-
-  const { position } = entity.components
-  if (!position) return
 
   const { pointingDelta, velocity } = position.data
 
