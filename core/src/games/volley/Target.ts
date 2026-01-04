@@ -1,5 +1,5 @@
 import {
-  Entity, Networked, NPC, pixiGraphics, Position, Renderable, SystemBuilder, timeToLand, XY
+  Entity, Networked, NPC, pixiGraphics, Position, Renderable, timeToLand, XY
 } from "@piggo-gg/core"
 
 export const Target = () => {
@@ -47,27 +47,3 @@ export const Target = () => {
   })
   return target
 }
-
-// export const TargetSystem = SystemBuilder({
-//   id: "TargetSystem",
-//   init: ((world) => {
-
-//     let target: Entity<Renderable> | undefined = undefined
-
-//     return {
-//       id: "BallTargetSystem",
-//       query: [],
-//       priority: 5,
-//       onTick: () => {
-//         const ball = world.entity<Position | Renderable>("ball")
-
-//         if (ball) {
-//           if (!target || !world.entity("target")) {
-//             target = Target(ball)
-//             world.addEntity(target)
-//           }
-//         }
-//       }
-//     }
-//   })
-// })
