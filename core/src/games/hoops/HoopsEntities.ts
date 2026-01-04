@@ -1,5 +1,5 @@
 import {
-  Collider, Debug, Entity, LineWall, Networked, Position, Renderable,
+  Collider, Debug, Entity, LineWall, Networked, PI, Position, Renderable,
   Shadow, XY, asin, cos, hypot, loadTexture, max, min, pixiGraphics, sin, sqrt
 } from "@piggo-gg/core"
 import { Graphics, Texture } from "pixi.js"
@@ -110,12 +110,12 @@ export const CourtLines = () => Entity({
           g.lineTo(x2, y2)
         }
 
-        const arc2 = (p1: XY, p2: XY, roundness: number) => {
-          const mx = (p1.x + p2.x) / 2 + 10000
-          const my = (p1.y + p2.y) / 2
-          g.moveTo(p1.x, p1.y)
-          g.arcTo(mx, my, p2.x, p2.y, 51.96)
-        }
+        // const arc2 = (p1: XY, p2: XY, factor: number = 1) => {
+        //   const mx = (p1.x + p2.x) / 2 + 10000 * factor
+        //   const my = (p1.y + p2.y) / 2
+        //   g.moveTo(p1.x, p1.y)
+        //   g.arcTo(mx, my, p2.x, p2.y, 51.96)
+        // }
 
         const arc = (cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
           const step = (end - start) / steps
@@ -124,6 +124,7 @@ export const CourtLines = () => Entity({
             const x = cx + cos(angle) * rx
             const y = cy + sin(angle) * ry
             if (i === 0) g.moveTo(x, y)
+            // if (i === 0) continue
             else g.lineTo(x, y)
           }
         }
@@ -150,7 +151,7 @@ export const CourtLines = () => Entity({
         // 3-point lines
         const threeTopEdges = edgeAtY(-THREE_POINT_SIDE_Y)
         const threeBottomEdges = edgeAtY(THREE_POINT_SIDE_Y)
-        line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX - offset, -THREE_POINT_SIDE_Y)
+        line(threeTopEdges.left, -THREE_POINT_SIDE_Y, leftHoopX + threePointSideX - offset * 2.4, -THREE_POINT_SIDE_Y)
         line(threeBottomEdges.left, THREE_POINT_SIDE_Y, leftHoopX + threePointSideX - offset * 3 - 2, THREE_POINT_SIDE_Y)
 
         // console.log(threeBottomEdges.left, leftHoopX + threePointSideX - offset * 3 - 2)
@@ -160,11 +161,17 @@ export const CourtLines = () => Entity({
 
         // 3-point arcs
         console.log({ threePointRadiusY, threePointTheta })
-        arc2(
-          { x: leftHoopX + threePointSideX - offset * 3 - 2, y: THREE_POINT_SIDE_Y },
-          { x: leftHoopX + threePointSideX - offset, y: -THREE_POINT_SIDE_Y },
-          1
-        )
+        const threeR = 52
+        arc(leftHoopX + threePointSideX - offset * 3.25, 0, threeR + 12, threeR, -PI / 2 + 0.1, PI / 2)
+        // arc2(
+        //   { x: leftHoopX + threePointSideX - offset * 3 - 2, y: THREE_POINT_SIDE_Y },
+        //   { x: leftHoopX + threePointSideX - offset, y: -THREE_POINT_SIDE_Y }
+        // )
+        // arc2(
+        //   { x: rightHoopX - threePointSideX - offset * 3, y: -THREE_POINT_SIDE_Y },
+        //   { x: rightHoopX - threePointSideX + offset * 5, y: THREE_POINT_SIDE_Y },
+        //   -1
+        // )
         // arc({ x: leftHoopX + offset, y: 0 }, { x: leftHoopX + threePointSideX - offset, y: -THREE_POINT_SIDE_Y }, 1)
         // arc(leftHoopX - offset, 0, THREE_POINT_RADIUS, threePointRadiusY, -threePointTheta, threePointTheta)
         // arc(rightHoopX, 0, THREE_POINT_RADIUS, threePointRadiusY, Math.PI - threePointTheta, Math.PI + threePointTheta)
