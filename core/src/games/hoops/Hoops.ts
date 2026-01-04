@@ -236,7 +236,7 @@ const HoopsSystem = SystemBuilder({
               }
             } else {
               ballPos.data.follows = null
-              ballPos.setGravity(DRIBBLE_GRAVITY)
+              ballPos.setGravity(DRIBBLE_GRAVITY + 0.0005 * ownerPos.getSpeed())
               ballPos.setVelocity({
                 x: ownerPos.data.velocity.x,
                 y: ownerPos.data.velocity.y

@@ -33,6 +33,7 @@ export type Position = Component<"position", {
   screenFixed: boolean
   orientation: OctString
   orientationRads: number
+  getSpeed: () => number
   setGravity: (_: number) => Position
   setPosition: (_: { x?: number, y?: number, z?: number }) => Position
   setRotation: (_: number) => Position
@@ -110,6 +111,9 @@ export const Position = (props: PositionProps = {}): Position => {
     screenFixed: props.screenFixed ?? false,
     orientation: "r",
     orientationRads: 0,
+    getSpeed: () => {
+      return hypot(position.data.velocity.x, position.data.velocity.y)
+    },
     setGravity: (gravity: number) => {
       position.data.gravity = round(gravity, 5)
       return position
