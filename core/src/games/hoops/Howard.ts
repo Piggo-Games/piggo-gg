@@ -13,7 +13,7 @@ import {
 } from "./HoopsStateUtils"
 
 export const HOWARD_SPEED = 135
-export const HOWARD_ACCEL = 60
+export const HOWARD_ACCEL = 80
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -127,15 +127,6 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
     x: (params.x / magnitude) * accel,
     y: (params.y / magnitude) * accel
   })
-
-  // const speed = hypot(position.data.velocity.x, position.data.velocity.y)
-  // if (speed > position.data.speed) {
-  //   const scale = position.data.speed / speed
-  //   position.setVelocity({
-  //     x: position.data.velocity.x * scale,
-  //     y: position.data.velocity.y * scale
-  //   })
-  // }
 })
 
 const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
