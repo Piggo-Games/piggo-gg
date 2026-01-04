@@ -2,7 +2,9 @@ import {
   Entity, Networked, NPC, pixiGraphics, Position, Renderable, SystemBuilder, timeToLand, XY
 } from "@piggo-gg/core"
 
-const Target = (ball: Entity<Position | Renderable>) => {
+export const Target = () => {
+
+  let ball: Entity<Position> | undefined = undefined
 
   let last: XY = { x: 0, y: 0 }
 
@@ -12,7 +14,12 @@ const Target = (ball: Entity<Position | Renderable>) => {
       position: Position(),
       networked: Networked(),
       npc: NPC({
-        behavior: () => {
+        behavior: (_, world) => {
+          if (!ball) {
+            ball = world.entity<Position>("ball")
+            if (!ball) return
+          }
+
           const { z, x, y, velocity: v, gravity, standing } = ball.components.position.data
 
           if (v.x === last.x && v.y === last.y) return
@@ -41,26 +48,26 @@ const Target = (ball: Entity<Position | Renderable>) => {
   return target
 }
 
-export const TargetSystem = SystemBuilder({
-  id: "TargetSystem",
-  init: ((world) => {
+// export const TargetSystem = SystemBuilder({
+//   id: "TargetSystem",
+//   init: ((world) => {
 
-    let target: Entity<Renderable> | undefined = undefined
+//     let target: Entity<Renderable> | undefined = undefined
 
-    return {
-      id: "BallTargetSystem",
-      query: [],
-      priority: 5,
-      onTick: () => {
-        const ball = world.entity<Position | Renderable>("ball")
+//     return {
+//       id: "BallTargetSystem",
+//       query: [],
+//       priority: 5,
+//       onTick: () => {
+//         const ball = world.entity<Position | Renderable>("ball")
 
-        if (ball) {
-          if (!target || !world.entity("target")) {
-            target = Target(ball)
-            world.addEntity(target)
-          }
-        }
-      }
-    }
-  })
-})
+//         if (ball) {
+//           if (!target || !world.entity("target")) {
+//             target = Target(ball)
+//             world.addEntity(target)
+//           }
+//         }
+//       }
+//     }
+//   })
+// })
