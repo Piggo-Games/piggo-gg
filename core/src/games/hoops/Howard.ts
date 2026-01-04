@@ -9,7 +9,9 @@ import {
   SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
-import { addShotCharging, getDashUntil, removeShotCharging, setDashEntry } from "./HoopsStateUtils"
+import {
+  addShotCharging, getDashUntil, isShotCharging, removeShotCharging, setDashEntry
+} from "./HoopsStateUtils"
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -111,6 +113,10 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
 
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
+  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) {
+    position.setVelocity({ x: 0, y: 0 })
+    return
+  }
 
   if (params.x > 0) position.data.facing = 1
   if (params.x < 0) position.data.facing = -1
@@ -152,6 +158,10 @@ const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
 
   const state = world.game.state as HoopsState
   if (state.phase !== "play") return
+  if (state.ballOwner !== entity.id) return
+
+  const { position } = entity.components
+  if (position) position.setVelocity({ x: 0, y: 0 })
 
   state.shotCharging = addShotCharging(state.shotCharging, entity.id)
 })
@@ -222,6 +232,7 @@ const dash = Action("dash", ({ entity, world }) => {
   if (!position) return
 
   if (isMovementLocked(state, entity.id, position)) return
+  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
 
   const readyAt = getDashUntil(state.dashReady, entity.id) ?? 0
   if (world.tick < readyAt) return

@@ -249,6 +249,7 @@ const HoopsSystem = SystemBuilder({
               if (ballPos.data.z <= 0 && ballPos.data.velocity.z <= 0) {
                 ballPos.setPosition({ z: 0 })
                 ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
+                world.client?.sound.playChoice(["bounce1", "bounce2", "bounce3", "bounce4"])
               }
 
               ballPos.localVelocity = {
