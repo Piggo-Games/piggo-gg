@@ -33,8 +33,8 @@ export const PASS_UP = 2.2
 export const PASS_SPEED = 120
 
 export const SHOT_GRAVITY = 0.09
-export const SHOT_UP_MIN = 2.2
-export const SHOT_UP_MAX = 3.6
+export const SHOT_UP_MIN = 1.6
+export const SHOT_UP_MAX = 4
 export const SHOT_UP_SCALE = 180
 export const SHOT_SPEED_MIN = 10
 export const SHOT_SPEED_MAX = 100
