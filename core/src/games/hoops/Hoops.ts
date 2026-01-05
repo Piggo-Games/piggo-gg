@@ -3,18 +3,15 @@ import {
   HtmlChat, HtmlFpsText, HtmlLagText, PixiNametagSystem, PhysicsSystem,
   PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position, Renderable,
   ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, XY,
-  abs, hypot, min, round, screenWH, sign, sqrt
+  abs, hypot, min, round, screenWH, sign, sqrt, XYdistance
 } from "@piggo-gg/core"
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
   DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
-import { Ball, CenterCircle, Centerline, Court, CourtLines, HoopSet, ShotChargeLine } from "./HoopsEntities"
+import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
-import {
-  isShotCharging, pruneShotCharging
-} from "./HoopsStateUtils"
 
 export type HoopsState = {
   phase: "play" | "score"
@@ -25,7 +22,6 @@ export type HoopsState = {
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
   dribbleLocked: boolean
-  shotCharging: string[]
 }
 
 export type HoopsSettings = {
@@ -49,8 +45,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       scoredTick: 0,
       ballOwner: "",
       ballOwnerTeam: 0,
-      dribbleLocked: false,
-      shotCharging: []
+      dribbleLocked: false
     },
     systems: [
       PhysicsSystem("local"),
@@ -73,10 +68,10 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
     entities: [
       Background({ rays: true }),
       Cursor(),
-      ShotChargeLine(),
       Ball(),
       Court(),
       CourtLines(),
+      Goal1(),
       Centerline(),
       CenterCircle(),
       // ...HoopSet(),
@@ -148,6 +143,8 @@ const HoopsSystem = SystemBuilder({
       if (ball?.components.collider) ball.components.collider.setGroup("none")
     }
 
+    let lastBallZ = 0
+
     return {
       id: "HoopsSystem",
       query: [],
@@ -159,9 +156,6 @@ const HoopsSystem = SystemBuilder({
         if (!ballPos) return
 
         const players = world.queryEntities<Position | Team | Renderable>(["position", "team", "input"])
-
-        const exists = (id: string) => Boolean(world.entities[id])
-        state.shotCharging = pruneShotCharging(state.shotCharging, exists)
 
         // reset after score
         if (state.phase === "score" && (world.tick - state.scoredTick) > SCORE_RESET_TICKS) {
@@ -177,6 +171,7 @@ const HoopsSystem = SystemBuilder({
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
           resetBall()
+          console.log("reset after score")
         }
 
         // remove ownership if owner missing
@@ -186,7 +181,7 @@ const HoopsSystem = SystemBuilder({
           state.dribbleLocked = false
         }
 
-        if (!isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
+        if (!state.ballOwner && ballPos.data.z === 0 && !isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
           state.ballOwner = ""
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
@@ -206,8 +201,7 @@ const HoopsSystem = SystemBuilder({
           } else {
             state.ballOwnerTeam = ownerTeam.data.team
             const offset = orbitOffset(ownerPos.data.pointingDelta)
-            const charging = isShotCharging(state.shotCharging, owner.id)
-            const shouldDribble = !charging && !state.dribbleLocked && ownerPos.data.standing
+            const shouldDribble = !state.dribbleLocked && ownerPos.data.standing
             const carryZ = ownerPos.data.z + SHOT_CHARGE_Z
 
             ballPos.data.offset = offset
@@ -304,8 +298,27 @@ const HoopsSystem = SystemBuilder({
             }
           }
 
-          if (closest) assignBall(closest.id, closest.team)
+        if (closest) assignBall(closest.id, closest.team)
         }
+
+        // swish sound when the ball drops through the hoop
+        if (!state.ballOwner && state.phase !== "score" && ballPos.data.velocity.z < 0 && ballPos.data.z >= 36) {
+
+          const dist = XYdistance( ballPos.data, { x: -26, y: 0 } )
+
+          if (dist < 6) {
+            console.log("swoosh")
+            world.client?.sound.play({ name: "swish" })
+
+            // count the score
+            state.phase = "score"
+            state.scoredTick = world.tick
+            state.scoredTeam = 1
+            state.scoreLeft += 2
+          }
+        }
+
+        lastBallZ = ballPos.data.z
 
         // ball spin
         const { x, y } = ballPos.data.velocity
