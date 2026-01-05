@@ -132,7 +132,6 @@ export const CourtLines = () => Entity({
         line(rightFreeThrowX - offset, -laneHalf, rightFreeThrowX, laneHalf)
 
         // Free throw circles
-        console.log({ freeThrowCircleRadiusY })
         arc(leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
         arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
@@ -143,7 +142,6 @@ export const CourtLines = () => Entity({
         line(495, THREE_POINT_SIDE_Y, 373, THREE_POINT_SIDE_Y)
 
         // 3-point arcs
-        console.log({ threePointRadiusY, threePointTheta })
         arc(74, -2, 82, 72, -PI / 2 + 0.33, PI / 2)
         arc(376, -2, 82, 72, PI / 2, PI * 1.5 - 0.34)
 
