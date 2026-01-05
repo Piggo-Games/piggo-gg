@@ -8,7 +8,7 @@ import {
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
-  DRIBBLE_GRAVITY, HOOP_RADIUS, SCORE_RESET_TICKS, SHOT_CHARGE_Z
+  DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
