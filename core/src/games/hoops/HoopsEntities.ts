@@ -4,10 +4,11 @@ import {
 } from "@piggo-gg/core"
 import { Graphics, Texture } from "pixi.js"
 import {
-  COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY,
-  COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS, FREE_THROW_DISTANCE,
-  FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
-  SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
+  BACKBOARD_HEIGHT, BACKBOARD_WIDTH, BACKBOARD_Z, COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X,
+  COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY, COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_WIDTH,
+  FREE_THROW_CIRCLE_RADIUS, FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
+  SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN, THREE_POINT_RADIUS,
+  THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -151,6 +152,32 @@ export const CourtLines = () => Entity({
 
         g.stroke({ width: COURT_LINE_WIDTH, color: 0xffffff, alpha: 1 })
         renderable.c = g
+      }
+    })
+  }
+})
+
+export const Goal1 = () => Entity({
+  id: "goal1",
+  components: {
+    position: Position({ x: -28, y: -20, z: BACKBOARD_Z }),
+    renderable: Renderable({
+      zIndex: 3.55,
+      setup: async (renderable) => {
+        const board = pixiGraphics()
+          .moveTo(-1, 0)
+          .lineTo(-9, 26)
+          .lineTo(-15, 12)
+          .lineTo(-7, -14)
+          .lineTo(-1, 0)
+          .fill({ color: 0xf7f2e8, alpha: 1 })
+          .stroke({ color: 0xFF7F50, width: 1, alpha: 1 })
+
+        const hoop = pixiGraphics()
+          .ellipse(1, 10, 6, 4)
+          .stroke({ color: 0xFF7F50, width: 1.6, alpha: 1 })
+
+        renderable.c.addChild(board, hoop)
       }
     })
   }

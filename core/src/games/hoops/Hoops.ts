@@ -10,7 +10,7 @@ import {
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
   DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
-import { Ball, CenterCircle, Centerline, Court, CourtLines, HoopSet, ShotChargeLine } from "./HoopsEntities"
+import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
 
 export type HoopsState = {
@@ -90,6 +90,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       Ball(),
       Court(),
       CourtLines(),
+      Goal1(),
       Centerline(),
       CenterCircle(),
       // ...HoopSet(),

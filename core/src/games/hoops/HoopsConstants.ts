@@ -16,6 +16,9 @@ export const FREE_THROW_CIRCLE_RADIUS = 40
 export const HOOP_OFFSET_X = 22
 export const HOOP_RADIUS = 8
 export const HOOP_SCORE_Z = 10
+export const BACKBOARD_WIDTH = 40
+export const BACKBOARD_HEIGHT = 18
+export const BACKBOARD_Z = 16
 
 export const BALL_ORBIT_DISTANCE = 16
 export const BALL_PICKUP_RANGE = 12
