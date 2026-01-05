@@ -4,8 +4,8 @@ import {
   VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS,
-  SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN
+  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_GRAVITY, SHOT_UP_MAX,
+  SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import {
   addShotCharging, isShotCharging, removeShotCharging, type HoopsState
@@ -172,7 +172,7 @@ const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
   state.shotCharging = addShotCharging(state.shotCharging, entity.id)
 })
 
-const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
+const shootBall = Action<ShootParams>("shoot", ({ entity, world }) => {
   if (!entity) return
 
   const state = world.game.state as HoopsState
@@ -184,14 +184,14 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
-  const hold = max(0, params?.hold ?? 0)
-  const charge = min(1, hold / SHOT_CHARGE_TICKS)
-  let up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
-  const originZ = max(1.5, ballPos.data.z)
-
   const dx = HOOP_TARGET.x - ballPos.data.x
   const dy = HOOP_TARGET.y - ballPos.data.y
   if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+
+  const distance = hypot(dx, dy)
+  const distanceCharge = min(1, distance / SHOT_UP_SCALE)
+  let up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * distanceCharge
+  const originZ = max(1.5, ballPos.data.z)
 
   if (HOOP_TARGET.z > originZ) {
     const minUp = Math.sqrt(2 * SHOT_GRAVITY * (HOOP_TARGET.z - originZ)) - 0.5 * SHOT_GRAVITY
