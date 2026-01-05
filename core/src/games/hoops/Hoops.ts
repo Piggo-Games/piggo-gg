@@ -200,7 +200,7 @@ const HoopsSystem = SystemBuilder({
           state.dribbleLocked = false
         }
 
-        if (!isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
+        if (!state.ballOwner && !isInCourtBounds(ballPos.data.x, ballPos.data.y)) {
           state.ballOwner = ""
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
