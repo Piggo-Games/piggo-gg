@@ -8,11 +8,12 @@ export type ClickSounds = "click1" | "click2" | "click3" | "cassettePlay" | "cas
 export type ToolSounds = "whiff" | "thud" | "slash"
 export type EatSounds = "eat" | "eat2"
 export type VolleySounds = "spike"
+export type HoopsSounds = "swish"
 export type LaserSounds = "laser1"
 
 export type ValidSounds =
   BounceSounds | BubbleSounds | ClickSounds | MusicSounds | ToolSounds |
-  GunNames | EatSounds | VolleySounds | LaserSounds
+  GunNames | EatSounds | VolleySounds | HoopsSounds | LaserSounds
 
 const load = (url: string, volume: number): Tone => {
   const player = new Tone({ url, volume: volume - 10 })
@@ -96,6 +97,7 @@ export const Sound = (world: World): Sound => {
       eat: load("eat.mp3", -5),
       eat2: load("eat2.mp3", -5),
       spike: load("spike.mp3", 5),
+      swish: load("swish.mp3", 0),
       laser1: load("laser1.mp3", -15),
 
       thud: load("thud.mp3", -15),

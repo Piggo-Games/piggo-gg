@@ -1,12 +1,11 @@
 import {
   Collider, Debug, Entity, LineWall, Networked, PI, Position, Renderable,
-  Shadow, asin, cos, loadTexture, min, pixiGraphics, sin, HoopsState
+  Shadow, asin, cos, loadTexture, min, pixiGraphics, sin
 } from "@piggo-gg/core"
 import {
   COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT,
   COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_SPLAY, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS,
-  FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
-  THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
+  FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
 import { Texture } from "pixi.js"
 
@@ -184,75 +183,3 @@ export const Goal1 = () => Entity({
     })
   }
 })
-
-type HoopProps = {
-  id: string
-  x: number
-  y: number
-  facing: "left" | "right"
-  scoringTeam: 1 | 2
-}
-
-export const Hoop = ({ id, x, y, facing, scoringTeam }: HoopProps) => Entity({
-  id,
-  components: {
-    position: Position({ x, y }),
-    networked: Networked(),
-    collider: Collider({
-      shape: "ball",
-      radius: HOOP_RADIUS,
-      isStatic: true,
-      sensor: (e2, world) => {
-        if (e2.id !== "ball") return false
-
-        const state = world.game.state as HoopsState
-        if (state.phase !== "play") return false
-        if (state.ballOwner) return false
-
-        const ball = world.entity<Position>("ball")
-        const ballPos = ball?.components.position
-        if (!ballPos) return false
-
-        if (ballPos.data.z > HOOP_SCORE_Z) return false
-        if (ballPos.data.velocity.z > 0) return false
-
-        if (scoringTeam === 1) {
-          state.scoreLeft += 1
-        } else {
-          state.scoreRight += 1
-        }
-
-        state.phase = "score"
-        state.scoredTeam = scoringTeam
-        state.scoredTick = world.tick
-        state.ballOwner = ""
-        state.ballOwnerTeam = 0
-        state.dribbleLocked = false
-        return true
-      }
-    }),
-    renderable: Renderable({
-      zIndex: 3.6,
-      setup: async (renderable) => {
-        renderable.c.rotation = facing === "right" ? -Math.PI / 2 : Math.PI / 2
-
-        const ring = pixiGraphics()
-          .circle(0, 0, HOOP_RADIUS)
-          .stroke({ color: 0xff8c1a, width: 3, alpha: 0.9 })
-
-        const board = pixiGraphics()
-          .roundRect(-12, -16, 24, 10, 2)
-          .fill({ color: 0xf7f2e8, alpha: 0.95 })
-          .stroke({ color: 0x1e1e1e, width: 2, alpha: 0.8 })
-
-        renderable.c.addChild(board)
-        renderable.c.addChild(ring)
-      }
-    })
-  }
-})
-
-export const HoopSet = () => [
-  Hoop({ id: "hoop-left", x: HOOP_OFFSET_X, y: 0, facing: "right", scoringTeam: 2 }),
-  Hoop({ id: "hoop-right", x: COURT_WIDTH - HOOP_OFFSET_X, y: 0, facing: "left", scoringTeam: 1 })
-]
