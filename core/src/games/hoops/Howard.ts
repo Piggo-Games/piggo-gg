@@ -7,10 +7,9 @@ import {
   COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS,
   SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
-import type { HoopsState } from "./Hoops"
 import {
-  addShotCharging, isShotCharging, removeShotCharging
-} from "./HoopsStateUtils"
+  addShotCharging, isShotCharging, removeShotCharging, type HoopsState
+} from "./Hoops"
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80

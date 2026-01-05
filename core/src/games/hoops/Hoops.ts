@@ -12,9 +12,6 @@ import {
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
-import {
-  isShotCharging, pruneShotCharging
-} from "./HoopsStateUtils"
 
 export type HoopsState = {
   phase: "play" | "score"
@@ -30,6 +27,22 @@ export type HoopsState = {
 
 export type HoopsSettings = {
   showControls: boolean
+}
+
+export const isShotCharging = (entries: string[], id: string): boolean => {
+  return entries.includes(id)
+}
+
+export const addShotCharging = (entries: string[], id: string): string[] => {
+  return entries.includes(id) ? entries : [...entries, id]
+}
+
+export const removeShotCharging = (entries: string[], id: string): string[] => {
+  return entries.filter((entry) => entry !== id)
+}
+
+export const pruneShotCharging = (entries: string[], exists: (id: string) => boolean): string[] => {
+  return entries.filter(exists)
 }
 
 export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
