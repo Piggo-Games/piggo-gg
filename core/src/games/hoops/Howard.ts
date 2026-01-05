@@ -7,9 +7,7 @@ import {
   COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_GRAVITY, SHOT_UP_MAX,
   SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
-import {
-  addShotCharging, isShotCharging, removeShotCharging, type HoopsState
-} from "./Hoops"
+import { type HoopsState } from "./Hoops"
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80
@@ -32,16 +30,11 @@ export const Howard = (player: Player) => {
       team: Team(player.components.team.data.team),
       shadow: Shadow(5, 1),
       input: Input({
-        release: {
-          "mb1": ({ hold }) => {
-            return { actionId: "shoot", params: { hold } }
-          }
-        },
         press: {
           ...WASDInputMap.press,
           "mb1": ({ hold }) => {
             if (hold) return
-            return { actionId: "startShotCharge" }
+            return { actionId: "shoot" }
           },
           " ": ({ hold }) => {
             if (hold) return
@@ -67,7 +60,6 @@ export const Howard = (player: Player) => {
         point: Point,
         pass: passBall,
         shoot: shootBall,
-        startShotCharge,
         jump: jumpHoward
       }),
       renderable: Renderable({
@@ -90,10 +82,6 @@ type PassParams = {
   target: XY
 }
 
-type ShootParams = {
-  hold?: number
-}
-
 const isMovementLocked = (state: HoopsState, entityId: string, position: Position): boolean => {
   return state.ballOwner === entityId
     && state.dribbleLocked
@@ -109,8 +97,6 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
 
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
-  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
-
   if (!Number.isFinite(params.x) || !Number.isFinite(params.y)) return
 
   if (params.x > 0) position.data.facing = 1
@@ -162,21 +148,10 @@ const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   })
 })
 
-const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
+const shootBall = Action("shoot", ({ entity, world }) => {
   if (!entity) return
 
   const state = world.game.state as HoopsState
-  if (state.phase !== "play") return
-  if (state.ballOwner !== entity.id) return
-
-  state.shotCharging = addShotCharging(state.shotCharging, entity.id)
-})
-
-const shootBall = Action<ShootParams>("shoot", ({ entity, world }) => {
-  if (!entity) return
-
-  const state = world.game.state as HoopsState
-  state.shotCharging = removeShotCharging(state.shotCharging, entity.id)
   if (state.phase !== "play") return
   if (state.ballOwner !== entity.id) return
 

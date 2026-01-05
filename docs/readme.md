@@ -12,6 +12,8 @@ lofi music | https://freemusicarchive.org/music/holiznacc0/
 
 ### assets
 
+swish sound | elevenlabs.io | license: attribution
+
 falcon rockets | Dylan Semrau | license: attribution
 
 flintlock | https://opengameart.org/content/flintlock-pistol | license: attribution

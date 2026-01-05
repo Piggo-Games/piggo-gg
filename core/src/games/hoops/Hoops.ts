@@ -22,27 +22,10 @@ export type HoopsState = {
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
   dribbleLocked: boolean
-  shotCharging: string[]
 }
 
 export type HoopsSettings = {
   showControls: boolean
-}
-
-export const isShotCharging = (entries: string[], id: string): boolean => {
-  return entries.includes(id)
-}
-
-export const addShotCharging = (entries: string[], id: string): string[] => {
-  return entries.includes(id) ? entries : [...entries, id]
-}
-
-export const removeShotCharging = (entries: string[], id: string): string[] => {
-  return entries.filter((entry) => entry !== id)
-}
-
-export const pruneShotCharging = (entries: string[], exists: (id: string) => boolean): string[] => {
-  return entries.filter(exists)
 }
 
 export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
@@ -62,8 +45,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       scoredTick: 0,
       ballOwner: "",
       ballOwnerTeam: 0,
-      dribbleLocked: false,
-      shotCharging: []
+      dribbleLocked: false
     },
     systems: [
       PhysicsSystem("local"),
@@ -175,9 +157,6 @@ const HoopsSystem = SystemBuilder({
 
         const players = world.queryEntities<Position | Team | Renderable>(["position", "team", "input"])
 
-        const exists = (id: string) => Boolean(world.entities[id])
-        state.shotCharging = pruneShotCharging(state.shotCharging, exists)
-
         // reset after score
         if (state.phase === "score" && (world.tick - state.scoredTick) > SCORE_RESET_TICKS) {
           if (state.scoreLeft >= 11 || state.scoreRight >= 11) {
@@ -222,8 +201,7 @@ const HoopsSystem = SystemBuilder({
           } else {
             state.ballOwnerTeam = ownerTeam.data.team
             const offset = orbitOffset(ownerPos.data.pointingDelta)
-            const charging = isShotCharging(state.shotCharging, owner.id)
-            const shouldDribble = !charging && !state.dribbleLocked && ownerPos.data.standing
+            const shouldDribble = !state.dribbleLocked && ownerPos.data.standing
             const carryZ = ownerPos.data.z + SHOT_CHARGE_Z
 
             ballPos.data.offset = offset
