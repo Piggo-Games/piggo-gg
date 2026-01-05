@@ -1,17 +1,19 @@
 import {
   Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
   Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
-  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min, velocityToPoint
+  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, DASH_ACTIVE_TICKS, DASH_COOLDOWN_TICKS, DASH_SPEED, PASS_GRAVITY,
-  PASS_UP, SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN,
-  SHOT_UP_MAX, SHOT_UP_MIN
+  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS,
+  SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 import {
-  addShotCharging, getDashUntil, isShotCharging, removeShotCharging, setDashEntry
+  addShotCharging, isShotCharging, removeShotCharging
 } from "./HoopsStateUtils"
+
+export const HOWARD_SPEED = 135
+export const HOWARD_ACCEL = 80
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -23,8 +25,7 @@ export const Howard = (player: Player) => {
     components: {
       debug: Debug(),
       position: Position({
-        x: spawnX, y: yOffset,
-        velocityResets: 1, speed: 135, gravity: 0.25
+        x: spawnX, y: yOffset, speed: HOWARD_SPEED, gravity: 0.4, friction: true
       }),
       networked: Networked(),
       collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
@@ -41,10 +42,6 @@ export const Howard = (player: Player) => {
           "mb1": ({ hold }) => {
             if (hold) return
             return { actionId: "startShotCharge" }
-          },
-          "shift": ({ hold }) => {
-            if (hold) return
-            return { actionId: "dash" }
           },
           " ": ({ hold }) => {
             if (hold) return
@@ -71,7 +68,6 @@ export const Howard = (player: Player) => {
         pass: passBall,
         shoot: shootBall,
         startShotCharge,
-        dash,
         jump: jumpHoward
       }),
       renderable: Renderable({
@@ -113,18 +109,23 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
 
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
-  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) {
-    position.setVelocity({ x: 0, y: 0 })
-    return
-  }
+  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
+
+  if (!Number.isFinite(params.x) || !Number.isFinite(params.y)) return
 
   if (params.x > 0) position.data.facing = 1
   if (params.x < 0) position.data.facing = -1
 
-  position.setHeading({ x: NaN, y: NaN })
-  position.setVelocity({
-    ...((params.x !== undefined) ? { x: params.x } : {}),
-    ...((params.y !== undefined) ? { y: params.y } : {})
+  position.clearHeading()
+
+  const magnitude = hypot(params.x, params.y)
+  if (!magnitude) return
+
+  const accel = position.data.z > 0 ? HOWARD_ACCEL * 0.16 : HOWARD_ACCEL
+
+  position.impulse({
+    x: (params.x / magnitude) * accel,
+    y: (params.y / magnitude) * accel
   })
 })
 
@@ -147,10 +148,18 @@ const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   ballPos.setPosition({ z: Math.max(1, ballPos.data.z) })
   ballPos.setGravity(PASS_GRAVITY)
 
-  const v = velocityToPoint(ballPos.data, params.target, PASS_GRAVITY, PASS_UP)
-  const scale = 1000 / world.tickrate
+  const dx = params.target.x - ballPos.data.x
+  const dy = params.target.y - ballPos.data.y
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
 
-  ballPos.setVelocity({ x: v.x * scale, y: v.y * scale, z: PASS_UP })
+  const magnitude = hypot(dx, dy)
+  if (!magnitude) return
+
+  ballPos.setVelocity({
+    x: (dx / magnitude) * PASS_SPEED,
+    y: (dy / magnitude) * PASS_SPEED,
+    z: PASS_UP
+  })
 })
 
 const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
@@ -159,9 +168,6 @@ const startShotCharge = Action("startShotCharge", ({ entity, world }) => {
   const state = world.game.state as HoopsState
   if (state.phase !== "play") return
   if (state.ballOwner !== entity.id) return
-
-  const { position } = entity.components
-  if (position) position.setVelocity({ x: 0, y: 0 })
 
   state.shotCharging = addShotCharging(state.shotCharging, entity.id)
 })
@@ -194,7 +200,6 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
   const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
   const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
-  console.log("Shooting with speed:", speed, charge)
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
@@ -217,41 +222,9 @@ const jumpHoward = Action("jump", ({ entity, world }) => {
   const state = world.game.state as HoopsState
   if (isMovementLocked(state, entity.id, position)) return
 
-  position.setVelocity({ z: 4 })
+  position.setVelocity({ z: 5 })
 
   if (state.ballOwner === entity.id) {
     state.dribbleLocked = true
   }
-})
-
-const dash = Action("dash", ({ entity, world }) => {
-  if (!entity) return
-
-  const state = world.game.state as HoopsState
-  const { position } = entity.components
-  if (!position) return
-
-  if (isMovementLocked(state, entity.id, position)) return
-  if (state.ballOwner === entity.id && isShotCharging(state.shotCharging, entity.id)) return
-
-  const readyAt = getDashUntil(state.dashReady, entity.id) ?? 0
-  if (world.tick < readyAt) return
-
-  state.dashReady = setDashEntry(state.dashReady, entity.id, world.tick + DASH_COOLDOWN_TICKS)
-  state.dashActive = setDashEntry(state.dashActive, entity.id, world.tick + DASH_ACTIVE_TICKS)
-
-  const { pointingDelta, velocity } = position.data
-
-  let dx = velocity.x
-  let dy = velocity.y
-
-  if (!dx && !dy) {
-    dx = Number.isFinite(pointingDelta.x) ? pointingDelta.x : 0
-    dy = Number.isFinite(pointingDelta.y) ? pointingDelta.y : 0
-  }
-
-  const magnitude = hypot(dx, dy)
-  if (!magnitude) return
-
-  position.impulse({ x: (dx / magnitude) * DASH_SPEED, y: (dy / magnitude) * DASH_SPEED })
 })

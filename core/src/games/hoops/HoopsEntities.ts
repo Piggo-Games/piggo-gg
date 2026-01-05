@@ -1,11 +1,13 @@
 import {
-  Collider, Debug, Entity, LineWall, Networked, Position, Renderable,
-  Shadow, hypot, loadTexture, min, pixiGraphics
+  Collider, Debug, Entity, LineWall, Networked, PI, Position, Renderable,
+  Shadow, asin, cos, hypot, loadTexture, max, min, pixiGraphics, sin
 } from "@piggo-gg/core"
 import { Graphics, Texture } from "pixi.js"
 import {
-  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
-  SHOT_CHARGE_LINE_MAX, SHOT_CHARGE_LINE_OFFSET, SHOT_CHARGE_TICKS
+  COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY,
+  COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS, FREE_THROW_DISTANCE,
+  FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z, SHOT_CHARGE_TICKS, SHOT_GRAVITY,
+  SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
 import type { HoopsState } from "./Hoops"
 
@@ -13,7 +15,7 @@ export const Ball = () => Entity({
   id: "ball",
   components: {
     debug: Debug(),
-    position: Position({ x: COURT_CENTER.x, y: COURT_CENTER.y, gravity: 0.1 }),
+    position: Position({ x: COURT_CENTER.x, gravity: 0.1 }),
     collider: Collider({ shape: "ball", radius: 4, restitution: 0.6, group: "2" }),
     shadow: Shadow(2.5, 3),
     networked: Networked(),
@@ -42,11 +44,12 @@ export const Court = () => LineWall({
     COURT_WIDTH, 0,
     COURT_WIDTH + COURT_SPLAY, COURT_HEIGHT,
     -COURT_SPLAY, COURT_HEIGHT,
-    0, 0
+    0, 0,
+    1, 0,
   ],
   visible: true,
   fill: 0xc48a5a,
-  strokeAlpha: 0.8
+  strokeAlpha: 1
 })
 
 export const Centerline = () => LineWall({
@@ -56,8 +59,101 @@ export const Centerline = () => LineWall({
     COURT_WIDTH / 2, COURT_HEIGHT
   ],
   visible: true,
-  strokeAlpha: 0.5,
+  strokeAlpha: 1,
   group: "none"
+})
+
+export const CenterCircle = () => Entity({
+  id: "center-circle",
+  components: {
+    position: Position({ x: COURT_CENTER.x, y: 0 }),
+    renderable: Renderable({
+      zIndex: 3.1,
+      setup: async (renderable) => {
+        renderable.c = pixiGraphics()
+          .ellipse(0, 0, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y)
+          .stroke({ width: 1.5, color: 0xffffff, alpha: 1 })
+      }
+    })
+  }
+})
+
+export const CourtLines = () => Entity({
+  id: "court-lines",
+  components: {
+    position: Position(),
+    renderable: Renderable({
+      zIndex: 3.2,
+      setup: async (renderable) => {
+        const g = pixiGraphics()
+        const halfCourtHeight = COURT_HEIGHT / 2
+        const laneHalf = FREE_THROW_LANE_WIDTH / 2
+        const freeThrowCircleRadiusY = FREE_THROW_CIRCLE_RADIUS * COURT_LINE_Y_SCALE
+        const threePointRadiusY = THREE_POINT_RADIUS * COURT_LINE_Y_SCALE
+
+        const leftHoopX = HOOP_OFFSET_X
+        const rightHoopX = COURT_WIDTH - HOOP_OFFSET_X
+        const leftFreeThrowX = leftHoopX + FREE_THROW_DISTANCE
+        const rightFreeThrowX = rightHoopX - FREE_THROW_DISTANCE
+
+        const threePointTheta = asin(min(1, THREE_POINT_SIDE_Y / threePointRadiusY))
+
+        const edgeAtY = (y: number) => {
+          const t = (y + halfCourtHeight) / COURT_HEIGHT
+          return { left: -COURT_SPLAY * t, right: COURT_WIDTH + COURT_SPLAY * t }
+        }
+
+        const line = (x1: number, y1: number, x2: number, y2: number) => {
+          g.moveTo(x1, y1)
+          g.lineTo(x2, y2)
+        }
+
+        const arc = (cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
+          const step = (end - start) / steps
+          for (let i = 0; i <= steps; i += 1) {
+            const angle = start + step * i
+            const x = cx + cos(angle) * rx
+            const y = cy + sin(angle) * ry
+            if (i === 0) g.moveTo(x, y)
+            else g.lineTo(x, y)
+          }
+        }
+
+        const offset = 8
+
+        // Free throw lane
+        const laneTopEdges = edgeAtY(-laneHalf)
+        const laneBottomEdges = edgeAtY(laneHalf)
+        line(laneTopEdges.left, -laneHalf, leftFreeThrowX - offset, -laneHalf)
+        line(laneBottomEdges.left, laneHalf, leftFreeThrowX - offset, laneHalf)
+        line(rightFreeThrowX, -laneHalf, laneTopEdges.right, -laneHalf)
+        line(rightFreeThrowX, laneHalf, laneBottomEdges.right, laneHalf)
+
+        // free throw line
+        line(leftFreeThrowX - offset, laneHalf, leftFreeThrowX, -laneHalf)
+        line(rightFreeThrowX - offset, -laneHalf, rightFreeThrowX, laneHalf)
+
+        // Free throw circles
+        console.log({ freeThrowCircleRadiusY })
+        arc(leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
+        arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
+
+        // 3-point lines
+        line(-6, -THREE_POINT_SIDE_Y, 101, -THREE_POINT_SIDE_Y)
+        line(-45, THREE_POINT_SIDE_Y, 77, THREE_POINT_SIDE_Y)
+        line(456, -THREE_POINT_SIDE_Y, 348, -THREE_POINT_SIDE_Y)
+        line(495, THREE_POINT_SIDE_Y, 373, THREE_POINT_SIDE_Y)
+
+        // 3-point arcs
+        console.log({ threePointRadiusY, threePointTheta })
+        arc(74, -2, 82, 72, -PI / 2 + 0.33, PI / 2)
+        arc(376, -2, 82, 72, PI / 2, PI * 1.5 - 0.34)
+
+        g.stroke({ width: COURT_LINE_WIDTH, color: 0xffffff, alpha: 1 })
+        renderable.c = g
+      }
+    })
+  }
 })
 
 export const ShotChargeLine = () => Entity({
@@ -67,76 +163,122 @@ export const ShotChargeLine = () => Entity({
     renderable: Renderable({
       zIndex: 3.5,
       setContainer: async () => pixiGraphics(),
-      onTick: ({ container, entity, world, renderable }) => {
-        const g = container as Graphics
-        const client = world.client
-        const linePos = entity.components.position
+      onTick: (() => {
+        const pointNodes: Graphics[] = []
+        const pointColor = 0xfff1c1
+        const pointAlpha = 0.85
+        return ({ container, entity, world, renderable }) => {
+          const g = container as Graphics
+          const client = world.client
+          const linePos = entity.components.position
 
-        if (!client) {
-          renderable.visible = false
-          g.clear()
-          return
-        }
+          if (!client) {
+            renderable.visible = false
+            g.clear()
+            return
+          }
 
-        const character = client.character()
-        const position = character?.components.position
-        if (!character || !position) {
-          renderable.visible = false
-          g.clear()
-          if (linePos.data.follows) linePos.data.follows = null
-          return
-        }
+          const character = client.character()
+          const position = character?.components.position
+          if (!character || !position) {
+            renderable.visible = false
+            g.clear()
+            if (linePos.data.follows) linePos.data.follows = null
+            return
+          }
 
-        if (linePos.data.follows !== character.id) {
-          linePos.data.follows = character.id
+          const state = world.game.state as HoopsState
+          const hold = client.bufferDown.get("mb1")?.hold ?? 0
+
+          if (hold <= 0 || state.phase !== "play" || state.ballOwner !== character.id) {
+            renderable.visible = false
+            g.clear()
+            return
+          }
+
+          const { pointingDelta } = position.data
+          if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
+            renderable.visible = false
+            g.clear()
+            return
+          }
+
+          const magnitude = hypot(pointingDelta.x, pointingDelta.y)
+          if (!magnitude) {
+            renderable.visible = false
+            g.clear()
+            return
+          }
+
+          const ball = world.entity<Position>("ball")
+          const ballPos = ball?.components.position
+          if (!ballPos) {
+            renderable.visible = false
+            g.clear()
+            return
+          }
+
+          const originZ = max(1.5, ballPos.data.z)
+          linePos.data.follows = null
           linePos.data.offset = { x: 0, y: 0 }
-          linePos.setPosition({ x: position.data.x, y: position.data.y, z: position.data.z })
+          linePos.setPosition({ x: ballPos.data.x, y: ballPos.data.y, z: originZ })
+
+          const charge = min(1, hold / SHOT_CHARGE_TICKS)
+          const dirX = pointingDelta.x / magnitude
+          const dirY = pointingDelta.y / magnitude
+          const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
+          const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
+
+          const origin = { x: ballPos.data.x, y: ballPos.data.y, z: originZ }
+          const velocity = { x: dirX * speed, y: dirY * speed }
+          const tickSeconds = world.tickrate / 1000
+
+          const gap = 1
+
+          let posX = origin.x
+          let posY = origin.y
+          let posZ = origin.z
+          let velZ = up
+
+          const points: { x: number, y: number }[] = [{ x: 0, y: 0 }]
+          const maxSteps = 90
+
+          for (let step = 0; step < maxSteps; step += 1) {
+            posX += velocity.x * tickSeconds * gap
+            posY += velocity.y * tickSeconds * gap
+            posZ += velZ * gap
+
+            if (posZ <= 0) {
+              posZ = 0
+            }
+
+            const dx = posX - origin.x
+            const dy = posY - origin.y
+            const dz = posZ - origin.z
+            points.push({ x: dx, y: dy - dz })
+
+            if (posZ <= 0) break
+
+            velZ -= SHOT_GRAVITY * gap
+          }
+
+          renderable.visible = true
+          for (let i = 0; i < points.length; i += 1) {
+            let node = pointNodes[i]
+            if (!node) {
+              node = pixiGraphics().circle(0, 0, 1).fill({ color: pointColor, alpha: pointAlpha })
+              pointNodes[i] = node
+              g.addChild(node)
+            }
+            node.visible = true
+            node.position.set(points[i].x, points[i].y)
+          }
+
+          for (let i = points.length; i < pointNodes.length; i += 1) {
+            pointNodes[i].visible = false
+          }
         }
-
-        const state = world.game.state as HoopsState
-        const hold = client.bufferDown.get("mb1")?.hold ?? 0
-
-        if (hold <= 0 || state.phase !== "play" || state.ballOwner !== character.id) {
-          renderable.visible = false
-          g.clear()
-          return
-        }
-
-        const { pointingDelta } = position.data
-        if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
-          renderable.visible = false
-          g.clear()
-          return
-        }
-
-        const magnitude = hypot(pointingDelta.x, pointingDelta.y)
-        if (!magnitude) {
-          renderable.visible = false
-          g.clear()
-          return
-        }
-
-        const charge = min(1, hold / SHOT_CHARGE_TICKS)
-        const length = SHOT_CHARGE_LINE_MAX * charge
-
-        if (length <= 0) {
-          renderable.visible = false
-          g.clear()
-          return
-        }
-
-        const dirX = pointingDelta.x / magnitude
-        const dirY = pointingDelta.y / magnitude
-        const startX = dirX * SHOT_CHARGE_LINE_OFFSET
-        const startY = dirY * SHOT_CHARGE_LINE_OFFSET
-        const endX = dirX * (SHOT_CHARGE_LINE_OFFSET + length)
-        const endY = dirY * (SHOT_CHARGE_LINE_OFFSET + length)
-
-        renderable.visible = true
-        g.clear().setStrokeStyle({ width: 2, color: 0xffffff, alpha: 0.8 })
-        g.moveTo(startX, startY).lineTo(endX, endY)
-        g.stroke()
-      }
+      })()
     })
   }
 })

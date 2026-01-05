@@ -10,10 +10,10 @@ import {
   COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
   DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
-import { Ball, Centerline, Court, HoopSet, ShotChargeLine } from "./HoopsEntities"
+import { Ball, CenterCircle, Centerline, Court, CourtLines, HoopSet, ShotChargeLine } from "./HoopsEntities"
 import { Howard } from "./Howard"
 import {
-  getDashUntil, isShotCharging, pruneDashEntries, pruneShotCharging
+  isShotCharging, pruneShotCharging
 } from "./HoopsStateUtils"
 
 export type HoopsState = {
@@ -25,8 +25,6 @@ export type HoopsState = {
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
   dribbleLocked: boolean
-  dashReady: string[]
-  dashActive: string[]
   shotCharging: string[]
 }
 
@@ -52,8 +50,6 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       ballOwner: "",
       ballOwnerTeam: 0,
       dribbleLocked: false,
-      dashReady: [],
-      dashActive: [],
       shotCharging: []
     },
     systems: [
@@ -80,7 +76,9 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       ShotChargeLine(),
       Ball(),
       Court(),
-      // Centerline(),
+      CourtLines(),
+      Centerline(),
+      CenterCircle(),
       // ...HoopSet(),
       ScorePanel(),
       HtmlChat(),
@@ -163,8 +161,6 @@ const HoopsSystem = SystemBuilder({
         const players = world.queryEntities<Position | Team | Renderable>(["position", "team", "input"])
 
         const exists = (id: string) => Boolean(world.entities[id])
-        state.dashReady = pruneDashEntries(state.dashReady, world.tick, exists, (until, now) => until > now)
-        state.dashActive = pruneDashEntries(state.dashActive, world.tick, exists, (until, now) => until >= now)
         state.shotCharging = pruneShotCharging(state.shotCharging, exists)
 
         // reset after score
@@ -274,8 +270,8 @@ const HoopsSystem = SystemBuilder({
             const team = player.components.team.data.team
             if (team === state.ballOwnerTeam) continue
 
-            const dashUntil = getDashUntil(state.dashActive, player.id)
-            if (!dashUntil || dashUntil < world.tick) continue
+            // const dashUntil = getDashUntil(state.dashActive, player.id)
+            // if (!dashUntil || dashUntil < world.tick) continue
 
             const distance = hypot(
               player.components.position.data.x - ballPos.data.x,
@@ -341,10 +337,10 @@ const controls: HUDSystemProps = {
       label: "pass",
       buttons: [["mb2"]]
     },
-    {
-      label: "dash",
-      buttons: [["shift"]]
-    },
+    // {
+    //   label: "dash",
+    //   buttons: [["shift"]]
+    // },
     {
       label: "menu",
       buttons: [["esc"]]

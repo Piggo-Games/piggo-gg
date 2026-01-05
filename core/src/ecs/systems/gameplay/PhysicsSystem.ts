@@ -220,6 +220,16 @@ export const PhysicsSystem = (mode: "global" | "local") => SystemBuilder({
         entities.forEach((entity) => {
           entity.components.position.updateVelocity()
         })
+
+        // friction
+        entities.forEach((entity) => {
+          const { position } = entity.components
+          if (!position.data.friction || position.data.tether) return
+
+          const { flying, standing } = position.data
+          const scale = flying ? 0.9 : (standing ? 0.4 : 0.92)
+          position.scaleVelocity(scale)
+        })
       }
     }
   }
