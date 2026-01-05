@@ -13,7 +13,7 @@ import {
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80
-const HOOP_TARGET = { x: -27, y: 0, z: 10 }
+const HOOP_TARGET = { x: -27, y: 0, z: 36 }
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -186,12 +186,17 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
 
   const hold = max(0, params?.hold ?? 0)
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
-  const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
+  let up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
   const originZ = max(1.5, ballPos.data.z)
 
   const dx = HOOP_TARGET.x - ballPos.data.x
   const dy = HOOP_TARGET.y - ballPos.data.y
   if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+
+  if (HOOP_TARGET.z > originZ) {
+    const minUp = Math.sqrt(2 * SHOT_GRAVITY * (HOOP_TARGET.z - originZ)) - 0.5 * SHOT_GRAVITY
+    if (minUp > up) up = minUp
+  }
 
   const a = -0.5 * SHOT_GRAVITY
   const b = up + 0.5 * SHOT_GRAVITY

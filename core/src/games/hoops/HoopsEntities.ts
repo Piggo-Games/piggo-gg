@@ -159,7 +159,7 @@ export const Goal1 = () => Entity({
   id: "goal1",
   components: {
     debug: Debug(),
-    position: Position({ x: -26, y: -12, z: 36 }),
+    position: Position({ x: -26, y: 0, z: 36 }),
     renderable: Renderable({
       zIndex: 4,
       anchor: { x: 0, y: 0.9 },
