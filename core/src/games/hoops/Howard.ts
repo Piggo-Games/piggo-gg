@@ -5,7 +5,7 @@ import {
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_CHARGE_TICKS,
-  SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN
+  SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN
 } from "./HoopsConstants"
 import {
   addShotCharging, isShotCharging, removeShotCharging, type HoopsState
@@ -13,6 +13,7 @@ import {
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80
+const HOOP_TARGET = { x: -27, y: 0, z: 10 }
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -183,32 +184,42 @@ const shootBall = Action<ShootParams>("shoot", ({ entity, world, params }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
-  const { position } = entity.components
-  if (!position) return
-
-  const { pointingDelta } = position.data
-  if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) return
-
-  const magnitude = hypot(pointingDelta.x, pointingDelta.y)
-  if (!magnitude) return
-
-  const dirX = pointingDelta.x / magnitude
-  const dirY = pointingDelta.y / magnitude
-
   const hold = max(0, params?.hold ?? 0)
   const charge = min(1, hold / SHOT_CHARGE_TICKS)
-  const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
   const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
+  const originZ = max(1.5, ballPos.data.z)
+
+  const dx = HOOP_TARGET.x - ballPos.data.x
+  const dy = HOOP_TARGET.y - ballPos.data.y
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+
+  const a = -0.5 * SHOT_GRAVITY
+  const b = up + 0.5 * SHOT_GRAVITY
+  const c = originZ - HOOP_TARGET.z
+  const discriminant = b * b - 4 * a * c
+  if (discriminant <= 0) return
+
+  const sqrt = Math.sqrt(discriminant)
+  const t1 = (-b - sqrt) / (2 * a)
+  const t2 = (-b + sqrt) / (2 * a)
+  const ticksToHoop = max(t1, t2)
+  if (!Number.isFinite(ticksToHoop) || ticksToHoop <= 0) return
+
+  const timeSeconds = ticksToHoop * (world.tickrate / 1000)
+  if (!Number.isFinite(timeSeconds) || timeSeconds <= 0) return
+
+  const velX = dx / timeSeconds
+  const velY = dy / timeSeconds
 
   state.ballOwner = ""
   state.ballOwnerTeam = 0
   state.dribbleLocked = false
 
   ballPos.data.follows = null
-  ballPos.setPosition({ z: Math.max(1.5, ballPos.data.z) })
+  ballPos.setPosition({ z: originZ })
   ballPos.setGravity(SHOT_GRAVITY)
 
-  ballPos.setVelocity({ x: dirX * speed, y: dirY * speed, z: up })
+  ballPos.setVelocity({ x: velX, y: velY, z: up })
 })
 
 const jumpHoward = Action("jump", ({ entity, world }) => {

@@ -1,16 +1,14 @@
 import {
   Collider, Debug, Entity, LineWall, Networked, PI, Position, Renderable,
-  Shadow, asin, cos, hypot, loadTexture, max, min, pixiGraphics, sin
+  Shadow, asin, cos, loadTexture, min, pixiGraphics, sin, HoopsState
 } from "@piggo-gg/core"
-import { Graphics, Texture } from "pixi.js"
 import {
-  BACKBOARD_HEIGHT, BACKBOARD_WIDTH, BACKBOARD_Z, COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X,
-  COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT, COURT_SPLAY, COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_WIDTH,
-  FREE_THROW_CIRCLE_RADIUS, FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
-  SHOT_CHARGE_TICKS, SHOT_GRAVITY, SHOT_SPEED_MAX, SHOT_SPEED_MIN, SHOT_UP_MAX, SHOT_UP_MIN, THREE_POINT_RADIUS,
-  THREE_POINT_SIDE_Y
+  COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT,
+  COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_SPLAY, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS,
+  FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, HOOP_RADIUS, HOOP_SCORE_Z,
+  THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
-import type { HoopsState } from "./Hoops"
+import { Texture } from "pixi.js"
 
 export const Ball = () => Entity({
   id: "ball",
@@ -160,152 +158,29 @@ export const CourtLines = () => Entity({
 export const Goal1 = () => Entity({
   id: "goal1",
   components: {
-    position: Position({ x: -28, y: -20, z: BACKBOARD_Z }),
+    debug: Debug(),
+    position: Position({ x: -26, y: -12, z: 36 }),
     renderable: Renderable({
-      zIndex: 3.55,
+      zIndex: 4,
+      anchor: { x: 0, y: 0.9 },
       setup: async (renderable) => {
         const board = pixiGraphics()
           .moveTo(-1, 0)
-          .lineTo(-9, 26)
+          .lineTo(-8, 26)
           .lineTo(-15, 12)
-          .lineTo(-7, -14)
+          .lineTo(-8, -14)
           .lineTo(-1, 0)
           .fill({ color: 0xf7f2e8, alpha: 1 })
           .stroke({ color: 0xFF7F50, width: 1, alpha: 1 })
+        board.y = -10
+        board.x = -1
 
         const hoop = pixiGraphics()
-          .ellipse(1, 10, 6, 4)
+          .ellipse(0, 0, 6, 4)
           .stroke({ color: 0xFF7F50, width: 1.6, alpha: 1 })
 
         renderable.c.addChild(board, hoop)
       }
-    })
-  }
-})
-
-export const ShotChargeLine = () => Entity({
-  id: "shot-charge-line",
-  components: {
-    position: Position(),
-    renderable: Renderable({
-      zIndex: 3.5,
-      setContainer: async () => pixiGraphics(),
-      onTick: (() => {
-        const pointNodes: Graphics[] = []
-        const pointColor = 0xfff1c1
-        const pointAlpha = 0.85
-        return ({ container, entity, world, renderable }) => {
-          const g = container as Graphics
-          const client = world.client
-          const linePos = entity.components.position
-
-          if (!client) {
-            renderable.visible = false
-            g.clear()
-            return
-          }
-
-          const character = client.character()
-          const position = character?.components.position
-          if (!character || !position) {
-            renderable.visible = false
-            g.clear()
-            if (linePos.data.follows) linePos.data.follows = null
-            return
-          }
-
-          const state = world.game.state as HoopsState
-          const hold = client.bufferDown.get("mb1")?.hold ?? 0
-
-          if (hold <= 0 || state.phase !== "play" || state.ballOwner !== character.id) {
-            renderable.visible = false
-            g.clear()
-            return
-          }
-
-          const { pointingDelta } = position.data
-          if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
-            renderable.visible = false
-            g.clear()
-            return
-          }
-
-          const magnitude = hypot(pointingDelta.x, pointingDelta.y)
-          if (!magnitude) {
-            renderable.visible = false
-            g.clear()
-            return
-          }
-
-          const ball = world.entity<Position>("ball")
-          const ballPos = ball?.components.position
-          if (!ballPos) {
-            renderable.visible = false
-            g.clear()
-            return
-          }
-
-          const originZ = max(1.5, ballPos.data.z)
-          linePos.data.follows = null
-          linePos.data.offset = { x: 0, y: 0 }
-          linePos.setPosition({ x: ballPos.data.x, y: ballPos.data.y, z: originZ })
-
-          const charge = min(1, hold / SHOT_CHARGE_TICKS)
-          const dirX = pointingDelta.x / magnitude
-          const dirY = pointingDelta.y / magnitude
-          const speed = SHOT_SPEED_MIN + (SHOT_SPEED_MAX - SHOT_SPEED_MIN) * charge
-          const up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * charge
-
-          const origin = { x: ballPos.data.x, y: ballPos.data.y, z: originZ }
-          const velocity = { x: dirX * speed, y: dirY * speed }
-          const tickSeconds = world.tickrate / 1000
-
-          const gap = 1
-
-          let posX = origin.x
-          let posY = origin.y
-          let posZ = origin.z
-          let velZ = up
-
-          const points: { x: number, y: number }[] = [{ x: 0, y: 0 }]
-          const maxSteps = 90
-
-          for (let step = 0; step < maxSteps; step += 1) {
-            posX += velocity.x * tickSeconds * gap
-            posY += velocity.y * tickSeconds * gap
-            posZ += velZ * gap
-
-            if (posZ <= 0) {
-              posZ = 0
-            }
-
-            const dx = posX - origin.x
-            const dy = posY - origin.y
-            const dz = posZ - origin.z
-            points.push({ x: dx, y: dy - dz })
-
-            if (posZ <= 0) break
-
-            velZ -= SHOT_GRAVITY * gap
-          }
-
-          renderable.visible = true
-          for (let i = 0; i < points.length; i += 1) {
-            let node = pointNodes[i]
-            if (!node) {
-              node = pixiGraphics().circle(0, 0, 1).fill({ color: pointColor, alpha: pointAlpha })
-              pointNodes[i] = node
-              g.addChild(node)
-            }
-            node.visible = true
-            node.position.set(points[i].x, points[i].y)
-          }
-
-          for (let i = points.length; i < pointNodes.length; i += 1) {
-            pointNodes[i].visible = false
-          }
-        }
-      })()
     })
   }
 })
