@@ -1,6 +1,6 @@
 import {
   ClientSystemBuilder, Entity, Renderable, Position,
-  abs, round, XY, XYZ, sign, sqrt, max, min
+  isMobile, abs, round, XY, XYZ, sign, sqrt, max, min
 } from "@piggo-gg/core"
 import { Application, Container } from "pixi.js"
 
@@ -78,12 +78,13 @@ export const PixiCamera = (app: Application): PixiCamera => {
   }
 
   const rescale = () => {
-    const min = 1.5
+    const min = isMobile() ? 1 : 1.5
     const max = 5
 
     if (camera.scale < min) camera.scale = min
     if (camera.scale > max) camera.scale = max
 
+    console.log("Rescaling camera to", camera.scale)
     root.scale?.set(camera.scale, camera.scale)
   }
 
@@ -149,7 +150,11 @@ export const PixiCameraSystem = ({ follow = () => ({ x: 0, y: 0, z: 0 }), resize
       onRender: (_, delta) => {
         if (targetScale !== pixi.camera.scale) {
           const diff = targetScale - pixi.camera.scale
-          pixi.camera.scaleBy(diff * 0.1)
+          if (abs(diff) < 0.01) {
+            pixi.camera.scaleTo(targetScale)
+          } else {
+            pixi.camera.scaleBy(diff * 0.1)
+          }
         }
 
         if (!pixi.camera.focus) {

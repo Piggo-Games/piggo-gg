@@ -1,8 +1,8 @@
 import {
-  Background, Build, Entity, GameBuilder, getBrowser, HButton,
-  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu,
-  Networked, NPC, piggoVersion, PixiRenderSystem, RefreshableDiv,
-  Volley, Island, Mars, World, canvasAppend, HtmlFpsText, HDiv, MusicButton, Hoops
+  Background, Build, Entity, GameBuilder, getBrowser, HButton, HImg,
+  HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC,
+  piggoVersion, PixiRenderSystem, RefreshableDiv, Volley, Island, CSS,
+  Mars, World, canvasAppend, HtmlFpsText, HDiv, MusicButton, Hoops
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -27,6 +27,15 @@ export const Lobby: GameBuilder<LobbyState> = {
     ],
     netcode: "delay"
   })
+}
+
+const startGame = (game: GameBuilder, world: World, state: LobbyState): void => {
+  if (!world.client?.isLeader()) return
+  if (state.starting) return
+
+  world.client?.sound.play({ name: "bubble" })
+  world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
+  state.starting = true
 }
 
 const GameButton = (game: GameBuilder, world: World) => {
@@ -85,13 +94,7 @@ const GameButton = (game: GameBuilder, world: World) => {
       if (!intent) return
 
       inner.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
-
-      if (!world.client?.isLeader()) return
-      if (state.starting) return
-
-      world.client?.sound.play({ name: "bubble" })
-      world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
-      state.starting = true
+      startGame(game, world, state)
     },
     onHover: () => {
       if (state.starting) return
@@ -109,6 +112,271 @@ const GameButton = (game: GameBuilder, world: World) => {
   )
 }
 
+const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState): { shell: HTMLDivElement, playButton: HTMLButtonElement } => {
+  let selectedIndex = 0
+  let startX = 0
+  let startY = 0
+  let lastDx = 0
+  let pointerActive = false
+  let activePointerId: number | null = null
+  let animating = false
+  const swipeDistance = 100
+
+  const cardWidth = "min(50vw, 180px)"
+  const cardHeight = "min(46vw, 160px)"
+  const sideWidth = "min(22vw, 90px)"
+  const sideHeight = "min(20vw, 80px)"
+
+  const buildCard = (size: "main" | "side") => {
+    const image = HImg({
+      src: `${games[0].id}-256.jpg`,
+      style: {
+        top: "50%",
+        width: "100%",
+        height: "101%",
+        transform: "translate(-50%, -50%)"
+      }
+    })
+
+    const label = size === "main" ? HText({
+      text: games[0].id,
+      style: {
+        fontSize: "min(6vw, 28px)",
+        left: "50%",
+        transform: "translate(-50%)",
+        bottom: "10px",
+        fontWeight: "bold"
+      }
+    }) : undefined
+
+    const inner = HButton({
+      style: {
+        width: "100%",
+        height: "100%",
+        borderRadius: "16px",
+        top: "0px",
+        left: "0px",
+        transition: "transform 0.2s ease",
+        border: "3px solid transparent",
+        backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)"
+      }
+    },
+      image,
+      label
+    )
+
+    const button = HButton({
+      style: {
+        width: size === "main" ? cardWidth : sideWidth,
+        height: size === "main" ? cardHeight : sideHeight,
+        borderRadius: "16px",
+        fontSize: "24px",
+        position: "relative",
+        background: "none",
+        pointerEvents: "none"
+      }
+    },
+      inner
+    )
+
+    return { button, image, label, inner }
+  }
+
+  const prevCard = buildCard("side")
+  const mainCard = buildCard("main")
+  const nextCard = buildCard("side")
+
+  mainCard.inner.style.transform = "scale(1) rotate(0deg)"
+
+  const carouselTrack = HDiv({
+    style: {
+      position: "relative",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      border: "none",
+      pointerEvents: "auto",
+      touchAction: "pan-y"
+    }
+  },
+    prevCard.button,
+    mainCard.button,
+    nextCard.button
+  )
+
+  const setDragTransform = (dx: number) => {
+    const clamped = Math.max(-swipeDistance, Math.min(swipeDistance, dx))
+    const spin = clamped * 0.05
+    const scale = 1 - Math.min(Math.abs(clamped) / swipeDistance, 1) * 0.05
+    carouselTrack.style.transform = `translateX(${clamped}px)`
+    mainCard.inner.style.transform = `scale(${scale}) rotate(${spin}deg)`
+  }
+
+  const setSelectedIndex = (nextIndex: number) => {
+    const count = games.length
+    selectedIndex = (nextIndex + count) % count
+    const prevGame = games[(selectedIndex - 1 + count) % count]
+    const game = games[selectedIndex]
+    const nextGame = games[(selectedIndex + 1) % count]
+    prevCard.image.src = `${prevGame.id}-256.jpg`
+    mainCard.image.src = `${game.id}-256.jpg`
+    nextCard.image.src = `${nextGame.id}-256.jpg`
+    if (mainCard.label) mainCard.label.textContent = game.id
+  }
+
+  const animateSwipe = (direction: "next" | "prev") => {
+    if (animating) return
+    animating = true
+
+    const offset = direction === "next" ? -swipeDistance : swipeDistance
+    const spin = offset * 0.05
+    carouselTrack.style.transition = "transform 0.2s ease"
+    carouselTrack.style.transform = `translateX(${offset}px)`
+    mainCard.inner.style.transition = "transform 0.2s ease"
+    mainCard.inner.style.transform = `scale(0.95) rotate(${spin}deg)`
+
+    window.setTimeout(() => {
+      setSelectedIndex(direction === "next" ? selectedIndex + 1 : selectedIndex - 1)
+      carouselTrack.style.transition = "transform 0.2s ease"
+      carouselTrack.style.transform = "translateX(0px)"
+      mainCard.inner.style.transition = "transform 0.2s ease"
+      mainCard.inner.style.transform = "scale(1) rotate(0deg)"
+      window.setTimeout(() => {
+        animating = false
+      }, 200)
+    }, 200)
+  }
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (animating) return
+    pointerActive = true
+    activePointerId = event.pointerId
+    startX = event.clientX
+    startY = event.clientY
+    lastDx = 0
+    carouselTrack.style.transition = "none"
+    mainCard.inner.style.transition = "none"
+    carouselTrack.setPointerCapture(event.pointerId)
+  }
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (!pointerActive) return
+    pointerActive = false
+    if (activePointerId !== null) {
+      if (carouselTrack.hasPointerCapture(activePointerId)) {
+        carouselTrack.releasePointerCapture(activePointerId)
+      }
+      activePointerId = null
+    }
+
+    const dx = event.clientX - startX
+    const dy = event.clientY - startY
+    lastDx = dx
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) {
+      carouselTrack.style.transition = "transform 0.2s ease"
+      carouselTrack.style.transform = "translateX(0px)"
+      mainCard.inner.style.transition = "transform 0.2s ease"
+      mainCard.inner.style.transform = "scale(1) rotate(0deg)"
+      return
+    }
+
+    animateSwipe(dx < 0 ? "next" : "prev")
+  }
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!pointerActive || animating) return
+    const dx = event.clientX - startX
+    if (Math.abs(dx - lastDx) < 2) return
+    lastDx = dx
+    setDragTransform(dx)
+  }
+
+  const onPointerCancel = () => {
+    pointerActive = false
+    if (activePointerId !== null) {
+      if (carouselTrack.hasPointerCapture(activePointerId)) {
+        carouselTrack.releasePointerCapture(activePointerId)
+      }
+      activePointerId = null
+    }
+    carouselTrack.style.transition = "transform 0.2s ease"
+    carouselTrack.style.transform = "translateX(0px)"
+    mainCard.inner.style.transition = "transform 0.2s ease"
+    mainCard.inner.style.transform = "scale(1) rotate(0deg)"
+  }
+
+  const arrowStyle: CSS = {
+    width: "44px",
+    height: "44px",
+    fontSize: "30px",
+    borderRadius: "999px",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundImage: "none",
+    border: "2px solid #ffffff",
+    color: "#ffffff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textShadow: "none"
+  }
+
+  const carouselRow = HDiv({
+    style: {
+      position: "relative",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "min(92vw, 360px)",
+      border: "none",
+      pointerEvents: "auto"
+    }
+  },
+    carouselTrack
+  )
+
+  carouselTrack.addEventListener("pointerdown", onPointerDown)
+  carouselTrack.addEventListener("pointermove", onPointerMove)
+  carouselTrack.addEventListener("pointerup", onPointerUp)
+  carouselTrack.addEventListener("pointercancel", onPointerCancel)
+
+  setSelectedIndex(2)
+
+  const playButton = HButton({
+    text: "play",
+    style: {
+      position: "relative",
+      width: "100px",
+      height: "56px",
+      marginTop: "14px",
+      backgroundColor: "#1f8f3a",
+      backgroundImage: "linear-gradient(180deg, #7bff98, #1f8f3a)",
+      border: "2px solid #baffc9",
+      color: "white",
+      textShadow: "1px 1px 2px rgba(0, 0, 0, 1)",
+      fontSize: "22px"
+    },
+    onRelease: () => {
+      startGame(games[selectedIndex], world, state)
+    }
+  })
+
+  const shell = HDiv({
+    style: {
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "12px",
+      border: "none"
+    }
+  },
+    carouselRow,
+    playButton
+  )
+
+  return { shell, playButton }
+}
+
 const Profile = (world: World): RefreshableDiv => {
 
   let tick = 0
@@ -117,7 +385,8 @@ const Profile = (world: World): RefreshableDiv => {
 
   const ProfileFrame = (frame: number) => HImg({
     style: {
-      width: "min(6.6vw, 100px)",
+      // width: "min(6.6vw, 100px)",
+      width: world.client?.mobile ? "10vh" : "min(6.6vw, 100px)",
       borderRadius: "12px",
       imageRendering: "pixelated",
       pointerEvents: "auto",
@@ -157,7 +426,8 @@ const Profile = (world: World): RefreshableDiv => {
     div: HButton({
       style: {
         position: "relative",
-        width: "min(13.4vw, 200px)",
+        // width: "min(13.4vw, 200px)",
+        width: world.client?.mobile ? "20vh" : "min(13.4vw, 200px)",
         aspectRatio: "20 / 17",
         borderRadius: "12px",
         transition: "transform 0.8s ease, box-shadow 0.2s ease"
@@ -181,7 +451,7 @@ const Profile = (world: World): RefreshableDiv => {
         id: "profile-name",
         text: "noob",
         style: {
-          fontSize: "min(2vw, 28px)", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
+          fontSize: "min(max(2vw, 3vh), 28px)", color: "#ffc0cb", left: "50%", bottom: "6px", transform: "translate(-50%)"
         }
       })
     )
@@ -274,22 +544,32 @@ const GameLobby = (): Entity => {
               flexDirection: "column"
             })
 
-            const gameButtonsShell = HtmlDiv({
-              position: "relative",
-              display: "flex",
-              gap: "20px",
-              flexDirection: "row",
-              transform: "translate(-50%)",
-              left: "50%",
-              border: "none",
-              paddingTop: "1vh",
-            })
-            shell.appendChild(gameButtonsShell)
+            const isMobileClient = Boolean(world.client?.mobile)
+            const state = world.game.state as LobbyState
 
-            for (const g of list) {
-              const gameButton = GameButton(g, world)
-              gameButtonsShell.appendChild(gameButton)
-              gameButtons.push(gameButton)
+            if (isMobileClient) {
+              shell.style.top = "34vh"
+              const mobilePicker = MobileGamePicker(list, world, state)
+              shell.appendChild(mobilePicker.shell)
+              gameButtons.push(mobilePicker.playButton)
+            } else {
+              const gameButtonsShell = HtmlDiv({
+                position: "relative",
+                display: "flex",
+                gap: "20px",
+                flexDirection: "row",
+                transform: "translate(-50%)",
+                left: "50%",
+                border: "none",
+                paddingTop: "1vh",
+              })
+              shell.appendChild(gameButtonsShell)
+
+              for (const g of list) {
+                const gameButton = GameButton(g, world)
+                gameButtonsShell.appendChild(gameButton)
+                gameButtons.push(gameButton)
+              }
             }
 
             canvasAppend(shell)

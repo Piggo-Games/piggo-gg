@@ -161,9 +161,9 @@ export const EscapeMenu = (world: World): Entity => {
 
   const musicButton = MusicButton(world, 40)
 
-  if (!world.client?.mobile) topRowDiv.appendChild(musicButton.div)
+  topRowDiv.appendChild(musicButton.div)
   if (!world.client?.mobile) topRowDiv.appendChild(art)
-  if (!world.client?.mobile) topRowDiv.appendChild(returnToHomescreen)
+  topRowDiv.appendChild(returnToHomescreen)
 
   wrapper.appendChild(topRowDiv)
   wrapper.appendChild(shell)

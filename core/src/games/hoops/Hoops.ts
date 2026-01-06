@@ -3,15 +3,16 @@ import {
   HtmlChat, HtmlFpsText, HtmlLagText, PixiNametagSystem, PhysicsSystem,
   PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position, Renderable,
   ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, XY,
-  abs, hypot, min, round, screenWH, sign, sqrt, XYdistance
+  hypot, min, round, screenWH, sign, sqrt, XYdistance
 } from "@piggo-gg/core"
 import {
-  BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
-  COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH, DRIBBLE_BOUNCE,
-  DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
+  BALL_ORBIT_DISTANCE, BALL_PICKUP_COOLDOWN_TICKS, BALL_PICKUP_RANGE,
+  BALL_PICKUP_Z, BALL_STEAL_RANGE, COURT_CENTER, COURT_HEIGHT, COURT_SPLAY,
+  COURT_WIDTH, DRIBBLE_BOUNCE, DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
+import { MobileUI } from "./MobileUI"
 
 export type HoopsState = {
   phase: "play" | "score"
@@ -93,6 +94,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
 const HoopsSystem = SystemBuilder({
   id: "HoopsSystem",
   init: (world) => {
+    const mobileUI = MobileUI(world)
     const halfCourtHeight = COURT_HEIGHT / 2
     const orbitOffset = (pointingDelta: XY) => {
       if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
@@ -106,8 +108,8 @@ const HoopsSystem = SystemBuilder({
       const hypY = pointingDelta.y / hypotenuse
 
       return {
-        x: round(hypX * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.x)), 2),
-        y: round(hypY * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.y)) / 2, 2)
+        x: round(hypX * BALL_ORBIT_DISTANCE, 2),
+        y: round(hypY * (BALL_ORBIT_DISTANCE / 2), 2)
       }
     }
 
@@ -156,6 +158,7 @@ const HoopsSystem = SystemBuilder({
       query: [],
       priority: 9,
       onTick: () => {
+        mobileUI?.update()
         const state = world.game.state as HoopsState
         const ball = world.entity<Position | Renderable>("ball")
         const ballPos = ball?.components.position
@@ -291,8 +294,12 @@ const HoopsSystem = SystemBuilder({
         // auto pickup
         if (!state.ballOwner && ballPos.data.z <= BALL_PICKUP_Z) {
           let closest: { id: string, team: 1 | 2, distance: number } | null = null
+          const shotCooldownActive = !!state.shotPlayer
+            && (world.tick - state.shotTick) < BALL_PICKUP_COOLDOWN_TICKS
 
           for (const player of players) {
+            if (shotCooldownActive && player.id === state.shotPlayer) continue
+
             const distance = hypot(
               player.components.position.data.x - ballPos.data.x,
               player.components.position.data.y - ballPos.data.y
@@ -307,7 +314,7 @@ const HoopsSystem = SystemBuilder({
             }
           }
 
-        if (closest) assignBall(closest.id, closest.team)
+          if (closest) assignBall(closest.id, closest.team)
         }
 
         // swish sound when the ball drops through the hoop

@@ -1,7 +1,7 @@
 import {
   Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
   Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
-  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
+  VolleyCharacterDynamic, WASDInputMap, XY, cos, hypot, max, min, sin
 } from "@piggo-gg/core"
 import {
   COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP,
@@ -31,6 +31,12 @@ export const Howard = (player: Player) => {
       team: Team(player.components.team.data.team),
       shadow: Shadow(5, 1),
       input: Input({
+        joystick: ({ client }) => {
+          const { power, angle } = client.controls.left
+          const dir: XY = { x: cos(angle), y: sin(angle) }
+
+          return { actionId: "moveAnalog", params: { dir, power, angle } }
+        },
         press: {
           ...WASDInputMap.press,
           "mb1": ({ hold }) => {
@@ -58,6 +64,7 @@ export const Howard = (player: Player) => {
       }),
       actions: Actions({
         move: moveHoward,
+        moveAnalog: moveHowardAnalog,
         point: Point,
         pass: passBall,
         shoot: shootBall,
@@ -113,6 +120,42 @@ const moveHoward = Action<XY>("move", ({ entity, world, params }) => {
   position.impulse({
     x: (params.x / magnitude) * accel,
     y: (params.y / magnitude) * accel
+  })
+})
+
+type AnalogParams = {
+  dir: XY
+  power: number
+  angle: number
+}
+
+const moveHowardAnalog = Action<AnalogParams>("moveAnalog", ({ entity, world, params }) => {
+  if (!entity) return
+
+  const { position } = entity.components
+  if (!position) return
+
+  const state = world.game.state as HoopsState
+  if (isMovementLocked(state, entity.id, position)) return
+
+  const power = params.power ?? 0
+  if (power <= 0) return
+
+  const dir = params.dir ?? { x: 0, y: 0 }
+  const magnitude = hypot(dir.x, dir.y)
+  if (!magnitude) return
+
+  const norm = { x: dir.x / magnitude, y: dir.y / magnitude }
+
+  if (norm.x > 0) position.data.facing = 1
+  if (norm.x < 0) position.data.facing = -1
+
+  position.clearHeading()
+
+  const accel = (position.data.z > 0 ? HOWARD_ACCEL * 0.16 : HOWARD_ACCEL) * power
+  position.impulse({
+    x: norm.x * accel,
+    y: norm.y * accel
   })
 })
 

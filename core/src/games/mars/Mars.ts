@@ -4,6 +4,7 @@ import {
   PixiRenderSystem, screenWH, ShadowSystem, SystemBuilder, Water2D
 } from "@piggo-gg/core"
 import { Beach } from "../island/terrain/Beach"
+import { MobileUI } from "./MobileUI"
 import { DateDisplay } from "./ui/DateDisplay"
 import { LaunchButton } from "./ui/LaunchButton"
 import { MoneyDisplay } from "./ui/MoneyDisplay"
@@ -29,6 +30,7 @@ const ticksPerDay = 12
 const MarsSystem = SystemBuilder({
   id: "MarsSystem",
   init: (world) => {
+    const mobileUI = MobileUI(world)
 
     let lastDayTick = world.tick
 
@@ -37,6 +39,7 @@ const MarsSystem = SystemBuilder({
       query: [],
       priority: 2,
       onTick: () => {
+        mobileUI?.update()
         const state = world.state<MarsState>()
 
         if (world.tick - lastDayTick >= ticksPerDay && ["ready", "unready"].includes(state.readiness)) {

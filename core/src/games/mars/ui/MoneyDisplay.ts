@@ -49,7 +49,7 @@ export const MoneyDisplay = (): Entity => {
           moneyButton = HButton({
             text: formatMoney(state.money),
             style: {
-              left: "2px",
+              right: "2px",
               top: "4px",
               marginTop: "env(safe-area-inset-top)",
               marginLeft: "env(safe-area-inset-left)",
