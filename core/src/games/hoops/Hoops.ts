@@ -3,7 +3,7 @@ import {
   HtmlChat, HtmlFpsText, HtmlLagText, PixiNametagSystem, PhysicsSystem,
   PixiCameraSystem, PixiDebugSystem, PixiRenderSystem, Position, Renderable,
   ScorePanel, ShadowSystem, SpawnSystem, SystemBuilder, Team, XY,
-  abs, hypot, min, round, screenWH, sign, sqrt, XYdistance
+  hypot, min, round, screenWH, sign, sqrt, XYdistance
 } from "@piggo-gg/core"
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_RANGE, BALL_PICKUP_Z, BALL_STEAL_RANGE,
@@ -106,8 +106,8 @@ const HoopsSystem = SystemBuilder({
       const hypY = pointingDelta.y / hypotenuse
 
       return {
-        x: round(hypX * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.x)), 2),
-        y: round(hypY * min(BALL_ORBIT_DISTANCE, abs(pointingDelta.y)) / 2, 2)
+        x: round(hypX * BALL_ORBIT_DISTANCE, 2),
+        y: round(hypY * (BALL_ORBIT_DISTANCE / 2), 2)
       }
     }
 
