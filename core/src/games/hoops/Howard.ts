@@ -126,6 +126,8 @@ const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
+  state.shotTick = world.tick
+  state.shotPlayer = entity.id
   state.ballOwner = ""
   state.ballOwnerTeam = 0
   state.dribbleLocked = false
