@@ -2,6 +2,10 @@
 
 Update this first, then align code with the design.
 
+## TODOs
+[x] 3-point line works
+[ ] ball should always extend away from the player (can't be inside the player)
+
 ## Draft v0
 - Goal: score by getting the ball through the opponent hoop; first to 11 resets the match.
 - Teams: 2v2; team 1 defends the left hoop and scores on the right hoop (and vice versa).

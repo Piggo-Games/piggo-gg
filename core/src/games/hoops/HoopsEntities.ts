@@ -1,13 +1,13 @@
 import {
-  Collider, Debug, Entity, LineWall, Networked, PI, Position, Renderable,
-  Shadow, asin, cos, loadTexture, min, pixiGraphics, sin
+  Collider, Debug, Entity, LineWall, Networked, PI, Position,
+  Renderable, Shadow, XY, arc, asin, loadTexture, min, pixiGraphics
 } from "@piggo-gg/core"
 import {
   COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT,
   COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_SPLAY, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS,
   FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
-import { Texture } from "pixi.js"
+import { Graphics, Texture } from "pixi.js"
 
 export const Ball = () => Entity({
   id: "ball",
@@ -76,6 +76,30 @@ export const CenterCircle = () => Entity({
   }
 })
 
+let boundary: Graphics | undefined = undefined
+
+export const isThreePointShot = (origin: XY): boolean => {
+  if (!boundary) {
+    boundary = pixiGraphics()
+    boundary.moveTo(-6, -THREE_POINT_SIDE_Y)
+    boundary.lineTo(101, -THREE_POINT_SIDE_Y)
+
+    arc(boundary, 74, -2, 82, 72, -PI / 2 + 0.33, PI / 2)
+
+    boundary.moveTo(-45, THREE_POINT_SIDE_Y)
+    boundary.lineTo(77, THREE_POINT_SIDE_Y)
+
+    // close the shape for fill
+    boundary.moveTo(-6, -THREE_POINT_SIDE_Y)
+    boundary.lineTo(-45, THREE_POINT_SIDE_Y)
+    boundary.lineTo(77, THREE_POINT_SIDE_Y)
+    boundary.lineTo(101, -THREE_POINT_SIDE_Y)
+
+    boundary.fill({ color: 0xff0000, alpha: 0.4 })
+  }
+  return !boundary.containsPoint({ x: origin.x, y: origin.y })
+}
+
 export const CourtLines = () => Entity({
   id: "court-lines",
   components: {
@@ -106,17 +130,6 @@ export const CourtLines = () => Entity({
           g.lineTo(x2, y2)
         }
 
-        const arc = (cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
-          const step = (end - start) / steps
-          for (let i = 0; i <= steps; i += 1) {
-            const angle = start + step * i
-            const x = cx + cos(angle) * rx
-            const y = cy + sin(angle) * ry
-            if (i === 0) g.moveTo(x, y)
-            else g.lineTo(x, y)
-          }
-        }
-
         const offset = 8
 
         // Free throw lane
@@ -132,8 +145,8 @@ export const CourtLines = () => Entity({
         line(rightFreeThrowX - offset, -laneHalf, rightFreeThrowX, laneHalf)
 
         // Free throw circles
-        arc(leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
-        arc(rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
+        arc(g, leftFreeThrowX - offset, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, -Math.PI / 2, Math.PI / 2)
+        arc(g, rightFreeThrowX, 0, FREE_THROW_CIRCLE_RADIUS, freeThrowCircleRadiusY, Math.PI / 2, Math.PI * 1.5)
 
         // 3-point lines
         line(-6, -THREE_POINT_SIDE_Y, 101, -THREE_POINT_SIDE_Y)
@@ -142,8 +155,8 @@ export const CourtLines = () => Entity({
         line(495, THREE_POINT_SIDE_Y, 373, THREE_POINT_SIDE_Y)
 
         // 3-point arcs
-        arc(74, -2, 82, 72, -PI / 2 + 0.33, PI / 2)
-        arc(376, -2, 82, 72, PI / 2, PI * 1.5 - 0.34)
+        arc(g, 74, -2, 82, 72, -PI / 2 + 0.33, PI / 2)
+        arc(g, 376, -2, 82, 72, PI / 2, PI * 1.5 - 0.34)
 
         g.stroke({ width: COURT_LINE_WIDTH, color: 0xffffff, alpha: 1 })
         renderable.c = g

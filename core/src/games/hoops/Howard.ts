@@ -4,10 +4,11 @@ import {
   VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_GRAVITY, SHOT_UP_MAX,
-  SHOT_UP_MIN, SHOT_UP_SCALE
+  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP,
+  SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import { type HoopsState } from "./Hoops"
+import { isThreePointShot } from "./HoopsEntities"
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80
@@ -126,6 +127,9 @@ const passBall = Action<PassParams>("pass", ({ entity, world, params }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
+  state.shotTick = world.tick
+  state.shotPlayer = entity.id
+  state.lastShotValue = 2
   state.ballOwner = ""
   state.ballOwnerTeam = 0
   state.dribbleLocked = false
@@ -159,9 +163,19 @@ const shootBall = Action("shoot", ({ entity, world }) => {
   const ballPos = ball?.components.position
   if (!ballPos) return
 
+  state.shotTick = world.tick
+  state.shotPlayer = entity.id
+
   const dx = HOOP_TARGET.x - ballPos.data.x
   const dy = HOOP_TARGET.y - ballPos.data.y
   if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+
+  const shooterPos = entity.components.position?.data
+  if (shooterPos) {
+    state.lastShotValue = isThreePointShot(shooterPos) ? 3 : 2
+  } else {
+    state.lastShotValue = 2
+  }
 
   const distance = hypot(dx, dy)
   const distanceCharge = min(1, distance / SHOT_UP_SCALE)

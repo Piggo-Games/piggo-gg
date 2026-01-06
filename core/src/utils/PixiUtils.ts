@@ -2,7 +2,7 @@ import {
   AnimatedSprite, AnimatedSpriteFrames, Assets, Container, Graphics,
   GraphicsContext, GraphicsOptions, Text, TextStyleFontWeight, Texture
 } from "pixi.js"
-import { XY } from "@piggo-gg/core"
+import { cos, sin, XY } from "@piggo-gg/core"
 
 export type pixiRectProps = { x: number, y: number, w: number, h: number, rounded?: number, style?: Omit<pixiStyleProps, "g"> }
 export type pixiCircleProps = { x?: number, y?: number, r: number, style?: Omit<pixiStyleProps, "g"> }
@@ -177,3 +177,14 @@ export const loadTextureCached = (file: string): Record<string, any> | undefined
 }
 
 export const load = async (url: string) => Assets.load(url) as Promise<Texture>
+
+export const arc = (target: Graphics, cx: number, cy: number, rx: number, ry: number, start: number, end: number, steps = 36) => {
+  const step = (end - start) / steps
+  for (let i = 0; i <= steps; i += 1) {
+    const angle = start + step * i
+    const x = cx + cos(angle) * rx
+    const y = cy + sin(angle) * ry
+    if (i === 0) target.moveTo(x, y)
+    else target.lineTo(x, y)
+  }
+}
