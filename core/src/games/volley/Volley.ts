@@ -8,6 +8,7 @@ import { Bot } from "./Bot"
 import { Ball, Bounds, Centerline, Court, Net, PostBottom, PostTop } from "./entities"
 import { Target } from "./Target"
 import { Vince } from "./Vince"
+import { MobileUI } from "./MobileUI"
 
 export const range = 32
 
@@ -96,6 +97,7 @@ const VolleySystem = SystemBuilder({
   id: "VolleySystem",
   init: (world) => {
     const bots: Record<string, Entity<Position | Team>> = {}
+    const mobileUI = MobileUI(world)
 
     // spawn bots
     const players = world.queryEntities<Team>(["pc", "team"])
@@ -129,6 +131,7 @@ const VolleySystem = SystemBuilder({
       query: [],
       priority: 9,
       onTick: () => {
+        mobileUI?.update()
         const ballPos = world.entity<Position>("ball")?.components.position
         if (!ballPos) return
 

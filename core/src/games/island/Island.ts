@@ -12,6 +12,7 @@ import { Flag } from "./terrain/Flag"
 import { NumBoard } from "./ui/NumBoard"
 import { HeartSystem } from "./ui/HeartSystem"
 import { RallyScroll, SliceScroll } from "./ui/Scroll"
+import { MobileUI } from "./MobileUI"
 
 export type D6 = 1 | 2 | 3 | 4 | 5 | 6
 export type Roll = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 67
@@ -116,6 +117,7 @@ export const Island: GameBuilder<IslandState, IslandSettings> = {
 const IslandSystem = SystemBuilder({
   id: "IslandSystem",
   init: (world) => {
+    const mobileUI = MobileUI(world)
 
     const monsterId = "patrick"
     const monsterPointingDelta = { x: -140, y: 0 }
@@ -216,6 +218,7 @@ const IslandSystem = SystemBuilder({
       query: [],
       priority: 6,
       onTick: () => {
+        mobileUI?.update()
         const state = world.state<IslandState>()
 
         const characters = world.characters()
