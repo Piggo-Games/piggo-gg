@@ -1,14 +1,13 @@
 import {
-  Action, Actions, Character, Collider, Debug, Entity, Input, Networked, PixiSkins,
+  Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
   Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
-  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min, pixiGraphics
+  VolleyCharacterDynamic, WASDInputMap, XY, hypot, max, min
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP, SHOT_GRAVITY, SHOT_UP_MAX,
-  SHOT_UP_MIN, SHOT_UP_SCALE, THREE_POINT_RADIUS
+  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP,
+  SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import { type HoopsState } from "./Hoops"
-import { Graphics } from "pixi.js"
 import { isThreePointShot } from "./HoopsEntities"
 
 export const HOWARD_SPEED = 135
