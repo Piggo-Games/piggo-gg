@@ -19,6 +19,9 @@ export type HoopsState = {
   scoreRight: number
   scoredTeam: 0 | 1 | 2
   scoredTick: number
+  shotTick: number
+  shotPlayer: string
+  lastShotValue: 2 | 3
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
   dribbleLocked: boolean
@@ -43,6 +46,9 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       scoreRight: 0,
       scoredTeam: 0,
       scoredTick: 0,
+      shotTick: 0,
+      shotPlayer: "",
+      lastShotValue: 2,
       ballOwner: "",
       ballOwnerTeam: 0,
       dribbleLocked: false
@@ -167,6 +173,9 @@ const HoopsSystem = SystemBuilder({
           state.phase = "play"
           state.scoredTeam = 0
           state.scoredTick = 0
+          state.shotTick = 0
+          state.shotPlayer = ""
+          state.lastShotValue = 2
           state.ballOwner = ""
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
@@ -314,7 +323,7 @@ const HoopsSystem = SystemBuilder({
             state.phase = "score"
             state.scoredTick = world.tick
             state.scoredTeam = 1
-            state.scoreLeft += 2
+            state.scoreLeft += state.lastShotValue
           }
         }
 
