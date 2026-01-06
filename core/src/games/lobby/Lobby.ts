@@ -122,8 +122,8 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   let animating = false
   const swipeDistance = 100
 
-  const cardWidth = "min(50vw, 220px)"
-  const cardHeight = "min(46vw, 200px)"
+  const cardWidth = "min(50vw, 180px)"
+  const cardHeight = "min(46vw, 160px)"
   const sideWidth = "min(22vw, 90px)"
   const sideHeight = "min(20vw, 80px)"
 
