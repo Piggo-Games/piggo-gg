@@ -41,9 +41,7 @@ export const VolleyCharacterAnimations: AnimationSelect = (entity) => {
 export const VolleyCharacterDynamic: Dynamic = ({ entity }) => {
   const { position, renderable } = entity.components
 
-  if (position.data.velocity.x !== 0) {
-    renderable.setScale({ x: position.data.facing, y: 1 })
-  }
+  renderable.setScale({ x: position.data.facing, y: 1 })
 }
 
 export const Ghost: PixiSkin = async (r) => {

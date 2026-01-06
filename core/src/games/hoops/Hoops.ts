@@ -162,6 +162,10 @@ const HoopsSystem = SystemBuilder({
         if (!ballPos) return
 
         const players = world.queryEntities<Position | Team | Renderable>(["position", "team", "input"])
+        // for (const player of players) {
+        //   const team = player.components.team.data.team
+        //   player.components.position.data.facing = team === 1 ? 1 : -1
+        // }
 
         // reset after score
         if (state.phase === "score" && (world.tick - state.scoredTick) > SCORE_RESET_TICKS) {
