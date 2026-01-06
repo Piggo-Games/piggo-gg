@@ -122,8 +122,8 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   let animating = false
   const swipeDistance = 100
 
-  const cardWidth = "min(58vw, 260px)"
-  const cardHeight = "min(54vw, 230px)"
+  const cardWidth = "min(50vw, 220px)"
+  const cardHeight = "min(46vw, 200px)"
   const sideWidth = "min(22vw, 90px)"
   const sideHeight = "min(20vw, 80px)"
 
@@ -370,7 +370,7 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   setSelectedIndex(0)
 
   const playButton = HButton({
-    text: "Play",
+    text: "play",
     style: {
       position: "relative",
       width: "100px",
