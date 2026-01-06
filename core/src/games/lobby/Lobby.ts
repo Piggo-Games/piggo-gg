@@ -1,8 +1,8 @@
 import {
-  Background, Build, Entity, GameBuilder, getBrowser, HButton,
-  HImg, HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu,
-  Networked, NPC, piggoVersion, PixiRenderSystem, RefreshableDiv,
-  Volley, Island, Mars, World, canvasAppend, HtmlFpsText, HDiv, MusicButton, Hoops
+  Background, Build, Entity, GameBuilder, getBrowser, HButton, HImg,
+  HText, HtmlDiv, HtmlLagText, HtmlText, LobbiesMenu, Networked, NPC,
+  piggoVersion, PixiRenderSystem, RefreshableDiv, Volley, Island, CSS,
+  Mars, World, canvasAppend, HtmlFpsText, HDiv, MusicButton, Hoops
 } from "@piggo-gg/core"
 
 type LobbyState = {
@@ -120,96 +120,130 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   let pointerActive = false
   let activePointerId: number | null = null
   let animating = false
-  const swipeDistance = 120
-  const swipeRotate = 8
+  const swipeDistance = 100
 
-  const cardWidth = "min(60vw, 266px)"
-  const cardHeight = "min(56vw, 238px)"
+  const cardWidth = "min(58vw, 260px)"
+  const cardHeight = "min(54vw, 230px)"
+  const sideWidth = "min(22vw, 90px)"
+  const sideHeight = "min(20vw, 80px)"
 
-  const image = HImg({
-    src: `${games[0].id}-256.jpg`,
+  const buildCard = (size: "main" | "side") => {
+    const image = HImg({
+      src: `${games[0].id}-256.jpg`,
+      style: {
+        top: "50%",
+        width: "100%",
+        height: "101%",
+        transform: "translate(-50%, -50%)"
+      }
+    })
+
+    const label = size === "main" ? HText({
+      text: games[0].id,
+      style: {
+        fontSize: "min(6vw, 28px)",
+        left: "50%",
+        transform: "translate(-50%)",
+        bottom: "10px",
+        fontWeight: "bold"
+      }
+    }) : undefined
+
+    const inner = HButton({
+      style: {
+        width: "100%",
+        height: "100%",
+        borderRadius: "16px",
+        top: "0px",
+        left: "0px",
+        transition: "transform 0.2s ease",
+        border: "3px solid transparent",
+        backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)"
+      }
+    },
+      image,
+      label
+    )
+
+    const button = HButton({
+      style: {
+        width: size === "main" ? cardWidth : sideWidth,
+        height: size === "main" ? cardHeight : sideHeight,
+        borderRadius: "16px",
+        fontSize: "24px",
+        position: "relative",
+        background: "none",
+        pointerEvents: "none"
+      }
+    },
+      inner
+    )
+
+    return { button, image, label, inner }
+  }
+
+  const prevCard = buildCard("side")
+  const mainCard = buildCard("main")
+  const nextCard = buildCard("side")
+
+  mainCard.inner.style.transform = "scale(1) rotate(0deg)"
+
+  const carouselTrack = HDiv({
     style: {
-      top: "50%",
-      width: "100%",
-      height: "101%",
-      transform: "translate(-50%, -50%)"
-    }
-  })
-
-  const label = HText({
-    text: games[0].id,
-    style: {
-      fontSize: "min(6vw, 28px)",
-      left: "50%",
-      transform: "translate(-50%)",
-      bottom: "10px",
-      fontWeight: "bold"
-    }
-  })
-
-  const cardInner = HButton({
-    style: {
-      width: "100%",
-      height: "100%",
-      borderRadius: "16px",
-      top: "0px",
-      left: "0px",
-      transition: "transform 0.25s ease",
-      border: "3px solid transparent",
-      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)"
-    }
-  },
-    image,
-    label
-  )
-
-  const cardButton = HButton({
-    style: {
-      width: cardWidth,
-      height: cardHeight,
-      borderRadius: "16px",
-      fontSize: "24px",
       position: "relative",
-      background: "none",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      border: "none",
       pointerEvents: "auto",
       touchAction: "pan-y"
     }
   },
-    cardInner
+    prevCard.button,
+    mainCard.button,
+    nextCard.button
   )
 
   const setDragTransform = (dx: number) => {
     const clamped = Math.max(-swipeDistance, Math.min(swipeDistance, dx))
-    cardInner.style.transform = `translateX(${clamped}px) rotateZ(${clamped * 0.06}deg)`
+    const spin = clamped * 0.05
+    const scale = 1 - Math.min(Math.abs(clamped) / swipeDistance, 1) * 0.05
+    carouselTrack.style.transform = `translateX(${clamped}px)`
+    mainCard.inner.style.transform = `scale(${scale}) rotate(${spin}deg)`
   }
 
   const setSelectedIndex = (nextIndex: number) => {
     const count = games.length
     selectedIndex = (nextIndex + count) % count
+    const prevGame = games[(selectedIndex - 1 + count) % count]
     const game = games[selectedIndex]
-    image.src = `${game.id}-256.jpg`
-    label.textContent = game.id
+    const nextGame = games[(selectedIndex + 1) % count]
+    prevCard.image.src = `${prevGame.id}-256.jpg`
+    mainCard.image.src = `${game.id}-256.jpg`
+    nextCard.image.src = `${nextGame.id}-256.jpg`
+    if (mainCard.label) mainCard.label.textContent = game.id
   }
 
   const animateSwipe = (direction: "next" | "prev") => {
     if (animating) return
     animating = true
 
-    const multiplier = direction === "next" ? -1 : 1
-    cardInner.style.transition = "transform 0.2s ease"
-    cardInner.style.transform = `translateX(${multiplier * swipeDistance}px) rotateZ(${multiplier * swipeRotate}deg)`
+    const offset = direction === "next" ? -swipeDistance : swipeDistance
+    const spin = offset * 0.05
+    carouselTrack.style.transition = "transform 0.2s ease"
+    carouselTrack.style.transform = `translateX(${offset}px)`
+    mainCard.inner.style.transition = "transform 0.2s ease"
+    mainCard.inner.style.transform = `scale(0.95) rotate(${spin}deg)`
 
     window.setTimeout(() => {
       setSelectedIndex(direction === "next" ? selectedIndex + 1 : selectedIndex - 1)
-      cardInner.style.transition = "none"
-      cardInner.style.transform = `translateX(${-multiplier * swipeDistance}px) rotateZ(${-multiplier * swipeRotate}deg)`
-      requestAnimationFrame(() => {
-        cardInner.style.transition = "transform 0.2s ease"
-        cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
-      })
+      carouselTrack.style.transition = "transform 0.2s ease"
+      carouselTrack.style.transform = "translateX(0px)"
+      mainCard.inner.style.transition = "transform 0.2s ease"
+      mainCard.inner.style.transform = "scale(1) rotate(0deg)"
       window.setTimeout(() => {
         animating = false
-      }, 220)
+      }, 200)
     }, 200)
   }
 
@@ -220,16 +254,17 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     startX = event.clientX
     startY = event.clientY
     lastDx = 0
-    cardInner.style.transition = "none"
-    cardButton.setPointerCapture(event.pointerId)
+    carouselTrack.style.transition = "none"
+    mainCard.inner.style.transition = "none"
+    carouselTrack.setPointerCapture(event.pointerId)
   }
 
   const onPointerUp = (event: PointerEvent) => {
     if (!pointerActive) return
     pointerActive = false
     if (activePointerId !== null) {
-      if (cardButton.hasPointerCapture(activePointerId)) {
-        cardButton.releasePointerCapture(activePointerId)
+      if (carouselTrack.hasPointerCapture(activePointerId)) {
+        carouselTrack.releasePointerCapture(activePointerId)
       }
       activePointerId = null
     }
@@ -238,14 +273,14 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     const dy = event.clientY - startY
     lastDx = dx
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) {
-      cardInner.style.transition = "transform 0.25s ease"
-      cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+      carouselTrack.style.transition = "transform 0.2s ease"
+      carouselTrack.style.transform = "translateX(0px)"
+      mainCard.inner.style.transition = "transform 0.2s ease"
+      mainCard.inner.style.transform = "scale(1) rotate(0deg)"
       return
     }
 
-    setSelectedIndex(dx < 0 ? selectedIndex + 1 : selectedIndex - 1)
-    cardInner.style.transition = "transform 0.25s ease"
-    cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+    animateSwipe(dx < 0 ? "next" : "prev")
   }
 
   const onPointerMove = (event: PointerEvent) => {
@@ -259,17 +294,18 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   const onPointerCancel = () => {
     pointerActive = false
     if (activePointerId !== null) {
-      if (cardButton.hasPointerCapture(activePointerId)) {
-        cardButton.releasePointerCapture(activePointerId)
+      if (carouselTrack.hasPointerCapture(activePointerId)) {
+        carouselTrack.releasePointerCapture(activePointerId)
       }
       activePointerId = null
     }
-    cardInner.style.transition = "transform 0.25s ease"
-    cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+    carouselTrack.style.transition = "transform 0.2s ease"
+    carouselTrack.style.transform = "translateX(0px)"
+    mainCard.inner.style.transition = "transform 0.2s ease"
+    mainCard.inner.style.transform = "scale(1) rotate(0deg)"
   }
 
-  const arrowStyle = {
-    position: "relative",
+  const arrowStyle: CSS = {
     width: "44px",
     height: "44px",
     fontSize: "30px",
@@ -281,19 +317,32 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    textShadow: "none",
-    padding: "0px"
+    textShadow: "none"
   }
 
   const leftArrow = HButton({
     text: "<",
-    style: arrowStyle,
+    style: {
+      ...arrowStyle,
+      position: "absolute",
+      left: "0px",
+      top: "50%",
+      transform: "translate(-50%, -50%)",
+      zIndex: 2
+    },
     onRelease: () => animateSwipe("prev")
   })
 
   const rightArrow = HButton({
     text: ">",
-    style: arrowStyle,
+    style: {
+      ...arrowStyle,
+      position: "absolute",
+      right: "0px",
+      top: "50%",
+      transform: "translate(50%, -50%)",
+      zIndex: 2
+    },
     onRelease: () => animateSwipe("next")
   })
 
@@ -302,19 +351,23 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
       position: "relative",
       display: "flex",
       alignItems: "center",
-      gap: "10px",
-      border: "none"
+      justifyContent: "center",
+      width: "min(92vw, 360px)",
+      border: "none",
+      pointerEvents: "auto"
     }
   },
+    carouselTrack,
     leftArrow,
-    cardButton,
     rightArrow
   )
 
-  cardButton.addEventListener("pointerdown", onPointerDown)
-  cardButton.addEventListener("pointermove", onPointerMove)
-  cardButton.addEventListener("pointerup", onPointerUp)
-  cardButton.addEventListener("pointercancel", onPointerCancel)
+  carouselTrack.addEventListener("pointerdown", onPointerDown)
+  carouselTrack.addEventListener("pointermove", onPointerMove)
+  carouselTrack.addEventListener("pointerup", onPointerUp)
+  carouselTrack.addEventListener("pointercancel", onPointerCancel)
+
+  setSelectedIndex(0)
 
   const playButton = HButton({
     text: "Play",
@@ -521,7 +574,7 @@ const GameLobby = (): Entity => {
             const state = world.game.state as LobbyState
 
             if (isMobileClient) {
-              shell.style.top = "30vh"
+              shell.style.top = "34vh"
               const mobilePicker = MobileGamePicker(list, world, state)
               shell.appendChild(mobilePicker.shell)
               gameButtons.push(mobilePicker.playButton)
