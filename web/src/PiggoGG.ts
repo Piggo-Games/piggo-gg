@@ -84,5 +84,5 @@ const setupAudioUnlock = (world: World, target: HTMLElement) => {
     audioElement.play().then(() => {
       world.client!.sound.ready = true
     }).catch(() => { })
-  }, { capture: true })
+  }, { capture: true, once: true })
 }
