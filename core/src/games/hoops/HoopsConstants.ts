@@ -23,6 +23,7 @@ export const BACKBOARD_Z = 16
 export const BALL_ORBIT_DISTANCE = 16
 export const BALL_PICKUP_RANGE = 12
 export const BALL_PICKUP_Z = 6
+export const BALL_PICKUP_COOLDOWN_TICKS = 6
 export const BALL_STEAL_RANGE = 10
 
 export const DRIBBLE_GRAVITY = 0.12
