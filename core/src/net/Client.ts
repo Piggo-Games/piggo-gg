@@ -192,7 +192,7 @@ export const Client = ({ world }: ClientProps): Client => {
       return client.player.components.controlling.getCharacter(world)
     },
     pointerLock: () => {
-      document.body.requestPointerLock({ unadjustedMovement: true })
+      if (!client.mobile) document.body.requestPointerLock({ unadjustedMovement: true })
     },
     pointerUnlock: () => {
       document.exitPointerLock()

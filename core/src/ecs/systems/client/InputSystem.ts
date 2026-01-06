@@ -452,7 +452,7 @@ export const InputSystem = ClientSystemBuilder({
 
         const { power, angle, active } = client.controls.right
 
-        if (world.pixi && active) {
+        if (world.pixi?.ready && active) {
           const character = client.character()
           const position = character?.components.position
           if (position) {
