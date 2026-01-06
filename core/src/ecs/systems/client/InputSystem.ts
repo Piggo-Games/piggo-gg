@@ -452,6 +452,27 @@ export const InputSystem = ClientSystemBuilder({
 
         const { power, angle, active } = client.controls.right
 
+        if (world.pixi && active) {
+          const character = client.character()
+          const position = character?.components.position
+          if (position) {
+            const distance = 120 * max(0.2, power)
+            const target = {
+              x: position.data.x + cos(angle) * distance,
+              y: position.data.y + sin(angle) * distance
+            }
+
+            client.controls.mouse = target
+            client.controls.mouseScreen = world.pixi.camera.toCameraCoords(target)
+            mouse = { ...target }
+          }
+        }
+
+        if (!world.three) {
+          if (!active) last = 0
+          return
+        }
+
         if (!active) {
           last = 0
           return

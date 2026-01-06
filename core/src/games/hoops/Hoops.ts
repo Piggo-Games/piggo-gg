@@ -12,6 +12,7 @@ import {
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
+import { MobileUI } from "./MobileUI"
 
 export type HoopsState = {
   phase: "play" | "score"
@@ -93,6 +94,7 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
 const HoopsSystem = SystemBuilder({
   id: "HoopsSystem",
   init: (world) => {
+    const mobileUI = MobileUI(world)
     const halfCourtHeight = COURT_HEIGHT / 2
     const orbitOffset = (pointingDelta: XY) => {
       if (!Number.isFinite(pointingDelta.x) || !Number.isFinite(pointingDelta.y)) {
@@ -156,6 +158,7 @@ const HoopsSystem = SystemBuilder({
       query: [],
       priority: 9,
       onTick: () => {
+        mobileUI?.update()
         const state = world.game.state as HoopsState
         const ball = world.entity<Position | Renderable>("ball")
         const ballPos = ball?.components.position
