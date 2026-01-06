@@ -373,14 +373,14 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     text: "Play",
     style: {
       position: "relative",
-      width: cardWidth,
+      width: "100px",
       height: "56px",
       marginTop: "14px",
       backgroundColor: "#1f8f3a",
       backgroundImage: "linear-gradient(180deg, #7bff98, #1f8f3a)",
-      border: "3px solid #baffc9",
-      color: "#0d2b16",
-      textShadow: "none",
+      border: "2px solid #baffc9",
+      color: "white",
+      textShadow: "1px 1px 2px rgba(0, 0, 0, 1)",
       fontSize: "22px"
     },
     onRelease: () => {
