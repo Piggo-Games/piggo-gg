@@ -320,32 +320,6 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     textShadow: "none"
   }
 
-  const leftArrow = HButton({
-    text: "<",
-    style: {
-      ...arrowStyle,
-      position: "absolute",
-      left: "12px",
-      top: "80%",
-      transform: "translate(-50%, 0%)",
-      zIndex: 2
-    },
-    onRelease: () => animateSwipe("prev")
-  })
-
-  const rightArrow = HButton({
-    text: ">",
-    style: {
-      ...arrowStyle,
-      position: "absolute",
-      right: "12px",
-      top: "80%",
-      transform: "translate(50%, 0%)",
-      zIndex: 2
-    },
-    onRelease: () => animateSwipe("next")
-  })
-
   const carouselRow = HDiv({
     style: {
       position: "relative",
@@ -357,9 +331,7 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
       pointerEvents: "auto"
     }
   },
-    carouselTrack,
-    // leftArrow,
-    // rightArrow
+    carouselTrack
   )
 
   carouselTrack.addEventListener("pointerdown", onPointerDown)
@@ -367,7 +339,7 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
   carouselTrack.addEventListener("pointerup", onPointerUp)
   carouselTrack.addEventListener("pointercancel", onPointerCancel)
 
-  setSelectedIndex(0)
+  setSelectedIndex(2)
 
   const playButton = HButton({
     text: "play",

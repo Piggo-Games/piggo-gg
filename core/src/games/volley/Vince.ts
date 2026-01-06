@@ -1,7 +1,7 @@
 import {
   Action, Actions, ChangeSkin, Character, Collider, Debug, Input, Move,
   Networked, PixiSkins, Player, Position, Renderable, Shadow, Team,
-  VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap
+  VolleyCharacterAnimations, VolleyCharacterDynamic, WASDInputMap, cos, sin
 } from "@piggo-gg/core"
 import { Spike } from "./Spike"
 
@@ -17,6 +17,22 @@ export const Vince = (player: Player) => Character({
     collider: Collider({ shape: "ball", radius: 4, group: "notme1" }),
     team: Team(player.components.team.data.team),
     input: Input({
+      joystick: ({ client, character }) => {
+        const { power, angle } = client.controls.left
+        if (power <= 0) return
+
+        const { position } = character.components
+        const speed = position?.data.speed ?? 0
+        if (!speed) return
+
+        return {
+          actionId: "move",
+          params: {
+            x: cos(angle) * power * speed,
+            y: sin(angle) * power * speed
+          }
+        }
+      },
       press: {
         ...WASDInputMap.press,
         " ": ({ hold }) => {
