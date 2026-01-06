@@ -29,6 +29,15 @@ export const Lobby: GameBuilder<LobbyState> = {
   })
 }
 
+const startGame = (game: GameBuilder, world: World, state: LobbyState): void => {
+  if (!world.client?.isLeader()) return
+  if (state.starting) return
+
+  world.client?.sound.play({ name: "bubble" })
+  world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
+  state.starting = true
+}
+
 const GameButton = (game: GameBuilder, world: World) => {
 
   let rotation = 0
@@ -85,13 +94,7 @@ const GameButton = (game: GameBuilder, world: World) => {
       if (!intent) return
 
       inner.style.transform = `translate(0%, -16px) rotateY(${rotation += 360}deg)`
-
-      if (!world.client?.isLeader()) return
-      if (state.starting) return
-
-      world.client?.sound.play({ name: "bubble" })
-      world.actions.push(world.tick + 20, "world", { actionId: "game", params: { game: game.id } })
-      state.starting = true
+      startGame(game, world, state)
     },
     onHover: () => {
       if (state.starting) return
@@ -107,6 +110,246 @@ const GameButton = (game: GameBuilder, world: World) => {
   },
     inner
   )
+}
+
+const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState): { shell: HTMLDivElement, playButton: HTMLButtonElement } => {
+  let selectedIndex = 0
+  let startX = 0
+  let startY = 0
+  let lastDx = 0
+  let pointerActive = false
+  let activePointerId: number | null = null
+  let animating = false
+  const swipeDistance = 120
+  const swipeRotate = 8
+
+  const cardWidth = "min(60vw, 266px)"
+  const cardHeight = "min(56vw, 238px)"
+
+  const image = HImg({
+    src: `${games[0].id}-256.jpg`,
+    style: {
+      top: "50%",
+      width: "100%",
+      height: "101%",
+      transform: "translate(-50%, -50%)"
+    }
+  })
+
+  const label = HText({
+    text: games[0].id,
+    style: {
+      fontSize: "min(6vw, 28px)",
+      left: "50%",
+      transform: "translate(-50%)",
+      bottom: "10px",
+      fontWeight: "bold"
+    }
+  })
+
+  const cardInner = HButton({
+    style: {
+      width: "100%",
+      height: "100%",
+      borderRadius: "16px",
+      top: "0px",
+      left: "0px",
+      transition: "transform 0.25s ease",
+      border: "3px solid transparent",
+      backgroundImage: "linear-gradient(black, black), linear-gradient(180deg, white, 90%, #aaaaaa)"
+    }
+  },
+    image,
+    label
+  )
+
+  const cardButton = HButton({
+    style: {
+      width: cardWidth,
+      height: cardHeight,
+      borderRadius: "16px",
+      fontSize: "24px",
+      position: "relative",
+      background: "none",
+      pointerEvents: "auto",
+      touchAction: "pan-y"
+    }
+  },
+    cardInner
+  )
+
+  const setDragTransform = (dx: number) => {
+    const clamped = Math.max(-swipeDistance, Math.min(swipeDistance, dx))
+    cardInner.style.transform = `translateX(${clamped}px) rotateZ(${clamped * 0.06}deg)`
+  }
+
+  const setSelectedIndex = (nextIndex: number) => {
+    const count = games.length
+    selectedIndex = (nextIndex + count) % count
+    const game = games[selectedIndex]
+    image.src = `${game.id}-256.jpg`
+    label.textContent = game.id
+  }
+
+  const animateSwipe = (direction: "next" | "prev") => {
+    if (animating) return
+    animating = true
+
+    const multiplier = direction === "next" ? -1 : 1
+    cardInner.style.transition = "transform 0.2s ease"
+    cardInner.style.transform = `translateX(${multiplier * swipeDistance}px) rotateZ(${multiplier * swipeRotate}deg)`
+
+    window.setTimeout(() => {
+      setSelectedIndex(direction === "next" ? selectedIndex + 1 : selectedIndex - 1)
+      cardInner.style.transition = "none"
+      cardInner.style.transform = `translateX(${-multiplier * swipeDistance}px) rotateZ(${-multiplier * swipeRotate}deg)`
+      requestAnimationFrame(() => {
+        cardInner.style.transition = "transform 0.2s ease"
+        cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+      })
+      window.setTimeout(() => {
+        animating = false
+      }, 220)
+    }, 200)
+  }
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (animating) return
+    pointerActive = true
+    activePointerId = event.pointerId
+    startX = event.clientX
+    startY = event.clientY
+    lastDx = 0
+    cardInner.style.transition = "none"
+    cardButton.setPointerCapture(event.pointerId)
+  }
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (!pointerActive) return
+    pointerActive = false
+    if (activePointerId !== null) {
+      if (cardButton.hasPointerCapture(activePointerId)) {
+        cardButton.releasePointerCapture(activePointerId)
+      }
+      activePointerId = null
+    }
+
+    const dx = event.clientX - startX
+    const dy = event.clientY - startY
+    lastDx = dx
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) {
+      cardInner.style.transition = "transform 0.25s ease"
+      cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+      return
+    }
+
+    setSelectedIndex(dx < 0 ? selectedIndex + 1 : selectedIndex - 1)
+    cardInner.style.transition = "transform 0.25s ease"
+    cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+  }
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!pointerActive || animating) return
+    const dx = event.clientX - startX
+    if (Math.abs(dx - lastDx) < 2) return
+    lastDx = dx
+    setDragTransform(dx)
+  }
+
+  const onPointerCancel = () => {
+    pointerActive = false
+    if (activePointerId !== null) {
+      if (cardButton.hasPointerCapture(activePointerId)) {
+        cardButton.releasePointerCapture(activePointerId)
+      }
+      activePointerId = null
+    }
+    cardInner.style.transition = "transform 0.25s ease"
+    cardInner.style.transform = "translateX(0px) rotateZ(0deg)"
+  }
+
+  const arrowStyle = {
+    position: "relative",
+    width: "44px",
+    height: "44px",
+    fontSize: "30px",
+    borderRadius: "999px",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundImage: "none",
+    border: "2px solid #ffffff",
+    color: "#ffffff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textShadow: "none",
+    padding: "0px"
+  }
+
+  const leftArrow = HButton({
+    text: "<",
+    style: arrowStyle,
+    onRelease: () => animateSwipe("prev")
+  })
+
+  const rightArrow = HButton({
+    text: ">",
+    style: arrowStyle,
+    onRelease: () => animateSwipe("next")
+  })
+
+  const carouselRow = HDiv({
+    style: {
+      position: "relative",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      border: "none"
+    }
+  },
+    leftArrow,
+    cardButton,
+    rightArrow
+  )
+
+  cardButton.addEventListener("pointerdown", onPointerDown)
+  cardButton.addEventListener("pointermove", onPointerMove)
+  cardButton.addEventListener("pointerup", onPointerUp)
+  cardButton.addEventListener("pointercancel", onPointerCancel)
+
+  const playButton = HButton({
+    text: "Play",
+    style: {
+      position: "relative",
+      width: cardWidth,
+      height: "56px",
+      marginTop: "14px",
+      backgroundColor: "#1f8f3a",
+      backgroundImage: "linear-gradient(180deg, #7bff98, #1f8f3a)",
+      border: "3px solid #baffc9",
+      color: "#0d2b16",
+      textShadow: "none",
+      fontSize: "22px"
+    },
+    onRelease: () => {
+      startGame(games[selectedIndex], world, state)
+    }
+  })
+
+  const shell = HDiv({
+    style: {
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "12px",
+      border: "none"
+    }
+  },
+    carouselRow,
+    playButton
+  )
+
+  return { shell, playButton }
 }
 
 const Profile = (world: World): RefreshableDiv => {
@@ -274,22 +517,32 @@ const GameLobby = (): Entity => {
               flexDirection: "column"
             })
 
-            const gameButtonsShell = HtmlDiv({
-              position: "relative",
-              display: "flex",
-              gap: "20px",
-              flexDirection: "row",
-              transform: "translate(-50%)",
-              left: "50%",
-              border: "none",
-              paddingTop: "1vh",
-            })
-            shell.appendChild(gameButtonsShell)
+            const isMobileClient = Boolean(world.client?.mobile)
+            const state = world.game.state as LobbyState
 
-            for (const g of list) {
-              const gameButton = GameButton(g, world)
-              gameButtonsShell.appendChild(gameButton)
-              gameButtons.push(gameButton)
+            if (isMobileClient) {
+              shell.style.top = "30vh"
+              const mobilePicker = MobileGamePicker(list, world, state)
+              shell.appendChild(mobilePicker.shell)
+              gameButtons.push(mobilePicker.playButton)
+            } else {
+              const gameButtonsShell = HtmlDiv({
+                position: "relative",
+                display: "flex",
+                gap: "20px",
+                flexDirection: "row",
+                transform: "translate(-50%)",
+                left: "50%",
+                border: "none",
+                paddingTop: "1vh",
+              })
+              shell.appendChild(gameButtonsShell)
+
+              for (const g of list) {
+                const gameButton = GameButton(g, world)
+                gameButtonsShell.appendChild(gameButton)
+                gameButtons.push(gameButton)
+              }
             }
 
             canvasAppend(shell)
