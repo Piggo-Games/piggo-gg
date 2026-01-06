@@ -325,9 +325,9 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     style: {
       ...arrowStyle,
       position: "absolute",
-      left: "0px",
-      top: "50%",
-      transform: "translate(-50%, -50%)",
+      left: "12px",
+      top: "80%",
+      transform: "translate(-50%, 0%)",
       zIndex: 2
     },
     onRelease: () => animateSwipe("prev")
@@ -338,9 +338,9 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     style: {
       ...arrowStyle,
       position: "absolute",
-      right: "0px",
-      top: "50%",
-      transform: "translate(50%, -50%)",
+      right: "12px",
+      top: "80%",
+      transform: "translate(50%, 0%)",
       zIndex: 2
     },
     onRelease: () => animateSwipe("next")
