@@ -358,8 +358,8 @@ const MobileGamePicker = (games: GameBuilder[], world: World, state: LobbyState)
     }
   },
     carouselTrack,
-    leftArrow,
-    rightArrow
+    // leftArrow,
+    // rightArrow
   )
 
   carouselTrack.addEventListener("pointerdown", onPointerDown)
