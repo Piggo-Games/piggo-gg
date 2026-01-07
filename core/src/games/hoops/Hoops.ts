@@ -232,7 +232,6 @@ const HoopsSystem = SystemBuilder({
                 y: ownerPos.data.y + offset.y,
                 z: carryZ
               })
-              console.log("carrying", ballPos.data.z)
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
                 y: ownerPos.localVelocity.y,
