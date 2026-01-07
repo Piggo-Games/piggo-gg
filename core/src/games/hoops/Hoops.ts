@@ -7,12 +7,12 @@ import {
 } from "@piggo-gg/core"
 import {
   BALL_ORBIT_DISTANCE, BALL_PICKUP_COOLDOWN_TICKS, BALL_PICKUP_RANGE,
-  BALL_PICKUP_Z, BALL_STEAL_RANGE, COURT_CENTER, COURT_HEIGHT, COURT_SPLAY,
-  COURT_WIDTH, DRIBBLE_BOUNCE, DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
+  BALL_PICKUP_Z, COURT_CENTER, COURT_HEIGHT, COURT_SPLAY, COURT_WIDTH,
+  DRIBBLE_BOUNCE, DRIBBLE_GRAVITY, SCORE_RESET_TICKS, SHOT_CHARGE_Z
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
-import { type Factor, getShotChance } from "./HoopsShot"
+import { getShotChance } from "./HoopsShot"
 import { MobileUI } from "./MobileUI"
 
 export type HoopsState = {
@@ -86,7 +86,6 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       Goal1(),
       Centerline(),
       CenterCircle(),
-      // ...HoopSet(),
       ScorePanel(),
       HtmlChat(),
       EscapeMenu(world),
@@ -136,7 +135,6 @@ const HoopsSystem = SystemBuilder({
 
       ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setRotation(0).setGravity(0.1)
       ballPos.setPosition({ x: COURT_CENTER.x, y: 0, z: 0 })
-      ballPos.data.follows = null
       ballPos.data.offset = { x: 0, y: 0 }
     }
 
@@ -150,8 +148,7 @@ const HoopsSystem = SystemBuilder({
       state.ballOwnerTeam = team
       state.dribbleLocked = false
 
-      ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0)
-      ballPos.data.follows = playerId
+      ballPos.setVelocity({ x: 0, y: 0, z: 0 }).setGravity(0).setPosition({ z: 3.6 })
 
       if (ball?.components.collider) ball.components.collider.setGroup("none")
     }
@@ -189,8 +186,7 @@ const HoopsSystem = SystemBuilder({
           state.ballOwner = ""
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
-          resetBall()
-          console.log("reset after score")
+          // resetBall()
         }
 
         // remove ownership if owner missing
@@ -226,25 +222,23 @@ const HoopsSystem = SystemBuilder({
             ballPos.data.offset = offset
 
             if (!shouldDribble) {
-              ballPos.data.follows = null
               ballPos.setGravity(0)
               ballPos.setVelocity({
                 x: ownerPos.data.velocity.x,
-                y: ownerPos.data.velocity.y,
-                // z: 0
+                y: ownerPos.data.velocity.y
               })
               ballPos.setPosition({
                 x: ownerPos.data.x + offset.x,
                 y: ownerPos.data.y + offset.y,
                 z: carryZ
               })
+              console.log("carrying", ballPos.data.z)
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
                 y: ownerPos.localVelocity.y,
                 z: ownerPos.localVelocity.z
               }
             } else {
-              ballPos.data.follows = null
               ballPos.setGravity(DRIBBLE_GRAVITY + 0.0005 * ownerPos.getSpeed())
               ballPos.setVelocity({
                 x: ownerPos.data.velocity.x,
@@ -254,12 +248,6 @@ const HoopsSystem = SystemBuilder({
                 x: ownerPos.data.x + offset.x,
                 y: ownerPos.data.y + offset.y
               })
-
-              if (ballPos.data.z <= 0 && ballPos.data.velocity.z <= 0) {
-                ballPos.setPosition({ z: 0 })
-                ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
-                world.client?.sound.playChoice(["bounce1", "bounce2", "bounce3", "bounce4"])
-              }
 
               ballPos.localVelocity = {
                 x: ownerPos.localVelocity.x,
@@ -271,32 +259,36 @@ const HoopsSystem = SystemBuilder({
             if (ball?.components.collider) ball.components.collider.setGroup("none")
           }
         } else {
-          ballPos.data.follows = null
           ballPos.data.offset = { x: 0, y: 0 }
 
           if (ball?.components.collider) ball.components.collider.setGroup("2")
         }
 
+        if (ballPos.data.z <= 0 && ballPos.data.velocity.z <= -0.01) {
+          ballPos.setVelocity({ z: DRIBBLE_BOUNCE })
+          world.client?.sound.playChoice(["bounce1", "bounce2", "bounce3", "bounce4"])
+        }
+
         // dash steal
-        if (state.ballOwner) {
-          for (const player of players) {
-            const team = player.components.team.data.team
-            if (team === state.ballOwnerTeam) continue
+        // if (state.ballOwner) {
+        //   for (const player of players) {
+        //     const team = player.components.team.data.team
+        //     if (team === state.ballOwnerTeam) continue
 
             // const dashUntil = getDashUntil(state.dashActive, player.id)
             // if (!dashUntil || dashUntil < world.tick) continue
 
-            const distance = hypot(
-              player.components.position.data.x - ballPos.data.x,
-              player.components.position.data.y - ballPos.data.y
-            )
+        //     const distance = hypot(
+        //       player.components.position.data.x - ballPos.data.x,
+        //       player.components.position.data.y - ballPos.data.y
+        //     )
 
-            if (distance <= BALL_STEAL_RANGE) {
-              assignBall(player.id, team)
-              break
-            }
-          }
-        }
+        //     if (distance <= BALL_STEAL_RANGE) {
+        //       assignBall(player.id, team)
+        //       break
+        //     }
+        //   }
+        // }
 
         // auto pickup
         if (!state.ballOwner && ballPos.data.z <= BALL_PICKUP_Z) {
@@ -334,7 +326,7 @@ const HoopsSystem = SystemBuilder({
             })
             state.shotFactors = shotChance.factors.map(f => f.name)
             state.shotChance = shotChance.total
-            console.log("shot chance:", state.shotChance)
+            // console.log("shot chance:", state.shotChance)
           } else {
             state.shotFactors = []
             state.shotChance = 0
@@ -393,10 +385,6 @@ const controls: HUDSystemProps = {
       label: "pass",
       buttons: [["mb2"]]
     },
-    // {
-    //   label: "dash",
-    //   buttons: [["shift"]]
-    // },
     {
       label: "menu",
       buttons: [["esc"]]
