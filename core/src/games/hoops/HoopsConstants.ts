@@ -19,6 +19,7 @@ export const HOOP_SCORE_Z = 10
 export const BACKBOARD_WIDTH = 40
 export const BACKBOARD_HEIGHT = 18
 export const BACKBOARD_Z = 16
+export const HOOP_TARGET = { x: -27, y: 0, z: 36 }
 
 export const BALL_ORBIT_DISTANCE = 16
 export const BALL_PICKUP_RANGE = 12
@@ -44,6 +45,16 @@ export const SHOT_CHARGE_MAX = 1.3
 export const SHOT_CHARGE_Z = 3.6
 export const SHOT_CHARGE_LINE_MAX = 45
 export const SHOT_CHARGE_LINE_OFFSET = 8
+export const SHOT_BASE_CHANCE = 65
+export const SHOT_DISTANCE_MAX = 500
+export const SHOT_DISTANCE_BONUS = 25
+export const SHOT_DISTANCE_PENALTY = -70
+export const SHOT_AIM_SCALE = 12
+export const SHOT_JUMP_PENALTY = -5
+export const SHOT_BLOCKER_RANGE = 28
+export const SHOT_BLOCKER_PENALTY = -8
+export const SHOT_MISS_OFFSET_MIN = 10
+export const SHOT_MISS_OFFSET_MAX = 24
 
 export const DASH_COOLDOWN_TICKS = 30
 export const DASH_ACTIVE_TICKS = 8
