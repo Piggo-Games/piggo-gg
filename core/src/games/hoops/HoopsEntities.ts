@@ -1,13 +1,40 @@
 import {
   Collider, Debug, Entity, LineWall, Networked, PI, Position,
-  Renderable, Shadow, XY, arc, asin, loadTexture, min, pixiGraphics
+  Renderable, Shadow, XY, arc, asin, loadTexture, min, minmax, pixiGraphics
 } from "@piggo-gg/core"
 import {
   COURT_CENTER, COURT_CENTER_CIRCLE_RADIUS_X, COURT_CENTER_CIRCLE_RADIUS_Y, COURT_HEIGHT,
   COURT_LINE_WIDTH, COURT_LINE_Y_SCALE, COURT_SPLAY, COURT_WIDTH, FREE_THROW_CIRCLE_RADIUS,
   FREE_THROW_DISTANCE, FREE_THROW_LANE_WIDTH, HOOP_OFFSET_X, THREE_POINT_RADIUS, THREE_POINT_SIDE_Y
 } from "./HoopsConstants"
+import { type HoopsState } from "./Hoops"
 import { Graphics, Texture } from "pixi.js"
+
+const OUTLINE_RED = 0xff3b30
+const OUTLINE_ORANGE = 0xffa500
+const OUTLINE_GREEN = 0x55ff00
+
+const lerpChannel = (a: number, b: number, t: number) => {
+  return Math.round(a + (b - a) * t)
+}
+
+const lerpColor = (a: number, b: number, t: number) => {
+  const ar = (a >> 16) & 0xff
+  const ag = (a >> 8) & 0xff
+  const ab = a & 0xff
+  const br = (b >> 16) & 0xff
+  const bg = (b >> 8) & 0xff
+  const bb = b & 0xff
+  return (lerpChannel(ar, br, t) << 16) | (lerpChannel(ag, bg, t) << 8) | lerpChannel(ab, bb, t)
+}
+
+const shotChanceToOutlineColor = (shotChance: number) => {
+  const t = minmax(shotChance, 0, 100) / 100
+  if (t <= 0.5) {
+    return lerpColor(OUTLINE_RED, OUTLINE_ORANGE, t / 0.5)
+  }
+  return lerpColor(OUTLINE_ORANGE, OUTLINE_GREEN, (t - 0.5) / 0.5)
+}
 
 export const Ball = () => Entity({
   id: "ball",
@@ -23,6 +50,23 @@ export const Ball = () => Entity({
       interpolate: true,
       scaleMode: "nearest",
       rotates: true,
+      onTick: ({ entity: ball, world }) => {
+        const clientPlayer = world.client?.character()
+        if (!clientPlayer) {
+          ball.components.renderable.setOutline({ color: 0x000000, thickness: 0 })
+          return
+        }
+
+        const state = world.game.state as HoopsState
+        if (state.ballOwner === clientPlayer.id) {
+          ball.components.renderable.setOutline({
+            color: shotChanceToOutlineColor(state.shotChance),
+            thickness: 2
+          })
+        } else {
+          ball.components.renderable.setOutline({ color: 0x000000, thickness: 0 })
+        }
+      },
       setup: async (r) => {
         r.setBevel({ lightAlpha: 0.5 })
 
