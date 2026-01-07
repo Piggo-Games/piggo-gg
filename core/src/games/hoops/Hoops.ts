@@ -12,6 +12,7 @@ import {
 } from "./HoopsConstants"
 import { Ball, CenterCircle, Centerline, Court, CourtLines, Goal1 } from "./HoopsEntities"
 import { Howard } from "./Howard"
+import { type Factor, getShotChance } from "./HoopsShot"
 import { MobileUI } from "./MobileUI"
 
 export type HoopsState = {
@@ -23,6 +24,8 @@ export type HoopsState = {
   shotTick: number
   shotPlayer: string
   lastShotValue: 2 | 3
+  shotFactors: string[]
+  shotChance: number
   ballOwner: string
   ballOwnerTeam: 0 | 1 | 2
   dribbleLocked: boolean
@@ -50,6 +53,8 @@ export const Hoops: GameBuilder<HoopsState, HoopsSettings> = {
       shotTick: 0,
       shotPlayer: "",
       lastShotValue: 2,
+      shotFactors: [],
+      shotChance: 0,
       ballOwner: "",
       ballOwnerTeam: 0,
       dribbleLocked: false
@@ -164,7 +169,7 @@ const HoopsSystem = SystemBuilder({
         const ballPos = ball?.components.position
         if (!ballPos) return
 
-        const players = world.queryEntities<Position | Team | Renderable>(["position", "team", "input"])
+        const players = world.queryEntities<Position | Team>(["position", "team", "input"])
 
         // reset after score
         if (state.phase === "score" && (world.tick - state.scoredTick) > SCORE_RESET_TICKS) {
@@ -179,6 +184,8 @@ const HoopsSystem = SystemBuilder({
           state.shotTick = 0
           state.shotPlayer = ""
           state.lastShotValue = 2
+          state.shotFactors = []
+          state.shotChance = 0
           state.ballOwner = ""
           state.ballOwnerTeam = 0
           state.dribbleLocked = false
@@ -317,10 +324,30 @@ const HoopsSystem = SystemBuilder({
           if (closest) assignBall(closest.id, closest.team)
         }
 
+        if (state.ballOwner) {
+          const owner = world.entity<Position | Team>(state.ballOwner)
+          if (owner?.components.position && owner?.components.team) {
+            const shotChance = getShotChance({
+              ballPos: ballPos.data,
+              shooter: owner,
+              players
+            })
+            state.shotFactors = shotChance.factors.map(f => f.name)
+            state.shotChance = shotChance.total
+            console.log("shot chance:", state.shotChance)
+          } else {
+            state.shotFactors = []
+            state.shotChance = 0
+          }
+        } else {
+          state.shotFactors = []
+          state.shotChance = 0
+        }
+
         // swish sound when the ball drops through the hoop
         if (!state.ballOwner && state.phase !== "score" && ballPos.data.velocity.z < 0 && ballPos.data.z >= 36) {
 
-          const dist = XYdistance( ballPos.data, { x: -26, y: 0 } )
+          const dist = XYdistance(ballPos.data, { x: -26, y: 0 })
 
           if (dist < 6) {
             console.log("swoosh")

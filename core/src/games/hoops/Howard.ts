@@ -1,18 +1,19 @@
 import {
-  Action, Actions, Character, Collider, Debug, Input, Networked, PixiSkins,
+  Action, Actions, Character, Collider, Debug, Entity, Input, Networked, PixiSkins,
   Player, Point, Position, Renderable, Shadow, Team, VolleyCharacterAnimations,
-  VolleyCharacterDynamic, WASDInputMap, XY, cos, hypot, max, min, sin
+  VolleyCharacterDynamic, WASDInputMap, XY, PI, cos, hypot, max, min, sin
 } from "@piggo-gg/core"
 import {
-  COURT_WIDTH, PASS_GRAVITY, PASS_SPEED, PASS_UP,
-  SHOT_GRAVITY, SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
+  COURT_WIDTH, HOOP_TARGET, PASS_GRAVITY, PASS_SPEED, PASS_UP,
+  SHOT_GRAVITY, SHOT_MISS_OFFSET_MAX, SHOT_MISS_OFFSET_MIN,
+  SHOT_UP_MAX, SHOT_UP_MIN, SHOT_UP_SCALE
 } from "./HoopsConstants"
 import { type HoopsState } from "./Hoops"
 import { isThreePointShot } from "./HoopsEntities"
+import { getShotChance } from "./HoopsShot"
 
 export const HOWARD_SPEED = 135
 export const HOWARD_ACCEL = 80
-const HOOP_TARGET = { x: -27, y: 0, z: 36 }
 
 export const Howard = (player: Player) => {
   const seed = player.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -209,10 +210,6 @@ const shootBall = Action("shoot", ({ entity, world }) => {
   state.shotTick = world.tick
   state.shotPlayer = entity.id
 
-  const dx = HOOP_TARGET.x - ballPos.data.x
-  const dy = HOOP_TARGET.y - ballPos.data.y
-  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
-
   const shooterPos = entity.components.position?.data
   if (shooterPos) {
     state.lastShotValue = isThreePointShot(shooterPos) ? 3 : 2
@@ -220,19 +217,34 @@ const shootBall = Action("shoot", ({ entity, world }) => {
     state.lastShotValue = 2
   }
 
+  const isMake = world.random.next() * 100 <= state.shotChance
+  const missAngle = world.random.next() * PI * 2
+  const missRadius = SHOT_MISS_OFFSET_MIN + world.random.next() * (SHOT_MISS_OFFSET_MAX - SHOT_MISS_OFFSET_MIN)
+  const target = isMake ? HOOP_TARGET : {
+    x: HOOP_TARGET.x + cos(missAngle) * missRadius,
+    y: HOOP_TARGET.y + sin(missAngle) * missRadius,
+    z: HOOP_TARGET.z
+  }
+
+  console.log(`Shot by ${entity.id}: ${isMake ? "MAKE" : "MISS"} (${state.shotChance.toFixed(1)}% chance)`)
+
+  const dx = target.x - ballPos.data.x
+  const dy = target.y - ballPos.data.y
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+
   const distance = hypot(dx, dy)
   const distanceCharge = min(1, distance / SHOT_UP_SCALE)
   let up = SHOT_UP_MIN + (SHOT_UP_MAX - SHOT_UP_MIN) * distanceCharge
   const originZ = max(1.5, ballPos.data.z)
 
-  if (HOOP_TARGET.z > originZ) {
-    const minUp = Math.sqrt(2 * SHOT_GRAVITY * (HOOP_TARGET.z - originZ)) - 0.5 * SHOT_GRAVITY
+  if (target.z > originZ) {
+    const minUp = Math.sqrt(2 * SHOT_GRAVITY * (target.z - originZ)) - 0.5 * SHOT_GRAVITY
     if (minUp > up) up = minUp
   }
 
   const a = -0.5 * SHOT_GRAVITY
   const b = up + 0.5 * SHOT_GRAVITY
-  const c = originZ - HOOP_TARGET.z
+  const c = originZ - target.z
   const discriminant = b * b - 4 * a * c
   if (discriminant <= 0) return
 

@@ -3,6 +3,8 @@
 Update this first, then align code with the design.
 
 ## TODOs
+[x] shooting should always be a %chance. several factors will be layered at any given time (distance, pointing direction, nearby blockers, jumping, etc.)
+
 [x] 3-point line works
 [x] ball should always extend away from the player (can't be inside the player)
 [x] player should always face the direction of the goal they're trying to score on (team-based)
